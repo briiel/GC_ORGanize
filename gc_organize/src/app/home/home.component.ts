@@ -1,18 +1,27 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalService } from '../modal.service';
 import { RegistermodalComponent } from '../registermodal/registermodal.component';
+import { ViewmodalComponent } from '../viewmodal/viewmodal.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   standalone: true,
-  imports: [CommonModule, RegistermodalComponent]
+  imports: [CommonModule, RegistermodalComponent, ViewmodalComponent]
 })
 export class HomeComponent {
   dropdownVisible = false;
   notificationDropdownVisible = false;
+
+  // Method to scroll to the top of the page
+  scrollToTop(): void {
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
 
   toggleDropdown() {
     this.dropdownVisible = !this.dropdownVisible;
@@ -56,5 +65,15 @@ export class HomeComponent {
 
   closeRegisterModal() {
     this.isRegisterModalOpen = false;
+  }
+
+  isViewModalOpen = false;
+
+  openViewModal() {
+    this.isViewModalOpen = true;
+  }
+
+  closeViewModal() {
+    this.isViewModalOpen = false;
   }
 }

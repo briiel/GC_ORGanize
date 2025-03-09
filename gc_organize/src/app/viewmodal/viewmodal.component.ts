@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-viewmodal',
@@ -7,5 +7,10 @@ import { Component } from '@angular/core';
   styleUrl: './viewmodal.component.css'
 })
 export class ViewmodalComponent {
+  @Output() close = new EventEmitter<void>();
 
+  closeModal() {
+    this.close.emit();
+  }
 }
+

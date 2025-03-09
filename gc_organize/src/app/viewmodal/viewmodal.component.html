@@ -1,1 +1,28 @@
-<p>viewmodal works!</p>
+<div class="modal-overlay">
+  <div class="modal-content relative max-w-4xl h-96 rounded-3xl overflow-hidden shadow-lg flex border-3 border-[#679436] bg-white">
+    <button (click)="closeModal()" class="absolute top-4 right-4 p-2 text-gray-600 hover:text-[#AA0000] cursor-pointer">
+      <i class="fas fa-times text-2xl"></i>
+    </button>
+    <div class="w-1/3">
+      <img class="w-full h-full object-contain" src="JFINEX_OPERATION.jpg" alt="Event Image">
+    </div>
+    <div class="w-2/3 p-8 overflow-y-auto">
+      <div class="font-bold text-3xl mb-6">Sample Event Title</div>
+      <p class="text-gray-700 text-lg mb-8">
+        This is a sample description for the event. It provides an overview of what the event is all about. 
+      </p>
+      <div class="flex items-center text-gray-600 text-lg mb-6">
+        <i class="fas fa-map-marker-alt mr-3"></i>
+        <span>Venue: Sample Venue</span>
+      </div>
+      <div class="flex items-center text-gray-600 text-lg mb-6">
+        <i class="fas fa-calendar-alt mr-3"></i>
+        <span>Date: March 15, 2025</span>
+      </div>
+      <div class="flex items-center text-gray-600 text-lg">
+        <i class="fas fa-clock mr-3"></i>
+        <span>Time: 10:00 AM - 2:00 PM</span>
+      </div>
+    </div>
+  </div>
+</div>

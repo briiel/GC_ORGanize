@@ -22,16 +22,16 @@
   </div>
 
   <!-- Main content -->
-  <div class="flex-1 p-6 bg-gray-100 overflow-y-auto">
+  <div class="flex-1 p-6 bg-gray-100 overflow-y-auto" id="main-content">
     <div class="flex flex-col md:flex-row items-center justify-between mb-4">
       <div class="flex items-center space-x-2 mb-4 md:mb-0">
         <div class="relative">
           <input type="text" placeholder="Search..." class="w-full md:w-96 px-4 py-2 border rounded-lg pl-10">
           <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
         </div>
-        <button class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e]">Search</button>
+        <button class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer">Search</button>
         <button class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-          <i class="fas fa-filter"></i>
+          <i class="fas fa-filter cursor-pointer"></i>
         </button>
       </div>
       <div class="flex items-center space-x-4">
@@ -48,6 +48,7 @@
           <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" (click)="toggleDropdown()">
             <i class="fas fa-user text-gray-600 text-2xl"></i>
             <span>Account</span>
+            <i class="fas fa-chevron-down text-gray-600 text-sm"></i> <!-- Added arrow icon -->
           </div>
           <div id="dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden z-50">
             <div class="arrow-up"></div>
@@ -75,7 +76,7 @@
             <span><i class="fas fa-clock mr-2"></i>Time: 10:00 AM</span>
           </div>
           <div class="flex justify-end space-x-2 mt-4">
-            <button class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
+            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
             <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
           </div>
         </div>
@@ -96,7 +97,7 @@
             <span><i class="fas fa-clock mr-2"></i>Time: 11:00 AM</span>
           </div>
           <div class="flex justify-end space-x-2 mt-4">
-            <button class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
+            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
             <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
           </div>
         </div>
@@ -117,7 +118,7 @@
             <span><i class="fas fa-clock mr-2"></i>Time: 12:00 PM</span>
           </div>
           <div class="flex justify-end space-x-2 mt-4">
-            <button class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
+            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
             <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
           </div>
         </div>
@@ -138,13 +139,21 @@
             <span><i class="fas fa-clock mr-2"></i>Time: 01:00 PM</span>
           </div>
           <div class="flex justify-end space-x-2 mt-4">
-            <button class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
+            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
             <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Back to Top Button -->
+    <div class="fixed bottom-4 right-4">
+      <button (click)="scrollToTop()" class="px-6 py-4 bg-[#05668D] text-white rounded-full hover:bg-[#034f6b] cursor-pointer text-2xl transition-transform transform hover:scale-110 shadow-md hover:shadow-lg">
+        <i class="fas fa-arrow-up"></i>
+      </button>
+    </div>
+    
     <app-registermodal *ngIf="isRegisterModalOpen" (close)="closeRegisterModal()"></app-registermodal>
+    <app-viewmodal *ngIf="isViewModalOpen" (close)="closeViewModal()"></app-viewmodal>
   </div>
 </div>
