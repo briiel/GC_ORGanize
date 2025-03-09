@@ -1,0 +1,43 @@
+.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+}
+
+.bg-gray-800 {
+    background-color: rgba(31, 41, 55, 0.75);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .bg-white {
+        padding: 1rem;
+        margin: 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .bg-white {
+        padding: 2rem;
+        margin: 2rem;
+    }
+}
+
+@media (min-width: 1025px) {
+    .bg-white {
+        padding: 3rem;
+        margin: 3rem;
+    }
+}
+
+
+
+
+
+
+
+
+

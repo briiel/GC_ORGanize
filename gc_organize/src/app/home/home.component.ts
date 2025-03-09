@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ModalService } from '../modal.service';
+import { RegistermodalComponent } from '../registermodal/registermodal.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
-  imports: [CommonModule]})
-
+  standalone: true,
+  imports: [CommonModule, RegistermodalComponent]
+})
 export class HomeComponent {
   dropdownVisible = false;
   notificationDropdownVisible = false;
@@ -35,5 +38,23 @@ export class HomeComponent {
     if (dropdown) {
       dropdown.classList.add('hidden');
     }
+  }
+
+  updateBackgroundImage(event: Event, bgElementId: string): void {
+    const imgElement = event.target as HTMLImageElement;
+    const bgElement = document.getElementById(bgElementId);
+    if (bgElement && imgElement) {
+      bgElement.style.backgroundImage = `url('${imgElement.src}')`;
+    }
+  }
+
+  isRegisterModalOpen = false;
+
+  openRegisterModal() {
+    this.isRegisterModalOpen = true;
+  }
+
+  closeRegisterModal() {
+    this.isRegisterModalOpen = false;
   }
 }
