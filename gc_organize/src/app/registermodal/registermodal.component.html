@@ -1,5 +1,5 @@
 <div class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75" style="z-index: 1000;">
-  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-5xl mx-4 md:mx-auto" style="outline: 2px solid #679436;">
+  <div class="scrollable-container bg-white rounded-lg shadow-lg p-6 w-full max-w-5xl mx-4 md:mx-auto" style="outline: 2px solid #679436;">
     <h2 class="text-2xl font-bold mb-4">Event Registration</h2>
     <form>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
@@ -47,9 +47,43 @@
             <option value="CHTM">CHTM</option>
           </select>
         </div>
-        <div class="mb-6"> <!-- Added margin-bottom here -->
+        <div class="mb-6">
           <label for="program" class="block text-sm font-medium text-gray-700">Program:</label>
           <input type="text" id="program" name="program" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+        </div>
+      </div>
+      <div class="mb-6">
+        <label for="dropzone-file" class="block text-sm font-medium text-gray-700">Proof of Payment (If Applicable):</label>
+        <div class="flex items-center justify-center w-full">
+          <div class="flex flex-col items-center justify-center w-full">
+            <div class="flex flex-wrap gap-4 mb-4">
+              <div *ngFor="let image of imageSrcs; let i = index" class="flex-shrink-0 relative">
+                <img [src]="image" alt="Image Preview" class="w-32 h-32 object-cover rounded-md">
+                <button type="button" (click)="removeImage(i)" class="absolute top-0 right-0 bg-red-600 text-white font-bold w-6 h-6 rounded-full hover:bg-red-700 cursor-pointer flex items-center justify-center">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="flex flex-col items-center justify-center">
+                <button *ngIf="imageSrcs.length > 0" type="button" (click)="triggerFileInput()" class="bg-[#679436] text-white font-bold w-12 h-12 rounded-md hover:bg-[#4e732b] cursor-pointer flex items-center justify-center mb-2">
+                  <i class="fas fa-plus"></i>
+                </button>
+                <button *ngIf="imageSrcs.length > 0" type="button" (click)="removeAllImages()" class="bg-red-600 text-white font-bold w-12 h-12 rounded-md hover:bg-red-700 cursor-pointer flex items-center justify-center">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <label *ngIf="imageSrcs.length === 0" for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                </svg>
+                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+                <p class="text-xs text-gray-500">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+              </div>
+              <input id="dropzone-file" type="file" class="hidden" (change)="previewImages($event)" multiple />
+            </label>
+            <input id="hidden-file-input" type="file" class="hidden" (change)="previewImages($event)" multiple />
+          </div>
         </div>
       </div>
       <div class="flex justify-end mt-4">

@@ -11,6 +11,11 @@
     background-color: rgba(31, 41, 55, 0.75);
 }
 
+.scrollable-container {
+    max-height: 90vh; /* Adjust as needed */
+    overflow-y: auto;
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .bg-white {
