@@ -1,0 +1,82 @@
+<div class="min-h-screen bg-gray-100 p-4">
+    <div class="overflow-x-auto">
+      <!-- Label for the table -->
+      <h1 class="text-2xl font-bold text-gray-800 mb-4">Events Registered</h1>
+
+      <!-- Wrap the table in a container with rounded corners and overflow-hidden -->
+      <div class="m-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
+        <table class="w-full">
+          <thead class="bg-[#679436]">
+            <tr class="uppercase text-sm tracking-wider text-white">
+              <th class="px-4 py-2 border-b border-gray-200 text-center">No.</th>
+              <th class="px-4 py-2 border-b border-gray-200 text-left">Event Name</th>
+              <th class="px-4 py-2 border-b border-gray-200 text-center">Status</th>
+              <th class="px-4 py-2 border-b border-gray-200 text-center">QR Code</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+            <!-- Row 1 -->
+            <tr class="hover:bg-gray-200 transition-colors duration-200">
+              <td class="px-4 py-2 text-center">1</td>
+              <td class="px-4 py-2">Sample Event</td>
+              <td class="px-4 py-2 text-center">
+                <span class="text-green-600 font-bold">Active</span>
+              </td>
+              <td class="px-4 py-2">
+                <div class="flex flex-col items-center space-y-3">
+                  <button
+                    (click)="toggleQRCode(1)"
+                    class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold py-2 px-4 rounded-md transition-transform duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#56732e] focus:ring-opacity-75">
+                    Generate QR Code
+                  </button>
+                  <div *ngIf="activeRow === 1" class="p-4 bg-gray-50 rounded-lg shadow-lg border border-gray-200">
+                    <qrcode [qrdata]="qrCodeData!" [width]="100" [errorCorrectionLevel]="'M'"></qrcode>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <!-- Row 2 -->
+            <tr class="hover:bg-gray-200 transition-colors duration-200">
+              <td class="px-4 py-2 text-center">2</td>
+              <td class="px-4 py-2">Tech Summit 2023</td>
+              <td class="px-4 py-2 text-center">
+                <span class="text-red-600 font-bold">Inactive</span>
+              </td>
+              <td class="px-4 py-2">
+                <div class="flex flex-col items-center space-y-3">
+                  <button
+                    (click)="toggleQRCode(2)"
+                    class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold py-2 px-4 rounded-md transition-transform duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#56732e] focus:ring-opacity-75">
+                    Generate QR Code
+                  </button>
+                  <div *ngIf="activeRow === 2" class="p-4 bg-gray-50 rounded-lg shadow-lg border border-gray-200">
+                    <qrcode [qrdata]="qrCodeData!" [width]="100" [errorCorrectionLevel]="'M'"></qrcode>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <!-- Row 3 -->
+            <tr class="hover:bg-gray-200 transition-colors duration-200">
+              <td class="px-4 py-2 text-center">3</td>
+              <td class="px-4 py-2">Developer Meetup</td>
+              <td class="px-4 py-2 text-center">
+                <span class="text-green-600 font-bold">Active</span>
+              </td>
+              <td class="px-4 py-2">
+                <div class="flex flex-col items-center space-y-3">
+                  <button
+                    (click)="toggleQRCode(3)"
+                    class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold py-2 px-4 rounded-md transition-transform duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#56732e] focus:ring-opacity-75">
+                    Generate QR Code
+                  </button>
+                  <div *ngIf="activeRow === 3" class="p-4 bg-gray-50 rounded-lg shadow-lg border border-gray-200">
+                    <qrcode [qrdata]="qrCodeData!" [width]="100" [errorCorrectionLevel]="'M'"></qrcode>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+</div>

@@ -17,10 +17,7 @@ export class HomeComponent {
 
   // Method to scroll to the top of the page
   scrollToTop(): void {
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   toggleDropdown() {
