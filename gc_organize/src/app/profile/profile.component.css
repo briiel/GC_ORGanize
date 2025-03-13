@@ -1,0 +1,15 @@
+.profile-section {
+  transition: all 0.3s ease;
+}
+
+.profile-section:hover {
+  transform: translateY(-2px);
+}
+
+.activity-icon {
+  transition: all 0.3s ease;
+}
+
+.activity-icon:hover {
+  transform: scale(1.1);
+}

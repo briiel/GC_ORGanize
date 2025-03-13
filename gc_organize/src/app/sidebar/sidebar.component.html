@@ -1,28 +1,41 @@
-<div class="flex h-screen">
-    <!-- Sidebar -->
-    <div class="w-64 bg-[#679436] text-white flex flex-col items-center fixed h-full">
-      <div class="p-4 flex flex-col items-center space-y-2">
-        <img src="GC-Logo.png" alt="Logo" class="w-24 h-24 object-contain">
-        <h1 class="text-2xl font-bold">GC-ORGANIZE</h1>
-      </div>
-      <nav class="flex-1 px-2 py-4 w-full">
-        <button [routerLink]="'/sidebar/home'" class="flex items-center px-4 py-2 mt-2 text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
-          <i class="fas fa-home mr-2 text-xl"></i> Home
-        </button>
-        <button [routerLink]="'/sidebar/eventsreg'" class="flex items-center px-4 py-2 mt-2 text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
-          <i class="fas fa-calendar-check mr-2 text-xl"></i> Events Registered
-        </button>
-        <button class="flex items-center px-4 py-2 mt-2 text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
-          <i class="fas fa-certificate mr-2 text-xl"></i> E-Certificates
-        </button>
-        <button class="flex items-center px-4 py-2 mt-2 text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
-          <i class="fas fa-info-circle mr-2 text-xl"></i> About
-        </button>
-      </nav>      
+<div class="flex h-screen relative">
+    <!-- Mobile Menu Button - Updated positioning and size -->
+    <button (click)="toggleSidebar()" class="lg:hidden fixed top-4 left-4 z-20 text-[#679436] p-2 rounded-lg bg-white shadow-md">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
+
+    <!-- Backdrop overlay for mobile -->
+    <div *ngIf="isSidebarOpen" 
+         class="fixed inset-0 bg-black/30 backdrop-blur-sm z-0 lg:hidden"
+         (click)="toggleSidebar()">
     </div>
 
-    <!-- Main Content Area -->
-    <div class="ml-64 flex-1 overflow-y-auto h-screen">
+    <!-- Sidebar - Updated for better mobile experience -->
+    <div [class.translate-x-0]="isSidebarOpen" 
+         [class.-translate-x-full]="!isSidebarOpen" 
+         class="w-64 bg-[#679436] text-white flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-10 shadow-lg">
+        <div class="p-4 flex flex-col items-center space-y-2 mt-8 lg:mt-0">
+            <img src="GC-Logo.png" alt="Logo" class="w-16 h-16 sm:w-24 sm:h-24 object-contain">
+            <h1 class="text-xl sm:text-2xl font-bold text-center">GC-ORGANIZE</h1>
+        </div>
+        <nav class="flex-1 px-2 py-4 w-full space-y-2">
+            <button [routerLink]="'/sidebar/home'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <i class="fas fa-home mr-2 text-lg sm:text-xl"></i> Home
+            </button>
+            <button [routerLink]="'/sidebar/eventsreg'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <i class="fas fa-calendar-check mr-2 text-lg sm:text-xl"></i> Events Registered
+            </button>
+            <button [routerLink]="'/sidebar/ecertificate'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificates
+            </button>
+            <button class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <i class="fas fa-info-circle mr-2 text-lg sm:text-xl"></i> About
+            </button>
+        </nav>      
+    </div>
+
+    <!-- Main Content Area - Added padding for mobile menu button -->
+    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0">
         <router-outlet></router-outlet>
     </div>
 </div>

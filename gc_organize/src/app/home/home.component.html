@@ -1,19 +1,25 @@
   <!-- Main content -->
-  <div class="flex-1 p-6 bg-gray-100 overflow-y-auto" id="main-content">
-    <div class="flex flex-col md:flex-row items-center justify-between mb-4">
-      <div class="flex items-center space-x-2 mb-4 md:mb-0">
-        <div class="relative">
-          <input type="text" placeholder="Search..." class="w-full md:w-96 px-4 py-2 border rounded-lg pl-10">
+  <div class="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto" id="main-content">
+    <!-- Top section with responsive layout -->
+    <div class="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between mb-4">
+      <!-- Search section -->
+      <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
+        <div class="relative w-full">
+          <input type="text" placeholder="Search..." class="w-full min-w-full sm:min-w-0 sm:w-[300px] lg:w-[400px] px-4 py-2 border rounded-lg pl-10">
           <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
         </div>
-        <button class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer">Search</button>
-        <button class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-          <i class="fas fa-filter cursor-pointer"></i>
-        </button>
+        <div class="flex space-x-2 w-full sm:w-auto justify-center mt-2 sm:mt-0">
+          <button class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer">Search</button>
+          <button class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+            <i class="fas fa-filter cursor-pointer"></i>
+          </button>
+        </div>
       </div>
-      <div class="flex items-center space-x-4">
+
+      <!-- User controls -->
+      <div class="flex items-center justify-center space-x-4 mt-4 lg:mt-0">
         <div class="relative">
-          <i class="fas fa-bell text-yellow-500 cursor-pointer text-2xl" (click)="toggleNotificationDropdown()"></i>
+          <i class="fas fa-bell text-yellow-500 cursor-pointer text-xl sm:text-2xl"></i>
           <div id="notificationDropdown" class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-2 hidden z-50">
             <div class="arrow-up"></div>
             <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 1</a>
@@ -25,111 +31,111 @@
           <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" (click)="toggleDropdown()">
             <i class="fas fa-user text-gray-600 text-2xl"></i>
             <span>Account</span>
-            <i class="fas fa-chevron-down text-gray-600 text-sm"></i> <!-- Added arrow icon -->
+            <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
           </div>
           <div id="dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden z-50">
             <div class="arrow-up"></div>
-            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</a>
-            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</a>
+            <button [routerLink]="'/profile'" class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</button>
+            <button class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Cards Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- Card 1 -->
-      <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300">
-        <div class="relative h-64 overflow-hidden">
-          <div class="absolute inset-0 bg-cover bg-center filter blur-lg" id="bg-image-1"></div>
-          <img src="JPIA_HEIST.jpg" alt="Card Image" class="relative w-full h-full object-contain" (load)="updateBackgroundImage($event, 'bg-image-1')">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      <div *ngFor="let card of [
+        {
+          id: 1,
+          title: 'Tech Conference 2024',
+          description: 'Join us for an exciting tech conference featuring the latest innovations and industry experts.',
+          venue: 'Convention Center',
+          date: '2024-04-15',
+          time: '09:00 AM',
+          image: '#'
+        },
+        {
+          id: 2,
+          title: 'Startup Workshop',
+          description: 'Learn essential strategies for launching and growing your startup from successful entrepreneurs.',
+          venue: 'Innovation Hub',
+          date: '2024-04-20',
+          time: '10:30 AM',
+          image: '#'
+        },
+        {
+          id: 3,
+          title: 'AI Symposium',
+          description: 'Explore the future of artificial intelligence and its impact on various industries.',
+          venue: 'Tech Campus',
+          date: '2024-04-25',
+          time: '02:00 PM',
+          image: '#'
+        },
+        {
+          id: 4,
+          title: 'Networking Mixer',
+          description: 'Connect with professionals from various tech fields in this casual networking event.',
+          venue: 'Digital Hub',
+          date: '2024-04-30',
+          time: '06:00 PM',
+          image: '#'
+        }
+      ]" class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300">
+        <div class="relative h-48 sm:h-64 overflow-hidden">
+          <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + card.id"></div>
+          <img [src]="card.image" [alt]="card.title" class="relative w-full h-full object-contain" (load)="updateBackgroundImage($event, 'bg-image-' + card.id)">
         </div>
-        <div class="p-6">
-          <h2 class="text-2xl font-bold mb-2">Card Title 1</h2>
-          <p class="text-gray-700 mb-4">This is a description of the first card. It provides an overview of the content within the card.</p>
+        <div class="p-4">
+          <h2 class="text-xl sm:text-2xl font-bold mb-2">{{card.title}}</h2>
+          <p class="text-sm sm:text-base text-gray-700 mb-4">{{card.description}}</p>
           <div class="flex flex-col text-gray-600 space-y-2">
-            <span><i class="fas fa-map-marker-alt mr-2"></i>Venue: Conference Hall A</span>
-            <span><i class="fas fa-calendar-alt mr-2"></i>Date: March 9, 2025</span>
-            <span><i class="fas fa-clock mr-2"></i>Time: 10:00 AM</span>
+            <span><i class="fas fa-map-marker-alt mr-2"></i>Venue: {{card.venue}}</span>
+            <span><i class="fas fa-calendar-alt mr-2"></i>Date: {{card.date}}</span>
+            <span><i class="fas fa-clock mr-2"></i>Time: {{card.time}}</span>
           </div>
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
-            <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300">
-        <div class="relative h-64 overflow-hidden">
-          <div class="absolute inset-0 bg-cover bg-center filter blur-lg" id="bg-image-2"></div>
-          <img src="JFINEX_OPERATION.jpg" alt="Card Image" class="relative w-full h-full object-contain" (load)="updateBackgroundImage($event, 'bg-image-2')">
-        </div>
-        <div class="p-6">
-          <h2 class="text-2xl font-bold mb-2">Card Title 2</h2>
-          <p class="text-gray-700 mb-4">This is a description of the second card. It provides an overview of the content within the card.</p>
-          <div class="flex flex-col text-gray-600 space-y-2">
-            <span><i class="fas fa-map-marker-alt mr-2"></i>Venue: Conference Hall B</span>
-            <span><i class="fas fa-calendar-alt mr-2"></i>Date: March 10, 2025</span>
-            <span><i class="fas fa-clock mr-2"></i>Time: 11:00 AM</span>
-          </div>
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
-            <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300">
-        <div class="relative h-64 overflow-hidden">
-          <div class="absolute inset-0 bg-cover bg-center filter blur-lg" id="bg-image-3"></div>
-          <img src="ELITES_DART.jpg" alt="Card Image" class="relative w-full h-full object-contain" (load)="updateBackgroundImage($event, 'bg-image-3')">
-        </div>
-        <div class="p-6">
-          <h2 class="text-2xl font-bold mb-2">Card Title 3</h2>
-          <p class="text-gray-700 mb-4">This is a description of the third card. It provides an overview of the content within the card.</p>
-          <div class="flex flex-col text-gray-600 space-y-2">
-            <span><i class="fas fa-map-marker-alt mr-2"></i>Venue: Conference Hall C</span>
-            <span><i class="fas fa-calendar-alt mr-2"></i>Date: March 11, 2025</span>
-            <span><i class="fas fa-clock mr-2"></i>Time: 12:00 PM</span>
-          </div>
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
-            <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300">
-        <div class="relative h-64 overflow-hidden">
-          <div class="absolute inset-0 bg-cover bg-center filter blur-lg" id="bg-image-4"></div>
-          <img src="CCSSC_ML.jpg" alt="Card Image" class="relative w-full h-full object-contain" (load)="updateBackgroundImage($event, 'bg-image-4')">
-        </div>
-        <div class="p-6">
-          <h2 class="text-2xl font-bold mb-2">Card Title 4</h2>
-          <p class="text-gray-700 mb-4">This is a description of the fourth card. It provides an overview of the content within the card.</p>
-          <div class="flex flex-col text-gray-600 space-y-2">
-            <span><i class="fas fa-map-marker-alt mr-2"></i>Venue: Conference Hall D</span>
-            <span><i class="fas fa-calendar-alt mr-2"></i>Date: March 12, 2025</span>
-            <span><i class="fas fa-clock mr-2"></i>Time: 01:00 PM</span>
-          </div>
-          <div class="flex justify-end space-x-2 mt-4">
-            <button (click)="openViewModal()" class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
-            <button (click)="openRegisterModal()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
+          <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
+            <button (click)="openViewModal()" class="w-full sm:w-auto px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
+            <button (click)="openRegisterModal()" class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Back to Top Button -->
+    <!-- Pagination -->
+    <div class="flex justify-center items-center space-x-2 mt-6 mb-4">
+      <button 
+        [disabled]="currentPage === 1"
+        (click)="changePage(currentPage - 1)"
+        class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] disabled:bg-gray-400 disabled:cursor-not-allowed">
+        Previous
+      </button>
+      
+      <div class="flex space-x-1">
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          (click)="changePage(page)"
+          [class]="page === currentPage ? 
+            'px-4 py-2 bg-[#679436] text-white rounded-lg' : 
+            'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'">
+          {{page}}
+        </button>
+      </div>
+
+      <button 
+        [disabled]="currentPage === totalPages"
+        (click)="changePage(currentPage + 1)"
+        class="px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] disabled:bg-gray-400 disabled:cursor-not-allowed">
+        Next
+      </button>
+    </div>
+
+    <!-- Back to Top Button 
     <div class="fixed bottom-4 right-4">
       <button (click)="scrollToTop()" class="px-6 py-4 bg-[#05668D] text-white rounded-full hover:bg-[#034f6b] cursor-pointer text-2xl transition-transform transform hover:scale-110 shadow-md hover:shadow-lg">
         <i class="fas fa-arrow-up"></i>
       </button>
-    </div>
+    </div> -->
     
     <app-registermodal *ngIf="isRegisterModalOpen" (close)="closeRegisterModal()"></app-registermodal>
     <app-viewmodal *ngIf="isViewModalOpen" (close)="closeViewModal()"></app-viewmodal>
-  </div>
