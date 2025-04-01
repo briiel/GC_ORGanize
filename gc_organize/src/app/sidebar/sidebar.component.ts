@@ -14,4 +14,5 @@ export class SidebarComponent {
     toggleSidebar() {
         this.isSidebarOpen = !this.isSidebarOpen;
     }
+    
 }

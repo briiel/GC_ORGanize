@@ -1,19 +1,19 @@
 <div class="flex h-screen relative">
-    <!-- Mobile Menu Button - Updated positioning and size -->
-    <button (click)="toggleSidebar()" class="lg:hidden fixed top-4 left-4 z-20 text-[#679436] p-2 rounded-lg bg-white shadow-md">
+    <!-- Mobile Menu Button - Ensure it stays above the backdrop -->
+    <button (click)="toggleSidebar()" class="lg:hidden fixed top-4 left-4 z-30 text-[#679436] p-2 rounded-lg bg-white shadow-md">
         <i class="fas fa-bars text-xl"></i>
     </button>
 
     <!-- Backdrop overlay for mobile -->
     <div *ngIf="isSidebarOpen" 
-         class="fixed inset-0 bg-black/30 backdrop-blur-sm z-0 lg:hidden"
+         class="fixed inset-0 bg-black/30 backdrop-blur-sm z-10 lg:hidden"
          (click)="toggleSidebar()">
     </div>
 
-    <!-- Sidebar - Updated for better mobile experience -->
+    <!-- Sidebar -->
     <div [class.translate-x-0]="isSidebarOpen" 
          [class.-translate-x-full]="!isSidebarOpen" 
-         class="w-64 bg-[#679436] text-white flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-10 shadow-lg">
+         class="w-64 bg-[#679436] text-white flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-20 shadow-lg">
         <div class="p-4 flex flex-col items-center space-y-2 mt-8 lg:mt-0">
             <img src="GC-Logo.png" alt="Logo" class="w-16 h-16 sm:w-24 sm:h-24 object-contain">
             <h1 class="text-xl sm:text-2xl font-bold text-center">GC-ORGANIZE</h1>
@@ -34,8 +34,8 @@
         </nav>      
     </div>
 
-    <!-- Main Content Area - Added padding for mobile menu button -->
-    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0">
+    <!-- Main Content Area -->
+    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0 z-0">
         <router-outlet></router-outlet>
     </div>
 </div>
