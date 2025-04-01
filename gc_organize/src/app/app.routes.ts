@@ -8,6 +8,8 @@ import { ProfileComponent } from './profile/profile.component';
 import { EcertificateComponent } from './ecertificate/ecertificate.component';
 import { AuthGuard } from './guards/auth.guard';
 import { SoDashboardComponent } from './so-dashboard/so-dashboard.component';
+import { CreateEventComponent } from './create-event/create-event.component';
+import { ManageEventComponent } from './manage-event/manage-event.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -21,7 +23,9 @@ export const routes: Routes = [
        },
       { path: 'eventsreg', component: EventsregComponent },
       { path: 'ecertificate', component: EcertificateComponent },
-      { path: 'so-dashboard', component: SoDashboardComponent}
+      { path: 'so-dashboard', component: SoDashboardComponent},
+      { path: 'create-event', component: CreateEventComponent},
+      { path: 'manage-event', component: ManageEventComponent}
   ] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];

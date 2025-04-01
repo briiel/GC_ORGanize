@@ -15,6 +15,11 @@ export class SidebarComponent implements OnInit {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  onLogout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+  
   ngOnInit(): void {
     this.role = localStorage.getItem('role');
     console.log('Role:', this.role);
