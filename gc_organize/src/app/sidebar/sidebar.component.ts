@@ -1,18 +1,26 @@
-import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule, RouterPreloader } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterModule, CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent {
-    isSidebarOpen = false;
+export class SidebarComponent implements OnInit {
+  isSidebarOpen = false;
+  role: string | null = null;
 
-    toggleSidebar() {
-        this.isSidebarOpen = !this.isSidebarOpen;
-    }
-    
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.role = localStorage.getItem('role');
+    console.log('Role:', this.role);
+  }
+
+  toggleSidebar() {
+    this.isSidebarOpen = !this.isSidebarOpen;
+  }
 }
