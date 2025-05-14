@@ -1,0 +1,32 @@
+/* ...existing code... */
+
+#preview-img {
+  width: 256px; /* Fixed width */
+  height: 160px; /* Fixed height */
+  object-fit: contain; /* Ensures the entire image is visible within the dimensions */
+  background-color: #f3f4f6; /* Optional: Add a background color for better visibility */
+}
+
+#image-preview {
+  position: relative;
+}
+
+#image-preview button {
+  position: absolute;
+  top: 8px; /* Adjust to position the icon */
+  right: 8px; /* Adjust to position the icon */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem; /* Adjust icon size */
+  color: #ef4444; /* Red color for the icon */
+}
+
+#image-preview button:hover {
+  color: #dc2626; /* Darker red on hover */
+}
+
+/* ...existing code... */

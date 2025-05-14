@@ -6,7 +6,7 @@
         <i class="fas fa-calendar-plus text-[#679436] mr-2"></i>Create Event
       </h2>
 
-      <form class="space-y-4">
+      <form class="space-y-4" (ngSubmit)="createEvent()">
         <!-- Title of Event -->
         <div>
           <label for="title" class="block text-lg font-medium text-gray-700 mb-1">
@@ -15,6 +15,7 @@
           <input
             type="text"
             id="title"
+            [(ngModel)]="event.title"
             name="title"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent transition duration-200"
             placeholder="Enter event title"
@@ -30,6 +31,7 @@
           <textarea
             id="description"
             name="description"
+            [(ngModel)]="event.description"
             rows="4"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent transition duration-200"
             placeholder="Enter event description"
@@ -45,6 +47,7 @@
           <input
             type="text"
             id="location"
+            [(ngModel)]="event.location"
             name="location"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent transition duration-200"
             placeholder="Enter event location"
@@ -62,6 +65,7 @@
             <input
               type="date"
               id="date"
+              [(ngModel)]="event.event_date"
               name="date"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent transition duration-200"
               required
@@ -76,12 +80,41 @@
             <input
               type="time"
               id="time"
+              [(ngModel)]="event.event_time"
               name="time"
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent transition duration-200"
               required
             />
           </div>
         </div>
+
+        <!-- Event Poster -->
+        <div class="w-full flex flex-col items-start">
+          <label for="dropzone-file" class="block text-lg font-medium text-gray-700 mb-2">
+            <i class="fas fa-image text-[#679436] mr-2"></i>Event Poster
+          </label>
+          <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+              <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+            </svg>
+              <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
+              <p class="text-xs text-gray-500">PNG or JPG (MAX. 800x400px)</p>
+            </div>
+            <input id="dropzone-file" name="event_poster" type="file" class="hidden" accept=".png, .jpg" (change)="previewImage($event)" />
+          </label>
+          <div id="image-preview" class="mt-4 relative hidden">
+            <p class="text-sm text-gray-500 mb-2">Preview:</p>
+            <img id="preview-img" class="w-64 h-40 object-contain rounded-lg shadow-md" alt="Uploaded image preview" />
+            <button 
+              type="button" 
+              class="absolute top-2 right-2 text-red-500 hover:text-red-700 focus:outline-none" 
+              (click)="removeImage()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div> 
+
 
         <!-- Submit Button -->
         <div class="text-right">
