@@ -19,16 +19,19 @@ export class HomeComponent implements OnInit {
   dropdownVisible = false;
   notificationDropdownVisible = false;
 
+
   events: any[] = [];
 
-  constructor(private eventService: EventService, private authService: AuthService, private router: Router) {}
+  constructor(private eventService: EventService, private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
     this.eventService.getAllEvents().subscribe(
       (data) => {
         console.log('Events API response:', data); // Check the structure in the browser console
-        // Ensure events is always an array
-        if (Array.isArray(data)) {
+        // Fix: Use data.data for events
+        if (data && Array.isArray(data.data)) {
+          this.events = data.data;
+        } else if (Array.isArray(data)) {
           this.events = data;
         } else if (data && Array.isArray(data.events)) {
           this.events = data.events;
@@ -92,13 +95,16 @@ export class HomeComponent implements OnInit {
   }
 
   isViewModalOpen = false;
+  selectedEvent: any = null;
 
-  openViewModal() {
+  openViewModal(event: any) {
+    this.selectedEvent = event;
     this.isViewModalOpen = true;
   }
 
   closeViewModal() {
     this.isViewModalOpen = false;
+    this.selectedEvent = null;
   }
 
 
@@ -131,5 +137,5 @@ export class HomeComponent implements OnInit {
   // getPageNumbers(): number[] {
   //   return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   // }
-  
+
 }

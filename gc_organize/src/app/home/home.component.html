@@ -1,69 +1,81 @@
 <!-- Main content -->
-  <div class="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto" id="main-content">
-    <!-- Top section with responsive layout -->
-    <div class="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between mb-4">
-      <!-- Search section -->
-      <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
-        <div class="relative w-full">
-          <input type="text" placeholder="Search..." class="w-full min-w-full sm:min-w-0 sm:w-[300px] lg:w-[400px] px-4 py-2 border rounded-lg pl-10">
-          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
+<div class="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto" id="main-content">
+  <!-- Top section with responsive layout -->
+  <div class="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between mb-4">
+    <!-- Search section -->
+    <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
+      <div class="relative w-full">
+        <input type="text" placeholder="Search..."
+          class="w-full min-w-full sm:min-w-0 sm:w-[300px] lg:w-[400px] px-4 py-2 border rounded-lg pl-10">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
+      </div>
+      <div class="flex space-x-2 w-full sm:w-auto justify-center mt-2 sm:mt-0">
+        <button
+          class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer">Search</button>
+        <button class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+          <i class="fas fa-filter cursor-pointer"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- User controls -->
+    <div class="flex items-center justify-center space-x-4 mt-4 lg:mt-0">
+      <div class="relative">
+        <i class="fas fa-bell text-yellow-500 cursor-pointer text-xl sm:text-2xl"></i>
+        <div id="notificationDropdown"
+          class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-2 hidden z-50">
+          <div class="arrow-up"></div>
+          <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 1</a>
+          <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 2</a>
+          <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 3</a>
         </div>
-        <div class="flex space-x-2 w-full sm:w-auto justify-center mt-2 sm:mt-0">
-          <button class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer">Search</button>
-          <button class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-            <i class="fas fa-filter cursor-pointer"></i>
+      </div>
+      <div class="relative">
+        <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" (click)="toggleDropdown()">
+          <i class="fas fa-user text-gray-600 text-2xl"></i>
+          <span>Account</span>
+          <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
+        </div>
+        <div id="dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden z-50">
+          <div class="arrow-up"></div>
+          <button [routerLink]="'/profile'"
+            class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</button>
+          <button class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer"
+            (click)="onLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+    <div
+      class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300"
+      *ngFor="let event of events">
+      <div class="relative h-48 sm:h-64 overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + event.id"></div>
+        <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
+          (load)="updateBackgroundImage($event, 'bg-image-' + event.id)">
+      </div>
+      <div class="p-4">
+        <ul class="space-y-2 text-gray-700">
+          <li class="text-xl sm:text-2xl font-bold">Title: {{event.title}}</li>
+          <li class="text-sm sm:text-base">Description: {{event.description}}</li>
+          <li><i class="fas fa-map-marker-alt mr-2"></i>Location: {{event.location}}</li>
+          <li><i class="fas fa-calendar-alt mr-2"></i>Date: {{event.event_date}}</li>
+          <li><i class="fas fa-clock mr-2"></i>Time: {{event.event_time}}</li>
+        </ul>
+        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
+          <button (click)="openViewModal(event)"
+            class="w-full sm:w-auto px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">
+            View
           </button>
-        </div>
-      </div>
-
-      <!-- User controls -->
-      <div class="flex items-center justify-center space-x-4 mt-4 lg:mt-0">
-        <div class="relative">
-          <i class="fas fa-bell text-yellow-500 cursor-pointer text-xl sm:text-2xl"></i>
-          <div id="notificationDropdown" class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-2 hidden z-50">
-            <div class="arrow-up"></div>
-            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 1</a>
-            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 2</a>
-            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 3</a>
-          </div>
-        </div>
-        <div class="relative">
-          <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" (click)="toggleDropdown()">
-            <i class="fas fa-user text-gray-600 text-2xl"></i>
-            <span>Account</span>
-            <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
-          </div>
-          <div id="dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden z-50">
-            <div class="arrow-up"></div>
-            <button [routerLink]="'/profile'" class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</button>
-            <button class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer" (click)="onLogout()">Logout</button>
-          </div>
+          <button (click)="openRegisterModal()"
+            class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Cards Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6" >
-      <div class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300">
-        <div class="relative h-48 sm:h-64 overflow-hidden">
-          <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-1'"></div>
-          <img [src]="'#'" [alt]="'Tech Conference 2024'" class="relative w-full h-full object-contain" (load)="updateBackgroundImage($event, 'bg-image-1')">
-        </div>
-        <div class="p-4">
-          <ul class="space-y-2 text-gray-700" *ngFor="let event of events">
-            <li class="text-xl sm:text-2xl font-bold">Title: {{event.title}}</li>
-            <li class="text-sm sm:text-base">Description: {{event.description}}</li>
-            <li><i class="fas fa-map-marker-alt mr-2"></i>Location: {{event.location}}</li>
-            <li><i class="fas fa-calendar-alt mr-2"></i>Date: {{event.event_date}}</li>
-            <li><i class="fas fa-clock mr-2"></i>Time: {{event.event_time}}</li>
-          </ul>
-          <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
-            <button (click)="openViewModal()" class="w-full sm:w-auto px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">View</button>
-            <button (click)="openRegisterModal()" class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer" >Register</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-  <!--  <app-registermodal *ngIf="isRegisterModalOpen" (close)="closeRegisterModal()"></app-registermodal>
-    <app-viewmodal *ngIf="isViewModalOpen" (close)="closeViewModal()"></app-viewmodal> -->
+  <app-viewmodal *ngIf="isViewModalOpen" [event]="selectedEvent" (close)="closeViewModal()">
+  </app-viewmodal>

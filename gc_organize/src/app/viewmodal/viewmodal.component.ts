@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-viewmodal',
@@ -10,12 +10,14 @@ export class ViewmodalComponent {
   @Output() close = new EventEmitter<void>();
   imageUrl: string = '';
 
-  setImage(url: string) {
-    this.imageUrl = url;
-  }
+  @Input() event: any;
 
   closeModal() {
     this.close.emit();
+  }
+
+  setImage(url: string) {
+    this.imageUrl = url;
   }
 
   updateBackgroundImage(event: Event, bgElementId: string): void {
