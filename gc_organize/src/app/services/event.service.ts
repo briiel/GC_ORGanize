@@ -10,8 +10,8 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
-  // Get all events
-  getEvents(): Observable<any> {
+  // Fetch all events
+  getAllEvents(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/events`, { headers });
   }
