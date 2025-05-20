@@ -1,15 +1,15 @@
 <div class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75" style="z-index: 1000;">
   <div class="scrollable-container bg-white rounded-lg shadow-lg p-6 w-full max-w-5xl mx-4 md:mx-auto" style="outline: 2px solid #679436;">
     <h2 class="text-2xl font-bold mb-4">Event Registration</h2>
-    <form>
+    <form (ngSubmit)="submitRegistration()">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div>
           <label for="firstName" class="block text-sm font-medium text-gray-700">First Name:</label>
-          <input type="text" id="firstName" name="firstName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <input type="text" id="firstName" name="firstName" [(ngModel)]="registrationData.first_name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
         </div>
         <div>
           <label for="surname" class="block text-sm font-medium text-gray-700">Surname:</label>
-          <input type="text" id="surname" name="surname" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <input type="text" id="surname" name="surname" [(ngModel)]="registrationData.last_name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
         </div>
         <div>
           <label for="middleInitial" class="block text-sm font-medium text-gray-700">Middle Initial:</label>
@@ -17,7 +17,7 @@
         </div>
         <div>
           <label for="suffix" class="block text-sm font-medium text-gray-700">Suffix:</label>
-          <select id="suffix" name="suffix" class="mt-1 block w-24 border border-gray-300 rounded-md shadow-sm p-2">
+          <select id="suffix" name="suffix" [(ngModel)]="registrationData.suffix" class="mt-1 block w-24 border border-gray-300 rounded-md shadow-sm p-2">
             <option value="">Select</option>
             <option value="Jr">Jr</option>
             <option value="Sr">Sr</option>
@@ -30,15 +30,15 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div>
           <label for="studentId" class="block text-sm font-medium text-gray-700">Student ID:</label>
-          <input type="text" id="studentId" name="studentId" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <input type="text" id="studentId" name="studentId" [(ngModel)]="registrationData.student_id" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
         </div>
         <div>
           <label for="domainEmail" class="block text-sm font-medium text-gray-700">Domain Email:</label>
-          <input type="email" id="domainEmail" name="domainEmail" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <input type="email" id="domainEmail" name="domainEmail" [(ngModel)]="registrationData.domain_email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
         </div>
         <div>
           <label for="department" class="block text-sm font-medium text-gray-700">Department:</label>
-          <select id="department" name="department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <select id="department" name="department" [(ngModel)]="registrationData.department" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
             <option value="">Select</option>
             <option value="CAHS">CAHS</option>
             <option value="CBA">CBA</option>
@@ -49,7 +49,7 @@
         </div>
         <div class="mb-6">
           <label for="program" class="block text-sm font-medium text-gray-700">Program:</label>
-          <input type="text" id="program" name="program" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <input type="text" id="program" name="program" [(ngModel)]="registrationData.program" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
         </div>
       </div>
       <div class="mb-6">

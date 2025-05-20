@@ -85,13 +85,16 @@ export class HomeComponent implements OnInit {
   }
 
   isRegisterModalOpen = false;
+  selectedEventId: number | null = null;
 
-  openRegisterModal() {
+  openRegisterModal(event: any) {
+    this.selectedEventId = event.event_id; // or event.id, depending on your event object
     this.isRegisterModalOpen = true;
   }
 
   closeRegisterModal() {
     this.isRegisterModalOpen = false;
+    this.selectedEventId = null;
   }
 
   isViewModalOpen = false;
@@ -138,4 +141,13 @@ export class HomeComponent implements OnInit {
   //   return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   // }
 
+  formatTime(timeString: string | null | undefined): string {
+    if (!timeString) return '';
+    const parts = timeString.split(':');
+    if (parts.length < 2) return '';
+    const [hours, minutes] = parts;
+    const date = new Date();
+    date.setHours(+hours, +minutes, 0, 0);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  }
 }

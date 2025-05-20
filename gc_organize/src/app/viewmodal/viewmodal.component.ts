@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-viewmodal',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './viewmodal.component.html',
   styleUrl: './viewmodal.component.css'
 })
@@ -26,6 +27,16 @@ export class ViewmodalComponent {
     if (bgElement && imgElement) {
       bgElement.style.backgroundImage = `url('${imgElement.src}')`;
     }
+  }
+
+    formatTime(timeString: string | null | undefined): string {
+    if (!timeString) return '';
+    const parts = timeString.split(':');
+    if (parts.length < 2) return '';
+    const [hours, minutes] = parts;
+    const date = new Date();
+    date.setHours(+hours, +minutes, 0, 0);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   }
 }
 

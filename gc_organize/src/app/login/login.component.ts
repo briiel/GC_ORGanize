@@ -24,20 +24,26 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogin(): void {
+    this.errorMessage = '';
     this.authService.login(this.email, this.password).subscribe(
       (response) => {
         if (response.success) {
-          this.authService.saveToken(response.token); // Save the token
-          const role = this.authService.getUserRole();
-          if (role) {
-            localStorage.setItem('role', role); // Save the role in localStorage
-            console.log('User role:', role); // Debug log
-            if (role === 'Participant') {
-              this.router.navigate(['/sidebar/home']); // Redirect for Participant
-            } else if (role === 'StudentOrganization') {
-              this.router.navigate(['/sidebar/so-dashboard']); // Redirect for StudentOrganization
-            }
+          this.authService.saveToken(response.token);
+          // Decode the JWT to get the user ID
+          const payload = JSON.parse(atob(response.token.split('.')[1]));
+          if (response.userType === 'student') {
+            localStorage.setItem('studentId', payload.id);
+            localStorage.setItem('role', 'student');
+            this.router.navigate(['/sidebar/home']);
+          } else if (response.userType === 'organization') {
+            localStorage.setItem('creatorId', payload.id); // Store org ID as creatorId
+            localStorage.setItem('role', 'organization');
+            this.router.navigate(['/sidebar/so-dashboard']);
+          } else {
+            this.errorMessage = 'Unknown user type.';
           }
+        } else {
+          this.errorMessage = response.message || 'Login failed.';
         }
       },
       (error) => {

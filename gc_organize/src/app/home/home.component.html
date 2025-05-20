@@ -51,27 +51,52 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
     <div
       class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300"
-      *ngFor="let event of events">
+      *ngFor="let event of events; let i = index"
+      style="height: 420px; display: flex; flex-direction: column;"
+    >
       <div class="relative h-48 sm:h-64 overflow-hidden">
-        <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + event.id"></div>
+        <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
-          (load)="updateBackgroundImage($event, 'bg-image-' + event.id)">
+          (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
       </div>
-      <div class="p-4">
-        <ul class="space-y-2 text-gray-700">
-          <li class="text-xl sm:text-2xl font-bold">Title: {{event.title}}</li>
-          <li class="text-sm sm:text-base">Description: {{event.description}}</li>
+      <div class="p-4 flex-1 flex flex-col">
+        <ul class="space-y-2 text-gray-700 flex-1">
+          <li class="text-xl sm:text-2xl font-bold">{{event.title}}</li>
+          <li class="text-sm sm:text-base truncate" title="{{event.description}}">
+            {{event.description}}
+          </li>
           <li><i class="fas fa-map-marker-alt mr-2"></i>Location: {{event.location}}</li>
-          <li><i class="fas fa-calendar-alt mr-2"></i>Date: {{event.event_date}}</li>
-          <li><i class="fas fa-clock mr-2"></i>Time: {{event.event_time}}</li>
+          <li><i class="fas fa-calendar-alt mr-2"></i>Date: {{event.event_date | date: 'MMMM d, y'}}</li>
+          <li><i class="fas fa-clock mr-2"></i>Time: {{formatTime(event.event_time)}}</li>
         </ul>
-        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
-          <button (click)="openViewModal(event)"
-            class="w-full sm:w-auto px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">
-            View
-          </button>
-          <button (click)="openRegisterModal()"
-            class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">Register</button>
+        <div class="flex flex-col h-full justify-end">
+          <div class="flex flex-col sm:flex-row sm:items-center w-full space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
+            <!-- Status badge always on the left -->
+            <div class="flex justify-start sm:flex-1">
+              <span
+                class="inline-block px-5 py-2 rounded-full text-base font-bold"
+                [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': event.status === 'not yet started',
+                  'bg-blue-100 text-blue-800': event.status === 'ongoing',
+                  'bg-green-100 text-green-800': event.status === 'completed',
+                  'bg-red-100 text-red-800': event.status === 'cancelled'
+                }"
+              >
+                {{ event.status | titlecase }}
+              </span>
+            </div>
+            <!-- Buttons always on the right in sm+ screens, bottom in mobile -->
+            <div class="flex flex-col sm:flex-row items-center w-full sm:w-auto space-y-2 sm:space-y-0 sm:space-x-2 sm:justify-end">
+              <button (click)="openViewModal(event)"
+                class="w-full sm:w-auto px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">
+                View
+              </button>
+              <button (click)="openRegisterModal(event)"
+                class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">
+                Register
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -79,3 +104,9 @@
 
   <app-viewmodal *ngIf="isViewModalOpen" [event]="selectedEvent" (close)="closeViewModal()">
   </app-viewmodal>
+  <app-registermodal
+    *ngIf="isRegisterModalOpen && selectedEventId !== null"
+    [eventId]="selectedEventId"
+    (close)="closeRegisterModal()">
+  </app-registermodal>
+</div>

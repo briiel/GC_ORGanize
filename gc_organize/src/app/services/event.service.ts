@@ -17,17 +17,35 @@ export class EventService {
   }
 
   // Create a new event
-  createEvent(eventData: any): Observable<any> {
+  createEvent(eventData: FormData): Observable<any> {
     const headers = this.getAuthHeaders();
+    // Do NOT set Content-Type here; browser will set it for FormData
     return this.http.post(`${this.apiUrl}/events`, eventData, { headers });
+  }
+
+  // Fetch events a participant registered in
+  getRegisteredEvents(studentId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/participants/${studentId}/events`, { headers });
+  }
+
+  // Fetch events by creator/org ID
+  getEventsByCreator(creatorId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/events/creator/${creatorId}`, { headers });
+  }
+
+  // Update event status
+  updateEventStatus(eventId: number, status: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status });
   }
 
   // Helper method to get Authorization headers
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('authToken'); // Retrieve the JWT token from localStorage
+    const token = localStorage.getItem('authToken');
+    // Remove Content-Type here
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      'Authorization': `Bearer ${token}`
     });
   }
 }

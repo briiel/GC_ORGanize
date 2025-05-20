@@ -39,74 +39,29 @@
                             <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">No.</th>
                             <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-left">Event Name</th>
                             <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">Date</th>
-                            <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">Status</th>
+                            <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">Time</th> <!-- Added -->
                             <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">QR Code</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-                        <!-- Sample Event Rows -->
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">1</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3">Tech Conference 2024</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">Apr 15, 2024</td>
+                        <!-- Event Rows -->
+                        <tr *ngFor="let event of registeredEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ i + 1 }}</td>
+                            <td class="px-1 lg:px-4 py-2 lg:py-3">{{ event.title }}</td>
+                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ event.event_date | date: 'mediumDate' }}</td>
                             <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Active</span>
+                                {{ formatTime(event.event_time) }}
                             </td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3">
-                                <div class="flex flex-col items-center space-y-3">
-                                    <button
-                                        (click)="toggleQRCode(1)"
-                                        class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold py-1 px-2 lg:py-2 lg:px-4 rounded-md transition-transform duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#56732e] focus:ring-opacity-75 text-sm lg:text-base w-full flex items-center justify-center gap-2">
-                                        <i class="fas fa-qrcode lg:hidden"></i>
-                                        <span class="hidden lg:block">Generate QR Code</span>
-                                    </button>
-                                    <div *ngIf="activeRow === 1" class="p-2 lg:p-4 bg-gray-50 rounded-lg shadow-lg border border-gray-200">
-                                        <qrcode [qrdata]="qrCodeData!" [width]="80" [errorCorrectionLevel]="'M'" class="lg:hidden"></qrcode>
-                                        <qrcode [qrdata]="qrCodeData!" [width]="100" [errorCorrectionLevel]="'M'" class="hidden lg:block"></qrcode>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">2</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3">Startup Summit</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">Apr 20, 2024</td>
                             <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span>
-                            </td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3">
                                 <div class="flex flex-col items-center space-y-3">
-                                    <button
-                                        (click)="toggleQRCode(2)"
-                                        class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold py-1 px-2 lg:py-2 lg:px-4 rounded-md transition-transform duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#56732e] focus:ring-opacity-75 text-sm lg:text-base w-full flex items-center justify-center gap-2">
-                                        <i class="fas fa-qrcode lg:hidden"></i>
-                                        <span class="hidden lg:block">Generate QR Code</span>
-                                    </button>
-                                    <div *ngIf="activeRow === 2" class="p-2 lg:p-4 bg-gray-50 rounded-lg shadow-lg border border-gray-200">
-                                        <qrcode [qrdata]="qrCodeData!" [width]="80" [errorCorrectionLevel]="'M'" class="lg:hidden"></qrcode>
-                                        <qrcode [qrdata]="qrCodeData!" [width]="100" [errorCorrectionLevel]="'M'" class="hidden lg:block"></qrcode>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">3</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3">Digital Marketing Workshop</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">Apr 25, 2024</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Expired</span>
-                            </td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3">
-                                <div class="flex flex-col items-center space-y-3">
-                                    <button
-                                        (click)="toggleQRCode(3)"
-                                        class="bg-gray-400 cursor-not-allowed text-white font-semibold py-1 px-2 lg:py-2 lg:px-4 rounded-md text-sm lg:text-base w-full flex items-center justify-center gap-2">
-                                        <i class="fas fa-qrcode lg:hidden"></i>
-                                        <span class="hidden lg:block">Generate QR Code</span>
-                                    </button>
-                                </div>
+                                    <a *ngIf="event.qr_code"
+                                       (click)="downloadQrCode(event.qr_code, event.event_id)"
+                                       class="text-[#679436] hover:underline flex items-center gap-2 cursor-pointer"
+                                       title="Download QR Code">
+                                      <i class="fas fa-download"></i>
+                                      Download QR Code
+                                    </a>
+                                  </div>
                             </td>
                         </tr>
                     </tbody>

@@ -10,17 +10,18 @@ import { HttpClient } from '@angular/common/http';
   providers: [EventService]
 })
 export class CreateEventComponent {
-  isImageUploaded = false; // Track if an image is uploaded
+  isImageUploaded = false;
   event = {
     title: '',
     description: '',
     location: '',
     event_date: '',
-    event_time: '',
-    event_poster: ''
+    event_time: ''
+    // Remove event_poster from here
   };
+  eventPosterFile: File | null = null; // Add this
 
-  constructor(private eventService: EventService) {} // Inject EventService
+  constructor(private eventService: EventService) {}
 
   previewImage(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -29,16 +30,18 @@ export class CreateEventComponent {
     const previewImg = document.getElementById('preview-img') as HTMLImageElement;
 
     if (file) {
+      this.eventPosterFile = file; // Save file for upload
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         if (e.target?.result) {
           previewImg.src = e.target.result as string;
           previewContainer.classList.remove('hidden');
-          this.isImageUploaded = true; // Hide file input
+          this.isImageUploaded = true;
         }
       };
       reader.readAsDataURL(file);
     } else {
+      this.eventPosterFile = null;
       previewContainer.classList.add('hidden');
       this.isImageUploaded = false;
     }
@@ -51,12 +54,26 @@ export class CreateEventComponent {
 
     previewImg.src = '';
     previewContainer.classList.add('hidden');
-    fileInput.value = ''; // Clear the file input
-    this.isImageUploaded = false; // Show file input
+    fileInput.value = '';
+    this.isImageUploaded = false;
+    this.eventPosterFile = null; // Clear file
   }
 
   createEvent(): void {
-    this.eventService.createEvent(this.event).subscribe(
+    const formData = new FormData();
+    formData.append('title', this.event.title);
+    formData.append('description', this.event.description);
+    formData.append('location', this.event.location);
+    formData.append('event_date', this.event.event_date);
+    formData.append('event_time', this.event.event_time);
+    if (this.eventPosterFile) {
+      formData.append('event_poster', this.eventPosterFile);
+    }
+
+    const creatorId = Number(localStorage.getItem('creatorId'));
+    formData.append('created_by_org_id', creatorId.toString());
+
+    this.eventService.createEvent(formData).subscribe(
       (response) => {
         console.log('Event successfully created:', response);
         alert('Event created successfully!');
