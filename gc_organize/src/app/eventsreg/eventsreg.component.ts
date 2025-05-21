@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { QRCodeComponent } from 'angularx-qrcode';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
@@ -8,7 +7,7 @@ import { EventService } from '../services/event.service';
 @Component({
   selector: 'app-eventsreg',
   standalone: true,
-  imports: [QRCodeComponent, CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './eventsreg.component.html',
   styleUrls: ['./eventsreg.component.css']
 })
@@ -17,11 +16,11 @@ export class EventsregComponent implements OnInit {
   searchTerm: string = '';
 
   registeredEvents: any[] = [];
-  studentId: number;
+  studentId: string | null = null;
 
   constructor(private http: HttpClient, private eventService: EventService) {
-    // Get studentId from localStorage
-    this.studentId = Number(localStorage.getItem('studentId'));
+    // Get studentId from localStorage as string
+    this.studentId = localStorage.getItem('studentId');
   }
 
   ngOnInit() {
@@ -29,7 +28,7 @@ export class EventsregComponent implements OnInit {
   }
 
   fetchRegisteredEvents() {
-    // Use your eventService or http with Authorization header as discussed earlier
+    if (!this.studentId) return;
     this.eventService.getRegisteredEvents(this.studentId).subscribe({
       next: (events) => {
         this.registeredEvents = events.data || events;

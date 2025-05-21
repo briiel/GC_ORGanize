@@ -14,10 +14,13 @@ export class SoDashboardComponent implements OnInit {
   constructor(private eventService: EventService) {}
 
   ngOnInit() {
-    this.eventService.getAllEvents().subscribe(
+    const creatorId = Number(localStorage.getItem('creatorId'));
+    if (!creatorId) {
+      this.events = [];
+      return;
+    }
+    this.eventService.getEventsByCreator(creatorId).subscribe(
       (data) => {
-        console.log('Events API response:', data); // Check the structure in the browser console
-        // Fix: Use data.data for events
         if (data && Array.isArray(data.data)) {
           this.events = data.data;
         } else if (Array.isArray(data)) {

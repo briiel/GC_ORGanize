@@ -14,8 +14,8 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   // Login method
-  login(email: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, { email, password }).pipe(
+  login(emailOrId: string, password: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, { emailOrId, password }).pipe(
       tap((response: any) => {
         if (response && response.token) {
           this.saveToken(response.token);

@@ -24,7 +24,7 @@ export class EventService {
   }
 
   // Fetch events a participant registered in
-  getRegisteredEvents(studentId: number): Observable<any> {
+  getRegisteredEvents(studentId: string | null): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/participants/${studentId}/events`, { headers });
   }
