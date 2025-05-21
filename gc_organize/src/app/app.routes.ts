@@ -11,6 +11,7 @@ import { SoDashboardComponent } from './so-dashboard/so-dashboard.component';
 import { CreateEventComponent } from './create-event/create-event.component';
 import { ManageEventComponent } from './manage-event/manage-event.component';
 import { ScanQrComponent } from './scan-qr/scan-qr.component';
+import { AttendanceRecordsComponent } from './attendance-records/attendance-records.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -28,6 +29,7 @@ export const routes: Routes = [
       { path: 'create-event', component: CreateEventComponent},
       { path: 'manage-event', component: ManageEventComponent},
       { path: 'scan-qr', component: ScanQrComponent },
+      { path: 'attendance-records', component: AttendanceRecordsComponent },
   ] },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];

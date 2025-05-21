@@ -1,48 +1,32 @@
-.fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 50;
+/* Ensure modal overlay covers the entire viewport and centers content */
+.fixed.inset-0 {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(31, 41, 55, 0.75); /* fallback for bg-gray-800 bg-opacity-75 */
+  z-index: 3000; /* Even higher to guarantee overlay */
 }
 
-.bg-gray-800 {
-    background-color: rgba(31, 41, 55, 0.75);
-}
-
+/* Make modal scrollable if content overflows */
 .scrollable-container {
-    max-height: 90vh; /* Adjust as needed */
-    overflow-y: auto;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
-/* Responsive styles */
+/* Remove extra margin that may offset modal */
+.mx-4 {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 @media (max-width: 768px) {
-    .bg-white {
-        padding: 1rem;
-        margin: 1rem;
-    }
+  .scrollable-container {
+    margin: 1rem;
+    width: calc(100vw - 2rem);
+  }
 }
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .bg-white {
-        padding: 2rem;
-        margin: 2rem;
-    }
-}
-
-@media (min-width: 1025px) {
-    .bg-white {
-        padding: 3rem;
-        margin: 3rem;
-    }
-}
-
-
-
-
-
-
-
-
-

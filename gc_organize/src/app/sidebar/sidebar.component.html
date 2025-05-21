@@ -30,6 +30,10 @@
                 <button [routerLink]="'/sidebar/ecertificate'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificates
                 </button>
+                <!-- Logout Button -->
+                <button (click)="onLogout()" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    <i class="fas fa-sign-out-alt mr-2 text-lg sm:text-xl"></i> Logout
+                </button>
             </ng-container>
 
             <!-- Buttons for StudentOrganization -->
@@ -45,6 +49,11 @@
                 </button>
                 <button [routerLink]="'/sidebar/scan-qr'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR Attendance
+                </button>
+                <!-- Attendance Records Button -->
+                <button [routerLink]="'/sidebar/attendance-records'" 
+                        class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer whitespace-nowrap">
+                    <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
                 </button>
                 <!-- Logout Button -->
                 <button (click)="onLogout()" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">

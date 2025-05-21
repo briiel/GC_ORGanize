@@ -19,16 +19,17 @@ export class HomeComponent implements OnInit {
   dropdownVisible = false;
   notificationDropdownVisible = false;
 
-
   events: any[] = [];
+  searchTerm: string = '';
+
+  notifications: any[] = [];
+  unreadCount: number = 0;
 
   constructor(private eventService: EventService, private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
     this.eventService.getAllEvents().subscribe(
       (data) => {
-        console.log('Events API response:', data); // Check the structure in the browser console
-        // Fix: Use data.data for events
         if (data && Array.isArray(data.data)) {
           this.events = data.data;
         } else if (Array.isArray(data)) {
@@ -37,18 +38,55 @@ export class HomeComponent implements OnInit {
           this.events = data.events;
         } else {
           this.events = [];
-          console.error('Unexpected events data structure:', data);
         }
       },
       (error) => {
         console.error('Error fetching events:', error);
       }
     );
+    this.loadNotifications();
   }
-  // Method to scroll to the top of the page
-  /*scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }*/
+
+  loadNotifications() {
+    this.eventService.getNotifications().subscribe({
+      next: (data: any) => {
+        // Safely handle different response shapes
+        let notifications: any[] = [];
+        if (Array.isArray(data)) {
+          notifications = data;
+        } else if (data && Array.isArray(data.data)) {
+          notifications = data.data;
+        } else if (data && Array.isArray(data.notifications)) {
+          notifications = data.notifications;
+        }
+        this.notifications = notifications;
+        this.unreadCount = notifications.filter((n: any) => !n.is_read).length;
+      },
+      error: (err) => {
+        this.notifications = [];
+        this.unreadCount = 0;
+      }
+    });
+  }
+
+  get filteredEvents() {
+    const search = this.searchTerm.trim().toLowerCase();
+    if (!search) return this.events;
+    return this.events.filter(event =>
+      (event.title && event.title.toLowerCase().includes(search)) ||
+      (event.department && event.department.toLowerCase().includes(search)) ||
+      (event.location && event.location.toLowerCase().includes(search)) ||
+      (event.description && event.description.toLowerCase().includes(search))
+    );
+  }
+
+  onSearchInput(event: any) {
+    this.searchTerm = event.target.value;
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+  }
 
   toggleDropdown() {
     this.dropdownVisible = !this.dropdownVisible;
@@ -63,9 +101,25 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  onNotificationClick(notif: any, event: MouseEvent) {
+    event.preventDefault();
+    if (!notif.is_read) {
+      this.eventService.markNotificationAsRead(notif.id).subscribe(() => {
+        notif.is_read = true;
+        this.unreadCount = this.notifications.filter(n => !n.is_read).length;
+      });
+    }
+    if (notif.event_id) {
+      const eventObj = this.events.find(e => e.event_id === notif.event_id || e.id === notif.event_id);
+      if (eventObj) {
+        this.openViewModal(eventObj);
+      }
+    }
+  }
+
   toggleNotificationDropdown() {
     this.notificationDropdownVisible = !this.notificationDropdownVisible;
-    this.dropdownVisible = false; // Hide account dropdown when notification dropdown is shown
+    this.dropdownVisible = false;
     const notificationDropdown = document.getElementById('notificationDropdown');
     const dropdown = document.getElementById('dropdown');
     if (notificationDropdown) {
@@ -73,6 +127,9 @@ export class HomeComponent implements OnInit {
     }
     if (dropdown) {
       dropdown.classList.add('hidden');
+    }
+    if (this.notificationDropdownVisible) {
+      this.loadNotifications(); // Refresh notifications when opened
     }
   }
 
@@ -110,28 +167,6 @@ export class HomeComponent implements OnInit {
     this.selectedEvent = null;
   }
 
-
-  onLogout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
-
-  // displayedCards: Card[] = [];
-  // currentPage = 1;
-  // itemsPerPage = 10;
-  // totalPages = 1;
-
-  // constructor() {
-  //   this.updateDisplayedCards();
-  // }
-
-  // updateDisplayedCards() {
-  //   const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-  //   const endIndex = startIndex + this.itemsPerPage;
-  //   this.displayedCards = this.cards.slice(startIndex, endIndex);
-  //   this.totalPages = Math.ceil(this.cards.length / this.itemsPerPage);
-  // }
-
   // changePage(page: number) {
   //   this.currentPage = page;
   //   this.updateDisplayedCards();
@@ -149,5 +184,18 @@ export class HomeComponent implements OnInit {
     const date = new Date();
     date.setHours(+hours, +minutes, 0, 0);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  }
+
+  onSearchClick() {
+    // This method is for UX clarity; filtering is already reactive.
+    // Optionally, you could trigger analytics or focus the results here.
+  }
+
+  expandedNotificationId: number | null = null;
+
+  onNotificationExpand(notif: any, event: MouseEvent) {
+    event.stopPropagation(); // Prevents the click from bubbling up
+    event.preventDefault(); // Prevents the anchor's default navigation
+    this.expandedNotificationId = this.expandedNotificationId === notif.id ? null : notif.id;
   }
 }

@@ -1,47 +1,74 @@
 <!-- Main content -->
-<div class="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto" id="main-content">
+<div class="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto min-h-screen" id="main-content">
   <!-- Top section with responsive layout -->
   <div class="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:items-center lg:justify-between mb-4">
     <!-- Search section -->
     <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
       <div class="relative w-full">
-        <input type="text" placeholder="Search..."
-          class="w-full min-w-full sm:min-w-0 sm:w-[300px] lg:w-[400px] px-4 py-2 border rounded-lg pl-10">
+        <input
+          type="text"
+          placeholder="Search..."
+          class="w-full min-w-full sm:min-w-0 sm:w-[300px] lg:w-[400px] px-4 py-2 border rounded-lg pl-10"
+          [value]="searchTerm"
+          (input)="onSearchInput($event)"
+          (keyup.enter)="onSearchClick()"
+        >
         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
       </div>
       <div class="flex space-x-2 w-full sm:w-auto justify-center mt-2 sm:mt-0">
         <button
-          class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer">Search</button>
-        <button class="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
-          <i class="fas fa-filter cursor-pointer"></i>
-        </button>
+          class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer"
+          (click)="onSearchClick()"
+        >Search</button>
+        <button
+          class="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer"
+          (click)="clearSearch()"
+          *ngIf="searchTerm"
+        >Clear</button>
       </div>
     </div>
 
     <!-- User controls -->
     <div class="flex items-center justify-center space-x-4 mt-4 lg:mt-0">
       <div class="relative">
-        <i class="fas fa-bell text-yellow-500 cursor-pointer text-xl sm:text-2xl"></i>
+        <i class="fas fa-bell text-yellow-500 cursor-pointer text-xl sm:text-2xl"
+           (click)="toggleNotificationDropdown()"></i>
+        <span *ngIf="unreadCount > 0"
+              class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-xs px-1.5 py-0.5">
+          {{ unreadCount }}
+        </span>
         <div id="notificationDropdown"
-          class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-2 hidden z-50">
+             class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg py-2 hidden z-50">
           <div class="arrow-up"></div>
-          <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 1</a>
-          <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 2</a>
-          <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-200">Notification 3</a>
-        </div>
-      </div>
-      <div class="relative">
-        <div class="flex items-center space-x-2 cursor-pointer hover:text-gray-800" (click)="toggleDropdown()">
-          <i class="fas fa-user text-gray-600 text-2xl"></i>
-          <span>Account</span>
-          <i class="fas fa-chevron-down text-gray-600 text-sm"></i>
-        </div>
-        <div id="dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 hidden z-50">
-          <div class="arrow-up"></div>
-          <button [routerLink]="'/profile'"
-            class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</button>
-          <button class="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer"
-            (click)="onLogout()">Logout</button>
+          <ng-container *ngIf="notifications.length > 0; else noNotif">
+            <a *ngFor="let notif of notifications"
+               href="#"
+               (click)="onNotificationClick(notif, $event)"
+               [ngClass]="{'font-bold': !notif.is_read, 'text-gray-800': notif.is_read}"
+               class="block px-4 py-2 hover:bg-gray-200 truncate relative"
+            >
+              <div class="flex justify-between items-center">
+                <span>
+                  {{ notif.message }}
+                </span>
+                <button type="button"
+                        class="ml-2 text-xs text-[#679436] focus:outline-none"
+                        (click)="onNotificationExpand(notif, $event)">
+                  <i class="fas"
+                     [ngClass]="expandedNotificationId === notif.id ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </button>
+              </div>
+              <span class="block text-xs text-gray-400">{{ notif.created_at | date:'short' }}</span>
+              <div *ngIf="expandedNotificationId === notif.id" class="mt-2 p-2 bg-gray-50 rounded text-m text-gray-700 border border-gray-200">
+                <div *ngIf="notif.event_title" class="font-semibold mb-1">
+                  Event Title: {{ notif.event_title }}
+                </div>
+              </div>
+            </a>
+          </ng-container>
+          <ng-template #noNotif>
+            <div class="px-4 py-2 text-gray-500">No notifications</div>
+          </ng-template>
         </div>
       </div>
     </div>
@@ -51,7 +78,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
     <div
       class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300"
-      *ngFor="let event of events; let i = index"
+      *ngFor="let event of filteredEvents; let i = index"
       style="height: 420px; display: flex; flex-direction: column;"
     >
       <div class="relative h-48 sm:h-64 overflow-hidden">
@@ -61,7 +88,22 @@
       </div>
       <div class="p-4 flex-1 flex flex-col">
         <ul class="space-y-2 text-gray-700 flex-1">
-          <li class="text-xl sm:text-2xl font-bold">{{event.title}}</li>
+          <li class="text-xl sm:text-2xl font-bold flex items-center">
+            {{event.title}}
+            <span
+              *ngIf="event.department"
+              class="ml-3 px-2 py-1 rounded text-sm text-white flex items-center font-semibold"
+              [ngClass]="{
+                'bg-orange-500': event.department === 'CCS',
+                'bg-yellow-400': event.department === 'CBA',
+                'bg-red-500': event.department === 'CAHS',
+                'bg-blue-500': event.department === 'CEAS',
+                'bg-pink-400': event.department === 'CHTM'
+              }"
+            >
+              {{ event.department }}
+            </span>
+          </li>
           <li class="text-sm sm:text-base truncate" title="{{event.description}}">
             {{event.description}}
           </li>
@@ -100,6 +142,11 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="filteredEvents.length === 0" class="flex flex-col items-center justify-center min-h-[300px] text-gray-500 mt-10">
+    <i class="fas fa-calendar-times text-5xl mb-4"></i>
+    <span>No events found.</span>
   </div>
 
   <app-viewmodal *ngIf="isViewModalOpen" [event]="selectedEvent" (close)="closeViewModal()">

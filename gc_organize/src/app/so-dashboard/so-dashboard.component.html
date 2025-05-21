@@ -3,7 +3,8 @@
   <header class="bg-[#679436] text-white shadow-md p-4 rounded-lg mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold flex items-center">
-        <i class="fas fa-calendar-alt text-white mr-2"></i> Welcome, Student Organization!
+        <i class="fas fa-calendar-alt text-white mr-2"></i>
+        Welcome, {{ orgName }}!
       </h1>
       <p class="text-gray-200">Manage your events efficiently.</p>
     </div>
@@ -16,15 +17,20 @@
       <h2 class="text-lg font-semibold text-[#679436] mb-4 flex items-center">
         <i class="fas fa-tools text-[#679436] mr-2"></i> Quick Actions
       </h2>
-      <div class="space-y-3">
-        <button class="w-full bg-[#679436] text-white py-2 px-3 rounded-lg hover:bg-[#56732e] flex items-center justify-center">
+      <div class="flex flex-col gap-3">
+        <button
+          class="w-full bg-[#679436] text-white py-3 px-3 text-base rounded-lg hover:bg-[#56732e] flex items-center justify-center"
+          [routerLink]="['/sidebar/create-event']"
+          type="button"
+        >
           <i class="fas fa-plus-circle mr-2"></i> Create New Event
         </button>
-        <button class="w-full bg-[#679436] text-white py-2 px-3 rounded-lg hover:bg-[#56732e] flex items-center justify-center">
+        <button
+          class="w-full bg-[#679436] text-white py-3 px-3 text-base rounded-lg hover:bg-[#56732e] flex items-center justify-center"
+          [routerLink]="['/sidebar/manage-event']"
+          type="button"
+        >
           <i class="fas fa-list mr-2"></i> View All Events
-        </button>
-        <button class="w-full bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 flex items-center justify-center">
-          <i class="fas fa-ban mr-2"></i> Cancel an Event
         </button>
       </div>
     </section>
@@ -34,26 +40,31 @@
       <h2 class="text-lg font-semibold text-[#679436] mb-4 flex items-center">
         <i class="fas fa-chart-bar text-[#679436] mr-2"></i> Statistics
       </h2>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
         <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
           <i class="fas fa-calendar-check text-[#679436] text-3xl mb-2"></i>
-          <p class="text-3xl font-bold text-gray-800">12</p>
-          <p class="text-gray-600 text-sm">Upcoming Events</p>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.upcoming }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Upcoming Events</p>
+        </div>
+        <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
+          <i class="fas fa-play-circle text-[#679436] text-3xl mb-2"></i>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.ongoing }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Ongoing Events</p>
         </div>
         <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
           <i class="fas fa-check-circle text-[#679436] text-3xl mb-2"></i>
-          <p class="text-3xl font-bold text-gray-800">5</p>
-          <p class="text-gray-600 text-sm">Completed Events</p>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.completed }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Completed Events</p>
         </div>
         <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
           <i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>
-          <p class="text-3xl font-bold text-gray-800">3</p>
-          <p class="text-gray-600 text-sm">Canceled Events</p>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.cancelled }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Canceled Events</p>
         </div>
         <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
           <i class="fas fa-users text-[#679436] text-3xl mb-2"></i>
-          <p class="text-3xl font-bold text-gray-800">150</p>
-          <p class="text-gray-600 text-sm">Total Attendees</p>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.totalAttendees }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Total Attendees</p>
         </div>
       </div>
     </section>
@@ -72,7 +83,8 @@
               {{ event.event_date | date: 'MMMM d, y'}} | {{ formatTime(event.event_time) }}
             </p>
           </div>
-          <button class="text-[#679436] hover:text-[#56732e] flex items-center">
+          <button class="text-[#679436] hover:text-[#56732e] flex items-center"           [routerLink]="['/sidebar/manage-event']"
+          type="button" cursor="pointer">
             <i class="fas fa-eye mr-1"></i> View
           </button>
         </li>

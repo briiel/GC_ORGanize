@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { EventService } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-create-event',
   templateUrl: './create-event.component.html',
@@ -75,13 +77,26 @@ export class CreateEventComponent {
 
     this.eventService.createEvent(formData).subscribe(
       (response) => {
-        console.log('Event successfully created:', response);
-        alert('Event created successfully!');
-        // Optionally, reset the form or navigate to another page
+        Swal.fire({
+          icon: 'success',
+          title: 'Event Created!',
+          text: 'Your event has been created successfully.',
+          confirmButtonColor: '#679436'
+        }).then(() => {
+          // Reset form fields
+          this.event = {
+            title: '',
+            description: '',
+            location: '',
+            event_date: '',
+            event_time: ''
+          };
+          this.removeImage();
+        });
       },
       (error) => {
         console.error('Error creating event:', error);
-        alert('Failed to create event. Please try again.');
+        Swal.fire('Error', 'Failed to create event. Please try again.', 'error');
       }
     );
   }

@@ -1,0 +1,77 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+  <!-- Search Bar, Heading, and Download Button Row -->
+  <div class="mb-6 mx-2 lg:mx-6">
+    <!-- Heading -->
+    <h1 class="text-3xl font-bold text-[#679436] mb-2 min-w-max">Attendance Records</h1>
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      <!-- Search and buttons group -->
+      <div class="flex flex-grow flex-col sm:flex-row gap-2">
+        <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px]">
+          <input
+            type="text"
+            placeholder="Search by event, student name, or student ID..."
+            class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+          />
+        </div>
+        <button
+          class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+          (click)="onSearch()"
+          type="button"
+        >
+          Search
+        </button>
+        <button
+          *ngIf="searchTerm"
+          class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 py-2 rounded-md transition-all duration-300 shadow-sm border border-gray-300 flex items-center justify-center w-full sm:w-auto"
+          (click)="clearSearch()"
+          type="button"
+        >
+          Clear
+        </button>
+      </div>
+      <!-- Download Excel button always at the right -->
+      <div class="flex-none">
+        <button
+          (click)="downloadExcel()"
+          class="bg-[#05668D] hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 min-w-[140px] w-full sm:w-auto"
+          [disabled]="filteredRecords.length === 0"
+          type="button"
+          style="font-size: 0.95rem;"
+        >
+          <i class="fas fa-file-excel"></i>
+          Download Excel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-[#679436]">Loading...</div>
+  <div *ngIf="error" class="text-red-600">{{ error }}</div>
+  <div class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
+    <div class="overflow-x-auto">
+      <table *ngIf="!loading && !error" class="w-full text-sm lg:text-base">
+        <thead class="bg-[#679436]">
+          <tr class="uppercase tracking-wider text-white">
+            <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/3">Event</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/3">Student Name</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-center w-1/4">Student ID</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+          <tr *ngFor="let record of filteredRecords; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+            <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ i + 1 }}</td>
+            <td class="px-4 py-3 text-left">{{ record.event_title || '-' }}</td>
+            <td class="px-4 py-3 text-left">{{ record.student_name || '-' }}</td>
+            <td class="px-4 py-3 text-center">{{ record.student_id || '-' }}</td>
+          </tr>
+          <tr *ngIf="filteredRecords.length === 0">
+            <td colspan="4" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No records found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

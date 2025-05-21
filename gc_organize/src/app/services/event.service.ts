@@ -40,12 +40,40 @@ export class EventService {
     return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status });
   }
 
+  // Fetch all attendance records
+  getAllAttendanceRecords(): Observable<any> {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get(`${this.apiUrl}/attendance-records`, { headers });
+  }
+
+  // Delete an event
+  deleteEvent(eventId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/events/${eventId}`, { headers });
+  }
+
   // Helper method to get Authorization headers
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('authToken');
-    // Remove Content-Type here
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      Authorization: `Bearer ${token}`
+    });
+  }
+
+  // Get notifications
+  getNotifications() {
+    return this.http.get<any[]>('http://localhost:5000/api/notifications', {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  // Mark notification as read
+  markNotificationAsRead(id: number) {
+    return this.http.patch(`http://localhost:5000/api/notifications/${id}/read`, {}, {
+      headers: this.getAuthHeaders()
     });
   }
 }
