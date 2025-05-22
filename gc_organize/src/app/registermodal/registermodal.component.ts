@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-registermodal',
@@ -61,14 +62,18 @@ export class RegistermodalComponent implements OnInit {
   }
 
   submitRegistration() {
-    const token = localStorage.getItem('authToken');  // or sessionStorage.getItem('token')
+    const token = localStorage.getItem('authToken');
     if (!token) {
-      alert('You must be logged in to register.');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Not Logged In',
+        text: 'You must be logged in to register.',
+      });
       return;
     }
 
     this.http.post(
-      'http://localhost:5000/api/event/events/register', // <-- Make sure this matches your backend route!
+      'http://localhost:5000/api/event/events/register',
       this.registrationData,
       {
         headers: {
@@ -77,11 +82,21 @@ export class RegistermodalComponent implements OnInit {
       }
     ).subscribe({
       next: (res) => {
-        alert('Registration successful!');
-        this.closeModal();
+        Swal.fire({
+          icon: 'success',
+          title: 'Registration Successful!',
+          text: 'You have been registered for the event.',
+          confirmButtonColor: '#679436'
+        }).then(() => {
+          this.closeModal();
+        });
       },
       error: (err) => {
-        alert('Registration failed: ' + (err.error?.message || err.message));
+        Swal.fire({
+          icon: 'error',
+          title: 'Registration Failed',
+          text: err.error?.message || err.message,
+        });
       }
     });
   }

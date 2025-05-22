@@ -1,51 +1,78 @@
 <div class="min-h-screen bg-gray-100 p-6">
-    <!-- Header Section -->
-    <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">My E-Certificates</h1>
-        <p class="text-gray-600 mt-2">View and download your earned certificates from participated events</p>
+    <!-- Header Section: label and description aligned left above search -->
+    <div class="mb-2 mx-2 lg:mx-6">
+        <h1 class="text-2xl lg:text-4xl font-bold text-gray-800 mb-1">My E-Certificates</h1>
+        <p class="text-gray-600">Download your earned certificates from participated events</p>
     </div>
 
-    <!-- Certificates Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Certificate Card (This will be repeated for each certificate) -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300">
-            <div class="relative">
-                <!-- Certificate Preview -->
-                <img src="#" alt="Certificate Preview" class="w-full h-48 object-cover">
-                <!-- Event Date Badge -->
-                <span class="absolute top-4 right-4 bg-[#05668D] text-white px-3 py-1 rounded-full text-sm">
-                    Mar 15, 2024
-                </span>
-            </div>
-            
-            <div class="p-4">
-                <!-- Certificate Details -->
-                <h3 class="text-lg font-semibold text-gray-800">Event Name</h3>
-                <p class="text-gray-600 text-sm mt-1">Certificate of Participation</p>
-                
-                <!-- Actions -->
-                <div class="mt-4 flex justify-between items-center">
-                    <button class="text-[#05668D] hover:text-[#034f6b] text-sm font-medium">
-                        View Certificate
-                    </button>
-                    <button class="bg-[#679436] hover:bg-[#4e732b] text-white px-4 py-2 rounded-lg text-sm">
-                        Download
-                    </button>
-                </div>
+    <!-- Search section aligned with table -->
+    <div class="mb-6 mx-2 lg:mx-6">
+        <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px] flex">
+                <input
+                    type="text"
+                    [(ngModel)]="searchTerm"
+                    placeholder="Search by event title..."
+                    class="px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
+                    style="width:100%; min-width:0; max-width:100%; flex:1 1 0;"
+                    (keyup.enter)="onSearch()"
+                />
+                <button
+                    class="ml-2 px-4 py-2 bg-[#679436] hover:bg-[#4e732b] text-white rounded-md text-sm flex-shrink-0"
+                    (click)="onSearch()"
+                >
+                    Search
+                </button>
+                <button
+                    class="ml-2 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm flex-shrink-0"
+                    (click)="clearSearch()"
+                    *ngIf="searchTerm"
+                >
+                    Clear
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Add more certificate cards here -->
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-12">
+        Loading...
     </div>
 
     <!-- Empty State (Show when no certificates) -->
-    <div class="hidden text-center py-12">
-        <div class="text-[#679436] mb-4">
-            <svg class="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-        </div>
+    <div *ngIf="!loading && filteredCertificates.length === 0" class="text-center py-12">
         <h3 class="text-lg font-medium text-gray-900">No certificates yet</h3>
         <p class="mt-1 text-gray-500">Participate in events to earn certificates!</p>
+    </div>
+
+    <!-- Certificates Table -->
+    <div *ngIf="filteredCertificates.length > 0" class="mx-2 lg:m-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm lg:text-base">
+                <thead class="bg-[#679436]">
+                    <tr class="uppercase tracking-wider text-white">
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-left">No.</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-left">Event Title</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">Event Date</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">Certificate</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+                    <tr *ngFor="let cert of filteredCertificates; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-1 lg:px-4 py-2 lg:py-3">{{ i + 1 }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 font-semibold">{{ cert.event_title }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ cert.event_date | date:'mediumDate' }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
+                            <button
+                                class="bg-[#679436] hover:bg-[#4e732b] text-white px-4 py-2 rounded-lg text-sm"
+                                (click)="downloadCertificate(cert.certificate_url)">
+                                <i class="fas fa-download mr-2"></i>
+                                Download Certificate
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

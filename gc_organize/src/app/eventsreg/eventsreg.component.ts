@@ -14,7 +14,7 @@ import { EventService } from '../services/event.service';
 export class EventsregComponent implements OnInit {
   // Search related properties
   searchTerm: string = '';
-
+  loading: boolean = false;
   registeredEvents: any[] = [];
   studentId: string | null = null;
 
@@ -41,15 +41,23 @@ export class EventsregComponent implements OnInit {
 
   // Filtered events based on search
   get filteredEvents() {
+    if (!this.searchTerm) {
+      return this.registeredEvents;
+    }
+    const term = this.searchTerm.toLowerCase();
     return this.registeredEvents.filter(event =>
-      event.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      event.venue.toLowerCase().includes(this.searchTerm.toLowerCase())
+      (event.title && event.title.toLowerCase().includes(term)) ||
+      (event.venue && event.venue.toLowerCase().includes(term))
     );
   }
 
   // Search function
-  onSearch(event: any) {
-    this.searchTerm = event.target.value;
+  onSearch() {
+    // Optionally trigger filtering logic or just rely on ngModel binding
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
   }
 
   // Certificate download function (dummy for now)

@@ -15,61 +15,59 @@
         >
         <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
       </div>
-      <div class="flex space-x-2 w-full sm:w-auto justify-center mt-2 sm:mt-0">
+      <div class="flex space-x-2 w-full sm:w-auto justify-center mt-2 sm:mt-0 items-center">
         <button
-          class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer"
+          class="w-full sm:w-auto sm:px-4 px-2 py-2 sm:py-3 text-sm sm:text-base bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer"
           (click)="onSearchClick()"
         >Search</button>
         <button
-          class="w-full sm:w-auto px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer"
+          class="w-full sm:w-auto sm:px-4 px-2 sm:py-2 py-1 text-sm sm:text-base bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer"
           (click)="clearSearch()"
           *ngIf="searchTerm"
         >Clear</button>
-      </div>
-    </div>
-
-    <!-- User controls -->
-    <div class="flex items-center justify-center space-x-4 mt-4 lg:mt-0">
-      <div class="relative">
-        <i class="fas fa-bell text-yellow-500 cursor-pointer text-xl sm:text-2xl"
-           (click)="toggleNotificationDropdown()"></i>
-        <span *ngIf="unreadCount > 0"
-              class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-xs px-1.5 py-0.5">
-          {{ unreadCount }}
-        </span>
-        <div id="notificationDropdown"
-             class="absolute right-0 mt-2 w-96 bg-white rounded-md shadow-lg py-2 hidden z-50">
-          <div class="arrow-up"></div>
-          <ng-container *ngIf="notifications.length > 0; else noNotif">
-            <a *ngFor="let notif of notifications"
-               href="#"
-               (click)="onNotificationClick(notif, $event)"
-               [ngClass]="{'font-bold': !notif.is_read, 'text-gray-800': notif.is_read}"
-               class="block px-4 py-2 hover:bg-gray-200 truncate relative"
-            >
-              <div class="flex justify-between items-center">
-                <span>
-                  {{ notif.message }}
-                </span>
-                <button type="button"
-                        class="ml-2 text-xs text-[#679436] focus:outline-none"
-                        (click)="onNotificationExpand(notif, $event)">
-                  <i class="fas"
-                     [ngClass]="expandedNotificationId === notif.id ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-                </button>
-              </div>
-              <span class="block text-xs text-gray-400">{{ notif.created_at | date:'short' }}</span>
-              <div *ngIf="expandedNotificationId === notif.id" class="mt-2 p-2 bg-gray-50 rounded text-m text-gray-700 border border-gray-200">
-                <div *ngIf="notif.event_title" class="font-semibold mb-1">
-                  Event Title: {{ notif.event_title }}
+        <!-- Notification bell moved here -->
+        <div class="relative ml-2">
+          <i class="fas fa-bell text-yellow-500 cursor-pointer text-xl sm:text-2xl"
+             (click)="toggleNotificationDropdown()"></i>
+          <span *ngIf="unreadCount > 0"
+                class="absolute -top-2 -right-2 bg-red-600 text-white rounded-full text-xs px-1.5 py-0.5">
+            {{ unreadCount }}
+          </span>
+          <div id="notificationDropdown"
+               class="absolute right-0 mt-2 w-[90vw] sm:w-96 bg-white rounded-md shadow-lg py-2 hidden z-50">
+            <div class="arrow-up"></div>
+            <ng-container *ngIf="notifications.length > 0; else noNotif">
+              <a *ngFor="let notif of notifications"
+                 href="#"
+                 (click)="onNotificationClick(notif, $event)"
+                 [ngClass]="{'font-bold': !notif.is_read, 'text-gray-800': notif.is_read}"
+                 class="block px-4 py-2 hover:bg-gray-200 truncate relative"
+              >
+                <div class="flex justify-between items-center">
+                  <span>
+                    {{ notif.message }}
+                  </span>
+                  <button type="button"
+                          class="ml-2 text-xs text-[#679436] focus:outline-none"
+                          (click)="onNotificationExpand(notif, $event)">
+                    <i class="fas"
+                       [ngClass]="expandedNotificationId === notif.id ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                  </button>
                 </div>
-              </div>
-            </a>
-          </ng-container>
-          <ng-template #noNotif>
-            <div class="px-4 py-2 text-gray-500">No notifications</div>
-          </ng-template>
+                <span class="block text-xs text-gray-400">{{ notif.created_at | date:'short' }}</span>
+                <div *ngIf="expandedNotificationId === notif.id" class="mt-2 p-2 bg-gray-50 rounded text-m text-gray-700 border border-gray-200">
+                  <div *ngIf="notif.event_title" class="font-semibold mb-1">
+                    Event Title: {{ notif.event_title }}
+                  </div>
+                </div>
+              </a>
+            </ng-container>
+            <ng-template #noNotif>
+              <div class="px-4 py-2 text-gray-500">No notifications</div>
+            </ng-template>
+          </div>
         </div>
+        <!-- End notification bell -->
       </div>
     </div>
   </div>
@@ -81,37 +79,44 @@
       *ngFor="let event of filteredEvents; let i = index"
       style="height: 420px; display: flex; flex-direction: column;"
     >
-      <div class="relative h-48 sm:h-64 overflow-hidden">
+      <!-- Poster image: taller on mobile -->
+      <div class="relative h-80 sm:h-72 overflow-hidden">
         <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
       </div>
-      <div class="p-4 flex-1 flex flex-col">
-        <ul class="space-y-2 text-gray-700 flex-1">
-          <li class="text-xl sm:text-2xl font-bold flex items-center">
-            {{event.title}}
-            <span
-              *ngIf="event.department"
-              class="ml-3 px-2 py-1 rounded text-sm text-white flex items-center font-semibold"
-              [ngClass]="{
-                'bg-orange-500': event.department === 'CCS',
-                'bg-yellow-400': event.department === 'CBA',
-                'bg-red-500': event.department === 'CAHS',
-                'bg-blue-500': event.department === 'CEAS',
-                'bg-pink-400': event.department === 'CHTM'
-              }"
-            >
-              {{ event.department }}
-            </span>
-          </li>
-          <li class="text-sm sm:text-base truncate" title="{{event.description}}">
-            {{event.description}}
-          </li>
-          <li><i class="fas fa-map-marker-alt mr-2"></i>Location: {{event.location}}</li>
-          <li><i class="fas fa-calendar-alt mr-2"></i>Date: {{event.event_date | date: 'MMMM d, y'}}</li>
-          <li><i class="fas fa-clock mr-2"></i>Time: {{formatTime(event.event_time)}}</li>
-        </ul>
-        <div class="flex flex-col h-full justify-end">
+      <div class="p-0 flex-1 flex flex-col relative">
+        <!-- Fixed title on mobile -->
+        <div class="sticky top-0 z-10 bg-white p-4 border-b border-gray-200 sm:static sm:border-0 sm:p-4">
+          <ul class="space-y-2 text-gray-700">
+            <li class="text-xl sm:text-2xl font-bold flex items-center">
+              {{event.title}}
+              <span
+                *ngIf="event.department"
+                class="ml-3 px-2 py-1 rounded text-sm text-white flex items-center font-semibold"
+                [ngClass]="{
+                  'bg-orange-500': event.department === 'CCS',
+                  'bg-yellow-400': event.department === 'CBA',
+                  'bg-red-500': event.department === 'CAHS',
+                  'bg-blue-500': event.department === 'CEAS',
+                  'bg-pink-400': event.department === 'CHTM'
+                }"
+              >
+                {{ event.department }}
+              </span>
+            </li>
+          </ul>
+        </div>
+        <!-- Scrollable details on mobile -->
+        <div class="flex-1 overflow-y-auto sm:overflow-visible px-4 py-2 pb-8 sm:pb-4 max-h-[180px] sm:max-h-none" >
+          <ul class="space-y-2 text-gray-700">
+            <li class="text-sm sm:text-base truncate" title="{{event.description}}">
+              {{event.description}}
+            </li>
+            <li><i class="fas fa-map-marker-alt mr-2"></i>Location: {{event.location}}</li>
+            <li><i class="fas fa-calendar-alt mr-2"></i>Date: {{event.event_date | date: 'MMMM d, y'}}</li>
+            <li><i class="fas fa-clock mr-2"></i>Time: {{formatTime(event.event_time)}}</li>
+          </ul>
           <div class="flex flex-col sm:flex-row sm:items-center w-full space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
             <!-- Status badge always on the left -->
             <div class="flex justify-start sm:flex-1">

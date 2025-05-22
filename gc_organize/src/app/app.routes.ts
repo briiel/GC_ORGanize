@@ -14,22 +14,30 @@ import { ScanQrComponent } from './scan-qr/scan-qr.component';
 import { AttendanceRecordsComponent } from './attendance-records/attendance-records.component';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'profile', component: ProfileComponent },
-  { path: 'sidebar', component: SidebarComponent, canActivate: [AuthGuard], 
+  { path: 'login', component: LoginComponent, data: { animation: 'LoginPage' } },
+  { path: 'profile', component: ProfileComponent, data: { animation: 'ProfilePage' } },
+  { 
+    path: 'sidebar', 
+    component: SidebarComponent, 
+    canActivate: [AuthGuard], 
+    data: { animation: 'SidebarPage' },
     children: [
-      { path: 'home', component: HomeComponent,
+      { 
+        path: 'home', 
+        component: HomeComponent, 
+        data: { animation: 'HomePage' },
         children: [
-          { path: 'profile', component: ProfileComponent }
+          { path: 'profile', component: ProfileComponent, data: { animation: 'ProfilePage' } }
         ]
-       },
-      { path: 'eventsreg', component: EventsregComponent },
-      { path: 'ecertificate', component: EcertificateComponent },
-      { path: 'so-dashboard', component: SoDashboardComponent},
-      { path: 'create-event', component: CreateEventComponent},
-      { path: 'manage-event', component: ManageEventComponent},
-      { path: 'scan-qr', component: ScanQrComponent },
-      { path: 'attendance-records', component: AttendanceRecordsComponent },
-  ] },
+      },
+      { path: 'eventsreg', component: EventsregComponent, data: { animation: 'EventsRegPage' } },
+      { path: 'ecertificate', component: EcertificateComponent, data: { animation: 'ECertificatePage' } },
+      { path: 'so-dashboard', component: SoDashboardComponent, data: { animation: 'SoDashboardPage' } },
+      { path: 'create-event', component: CreateEventComponent, data: { animation: 'CreateEventPage' } },
+      { path: 'manage-event', component: ManageEventComponent, data: { animation: 'ManageEventPage' } },
+      { path: 'scan-qr', component: ScanQrComponent, data: { animation: 'ScanQrPage' } },
+      { path: 'attendance-records', component: AttendanceRecordsComponent, data: { animation: 'AttendanceRecordsPage' } },
+    ] 
+  },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];

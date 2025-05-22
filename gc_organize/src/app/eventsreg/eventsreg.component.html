@@ -1,72 +1,82 @@
-<div class="min-h-screen bg-gray-100 p-4 lg:p-6">
-    <div class="overflow-x-auto">
-        <!-- Header section with title and description -->
-        <div class="mb-6 text-center">
-            <h1 class="text-2xl lg:text-4xl font-bold text-gray-800 mb-2">Events Registered</h1>
-            <p class="text-gray-600">View and manage your registered events</p>
-        </div>
+<div class="min-h-screen bg-gray-100 p-6">
+    <!-- Header Section: label and description aligned left above search -->
+    <div class="mb-2 mx-2 lg:mx-6">
+        <h1 class="text-2xl lg:text-4xl font-bold text-gray-800 mb-1">Events Registered</h1>
+        <p class="text-gray-600">View and manage your registered events</p>
+    </div>
 
-        <!-- Search section -->
-        <div class="mb-6 mx-2 lg:mx-6">
-            <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-                <div class="relative flex-grow">
-                    <input 
-                        type="text" 
-                        placeholder="Search events..." 
-                        class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
-                    >
-                </div>
-                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                    <button 
-                        class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto">
-                        <i class="fas fa-search"></i>
-                        Search
-                    </button>
-                    <button 
-                        class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 py-2 rounded-md transition-all duration-300 shadow-sm border border-gray-300 flex items-center justify-center w-full sm:w-auto">
-                        <i class="fas fa-filter text-lg"></i>
-                    </button>
-                </div>
+    <!-- Search section aligned with table -->
+    <div class="mb-6 mx-2 lg:mx-6">
+        <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+            <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px] flex">
+                <input
+                    type="text"
+                    [(ngModel)]="searchTerm"
+                    placeholder="Search events..."
+                    class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
+                    (keyup.enter)="onSearch()"
+                />
+                <button
+                    class="ml-2 px-4 py-2 bg-[#679436] hover:bg-[#4e732b] text-white rounded-md text-sm flex-shrink-0"
+                    (click)="onSearch()"
+                >
+                    Search
+                </button>
+                <button
+                    class="ml-2 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm flex-shrink-0"
+                    (click)="clearSearch()"
+                    *ngIf="searchTerm"
+                >
+                    Clear
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Table container -->
-        <div class="mx-2 lg:m-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm lg:text-base">
-                    <thead class="bg-[#679436]">
-                        <tr class="uppercase tracking-wider text-white">
-                            <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">No.</th>
-                            <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-left">Event Name</th>
-                            <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">Date</th>
-                            <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">Time</th> <!-- Added -->
-                            <th class="px-1 lg:px-4 py-2 lg:py-3 border-b border-gray-200 text-center">QR Code</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-                        <!-- Event Rows -->
-                        <tr *ngFor="let event of registeredEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ i + 1 }}</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3">{{ event.title }}</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ event.event_date | date: 'mediumDate' }}</td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
-                                {{ formatTime(event.event_time) }}
-                            </td>
-                            <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
-                                <div class="flex flex-col items-center space-y-3">
-                                    <a *ngIf="event.qr_code"
-                                       (click)="downloadQrCode(event.qr_code, event.event_id)"
-                                       class="text-[#679436] hover:underline flex items-center gap-2 cursor-pointer"
-                                       title="Download QR Code">
-                                      <i class="fas fa-download"></i>
-                                      Download QR Code
-                                    </a>
-                                  </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-12">
+        Loading...
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && filteredEvents.length === 0" class="text-center py-12">
+        <h3 class="text-lg font-medium text-gray-900">No registered events yet</h3>
+        <p class="mt-1 text-gray-500">Register for events to see them here!</p>
+    </div>
+
+    <!-- Table container -->
+    <div *ngIf="filteredEvents.length > 0" class="mx-2 lg:m-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm lg:text-base">
+                <thead class="bg-[#679436]">
+                    <tr class="uppercase tracking-wider text-white">
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">No.</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-left">Event Name</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">Date</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">Time</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">QR Code</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+                    <tr *ngFor="let event of filteredEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ i + 1 }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3">{{ event.title }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ event.event_date | date: 'mediumDate' }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ formatTime(event.event_time) }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
+                            <div class="flex flex-col items-center space-y-3">
+                                <a *ngIf="event.qr_code"
+                                   (click)="downloadQrCode(event.qr_code, event.event_id)"
+                                   class="text-[#679436] hover:underline flex items-center gap-2 cursor-pointer"
+                                   title="Download QR Code">
+                                    <i class="fas fa-download"></i>
+                                    Download QR Code
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

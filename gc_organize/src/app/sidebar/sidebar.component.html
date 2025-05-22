@@ -64,7 +64,7 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0 z-0">
-        <router-outlet></router-outlet>
+    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0 z-0 relative" [@routeAnimations]="prepareRoute(outlet)">
+        <router-outlet #outlet="outlet"></router-outlet>
     </div>
 </div>
