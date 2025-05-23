@@ -40,6 +40,13 @@ export class LoginComponent implements OnInit {
 
   onLogin(): void {
     this.errorMessage = '';
+    // Clear all user-related keys before setting new ones
+    localStorage.removeItem('studentId');
+    localStorage.removeItem('creatorId');
+    localStorage.removeItem('orgName');
+    localStorage.removeItem('role');
+    localStorage.removeItem('adminId');
+
     this.authService.login(this.emailOrId, this.password).subscribe(
       (response) => {
         if (response.success) {
@@ -54,6 +61,7 @@ export class LoginComponent implements OnInit {
             timer: 2000,
             timerProgressBar: true
           });
+
           if (response.userType === 'student') {
             localStorage.setItem('studentId', payload.id);
             localStorage.setItem('role', 'student');
@@ -63,6 +71,16 @@ export class LoginComponent implements OnInit {
             localStorage.setItem('role', 'organization');
             localStorage.setItem('orgName', response.orgName || payload.org_name || 'Student Organization');
             this.router.navigate(['/sidebar/so-dashboard']);
+          } else if (response.userType === 'admin') {
+            localStorage.setItem('role', 'osws_admin');
+            if (response.adminId) {
+              localStorage.setItem('adminId', response.adminId);
+            } else if (response.id) {
+              localStorage.setItem('adminId', response.id);
+            } else {
+              localStorage.removeItem('adminId');
+            }
+            this.router.navigate(['/sidebar/admin-dashboard']);
           } else {
             this.errorMessage = 'Unknown user type.';
           }

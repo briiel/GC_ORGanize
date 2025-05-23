@@ -92,17 +92,18 @@
             <li class="text-xl sm:text-2xl font-bold flex items-center">
               {{event.title}}
               <span
-                *ngIf="event.department"
+                *ngIf="event.department || !event.department"
                 class="ml-3 px-2 py-1 rounded text-sm text-white flex items-center font-semibold"
                 [ngClass]="{
                   'bg-orange-500': event.department === 'CCS',
                   'bg-yellow-400': event.department === 'CBA',
                   'bg-red-500': event.department === 'CAHS',
                   'bg-blue-500': event.department === 'CEAS',
-                  'bg-pink-400': event.department === 'CHTM'
+                  'bg-pink-400': event.department === 'CHTM',
+                  'bg-[#14532d]': !event.department || event.department === 'OSWS'
                 }"
               >
-                {{ event.department }}
+                {{ event.department ? event.department : 'OSWS' }}
               </span>
             </li>
           </ul>

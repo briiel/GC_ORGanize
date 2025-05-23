@@ -76,4 +76,21 @@ export class EventService {
       headers: this.getAuthHeaders()
     });
   }
+
+  // Fetch events by admin ID
+  getEventsByAdmin(adminId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/events/admin/${adminId}`, { headers });
+  }
+
+  // Fetch all events created by student organizations (not OSWS)
+  getAllOrgEvents(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/events/organizations`, { headers });
+  }
+
+    getAllOswsEvents(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/events/osws`, { headers });
+  }
 }

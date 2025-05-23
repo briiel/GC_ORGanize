@@ -1,9 +1,9 @@
-<div class="min-h-screen bg-[#e6f2fa] p-6">
+<div class="min-h-screen bg-gray-100 p-6">
   <!-- Header -->
-  <header class="bg-[#05668D] text-white shadow-md p-6 rounded-lg mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+  <header class="bg-[#14532d] text-white shadow-md p-6 rounded-lg mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold flex items-center">
-        <img src="GC-Logo.png" alt="GC-ORGANIZE Logo" class="h-10 w-10 mr-3 object-contain rounded-full bg-white p-1">
+        <img src="OSWS.png" alt="GC-ORGANIZE Logo" class="h-10 w-10 mr-3 object-contain rounded-full bg-white p-1">
         OSWS Admin Dashboard
       </h1>
       <p class="text-blue-100 mt-1">Welcome to the OSWS Admin Panel.</p>
@@ -14,17 +14,17 @@
   <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <!-- Statistics Cards -->
     <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
-      <i class="fas fa-users-cog text-[#05668D] text-3xl mb-2"></i>
+      <i class="fas fa-users-cog text-[#14532d] text-3xl mb-2"></i>
       <p class="text-3xl font-bold text-gray-800">12</p>
       <p class="text-gray-600 text-sm">Total Admins</p>
     </div>
     <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
-      <i class="fas fa-users text-[#05668D] text-3xl mb-2"></i>
+      <i class="fas fa-users text-[#14532d] text-3xl mb-2"></i>
       <p class="text-3xl font-bold text-gray-800">245</p>
       <p class="text-gray-600 text-sm">Total Users</p>
     </div>
     <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
-      <i class="fas fa-calendar-alt text-[#05668D] text-3xl mb-2"></i>
+      <i class="fas fa-calendar-alt text-[#14532d] text-3xl mb-2"></i>
       <p class="text-3xl font-bold text-gray-800">37</p>
       <p class="text-gray-600 text-sm">Active Events</p>
     </div>
@@ -32,14 +32,17 @@
 
   <!-- Quick Actions -->
   <section class="mt-8 bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-xl font-semibold text-[#05668D] mb-4 flex items-center">
+    <h2 class="text-xl font-semibold text-[#14532d] mb-4 flex items-center">
       <i class="fas fa-tools mr-2"></i> Quick Actions
     </h2>
     <div class="flex flex-col sm:flex-row gap-4">
-      <button [routerLink]="'/sidebar/manage-users'" class="bg-[#05668D] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#034f6b] flex items-center justify-center transition">
+      <button [routerLink]="'/sidebar/manage-users'" class="bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
         <i class="fas fa-users-cog mr-2"></i> Manage Users
       </button>
-      <button [routerLink]="'/sidebar/admin-reports'" class="bg-[#05668D] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#034f6b] flex items-center justify-center transition">
+      <button [routerLink]="'/sidebar/manage-event'" class="bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
+        <i class="fas fa-calendar-alt mr-2"></i> Manage Events
+      </button>
+      <button [routerLink]="'/sidebar/admin-reports'" class="bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
         <i class="fas fa-chart-bar mr-2"></i> View Reports
       </button>
     </div>

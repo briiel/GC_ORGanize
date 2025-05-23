@@ -1,102 +1,240 @@
 <div class="p-6 bg-gray-100 min-h-screen">
-    <!-- Search and Filter Controls -->
-    <div class="mb-6 mx-2 lg:mx-6">
-        <!-- Heading -->
-        <h1 class="text-3xl font-bold text-[#679436] mb-2 min-w-max">Manage Events</h1>
-        <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-            <!-- Search and buttons group -->
-            <div class="flex flex-grow flex-col sm:flex-row gap-2">
-                <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px]">
-                    <input 
-                        type="text" 
-                        placeholder="Search events..." 
-                        class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
-                        [(ngModel)]="searchTerm"
-                        (keyup.enter)="searchEvents()"
-                    >
-                </div>
-                <button 
-                    class="bg-[#679436] hover:bg-[#56732e] text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
-                    (click)="searchEvents()"
-                    type="button"
-                >
-                    Search
-                </button>
-                <button
-                    *ngIf="searchTerm || statusFilter"
-                    class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 py-2 rounded-md transition-all duration-300 shadow-sm border border-gray-300 flex items-center justify-center w-full sm:w-auto"
-                    (click)="clearSearch()"
-                    type="button"
-                >
-                    Clear
-                </button>
-            </div>
-            <!-- Status filter always at the right -->
-            <div class="flex-none">
-                <select
-                    class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm w-full sm:w-auto"
-                    [(ngModel)]="statusFilter"
-                    (change)="searchEvents()"
-                >
-                    <option value="">All Status</option>
-                    <option value="not yet started">Not Yet Started</option>
-                    <option value="ongoing">Ongoing</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-            </div>
+  <!-- Header and Search Row -->
+  <div class="mb-6 mx-2 lg:mx-6">
+    <!-- Heading -->
+    <h1 class="text-3xl font-bold mb-2 min-w-max"
+        [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+      {{ isOsws ? 'OSWS Event Management' : 'Manage Events' }}
+    </h1>
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      <div class="flex flex-grow flex-col sm:flex-row gap-2">
+        <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px]">
+          <input
+            type="text"
+            [placeholder]="isOsws ? 'Search all events (title, location, date)...' : 'Search by title, location, or date...'"
+            class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none"
+            [ngClass]="isOsws ? 'focus:ring-2 focus:ring-[#14532d] focus:border-transparent' : 'focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm'"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="searchEvents()"
+          />
         </div>
+        <button
+          [ngClass]="isOsws
+            ? 'bg-[#14532d] hover:bg-[#218c4a]'
+            : 'bg-[#679436] hover:bg-[#56732e]'"
+          class="text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+          (click)="searchEvents()"
+          type="button"
+        >
+          {{ isOsws ? 'Search All Events' : 'Search' }}
+        </button>
+        <button
+          *ngIf="searchTerm || statusFilter"
+          class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 py-2 rounded-md transition-all duration-300 shadow-sm border border-gray-300 flex items-center justify-center w-full sm:w-auto"
+          (click)="clearSearch()"
+          type="button"
+        >
+          Clear
+        </button>
+      </div>
+      <div class="flex-none" *ngIf="!isOsws">
+        <select
+          class="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm w-full sm:w-auto"
+          [(ngModel)]="statusFilter"
+          (change)="searchEvents()"
+        >
+          <option value="">All Status</option>
+          <option value="not yet started">Not Yet Started</option>
+          <option value="ongoing">Ongoing</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- OSWS VIEW: Show two tables with OSWS palette -->
+  <ng-container *ngIf="isOsws; else orgTable">
+    <!-- Table 1: Events made by OSWS -->
+    <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-lg shadow-md bg-white">
+      <h2 class="text-xl font-bold text-[#14532d] p-4 bg-[#e6f7ef] border-b-2 border-[#14532d]">
+        Events Created by OSWS
+      </h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm lg:text-base">
+          <thead class="bg-[#14532d]">
+            <tr class="uppercase tracking-wider text-white">
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center w-12">#</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Title</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Date</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Time</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Location</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Status</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white text-gray-800 divide-y divide-[#e6f7ef]">
+            <tr *ngFor="let event of oswsEvents; let i = index" class="hover:bg-[#f3fafd] transition-colors duration-200">
+              <td class="px-4 py-3 text-center text-[#05668D] font-semibold">{{ i + 1 }}</td>
+              <td class="px-4 py-3 font-semibold text-left">{{ event.title }}</td>
+              <td class="px-4 py-3 text-center">{{ event.event_date | date: 'MMMM d, y' }}</td>
+              <td class="px-4 py-3 text-center">{{ formatTime(event.event_time) }}</td>
+              <td class="px-4 py-3 text-left">{{ event.location }}</td>
+              <!-- Status Dropdown -->
+              <td class="px-4 py-3 text-center">
+                <select
+                  class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
+                  [ngClass]="{
+                    'bg-yellow-100 text-yellow-800 border-yellow-300': event.status === 'not yet started',
+                    'bg-blue-100 text-blue-800 border-blue-300': event.status === 'ongoing',
+                    'bg-green-100 text-green-800 border-green-300': event.status === 'completed',
+                    'bg-red-100 text-red-800 border-red-300': event.status === 'cancelled'
+                  }"
+                  [(ngModel)]="event.status"
+                  (change)="updateOswsEventStatus(event)"
+                >
+                  <option value="not yet started">Not Yet Started</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </td>
+              <!-- Actions -->
+              <td class="px-4 py-3 text-center">
+                <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center gap-1">
+                  <i class="fas fa-trash-alt"></i>
+                  <span class="hidden sm:inline">Delete</span>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="oswsEvents.length === 0">
+              <td colspan="7" class="text-center py-6 text-gray-500 bg-[#f3fafd] font-semibold">No OSWS events found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm lg:text-base">
-                <thead class="bg-[#679436]">
-                    <tr class="uppercase tracking-wider text-white">
-                        <th class="px-4 py-3 border-b border-gray-200 text-left">Title</th>
-                        <th class="px-4 py-3 border-b border-gray-200 text-center">Date</th>
-                        <th class="px-4 py-3 border-b border-gray-200 text-center">Time</th>
-                        <th class="px-4 py-3 border-b border-gray-200 text-left">Location</th>
-                        <th class="px-4 py-3 border-b border-gray-200 text-center">Status</th>
-                        <th class="px-4 py-3 border-b border-gray-200 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-                    <tr *ngFor="let event of filteredEvents()" class="hover:bg-gray-50 transition-colors duration-200">
-                        <td class="px-4 py-3 font-semibold text-left">{{ event.title }}</td>
-                        <td class="px-4 py-3 text-center">{{ event.event_date | date: 'MMMM d, y' }}</td>
-                        <td class="px-4 py-3 text-center">{{ formatTime(event.event_time) }}</td>
-                        <td class="px-4 py-3 text-left">{{ event.location }}</td>
-                        <td class="px-4 py-3 text-center">
-                            <select
-                                class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
-                                [ngClass]="{
-                                    'bg-yellow-100 text-yellow-800 border-yellow-300': event.status === 'not yet started',
-                                    'bg-blue-100 text-blue-800 border-blue-300': event.status === 'ongoing',
-                                    'bg-green-100 text-green-800 border-green-300': event.status === 'completed',
-                                    'bg-red-100 text-red-800 border-red-300': event.status === 'cancelled'
-                                }"
-                                [(ngModel)]="event.status"
-                                (change)="updateEventStatus(event)"
-                            >
-                                <option value="not yet started">Not Yet Started</option>
-                                <option value="ongoing">Ongoing</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                            </select>
-                        </td>
-                        <td class="px-4 py-3 text-center">
-                            <button
-                                class="text-red-600 hover:text-red-800"
-                                (click)="confirmDeleteEvent(event)"
-                                title="Delete Event"
-                            >
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+    <!-- Table 2: Events made by Student Organizations -->
+    <div class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-md bg-white">
+      <!-- Change bg and border to green -->
+      <h2 class="text-xl font-bold text-[#14532d] p-4 bg-[#e6f7ef] border-b-2 border-[#14532d]">
+        Events Created by Student Organizations
+      </h2>
+      
+      <!-- Search bar: change border and button to green -->
+      <div class="px-4 py-3 bg-[#e6f7ef] flex flex-col sm:flex-row gap-2 sm:items-center border-b border-[#e6f7ef]">
+        <div class="flex flex-grow flex-col sm:flex-row gap-2">
+          <input
+            type="text"
+            [(ngModel)]="orgEventsSearchTerm"
+            placeholder="Search organization events (title, location, date)..."
+            class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-transparent"
+            (keyup.enter)="searchOrgEvents()"
+          />
+          <button
+            class="bg-[#14532d] hover:bg-[#218c4a] text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+            (click)="searchOrgEvents()"
+            type="button"
+          >
+            Search
+          </button>
+          <button
+            *ngIf="orgEventsSearchTerm"
+            class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 py-2 rounded-md transition-all duration-300 shadow-sm border border-gray-300 flex items-center justify-center w-full sm:w-auto"
+            (click)="clearOrgEventsSearch()"
+            type="button"
+          >
+            Clear
+          </button>
         </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <!-- Table header: change to green -->
+        <table class="w-full text-sm lg:text-base">
+          <thead class="bg-[#14532d]">
+            <tr class="uppercase tracking-wider text-white">
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center w-12">#</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Title</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Date</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Time</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Location</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Department</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white text-gray-800 divide-y divide-[#e6f7ef]">
+            <tr *ngFor="let event of filteredOrgEvents(); let i = index" class="hover:bg-[#f3fafd] transition-colors duration-200">
+              <td class="px-4 py-3 text-center text-[#05668D] font-semibold">{{ i + 1 }}</td>
+              <td class="px-4 py-3 font-semibold text-left">{{ event.title }}</td>
+              <td class="px-4 py-3 text-center">{{ event.event_date | date: 'MMMM d, y' }}</td>
+              <td class="px-4 py-3 text-center">{{ formatTime(event.event_time) }}</td>
+              <td class="px-4 py-3 text-left">{{ event.location }}</td>
+              <td class="px-4 py-3 text-left">{{ event.department }}</td>
+            </tr>
+            <tr *ngIf="filteredOrgEvents().length === 0">
+              <td colspan="6" class="text-center py-6 text-gray-500 bg-[#f3fafd] font-semibold">No organization events found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
+  </ng-container>
+
+  <!-- Organization view fallback -->
+  <ng-template #orgTable>
+    <div class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm lg:text-base">
+          <thead class="bg-[#679436]">
+            <tr class="uppercase tracking-wider text-white">
+              <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
+              <th class="px-4 py-3 border-b border-gray-200 text-left">Title</th>
+              <th class="px-4 py-3 border-b border-gray-200 text-center">Date</th>
+              <th class="px-4 py-3 border-b border-gray-200 text-center">Time</th>
+              <th class="px-4 py-3 border-b border-gray-200 text-left">Location</th>
+              <th class="px-4 py-3 border-b border-gray-200 text-center">Status</th>
+              <th class="px-4 py-3 border-b border-gray-200 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+            <tr *ngFor="let event of filteredEvents(); let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+              <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ i + 1 }}</td>
+              <td class="px-4 py-3 font-semibold text-left">{{ event.title }}</td>
+              <td class="px-4 py-3 text-center">{{ event.event_date | date: 'MMMM d, y' }}</td>
+              <td class="px-4 py-3 text-center">{{ formatTime(event.event_time) }}</td>
+              <td class="px-4 py-3 text-left">{{ event.location }}</td>
+              <td class="px-4 py-3 text-center">
+                <select
+                  class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
+                  [ngClass]="{
+                    'bg-yellow-100 text-yellow-800 border-yellow-300': event.status === 'not yet started',
+                    'bg-blue-100 text-blue-800 border-blue-300': event.status === 'ongoing',
+                    'bg-green-100 text-green-800 border-green-300': event.status === 'completed',
+                    'bg-red-100 text-red-800 border-red-300': event.status === 'cancelled'
+                  }"
+                  [(ngModel)]="event.status"
+                  (change)="updateEventStatus(event)"
+                >
+                  <option value="not yet started">Not Yet Started</option>
+                  <option value="ongoing">Ongoing</option>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center gap-1">
+                  <i class="fas fa-trash-alt"></i>
+                  <span class="hidden sm:inline">Delete</span>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="filteredEvents().length === 0">
+              <td colspan="7" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No events found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-template>
 </div>

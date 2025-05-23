@@ -1,4 +1,4 @@
-<div class="p-6 bg-[#e6f2fa] min-h-screen">
+<div class="min-h-screen bg-gray-100 p-6">
   <!-- Add Admin Modal Overlay -->
   <div *ngIf="isAddAdminModalOpen"
     class="fixed inset-0 modal-blur bg-[#0000008a] flex items-center justify-center z-50">
@@ -6,8 +6,7 @@
       <button (click)="closeAddAdminModal()" class="absolute top-2 right-2 text-gray-500 hover:text-red-600">
         <i class="fas fa-times"></i>
       </button>
-      <!-- Add Admin Form Goes Here -->
-      <h2 class="text-xl font-bold mb-4">Add Admin</h2>
+      <h2 class="text-xl font-bold mb-4 ">Add Admin</h2>
       <form (ngSubmit)="addAdmin()">
         <div class="mb-3">
           <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -22,69 +21,77 @@
           <input type="password" [(ngModel)]="newPassword" name="newPassword" required
             class="w-full border px-2 py-1 rounded" />
         </div>
-        <button type="submit" class="w-full bg-[#05668D] text-white py-2 rounded hover:bg-[#034f6b]">Add Admin</button>
+        <button type="submit" class="w-full bg-[#14532d] text-white py-2 rounded hover:bg-[#56732e]">Add Admin</button>
       </form>
     </div>
   </div>
 
-  <div class="bg-white rounded-lg shadow-lg p-6">
-    <h2 class="text-2xl font-bold text-[#05668D] mb-4 flex items-center">
-      <i class="fas fa-users-cog mr-2"></i> Manage Users
-    </h2>
-    <div *ngIf="loading" class="text-gray-600">Loading...</div>
-    <div *ngIf="error" class="text-red-600">{{ error }}</div>
+  <h2 class="text-2xl font-bold text-[#14532d] mb-4 flex items-center">
+    <i class="fas fa-users-cog mr-2"></i> Manage Users
+  </h2>
+  <div *ngIf="loading" class="text-gray-600">Loading...</div>
+  <div *ngIf="error" class="text-red-600">{{ error }}</div>
 
-    <!-- Add Admin Button -->
-    <button (click)="openAddAdminModal()" class="mb-4 bg-[#05668D] text-white px-4 py-2 rounded hover:bg-[#034f6b]">
-      <i class="fas fa-user-plus mr-2"></i>Add Admin
-    </button>
+  <!-- OSWS Admins Table Section -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between mt-6 mb-2">
+      <h3 class="text-lg font-semibold text-[#14532d]">OSWS Admin Accounts</h3>
+      <button (click)="openAddAdminModal()" class="bg-[#14532d] text-white px-4 py-2 rounded hover:bg-[#56732e] shadow flex items-center gap-2">
+        <i class="fas fa-user-plus"></i>
+        <span class="hidden sm:inline">Add Admin</span>
+      </button>
+    </div>
+    <div class="overflow-x-auto rounded-lg shadow bg-white">
+      <table *ngIf="!loading && admins.length" class="min-w-full text-sm lg:text-base bg-white">
+        <thead class="bg-[#14532d] text-white">
+          <tr>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Name</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let admin of admins" class="hover:bg-gray-50 transition-colors duration-200">
+            <td class="px-6 py-4 whitespace-nowrap">{{ admin.id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ admin.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ admin.email }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <button (click)="deleteAdmin(admin.id)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center gap-1">
+                <i class="fas fa-trash-alt"></i>
+                <span class="hidden sm:inline">Delete</span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!loading && !admins.length" class="text-gray-600 px-6 py-4">No admin accounts found.</div>
+    </div>
+  </div>
 
-    <!-- OSWS Admins Table -->
-    <h3 class="text-lg font-semibold text-[#05668D] mt-6 mb-2">OSWS Admin Accounts</h3>
-    <table *ngIf="!loading && admins.length" class="min-w-full divide-y divide-gray-200 mb-8">
-      <thead class="bg-[#05668D]">
-        <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Name</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        <tr *ngFor="let admin of admins">
-          <td class="px-6 py-4 whitespace-nowrap">{{ admin.id }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ admin.name }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ admin.email }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <button (click)="deleteAdmin(admin.id)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded">
-              <i class="fas fa-trash-alt"></i> Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div *ngIf="!loading && !admins.length" class="text-gray-600">No admin accounts found.</div>
-
-    <!-- Student Organizations Table (unchanged) -->
-    <h3 class="text-lg font-semibold text-[#05668D] mt-6 mb-2">Student Organization Accounts</h3>
-    <table *ngIf="!loading && organizations.length" class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-[#05668D]">
-        <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">ID</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Organization Name</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Email</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">Department</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        <tr *ngFor="let org of organizations">
-          <td class="px-6 py-4 whitespace-nowrap">{{ org.id }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ org.name }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ org.email }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ org.department }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <div *ngIf="!loading && !organizations.length" class="text-gray-600">No organization accounts found.</div>
+  <!-- Student Organizations Table Section -->
+  <div class="mb-8">
+    <h3 class="text-lg font-semibold text-[#14532d] mb-2">Student Organization Accounts</h3>
+    <div class="overflow-x-auto rounded-lg shadow bg-white">
+      <table *ngIf="!loading && organizations.length" class="min-w-full text-sm lg:text-base bg-white">
+        <thead class="bg-[#14532d] text-white">
+          <tr>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Organization Name</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Department</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let org of organizations" class="hover:bg-gray-50 transition-colors duration-200">
+            <td class="px-6 py-4 whitespace-nowrap">{{ org.id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ org.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ org.email }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ org.department }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!loading && !organizations.length" class="text-gray-600 px-6 py-4">No organization accounts found.</div>
+    </div>
   </div>
 </div>

@@ -12,7 +12,6 @@ import { CreateEventComponent } from './create-event/create-event.component';
 import { ManageEventComponent } from './manage-event/manage-event.component';
 import { ScanQrComponent } from './scan-qr/scan-qr.component';
 import { AttendanceRecordsComponent } from './attendance-records/attendance-records.component';
-import { AdminLoginComponent } from './admin-login/admin-login.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { ManageUsersComponent } from './manage-users/manage-users.component';
 
@@ -25,11 +24,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard], 
     data: { animation: 'SidebarPage' },
     children: [
-      { 
-        path: 'home', 
-        component: HomeComponent, 
-        data: { animation: 'HomePage' },
-        children: [
+      { path: 'home', component: HomeComponent, data: { animation: 'HomePage' }, children: [
           { path: 'profile', component: ProfileComponent, data: { animation: 'ProfilePage' } }
         ]
       },
@@ -44,6 +39,5 @@ export const routes: Routes = [
       { path: 'manage-users', component: ManageUsersComponent },
     ] 
   },
-  { path: 'admin-login', component: AdminLoginComponent, data: { animation: 'AdminLoginPage' } },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 ];

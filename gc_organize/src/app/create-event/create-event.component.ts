@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { EventService } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
@@ -8,7 +9,7 @@ import Swal from 'sweetalert2';
   selector: 'app-create-event',
   templateUrl: './create-event.component.html',
   styleUrls: ['./create-event.component.css'],
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   providers: [EventService]
 })
 export class CreateEventComponent {
@@ -22,6 +23,7 @@ export class CreateEventComponent {
     // Remove event_poster from here
   };
   eventPosterFile: File | null = null; // Add this
+  role = localStorage.getItem('role');
 
   constructor(private eventService: EventService) {}
 
@@ -72,8 +74,17 @@ export class CreateEventComponent {
       formData.append('event_poster', this.eventPosterFile);
     }
 
-    const creatorId = Number(localStorage.getItem('creatorId'));
-    formData.append('created_by_org_id', creatorId.toString());
+    // Only append adminId if it exists and is valid
+    const adminId = localStorage.getItem('adminId');
+    if (adminId && adminId !== 'undefined' && adminId !== '') {
+      formData.append('created_by_osws_id', adminId);
+    }
+
+    // Only append creatorId if it exists and is valid
+    const creatorId = localStorage.getItem('creatorId');
+    if (creatorId && creatorId !== 'undefined' && creatorId !== '') {
+      formData.append('created_by_org_id', creatorId);
+    }
 
     this.eventService.createEvent(formData).subscribe(
       (response) => {

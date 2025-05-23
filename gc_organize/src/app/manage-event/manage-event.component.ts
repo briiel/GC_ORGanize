@@ -8,22 +8,35 @@ import Swal from 'sweetalert2';
   selector: 'app-manage-event',
   templateUrl: './manage-event.component.html',
   styleUrls: ['./manage-event.component.css'],
-  imports: [CommonModule, FormsModule] // <-- Add this line
+  imports: [CommonModule, FormsModule]
 })
 export class ManageEventComponent implements OnInit {
   events: any[] = [];
+  oswsEvents: any[] = [];
+  orgEvents: any[] = [];
   creatorId: number;
+  adminId: number;
   searchTerm: string = '';
   statusFilter: string = '';
   filteredList: any[] = [];
+  isOsws: boolean = false;
+  orgEventsSearchTerm: string = '';
+  filteredOrgEventsList: any[] = [];
 
   constructor(private eventService: EventService) {
     // Get creator/org ID from localStorage or AuthService
     this.creatorId = Number(localStorage.getItem('creatorId'));
+    this.adminId = Number(localStorage.getItem('adminId'));
+    this.isOsws = localStorage.getItem('role') === 'osws_admin';
   }
 
   ngOnInit() {
-    this.fetchEvents();
+    if (this.isOsws) {
+      this.fetchOswsEvents();
+      this.fetchOrgEvents();
+    } else {
+      this.fetchEvents();
+    }
   }
 
   fetchEvents() {
@@ -38,18 +51,41 @@ export class ManageEventComponent implements OnInit {
     });
   }
 
-  updateEventStatus(event: any) {
-    // Use event.event_id instead of event.id
-    this.eventService.updateEventStatus(event.event_id, event.status).subscribe({
+  fetchOswsEvents() {
+    if (!this.adminId) return;
+    this.eventService.getEventsByAdmin(this.adminId).subscribe({
       next: (res) => {
-        // Optionally show a success message or refresh events
-        // this.fetchEvents(); // Uncomment if you want to refresh the list
+        this.oswsEvents = res.data || res;
       },
       error: (err) => {
-        console.error('Error updating event status:', err);
-        // Optionally revert the status change in UI or show an error message
+        console.error('Error fetching OSWS events:', err);
       }
     });
+  }
+
+  fetchOrgEvents() {
+    this.eventService.getAllOrgEvents().subscribe({
+      next: (res) => {
+        this.orgEvents = res.data || res;
+        this.filteredOrgEventsList = this.orgEvents;
+      },
+      error: (err) => {
+        console.error('Error fetching org events:', err);
+      }
+    });
+  }
+
+  updateEventStatus(event: any) {
+    this.eventService.updateEventStatus(event.event_id, event.status).subscribe({
+      next: () => {},
+      error: (err) => {
+        console.error('Error updating event status:', err);
+      }
+    });
+  }
+
+  updateOswsEventStatus(event: any) {
+    this.updateEventStatus(event);
   }
 
   formatTime(timeString: string | null | undefined): string {
@@ -62,30 +98,57 @@ export class ManageEventComponent implements OnInit {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   }
 
-  // Remove onSearch(event: any) and ngDoCheck if you want it to be strictly non-reactive
-
   searchEvents() {
-    this.filteredList = this.events.filter(event => {
-      const search = this.searchTerm.trim().toLowerCase();
-      const matchesSearch =
-        !search ||
-        event.title.toLowerCase().includes(search) ||
-        event.location.toLowerCase().includes(search) ||
-        (event.event_date && (new Date(event.event_date).toLocaleDateString().toLowerCase().includes(search)));
-      const matchesStatus =
-        !this.statusFilter || event.status === this.statusFilter;
-      return matchesSearch && matchesStatus;
-    });
+    // For OSWS, search both tables
+    if (this.isOsws) {
+      // Optionally implement search for both tables if needed
+    } else {
+      this.filteredList = this.events.filter(event => {
+        const search = this.searchTerm.trim().toLowerCase();
+        const matchesSearch =
+          !search ||
+          event.title.toLowerCase().includes(search) ||
+          event.location.toLowerCase().includes(search) ||
+          (event.event_date && (new Date(event.event_date).toLocaleDateString().toLowerCase().includes(search)));
+        const matchesStatus =
+          !this.statusFilter || event.status === this.statusFilter;
+        return matchesSearch && matchesStatus;
+      });
+    }
   }
 
   clearSearch() {
     this.searchTerm = '';
     this.statusFilter = '';
-    this.filteredList = this.events; // Show all events
+    if (!this.isOsws) {
+      this.filteredList = this.events;
+    }
   }
 
   filteredEvents() {
     return this.filteredList;
+  }
+
+  searchOrgEvents() {
+    const search = this.orgEventsSearchTerm.trim().toLowerCase();
+    if (!search) {
+      this.filteredOrgEventsList = this.orgEvents;
+      return;
+    }
+    this.filteredOrgEventsList = this.orgEvents.filter(event =>
+      (event.title && event.title.toLowerCase().includes(search)) ||
+      (event.location && event.location.toLowerCase().includes(search)) ||
+      (event.event_date && (new Date(event.event_date).toLocaleDateString().toLowerCase().includes(search)))
+    );
+  }
+
+  clearOrgEventsSearch() {
+    this.orgEventsSearchTerm = '';
+    this.filteredOrgEventsList = this.orgEvents;
+  }
+
+  filteredOrgEvents() {
+    return this.filteredOrgEventsList;
   }
 
   confirmDeleteEvent(event: any) {
@@ -108,7 +171,12 @@ export class ManageEventComponent implements OnInit {
     this.eventService.deleteEvent(eventId).subscribe({
       next: () => {
         Swal.fire('Deleted!', 'The event has been deleted.', 'success');
-        this.fetchEvents(); // Refresh the list
+        if (this.isOsws) {
+          this.fetchOswsEvents();
+          this.fetchOrgEvents();
+        } else {
+          this.fetchEvents();
+        }
       },
       error: (err) => {
         Swal.fire('Error', 'Failed to delete event.', 'error');

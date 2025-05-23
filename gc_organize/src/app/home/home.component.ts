@@ -6,7 +6,7 @@ import { ViewmodalComponent } from '../viewmodal/viewmodal.component';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { EventService } from '../services/event.service';
-
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -28,20 +28,35 @@ export class HomeComponent implements OnInit {
   constructor(private eventService: EventService, private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
-    this.eventService.getAllEvents().subscribe(
-      (data) => {
-        if (data && Array.isArray(data.data)) {
-          this.events = data.data;
-        } else if (Array.isArray(data)) {
-          this.events = data;
-        } else if (data && Array.isArray(data.events)) {
-          this.events = data.events;
-        } else {
-          this.events = [];
+    forkJoin([
+      this.eventService.getAllEvents(),      // Organization events
+      this.eventService.getAllOswsEvents()   // OSWS-created events
+    ]).subscribe(
+      ([orgEvents, oswsEvents]) => {
+        let allEvents: any[] = [];
+
+        // Normalize and merge both arrays
+        if (orgEvents && Array.isArray(orgEvents.data)) {
+          allEvents = allEvents.concat(orgEvents.data);
+        } else if (Array.isArray(orgEvents)) {
+          allEvents = allEvents.concat(orgEvents);
+        } else if (orgEvents && Array.isArray(orgEvents.events)) {
+          allEvents = allEvents.concat(orgEvents.events);
         }
+
+        if (oswsEvents && Array.isArray(oswsEvents.data)) {
+          allEvents = allEvents.concat(oswsEvents.data);
+        } else if (Array.isArray(oswsEvents)) {
+          allEvents = allEvents.concat(oswsEvents);
+        } else if (oswsEvents && Array.isArray(oswsEvents.events)) {
+          allEvents = allEvents.concat(oswsEvents.events);
+        }
+
+        this.events = allEvents;
       },
       (error) => {
         console.error('Error fetching events:', error);
+        this.events = [];
       }
     );
     this.loadNotifications();
