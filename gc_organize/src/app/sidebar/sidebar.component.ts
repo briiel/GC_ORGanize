@@ -36,8 +36,13 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
   onLogout(): void {
     this.authService.logout();
-    localStorage.setItem('justLoggedOut', 'true'); // Add this line
-    this.router.navigate(['/login']);
+    const role = localStorage.getItem('role');
+    localStorage.setItem('justLoggedOut', 'true');
+    if (role === 'osws_admin') {
+      this.router.navigate(['/admin-login']);
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
   
   ngOnInit(): void {
