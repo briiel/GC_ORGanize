@@ -1,88 +1,101 @@
 <div class="flex h-screen relative">
     <!-- Mobile Menu Button -->
-    <button (click)="toggleSidebar()" class="lg:hidden fixed top-4 left-4 z-30 text-[#679436] p-2 rounded-lg bg-white shadow-md">
+    <button (click)="toggleSidebar()"
+        class="lg:hidden fixed top-4 left-4 z-30 text-[#679436] p-2 rounded-lg bg-white shadow-md">
         <i class="fas fa-bars text-xl"></i>
     </button>
 
     <!-- Backdrop overlay for mobile -->
-    <div *ngIf="isSidebarOpen" 
-         class="fixed inset-0 bg-black/30 backdrop-blur-sm z-10 lg:hidden"
-         (click)="toggleSidebar()">
+    <div *ngIf="isSidebarOpen" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-10 lg:hidden"
+        (click)="toggleSidebar()">
     </div>
 
     <!-- Sidebar -->
-    <div [class.translate-x-0]="isSidebarOpen" 
-         [class.-translate-x-full]="!isSidebarOpen" 
-         class="w-64 flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-20 shadow-lg"
-         [ngClass]="{
+    <div [class.translate-x-0]="isSidebarOpen" [class.-translate-x-full]="!isSidebarOpen"
+        class="w-64 flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-20 shadow-lg"
+        [ngClass]="{
             'bg-[#679436] text-white': role !== 'osws_admin',
             'bg-[#05668D] text-white': role === 'osws_admin'
          }">
         <div class="p-4 flex flex-col items-center space-y-2 mt-8 lg:mt-0">
             <img src="GC-Logo.png" alt="GC-ORGANIZE Logo" class="w-16 h-16 sm:w-24 sm:h-24 object-contain">
             <h1 class="text-xl sm:text-2xl font-bold text-center">GC-ORGANIZE</h1>
-            <span *ngIf="role === 'osws_admin'" class="text-xs text-blue-100 font-semibold tracking-wide">Admin Panel</span>
+            <span *ngIf="role === 'osws_admin'" class="text-xs text-blue-100 font-semibold tracking-wide">Admin
+                Panel</span>
         </div>
         <nav class="flex-1 px-2 py-4 w-full space-y-2">
             <!-- Student Buttons -->
             <ng-container *ngIf="role === 'student'">
-                <button [routerLink]="'/sidebar/home'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/home'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-home mr-2 text-lg sm:text-xl"></i> Home
                 </button>
-                <button [routerLink]="'/sidebar/eventsreg'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/eventsreg'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-calendar-check mr-2 text-lg sm:text-xl"></i> Events Registered
                 </button>
-                <button [routerLink]="'/sidebar/ecertificate'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/ecertificate'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificates
                 </button>
                 <!-- Logout Button -->
-                <button (click)="onLogout()" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button (click)="onLogout()"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-sign-out-alt mr-2 text-lg sm:text-xl"></i> Logout
                 </button>
             </ng-container>
 
             <!-- Organization Buttons -->
             <ng-container *ngIf="role === 'organization'">
-                <button [routerLink]="'/sidebar/so-dashboard'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/so-dashboard'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
-                <button [routerLink]="'/sidebar/manage-event'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/manage-event'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-tasks mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
-                <button [routerLink]="'/sidebar/create-event'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/create-event'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
                 </button>
-                <button [routerLink]="'/sidebar/scan-qr'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/scan-qr'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR Attendance
                 </button>
                 <!-- Attendance Records Button -->
-                <button [routerLink]="'/sidebar/attendance-records'" 
-                        class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer whitespace-nowrap">
+                <button [routerLink]="'/sidebar/attendance-records'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer whitespace-nowrap">
                     <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
                 </button>
                 <!-- Logout Button -->
-                <button (click)="onLogout()" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                <button (click)="onLogout()"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-sign-out-alt mr-2 text-lg sm:text-xl"></i> Logout
                 </button>
             </ng-container>
 
             <!-- OSWS Admin Buttons -->
             <ng-container *ngIf="role === 'osws_admin'">
-                <button [routerLink]="'/sidebar/admin-dashboard'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#034f6b] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/admin-dashboard'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#034f6b] w-full cursor-pointer">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Admin Dashboard
                 </button>
-                <button [routerLink]="'/sidebar/manage-users'" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#034f6b] w-full cursor-pointer">
+                <button [routerLink]="'/sidebar/manage-users'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#034f6b] w-full cursor-pointer">
                     <i class="fas fa-users-cog mr-2 text-lg sm:text-xl"></i> Manage Users
                 </button>
-                <button (click)="onLogout()" class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#034f6b] w-full cursor-pointer">
+                <button (click)="onLogout()"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#034f6b] w-full cursor-pointer">
                     <i class="fas fa-sign-out-alt mr-2 text-lg sm:text-xl"></i> Logout
                 </button>
             </ng-container>
-        </nav>      
+        </nav>
     </div>
 
     <!-- Main Content Area -->
-    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0 z-0 relative" [@routeAnimations]="prepareRoute(outlet)">
+    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0 z-20 relative"
+        [@routeAnimations]="prepareRoute(outlet)">
         <router-outlet #outlet="outlet"></router-outlet>
     </div>
 </div>

@@ -5,3 +5,7 @@
 body {
     font-family: 'Poppins', sans-serif;
 }
+
+.modal-blur {
+    backdrop-filter: blur(5px);
+}

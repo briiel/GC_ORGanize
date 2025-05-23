@@ -1,11 +1,17 @@
-<div class="modal-overlay flex items-center justify-center fixed inset-0 bg-black bg-opacity-50 z-50 p-4">
-  <div class="modal-content relative w-full max-w-sm md:max-w-3xl h-[650px] md:h-[500px] rounded-3xl overflow-hidden shadow-lg flex flex-col md:flex-row border-3 border-[#679436] bg-white mx-auto">
-    <button (click)="closeModal()" class="absolute top-2 right-2 p-2 text-gray-600 hover:text-[#AA0000] cursor-pointer z-10">
+<div class="modal-overlay modal-blur flex items-center justify-center fixed inset-0 bg-black bg-opacity-50 z-50 p-4">
+  <div
+    class="modal-content relative w-full max-w-sm md:max-w-3xl h-[650px] md:h-[500px] rounded-3xl overflow-hidden shadow-lg flex flex-col md:flex-row border-3 border-[#679436] bg-white mx-auto">
+    <button (click)="closeModal()"
+      class="absolute top-2 right-2 p-2 text-gray-600 hover:text-[#AA0000] cursor-pointer z-10">
       <i class="fas fa-times text-xl"></i>
     </button>
-    <div class="w-full md:w-1/3 h-[300px] md:h-full flex-shrink-0 overflow-hidden flex items-center justify-center relative bg-gray-100">
-      <div class="absolute inset-0" id="blurredBackground" style="background-size: cover; background-position: center; filter: blur(8px); opacity: 0.5;"></div>
-      <img [src]="event?.event_poster || 'assets/default-event.jpg'" class="w-auto h-auto max-w-[90%] max-h-[90%] object-contain relative z-[1]" alt="Event Image" (load)="updateBackgroundImage($event, 'blurredBackground')">
+    <div
+      class="w-full md:w-1/3 h-[300px] md:h-full flex-shrink-0 overflow-hidden flex items-center justify-center relative bg-gray-100">
+      <div class="absolute inset-0" id="blurredBackground"
+        style="background-size: cover; background-position: center; filter: blur(8px); opacity: 0.5;"></div>
+      <img [src]="event?.event_poster || 'assets/default-event.jpg'"
+        class="w-auto h-auto max-w-[90%] max-h-[90%] object-contain relative z-[1]" alt="Event Image"
+        (load)="updateBackgroundImage($event, 'blurredBackground')">
     </div>
     <div class="w-full md:w-2/3 h-[350px] md:h-full overflow-y-auto p-6">
       <div class="font-bold text-2xl md:text-3xl mb-4">{{ event?.title }}</div>
@@ -22,7 +28,7 @@
       </div>
       <div class="flex items-center text-gray-600 text-base md:text-lg">
         <i class="fas fa-clock mr-2"></i>
-        <span>Time: {{ formatTime (event.event_time)  }}</span>
+        <span>Time: {{ formatTime (event.event_time) }}</span>
       </div>
       <div class="flex items-center text-gray-600 text-base md:text-lg mt-4" *ngIf="event.status">
         <i class="fas fa-info-circle mr-2"></i>
