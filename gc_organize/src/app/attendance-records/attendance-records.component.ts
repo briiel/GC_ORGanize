@@ -61,7 +61,11 @@ export class AttendanceRecordsComponent implements OnInit {
     const worksheetData = this.filteredRecords.map((record, i) => ({
       '#': i + 1,
       'Event': record.event_title || '-',
-      'Student Name': record.student_name || '-',
+      'First Name': record.first_name || '-',
+      'Last Name': record.last_name || '-',
+      'Suffix': record.suffix || '-',
+      'Department': record.department || '-',
+      'Program': record.program || '-',
       'Student ID': record.student_id || '-'
     }));
 

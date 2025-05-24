@@ -55,20 +55,28 @@
         <thead class="bg-[#679436]">
           <tr class="uppercase tracking-wider text-white">
             <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/3">Event</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/3">Student Name</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center w-1/4">Student ID</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/4">Event</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/6">Student ID</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/6">First Name</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/6">Last Name</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/12">Suffix</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/6">Department</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left w-1/6">Program</th>
           </tr>
         </thead>
         <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
           <tr *ngFor="let record of filteredRecords; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
             <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ i + 1 }}</td>
             <td class="px-4 py-3 text-left">{{ record.event_title || '-' }}</td>
-            <td class="px-4 py-3 text-left">{{ record.student_name || '-' }}</td>
+            <td class="px-4 py-3 text-left">{{ record.first_name || '-' }}</td>
+            <td class="px-4 py-3 text-left">{{ record.last_name || '-' }}</td>
+            <td class="px-4 py-3 text-left">{{ record.suffix || '-' }}</td>
+            <td class="px-4 py-3 text-left">{{ record.department || '-' }}</td>
+            <td class="px-4 py-3 text-left">{{ record.program || '-' }}</td>
             <td class="px-4 py-3 text-center">{{ record.student_id || '-' }}</td>
           </tr>
           <tr *ngIf="filteredRecords.length === 0">
-            <td colspan="4" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No records found.</td>
+            <td colspan="8" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No records found.</td>
           </tr>
         </tbody>
       </table>

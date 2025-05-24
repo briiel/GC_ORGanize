@@ -65,6 +65,19 @@ export class LoginComponent implements OnInit {
           if (response.userType === 'student') {
             localStorage.setItem('studentId', payload.id);
             localStorage.setItem('role', 'student');
+            // Store additional student information
+            if (response.student) {
+              localStorage.setItem('studentInfo', JSON.stringify({
+                student_id: response.student.id,
+                first_name: response.student.first_name,
+                last_name: response.student.last_name,
+                middle_initial: response.student.middle_initial,
+                suffix: response.student.suffix,
+                domain_email: response.student.email,
+                department: response.student.department,
+                program: response.student.program
+              }));
+            }
             this.router.navigate(['/sidebar/home']);
           } else if (response.userType === 'organization') {
             localStorage.setItem('creatorId', payload.id);

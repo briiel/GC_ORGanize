@@ -25,17 +25,20 @@ export class HomeComponent implements OnInit {
   notifications: any[] = [];
   unreadCount: number = 0;
 
+  currentPage: number = 1;
+  pageSize: number = 6;
+
   constructor(private eventService: EventService, private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
     forkJoin([
-      this.eventService.getAllEvents(),      // Organization events
-      this.eventService.getAllOswsEvents()   // OSWS-created events
+      this.eventService.getAllEvents(),
+      this.eventService.getAllOswsEvents()
     ]).subscribe(
       ([orgEvents, oswsEvents]) => {
         let allEvents: any[] = [];
 
-        // Normalize and merge both arrays
+        // Merge org events
         if (orgEvents && Array.isArray(orgEvents.data)) {
           allEvents = allEvents.concat(orgEvents.data);
         } else if (Array.isArray(orgEvents)) {
@@ -44,13 +47,38 @@ export class HomeComponent implements OnInit {
           allEvents = allEvents.concat(orgEvents.events);
         }
 
+        // Merge OSWS events and tag them
+        let oswsList: any[] = [];
         if (oswsEvents && Array.isArray(oswsEvents.data)) {
-          allEvents = allEvents.concat(oswsEvents.data);
+          oswsList = oswsEvents.data;
         } else if (Array.isArray(oswsEvents)) {
-          allEvents = allEvents.concat(oswsEvents);
+          oswsList = oswsEvents;
         } else if (oswsEvents && Array.isArray(oswsEvents.events)) {
-          allEvents = allEvents.concat(oswsEvents.events);
+          oswsList = oswsEvents.events;
         }
+        oswsList = oswsList.map(e => ({
+          ...e,
+          osws: true,
+          department: e.department || 'OSWS' 
+        }));
+        allEvents = allEvents.concat(oswsList);
+
+        // Deduplicate by event_id or id, prioritize OSWS events
+        const eventMap = new Map();
+        for (const event of allEvents) {
+          const id = event.event_id || event.id;
+          if (!eventMap.has(id) || event.osws) {
+            eventMap.set(id, event);
+          }
+        }
+        allEvents = Array.from(eventMap.values());
+
+        // Sort by created_at descending (latest first)
+        allEvents.sort((a, b) => {
+          const dateA = new Date(a.created_at || a.createdAt || 0).getTime();
+          const dateB = new Date(b.created_at || b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
 
         this.events = allEvents;
       },
@@ -59,93 +87,63 @@ export class HomeComponent implements OnInit {
         this.events = [];
       }
     );
-    this.loadNotifications();
-  }
-
-  loadNotifications() {
-    this.eventService.getNotifications().subscribe({
-      next: (data: any) => {
-        // Safely handle different response shapes
-        let notifications: any[] = [];
-        if (Array.isArray(data)) {
-          notifications = data;
-        } else if (data && Array.isArray(data.data)) {
-          notifications = data.data;
-        } else if (data && Array.isArray(data.notifications)) {
-          notifications = data.notifications;
-        }
-        this.notifications = notifications;
-        this.unreadCount = notifications.filter((n: any) => !n.is_read).length;
-      },
-      error: (err) => {
-        this.notifications = [];
-        this.unreadCount = 0;
-      }
-    });
   }
 
   get filteredEvents() {
     const search = this.searchTerm.trim().toLowerCase();
-    if (!search) return this.events;
-    return this.events.filter(event =>
-      (event.title && event.title.toLowerCase().includes(search)) ||
-      (event.department && event.department.toLowerCase().includes(search)) ||
-      (event.location && event.location.toLowerCase().includes(search)) ||
-      (event.description && event.description.toLowerCase().includes(search))
-    );
+    let filtered = this.events;
+    if (search) {
+      filtered = this.events.filter(event => {
+        // If searching for "osws", show all events tagged as OSWS
+        if (search === 'osws') {
+          return event.osws === true;
+        }
+        // Otherwise, normal search logic
+        return (
+          (event.title && event.title.toLowerCase().includes(search)) ||
+          (event.department && event.department.toLowerCase().includes(search)) ||
+          (event.location && event.location.toLowerCase().includes(search)) ||
+          (event.description && event.description.toLowerCase().includes(search))
+        );
+      });
+    }
+    // Pagination logic
+    const start = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(start, start + this.pageSize);
   }
 
-  onSearchInput(event: any) {
-    this.searchTerm = event.target.value;
+  get totalPages() {
+    const search = this.searchTerm.trim().toLowerCase();
+    let filtered = this.events;
+    if (search) {
+      filtered = this.events.filter(event => {
+        if (search === 'osws') {
+          return event.osws === true;
+        }
+        return (
+          (event.title && event.title.toLowerCase().includes(search)) ||
+          (event.department && event.department.toLowerCase().includes(search)) ||
+          (event.location && event.location.toLowerCase().includes(search)) ||
+          (event.description && event.description.toLowerCase().includes(search))
+        );
+      });
+    }
+    return Math.ceil(filtered.length / this.pageSize) || 1;
+  }
+
+  changePage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
   }
 
   clearSearch() {
     this.searchTerm = '';
+    this.currentPage = 1;
   }
 
-  toggleDropdown() {
-    this.dropdownVisible = !this.dropdownVisible;
-    this.notificationDropdownVisible = false; // Hide notification dropdown when account dropdown is shown
-    const dropdown = document.getElementById('dropdown');
-    const notificationDropdown = document.getElementById('notificationDropdown');
-    if (dropdown) {
-      dropdown.classList.toggle('hidden', !this.dropdownVisible);
-    }
-    if (notificationDropdown) {
-      notificationDropdown.classList.add('hidden');
-    }
-  }
-
-  onNotificationClick(notif: any, event: MouseEvent) {
-    event.preventDefault();
-    if (!notif.is_read) {
-      this.eventService.markNotificationAsRead(notif.id).subscribe(() => {
-        notif.is_read = true;
-        this.unreadCount = this.notifications.filter(n => !n.is_read).length;
-      });
-    }
-    if (notif.event_id) {
-      const eventObj = this.events.find(e => e.event_id === notif.event_id || e.id === notif.event_id);
-      if (eventObj) {
-        this.openViewModal(eventObj);
-      }
-    }
-  }
-
-  toggleNotificationDropdown() {
-    this.notificationDropdownVisible = !this.notificationDropdownVisible;
-    this.dropdownVisible = false;
-    const notificationDropdown = document.getElementById('notificationDropdown');
-    const dropdown = document.getElementById('dropdown');
-    if (notificationDropdown) {
-      notificationDropdown.classList.toggle('hidden', !this.notificationDropdownVisible);
-    }
-    if (dropdown) {
-      dropdown.classList.add('hidden');
-    }
-    if (this.notificationDropdownVisible) {
-      this.loadNotifications(); // Refresh notifications when opened
-    }
+  onSearchInput(event: any) {
+    this.searchTerm = event.target.value;
+    this.currentPage = 1;
   }
 
   updateBackgroundImage(event: Event, bgElementId: string): void {
@@ -160,7 +158,7 @@ export class HomeComponent implements OnInit {
   selectedEventId: number | null = null;
 
   openRegisterModal(event: any) {
-    this.selectedEventId = event.event_id; // or event.id, depending on your event object
+    this.selectedEventId = event.event_id; 
     this.isRegisterModalOpen = true;
   }
 
@@ -182,14 +180,6 @@ export class HomeComponent implements OnInit {
     this.selectedEvent = null;
   }
 
-  // changePage(page: number) {
-  //   this.currentPage = page;
-  //   this.updateDisplayedCards();
-  // }
-
-  // getPageNumbers(): number[] {
-  //   return Array.from({ length: this.totalPages }, (_, i) => i + 1);
-  // }
 
   formatTime(timeString: string | null | undefined): string {
     if (!timeString) return '';
@@ -206,11 +196,4 @@ export class HomeComponent implements OnInit {
     // Optionally, you could trigger analytics or focus the results here.
   }
 
-  expandedNotificationId: number | null = null;
-
-  onNotificationExpand(notif: any, event: MouseEvent) {
-    event.stopPropagation(); // Prevents the click from bubbling up
-    event.preventDefault(); // Prevents the anchor's default navigation
-    this.expandedNotificationId = this.expandedNotificationId === notif.id ? null : notif.id;
-  }
 }

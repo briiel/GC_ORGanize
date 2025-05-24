@@ -8,16 +8,16 @@
           <div>
             <label for="firstName" class="block text-sm font-medium text-gray-700">First Name:</label>
             <input type="text" id="firstName" name="firstName" [(ngModel)]="registrationData.first_name"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
           <div>
             <label for="surname" class="block text-sm font-medium text-gray-700">Surname:</label>
             <input type="text" id="surname" name="surname" [(ngModel)]="registrationData.last_name"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
           <div>
             <label for="middleInitial" class="block text-sm font-medium text-gray-700">Middle Initial:</label>
-            <input type="text" id="middleInitial" name="middleInitial"
+            <input type="text" id="middleInitial" name="middleInitial" [(ngModel)]="registrationData.middle_initial" 
               class="mt-1 block w-20 border border-gray-300 rounded-md shadow-sm p-2">
           </div>
           <div>
@@ -37,17 +37,17 @@
           <div>
             <label for="studentId" class="block text-sm font-medium text-gray-700">Student ID:</label>
             <input type="text" id="studentId" name="studentId" [(ngModel)]="registrationData.student_id"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
           <div>
             <label for="domainEmail" class="block text-sm font-medium text-gray-700">Domain Email:</label>
             <input type="email" id="domainEmail" name="domainEmail" [(ngModel)]="registrationData.domain_email"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
           <div>
             <label for="department" class="block text-sm font-medium text-gray-700">Department:</label>
             <select id="department" name="department" [(ngModel)]="registrationData.department"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" disabled>
               <option value="">Select</option>
               <option value="CAHS">CAHS</option>
               <option value="CBA">CBA</option>
@@ -59,7 +59,7 @@
           <div class="mb-6">
             <label for="program" class="block text-sm font-medium text-gray-700">Program:</label>
             <input type="text" id="program" name="program" [(ngModel)]="registrationData.program"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
+              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
         </div>
         <div class="mb-6">

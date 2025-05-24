@@ -29,7 +29,7 @@ export class ViewmodalComponent {
     }
   }
 
-    formatTime(timeString: string | null | undefined): string {
+  formatTime(timeString: string | null | undefined): string {
     if (!timeString) return '';
     const parts = timeString.split(':');
     if (parts.length < 2) return '';
@@ -37,6 +37,12 @@ export class ViewmodalComponent {
     const date = new Date();
     date.setHours(+hours, +minutes, 0, 0);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  }
+
+  getPosterUrl(): string {
+    if (!this.event?.event_poster) return '#';
+    if (this.event.event_poster.startsWith('http')) return this.event.event_poster;
+    return `http://localhost:5000/${this.event.event_poster.replace(/^\/+/, '')}`;
   }
 }
 

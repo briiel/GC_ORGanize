@@ -41,34 +41,52 @@
           ></textarea>
         </div>
 
-        <!-- Date -->
-        <div>
-          <label class="block text-lg font-medium text-gray-700 mb-1">
-            Date
-          </label>
-          <input
-            type="date"
-            [(ngModel)]="event.event_date"
-            name="date"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
-            [ngClass]="role === 'osws_admin' ? 'focus:ring-2 focus:ring-[#14532d] focus:border-transparent' : 'focus:ring-2 focus:ring-[#679436] focus:border-transparent transition duration-200'"
-            required
-          />
+        <!-- Start and End Date on one line -->
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <label class="block text-lg font-medium text-gray-700 mb-1">Start Date</label>
+            <input
+              type="date"
+              [(ngModel)]="event.start_date"
+              name="start_date"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+              required
+            />
+          </div>
+          <div class="flex-1">
+            <label class="block text-lg font-medium text-gray-700 mb-1">End Date</label>
+            <input
+              type="date"
+              [(ngModel)]="event.end_date"
+              name="end_date"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+              required
+            />
+          </div>
         </div>
 
-        <!-- Time -->
-        <div>
-          <label class="block text-lg font-medium text-gray-700 mb-1">
-            Time
-          </label>
-          <input
-            type="time"
-            [(ngModel)]="event.event_time"
-            name="time"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
-            [ngClass]="role === 'osws_admin' ? 'focus:ring-2 focus:ring-[#14532d] focus:border-transparent' : 'focus:ring-2 focus:ring-[#679436] focus:border-transparent transition duration-200'"
-            required
-          />
+        <!-- Start and End Time on one line -->
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <label class="block text-lg font-medium text-gray-700 mb-1">Start Time</label>
+            <input
+              type="time"
+              [(ngModel)]="event.start_time"
+              name="start_time"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+              required
+            />
+          </div>
+          <div class="flex-1">
+            <label class="block text-lg font-medium text-gray-700 mb-1">End Time</label>
+            <input
+              type="time"
+              [(ngModel)]="event.end_time"
+              name="end_time"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none"
+              required
+            />
+          </div>
         </div>
 
         <!-- Location -->

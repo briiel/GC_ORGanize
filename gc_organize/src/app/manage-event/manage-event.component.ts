@@ -23,6 +23,11 @@ export class ManageEventComponent implements OnInit {
   orgEventsSearchTerm: string = '';
   filteredOrgEventsList: any[] = [];
 
+  showParticipantsModal = false;
+  participants: any[] = [];
+  participantsLoading = false;
+  selectedEventTitle = '';
+
   constructor(private eventService: EventService) {
     // Get creator/org ID from localStorage or AuthService
     this.creatorId = Number(localStorage.getItem('creatorId'));
@@ -183,5 +188,28 @@ export class ManageEventComponent implements OnInit {
         console.error('Error deleting event:', err);
       }
     });
+  }
+
+  openParticipantsModal(event: any) {
+    this.selectedEventTitle = event.title;
+    this.showParticipantsModal = true;
+    this.participantsLoading = true;
+    this.participants = [];
+    this.eventService.getEventParticipants(event.event_id).subscribe({
+      next: (res) => {
+        this.participants = res.data || res;
+        this.participantsLoading = false;
+      },
+      error: () => {
+        this.participants = [];
+        this.participantsLoading = false;
+      }
+    });
+  }
+
+  closeParticipantsModal() {
+    this.showParticipantsModal = false;
+    this.participants = [];
+    this.selectedEventTitle = '';
   }
 }

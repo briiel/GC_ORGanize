@@ -33,6 +33,18 @@ export class RegistermodalComponent implements OnInit {
     if (this.eventId !== null) {
       this.registrationData.event_id = this.eventId;
     }
+    const studentInfoStr = localStorage.getItem('studentInfo');
+    if (studentInfoStr) {
+      const student = JSON.parse(studentInfoStr);
+      this.registrationData.student_id = student.student_id || '';
+      this.registrationData.first_name = student.first_name || '';
+      this.registrationData.last_name = student.last_name || '';
+      this.registrationData.middle_initial = student.middle_initial || '';
+      this.registrationData.suffix = student.suffix || '';
+      this.registrationData.domain_email = student.domain_email || '';
+      this.registrationData.department = student.department || '';
+      this.registrationData.program = student.program || '';
+    }
   }
 
   previewImages(event: any) {

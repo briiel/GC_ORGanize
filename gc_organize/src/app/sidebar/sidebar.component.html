@@ -1,18 +1,18 @@
 <div class="flex h-screen relative">
     <!-- Mobile Menu Button -->
     <button (click)="toggleSidebar()"
-        class="lg:hidden fixed top-4 left-4 z-30 text-[#679436] p-2 rounded-lg bg-white shadow-md">
+        class="lg:hidden fixed top-4 left-4 z-40 text-[#679436] p-2 rounded-lg bg-white shadow-md">
         <i class="fas fa-bars text-xl"></i>
     </button>
 
     <!-- Backdrop overlay for mobile -->
-    <div *ngIf="isSidebarOpen" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-10 lg:hidden"
+    <div *ngIf="isSidebarOpen" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 lg:hidden"
         (click)="toggleSidebar()">
     </div>
 
     <!-- Sidebar -->
     <div [class.translate-x-0]="isSidebarOpen" [class.-translate-x-full]="!isSidebarOpen"
-        class="w-64 flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-20 shadow-lg"
+        class="w-64 flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-30 shadow-lg"
         [ngClass]="{
             'bg-[#679436] text-white': role !== 'osws_admin',
             'bg-[#14532d] text-white': role === 'osws_admin'

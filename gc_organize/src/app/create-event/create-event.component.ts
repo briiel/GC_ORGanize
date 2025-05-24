@@ -18,8 +18,10 @@ export class CreateEventComponent {
     title: '',
     description: '',
     location: '',
-    event_date: '',
-    event_time: ''
+    start_date: '',
+    start_time: '',
+    end_date: '',
+    end_time: ''
     // Remove event_poster from here
   };
   eventPosterFile: File | null = null; // Add this
@@ -64,12 +66,42 @@ export class CreateEventComponent {
   }
 
   createEvent(): void {
+    // Combine start date and time to a Date object
+    const startDateTime = new Date(`${this.event.start_date}T${this.event.start_time}`);
+    const now = new Date();
+
+    if (isNaN(startDateTime.getTime()) || startDateTime < now) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Start Date/Time',
+        text: 'Start date and time must be in the future.',
+        confirmButtonColor: '#d33'
+      });
+      return;
+    }
+
+    // Optionally, you can also check that end date/time is after start date/time
+    if (this.event.end_date && this.event.end_time) {
+      const endDateTime = new Date(`${this.event.end_date}T${this.event.end_time}`);
+      if (endDateTime < startDateTime) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid End Date/Time',
+          text: 'End date and time must be after the start date and time.',
+          confirmButtonColor: '#d33'
+        });
+        return;
+      }
+    }
+
     const formData = new FormData();
     formData.append('title', this.event.title);
     formData.append('description', this.event.description);
     formData.append('location', this.event.location);
-    formData.append('event_date', this.event.event_date);
-    formData.append('event_time', this.event.event_time);
+    formData.append('start_date', this.event.start_date);
+    formData.append('start_time', this.event.start_time);
+    formData.append('end_date', this.event.end_date);
+    formData.append('end_time', this.event.end_time);
     if (this.eventPosterFile) {
       formData.append('event_poster', this.eventPosterFile);
     }
@@ -99,8 +131,10 @@ export class CreateEventComponent {
             title: '',
             description: '',
             location: '',
-            event_date: '',
-            event_time: ''
+            start_date: '',
+            start_time: '',
+            end_date: '',
+            end_time: ''
           };
           this.removeImage();
         });
