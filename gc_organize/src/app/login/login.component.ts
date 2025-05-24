@@ -16,6 +16,7 @@ export class LoginComponent implements OnInit {
   emailOrId: string = '';
   password: string = '';
   errorMessage: string = '';
+  isLoading = false; // Add this line
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -34,12 +35,9 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
-  }
-
   onLogin(): void {
     this.errorMessage = '';
+    this.isLoading = true; // Start loading
     // Clear all user-related keys before setting new ones
     localStorage.removeItem('studentId');
     localStorage.removeItem('creatorId');
@@ -49,6 +47,7 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(this.emailOrId, this.password).subscribe(
       (response) => {
+        this.isLoading = false; // Stop loading
         if (response.success) {
           this.authService.saveToken(response.token);
           const payload = JSON.parse(atob(response.token.split('.')[1]));
@@ -102,9 +101,14 @@ export class LoginComponent implements OnInit {
         }
       },
       (error) => {
+        this.isLoading = false; // Stop loading
         this.errorMessage = 'Invalid email/ID or password';
         console.error('Login error:', error);
       }
     );
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 }
