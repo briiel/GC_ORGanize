@@ -65,8 +65,15 @@ export class EventsregComponent implements OnInit {
     alert('Certificate download functionality will be implemented with backend integration');
   }
 
+  canDownloadQr(qrUrl: string): boolean {
+    return !!qrUrl && qrUrl.startsWith('https://res.cloudinary.com/');
+  }
+
   downloadQrCode(qrUrl: string, eventId: number) {
-    // Fetch the image as a blob and trigger download
+    if (!this.canDownloadQr(qrUrl)) {
+      alert('QR code is not available for download.');
+      return;
+    }
     this.http.get(qrUrl, { responseType: 'blob' }).subscribe(blob => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
