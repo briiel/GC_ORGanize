@@ -34,7 +34,7 @@ export class EcertificateComponent implements OnInit {
   }
 
   downloadCertificate(certUrl: string) {
-    window.open(`http://localhost:5000/${certUrl}`, '_blank');
+    window.open(`https://gcorg-apiv1-8bn5.onrender.com/${certUrl}`, '_blank');
   }
 
   get filteredCertificates() {
