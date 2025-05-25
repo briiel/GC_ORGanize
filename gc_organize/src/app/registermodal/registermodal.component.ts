@@ -96,7 +96,7 @@ export class RegistermodalComponent implements OnInit {
     }
 
     this.http.post(
-      'http://localhost:5000/api/event/events/register',
+      'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/register',
       this.registrationData,
       {
         headers: {
