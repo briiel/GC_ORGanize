@@ -9,7 +9,7 @@ import { jwtDecode } from 'jwt-decode';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api'; // Use as base URL
+  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api'; // Use as base URL
 
   constructor(private http: HttpClient) {}
 
