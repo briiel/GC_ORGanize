@@ -97,4 +97,14 @@ export class EventService {
   getEventParticipants(eventId: number) {
     return this.http.get<any>(`http://localhost:5000/api/event/${eventId}/participants`);
   }
+
+  getEventById(eventId: number) {
+    const headers = this.getAuthHeaders();
+    return this.http.get<any>(`${this.apiUrl}/events/${eventId}`, { headers });
+  }
+
+  updateEvent(eventId: number, formData: FormData) {
+    const headers = this.getAuthHeaders();
+    return this.http.put<any>(`${this.apiUrl}/events/${eventId}`, formData, { headers });
+  }
 }

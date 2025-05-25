@@ -1,25 +1,7 @@
 <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100">
   <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
     <h2 class="text-2xl font-bold mb-4 text-[#679436]">Scan QR for Attendance</h2>
-    <select *ngIf="availableDevices.length > 1"
-            (change)="onDeviceSelectChange($event)"
-            class="mb-4 p-2 border rounded">
-      <option *ngFor="let device of availableDevices" [value]="device.deviceId">
-        {{ device.label || 'Camera ' + device.deviceId }}
-      </option>
-    </select>
-    <zxing-scanner
-      (scanSuccess)="onCodeResult($event)"
-      (scanError)="onScanError($event)"
-      [torch]="false"
-      [tryHarder]="true"
-      class="w-full mb-4"
-    ></zxing-scanner>
-    <div *ngIf="message" class="mt-2 text-center text-lg font-semibold text-[#05668D]">
-      {{ message }}
-    </div>
-    <button class="mt-4 px-4 py-2 bg-[#679436] text-white rounded hover:bg-[#56732e]" (click)="scanning = !scanning">
-      {{ scanning ? 'Pause' : 'Resume' }} Scanning
-    </button>
+    <div id="qr-reader" style="width: 100%;"></div>
+    <!-- Removed message and resume scanning button -->
   </div>
 </div>

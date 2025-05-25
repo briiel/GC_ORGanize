@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit {
                 last_name: response.student.last_name,
                 middle_initial: response.student.middle_initial,
                 suffix: response.student.suffix,
-                domain_email: response.student.email,
+                email: response.student.email,
                 department: response.student.department,
                 program: response.student.program
               }));

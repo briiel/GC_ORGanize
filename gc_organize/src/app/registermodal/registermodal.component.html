@@ -1,4 +1,4 @@
-<div class="fixed inset-0 modal-blur flex items-center justify-center bg-gray-800 bg-opacity-75" style="z-index: 1000;">
+<div class="fixed inset-0 modal-blur flex items-center justify-center bg-gray-800 bg-opacity-75" style="z-index: 3000;">
   <div class="scrollable-container bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl md:mx-8"
     style="outline: 2px solid #679436;">
     <form class="modal-flex-form" (ngSubmit)="submitRegistration()">
@@ -7,22 +7,22 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
             <label for="firstName" class="block text-sm font-medium text-gray-700">First Name:</label>
-            <input type="text" id="firstName" name="firstName" [(ngModel)]="registrationData.first_name"
+            <input type="text" id="firstName" name="firstName" [(ngModel)]="studentInfo.first_name"
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
           <div>
             <label for="surname" class="block text-sm font-medium text-gray-700">Surname:</label>
-            <input type="text" id="surname" name="surname" [(ngModel)]="registrationData.last_name"
+            <input type="text" id="surname" name="surname" [(ngModel)]="studentInfo.last_name"
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
           <div>
             <label for="middleInitial" class="block text-sm font-medium text-gray-700">Middle Initial:</label>
-            <input type="text" id="middleInitial" name="middleInitial" [(ngModel)]="registrationData.middle_initial" 
+            <input type="text" id="middleInitial" name="middleInitial" [(ngModel)]="studentInfo.middle_initial" 
               class="mt-1 block w-20 border border-gray-300 rounded-md shadow-sm p-2">
           </div>
           <div>
             <label for="suffix" class="block text-sm font-medium text-gray-700">Suffix:</label>
-            <select id="suffix" name="suffix" [(ngModel)]="registrationData.suffix"
+            <select id="suffix" name="suffix" [(ngModel)]="studentInfo.suffix"
               class="mt-1 block w-24 border border-gray-300 rounded-md shadow-sm p-2">
               <option value="">Select</option>
               <option value="Jr">Jr</option>
@@ -41,12 +41,12 @@
           </div>
           <div>
             <label for="domainEmail" class="block text-sm font-medium text-gray-700">Domain Email:</label>
-            <input type="email" id="domainEmail" name="domainEmail" [(ngModel)]="registrationData.domain_email"
+            <input type="email" id="domainEmail" name="domainEmail" [(ngModel)]="studentInfo.email"
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
           <div>
             <label for="department" class="block text-sm font-medium text-gray-700">Department:</label>
-            <select id="department" name="department" [(ngModel)]="registrationData.department"
+            <select id="department" name="department" [(ngModel)]="studentInfo.department"
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" disabled>
               <option value="">Select</option>
               <option value="CAHS">CAHS</option>
@@ -58,7 +58,7 @@
           </div>
           <div class="mb-6">
             <label for="program" class="block text-sm font-medium text-gray-700">Program:</label>
-            <input type="text" id="program" name="program" [(ngModel)]="registrationData.program"
+            <input type="text" id="program" name="program" [(ngModel)]="studentInfo.program"
               class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required readonly>
           </div>
         </div>

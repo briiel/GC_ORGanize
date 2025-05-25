@@ -133,14 +133,23 @@
 
 
         <!-- Submit Button -->
-        <div class="text-right">
+        <div class="text-right flex gap-2 justify-end">
+          <button
+            *ngIf="isEditMode"
+            type="button"
+            class="bg-gray-300 text-gray-800 py-2 px-6 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 transition duration-200 font-medium text-sm"
+            (click)="cancelEdit()"
+          >
+            Cancel
+          </button>
           <button
             type="submit"
             [ngClass]="role === 'osws_admin'
               ? 'bg-[#14532d] text-white py-2 px-6 rounded-lg hover:bg-[#218c4a] focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:ring-offset-2 transition duration-200 font-medium text-sm'
               : 'bg-[#679436] text-white py-2 px-6 rounded-lg hover:bg-[#56732e] focus:outline-none focus:ring-2 focus:ring-[#679436] focus:ring-offset-2 transition duration-200 font-medium text-sm'"
           >
-            <i class="fas fa-paper-plane mr-2"></i>Create Event
+            <i class="fas fa-paper-plane mr-2"></i>
+            {{ isEditMode ? 'Update Event' : 'Create Event' }}
           </button>
         </div>
       </form>

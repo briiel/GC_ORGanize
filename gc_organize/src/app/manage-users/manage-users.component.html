@@ -1,12 +1,13 @@
 <div class="min-h-screen bg-gray-100 p-6">
   <!-- Add Admin Modal Overlay -->
   <div *ngIf="isAddAdminModalOpen"
-    class="fixed inset-0 modal-blur bg-[#0000008a] flex items-center justify-center z-50">
+    class="fixed inset-0 modal-blur bg-[#0000008a] flex items-center justify-center"
+    style="z-index: 3000;">
     <div class="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative">
       <button (click)="closeAddAdminModal()" class="absolute top-2 right-2 text-gray-500 hover:text-red-600">
         <i class="fas fa-times"></i>
       </button>
-      <h2 class="text-xl font-bold mb-4 ">Add Admin</h2>
+      <h2 class="text-xl font-bold mb-4 text-[#14532d]">Add Admin</h2>
       <form (ngSubmit)="addAdmin()">
         <div class="mb-3">
           <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
@@ -21,7 +22,7 @@
           <input type="password" [(ngModel)]="newPassword" name="newPassword" required
             class="w-full border px-2 py-1 rounded" />
         </div>
-        <button type="submit" class="w-full bg-[#14532d] text-white py-2 rounded hover:bg-[#56732e]">Add Admin</button>
+        <button type="submit" class="w-full bg-[#14532d] text-white py-2 rounded hover:bg-[#103c22]">Add Admin</button>
       </form>
     </div>
   </div>
@@ -36,7 +37,7 @@
   <div class="mb-8">
     <div class="flex items-center justify-between mt-6 mb-2">
       <h3 class="text-lg font-semibold text-[#14532d]">OSWS Admin Accounts</h3>
-      <button (click)="openAddAdminModal()" class="bg-[#14532d] text-white px-4 py-2 rounded hover:bg-[#56732e] shadow flex items-center gap-2">
+      <button (click)="openAddAdminModal()" class="bg-[#14532d] text-white px-4 py-2 rounded hover:bg-[#103c22] shadow flex items-center gap-2">
         <i class="fas fa-user-plus"></i>
         <span class="hidden sm:inline">Add Admin</span>
       </button>

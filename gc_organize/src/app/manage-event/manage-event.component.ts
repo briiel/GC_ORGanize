@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common'; // <-- Add this import
 import { EventService } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-manage-event',
@@ -28,7 +29,7 @@ export class ManageEventComponent implements OnInit {
   participantsLoading = false;
   selectedEventTitle = '';
 
-  constructor(private eventService: EventService) {
+  constructor(private eventService: EventService, private router: Router) {
     // Get creator/org ID from localStorage or AuthService
     this.creatorId = Number(localStorage.getItem('creatorId'));
     this.adminId = Number(localStorage.getItem('adminId'));
@@ -124,10 +125,7 @@ export class ManageEventComponent implements OnInit {
 
   clearSearch() {
     this.searchTerm = '';
-    this.statusFilter = '';
-    if (!this.isOsws) {
-      this.filteredList = this.events;
-    }
+    // Optionally, reset other filters if needed
   }
 
   filteredEvents() {
@@ -154,6 +152,17 @@ export class ManageEventComponent implements OnInit {
 
   filteredOrgEvents() {
     return this.filteredOrgEventsList;
+  }
+
+  filteredOswsEvents(): any[] {
+    if (!this.searchTerm) return this.oswsEvents;
+    const term = this.searchTerm.toLowerCase();
+    return this.oswsEvents.filter(event =>
+      (event.title && event.title.toLowerCase().includes(term)) ||
+      (event.location && event.location.toLowerCase().includes(term)) ||
+      (event.start_date && event.start_date.toLowerCase().includes(term)) ||
+      (event.end_date && event.end_date.toLowerCase().includes(term))
+    );
   }
 
   confirmDeleteEvent(event: any) {
@@ -211,5 +220,10 @@ export class ManageEventComponent implements OnInit {
     this.showParticipantsModal = false;
     this.participants = [];
     this.selectedEventTitle = '';
+  }
+
+  editEvent(event: any) {
+    // Navigate to create-event with event_id as a query param
+    this.router.navigate(['/sidebar/create-event'], { queryParams: { event_id: event.event_id } });
   }
 }

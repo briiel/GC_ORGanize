@@ -125,27 +125,32 @@
   </div>
 
   <!-- Paginator -->
-  <div *ngIf="totalPages > 1" class="flex justify-center items-center mt-8 space-x-2">
-    <button
-      class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
-      [disabled]="currentPage === 1"
-      (click)="changePage(currentPage - 1)">
-      Prev
-    </button>
-    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+  <div *ngIf="totalPages > 1" class="flex justify-center items-center mt-8">
+    <nav class="inline-flex space-x-1" aria-label="Pagination">
+      <!-- Previous Arrow -->
       <button
-        class="px-3 py-1 rounded"
-        [ngClass]="currentPage === (i + 1) ? 'bg-[#679436] text-white' : 'bg-gray-200 hover:bg-gray-300'"
-        (click)="changePage(i + 1)">
-        {{ i + 1 }}
+        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        [disabled]="currentPage === 1"
+        (click)="changePage(currentPage - 1)">
+        <i class="fas fa-chevron-left"></i>
       </button>
-    </ng-container>
-    <button
-      class="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
-      [disabled]="currentPage === totalPages"
-      (click)="changePage(currentPage + 1)">
-      Next
-    </button>
+      <!-- Page Numbers -->
+      <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+        <button
+          class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+          [ngClass]="currentPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+          (click)="changePage(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </ng-container>
+      <!-- Next Arrow -->
+      <button
+        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        [disabled]="currentPage === totalPages"
+        (click)="changePage(currentPage + 1)">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </nav>
   </div>
 
   <app-viewmodal *ngIf="isViewModalOpen" [event]="selectedEvent" (close)="closeViewModal()">

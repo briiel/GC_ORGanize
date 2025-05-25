@@ -26,7 +26,7 @@
           (click)="searchEvents()"
           type="button"
         >
-          {{ isOsws ? 'Search All Events' : 'Search' }}
+          {{ isOsws ? 'Search' : 'Search' }}
         </button>
         <button
           *ngIf="searchTerm || statusFilter"
@@ -65,39 +65,39 @@
           <thead class="bg-[#14532d]">
             <tr class="uppercase tracking-wider text-white">
               <th class="px-4 py-3 border-b border-[#e6f7ef] text-center w-12">#</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Title</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Start Date</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">End Date</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Start Time</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">End Time</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Location</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left min-w-[180px]">Title</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center" colspan="2">Date</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center" colspan="2">Time</th>
+              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left min-w-[120px]">Location</th>
               <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Status</th>
               <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Actions</th>
             </tr>
+            <tr class="bg-[#e6f7ef] text-[#14532d] font-semibold">
+              <th></th>
+              <th></th>
+              <th class="text-center border-b border-[#e6f7ef]">Start</th>
+              <th class="text-center border-b border-[#e6f7ef]">End</th>
+              <th class="text-center border-b border-[#e6f7ef]">Start</th>
+              <th class="text-center border-b border-[#e6f7ef]">End</th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
           </thead>
           <tbody class="bg-white text-gray-800 divide-y divide-[#e6f7ef]">
-            <tr *ngFor="let event of oswsEvents; let i = index" class="hover:bg-[#f3fafd] transition-colors duration-200">
+            <tr *ngFor="let event of filteredOswsEvents(); let i = index" class="hover:bg-[#f3fafd] transition-colors duration-200">
               <td class="px-4 py-3 text-center text-[#14532d] font-semibold">{{ i + 1 }}</td>
-              <td class="px-4 py-3 font-semibold text-left">
-                <button class="text-[#14532d] hover:underline cursor-pointer"
+              <td class="px-4 py-3 font-semibold text-left max-w-[200px] truncate" [title]="event.title">
+                <button class="text-[#14532d] hover:underline cursor-pointer font-semibold"
                         (click)="openParticipantsModal(event)">
                   {{ event.title }}
                 </button>
               </td>
-              <td class="px-4 py-3 text-center">
-                {{ event.start_date | date: 'MMMM d, y' }}
-              </td>
-              <td class="px-4 py-3 text-center">
-                {{ event.end_date | date: 'MMMM d, y' }}
-              </td>
-              <td class="px-4 py-3 text-center">
-                {{ formatTime(event.start_time) }}
-              </td>
-              <td class="px-4 py-3 text-center">
-                {{ formatTime(event.end_time) }}
-              </td>
-              <td class="px-4 py-3 text-left">{{ event.location }}</td>
-              <!-- Status Dropdown -->
+              <td class="px-4 py-3 text-center">{{ event.start_date | date: 'MMM d, y' }}</td>
+              <td class="px-4 py-3 text-center">{{ event.end_date | date: 'MMM d, y' }}</td>
+              <td class="px-4 py-3 text-center">{{ formatTime(event.start_time) }}</td>
+              <td class="px-4 py-3 text-center">{{ formatTime(event.end_time) }}</td>
+              <td class="px-4 py-3 text-left max-w-[160px] truncate" [title]="event.location">{{ event.location }}</td>
               <td class="px-4 py-3 text-center">
                 <select
                   class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
@@ -116,15 +116,20 @@
                   <option value="cancelled">Cancelled</option>
                 </select>
               </td>
-              <!-- Actions -->
               <td class="px-4 py-3 text-center">
-                <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center gap-1">
-                  <i class="fas fa-trash-alt"></i>
-                  <span class="hidden sm:inline">Delete</span>
-                </button>
+                <div class="flex items-center justify-center gap-2">
+                  <!-- Update/Edit Icon -->
+                  <button (click)="editEvent(event)" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Edit Event">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <!-- Delete Icon only, remove label -->
+                  <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Delete Event">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
               </td>
             </tr>
-            <tr *ngIf="oswsEvents.length === 0">
+            <tr *ngIf="filteredOswsEvents().length === 0">
               <td colspan="9" class="text-center py-6 text-gray-500 bg-[#f3fafd] font-semibold">No OSWS events found.</td>
             </tr>
           </tbody>
@@ -212,38 +217,39 @@
         <thead class="bg-[#679436]">
           <tr class="uppercase tracking-wider text-white">
             <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-left">Title</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center">Start Date</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center">End Date</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center">Start Time</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center">End Time</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-left">Location</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[180px]">Title</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-center" colspan="2">Date</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-center" colspan="2">Time</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Location</th>
             <th class="px-4 py-3 border-b border-gray-200 text-center">Status</th>
             <th class="px-4 py-3 border-b border-gray-200 text-center">Actions</th>
+          </tr>
+          <tr class="bg-[#eaf7e0] text-[#14532d] font-semibold">
+            <th></th>
+            <th></th>
+            <th class="text-center border-b border-gray-200">Start</th>
+            <th class="text-center border-b border-gray-200">End</th>
+            <th class="text-center border-b border-gray-200">Start</th>
+            <th class="text-center border-b border-gray-200">End</th>
+            <th></th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
           <tr *ngFor="let event of filteredEvents(); let i = index" class="hover:bg-gray-50 transition-colors duration-200">
             <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ i + 1 }}</td>
-            <td class="px-4 py-3 font-semibold text-left">
-              <button class="text-[#679436] hover:underline cursor-pointer"
-                        (click)="openParticipantsModal(event)">
-                  {{ event.title }}
-                </button>
-              </td>
-            <td class="px-4 py-3 text-center">
-              {{ event.start_date | date: 'MMMM d, y' }}
+            <td class="px-4 py-3 font-semibold text-left max-w-[200px] truncate" [title]="event.title">
+              <button class="text-[#679436] hover:underline cursor-pointer font-semibold"
+                      (click)="openParticipantsModal(event)">
+                {{ event.title }}
+              </button>
             </td>
-            <td class="px-4 py-3 text-center">
-              {{ event.end_date | date: 'MMMM d, y' }}
-            </td>
-            <td class="px-4 py-3 text-center">
-              {{ formatTime(event.start_time) }}
-            </td>
-            <td class="px-4 py-3 text-center">
-              {{ formatTime(event.end_time) }}
-            </td>
-            <td class="px-4 py-3 text-left">{{ event.location }}</td>
+            <td class="px-4 py-3 text-center">{{ event.start_date | date: 'MMM d, y' }}</td>
+            <td class="px-4 py-3 text-center">{{ event.end_date | date: 'MMM d, y' }}</td>
+            <td class="px-4 py-3 text-center">{{ formatTime(event.start_time) }}</td>
+            <td class="px-4 py-3 text-center">{{ formatTime(event.end_time) }}</td>
+            <td class="px-4 py-3 text-left max-w-[160px] truncate" [title]="event.location">{{ event.location }}</td>
             <td class="px-4 py-3 text-center">
               <select
                 class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
@@ -263,10 +269,16 @@
               </select>
             </td>
             <td class="px-4 py-3 text-center">
-              <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center gap-1">
-                <i class="fas fa-trash-alt"></i>
-                <span class="hidden sm:inline">Delete</span>
-              </button>
+              <div class="flex items-center justify-center gap-2">
+                <!-- Update/Edit Icon -->
+                <button (click)="editEvent(event)" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Edit Event">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <!-- Delete Icon only, remove label -->
+                <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Delete Event">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
             </td>
           </tr>
           <tr *ngIf="filteredEvents().length === 0">
@@ -279,7 +291,7 @@
 </ng-template>
 
 <!-- Participants Modal (responsive update, larger size) -->
-<div *ngIf="showParticipantsModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a]">
+<div *ngIf="showParticipantsModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a]" style="z-index: 3000;">
   <div
     class="bg-white rounded-lg shadow-lg p-4 sm:p-8 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0"
     [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"

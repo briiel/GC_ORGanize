@@ -1,86 +1,124 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { CommonModule } from '@angular/common';
+import { Html5Qrcode, Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-scan-qr',
   standalone: true,
-  imports: [CommonModule, ZXingScannerModule],
+  imports: [CommonModule],
   templateUrl: './scan-qr.component.html',
   styleUrls: ['./scan-qr.component.css']
 })
-export class ScanQrComponent {
+export class ScanQrComponent implements AfterViewInit, OnDestroy {
   qrResultString: string = '';
   message: string = '';
   scanning: boolean = true;
-  availableDevices: MediaDeviceInfo[] = [];
-  selectedDevice: MediaDeviceInfo | undefined = undefined;
+  html5QrCode?: Html5Qrcode;
 
   constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
-  onCamerasFound(devices: MediaDeviceInfo[]) {
-    console.log('Cameras found:', devices);
-    this.availableDevices = devices;
-    if (devices.length === 0) {
-      this.message = 'No cameras found. Please check your device and permissions.';
-    } else {
-      this.selectedDevice = devices[0];
-      this.scanning = true;
-      this.cdr.detectChanges(); // Force update
-      console.log('Selected device:', this.selectedDevice);
+  ngAfterViewInit() {
+    this.startScanner();
+  }
+
+  async ngOnDestroy() {
+    if (this.html5QrCode) {
+      try {
+        await this.html5QrCode.stop();
+      } catch (e) {}
+      try {
+        await this.html5QrCode.clear();
+      } catch (e) {}
     }
   }
 
-  onDeviceSelectChange(event: Event) {
-    const deviceId = (event.target as HTMLSelectElement).value;
-    this.selectedDevice = this.availableDevices.find(d => d.deviceId === deviceId);
-    this.message = `Selected camera: ${this.selectedDevice?.label || this.selectedDevice?.deviceId}`;
-    this.scanning = true;
-    this.cdr.detectChanges(); // Force update
+  startScanner() {
+    this.html5QrCode = new Html5Qrcode("qr-reader");
+    this.html5QrCode.start(
+      { facingMode: "environment" },
+      {
+        fps: 10,
+        qrbox: 250
+      },
+      (decodedText, decodedResult) => {
+        this.onCodeResult(decodedText);
+      },
+      (errorMessage) => {
+        // Optionally handle scan errors
+      }
+    ).catch(err => {
+      this.message = "Camera start failed: " + err;
+      this.cdr.detectChanges();
+    });
+  }
+
+  stopScanner() {
+    if (this.html5QrCode) {
+      this.html5QrCode.stop().catch(() => {});
+      this.html5QrCode.clear();
+    }
   }
 
   onCodeResult(resultString: string) {
-    this.qrResultString = resultString;
-    this.scanning = false;
+    // Prevent multiple triggers for the same scan
+    if (!this.scanning) return;
+    this.scanning = false; // Pause scanning
 
     let qrData;
     try {
       qrData = JSON.parse(resultString);
     } catch (e) {
       this.message = 'Invalid QR code format.';
+      Swal.fire('Error', 'Invalid QR code format.', 'error').then(() => {
+        this.scanning = true; // Resume scanning after alert
+      });
       return;
     }
 
-    // You may need to adjust these keys based on your QR code structure
     const { registration_id, event_id, student_id } = qrData;
     if (!registration_id || !event_id || !student_id) {
       this.message = 'QR code missing required data.';
+      Swal.fire('Error', 'QR code missing required data.', 'error').then(() => {
+        this.scanning = true; // Resume scanning after alert
+      });
       return;
     }
 
     const token = localStorage.getItem('authToken');
     if (!token) {
       this.message = 'You must be logged in as an organization.';
+      Swal.fire('Error', 'You must be logged in as an organization.', 'error').then(() => {
+        this.scanning = true; // Resume scanning after alert
+      });
       return;
     }
 
     this.http.post(
       'http://localhost:5000/api/event/events/attendance',
       { registration_id, event_id, student_id },
-      { headers: { Authorization: `Bearer ${token}` } }
+      { headers: { Authorization: `Bearer ${token}` }, observe: 'response' }
     ).subscribe({
       next: (res: any) => {
-        this.message = res?.message || 'Attendance recorded!';
+        this.message = res.body?.message || 'Attendance recorded!';
+        Swal.fire('Success', 'Attendance recorded successfully.', 'success').then(() => {
+          this.scanning = true; // Resume scanning after alert
+        });
       },
       error: (err) => {
-        this.message = err.error?.message || 'Attendance failed.';
+        if (err.status === 409 || (err.error?.message && err.error.message.toLowerCase().includes('already'))) {
+          this.message = 'Attendance already recorded.';
+          Swal.fire('Notice', 'Attendance already recorded.', 'info').then(() => {
+            this.scanning = true; // Resume scanning after alert
+          });
+        } else {
+          this.message = err.error?.message || 'Attendance failed.';
+          Swal.fire('Error', this.message, 'error').then(() => {
+            this.scanning = true; // Resume scanning after alert
+          });
+        }
       }
     });
-  }
-
-  onScanError(error: any) {
-    console.error('Scan error:', error);
-    this.message = 'Camera error: ' + (error?.name || error?.message || error);
   }
 }

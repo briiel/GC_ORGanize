@@ -1,18 +1,7 @@
 <div class="flex h-screen relative">
-    <!-- Mobile Menu Button -->
-    <button (click)="toggleSidebar()"
-        class="lg:hidden fixed top-4 left-4 z-40 text-[#679436] p-2 rounded-lg bg-white shadow-md">
-        <i class="fas fa-bars text-xl"></i>
-    </button>
-
-    <!-- Backdrop overlay for mobile -->
-    <div *ngIf="isSidebarOpen" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 lg:hidden"
-        (click)="toggleSidebar()">
-    </div>
-
-    <!-- Sidebar -->
+    <!-- Sidebar: always collapsible -->
     <div [class.translate-x-0]="isSidebarOpen" [class.-translate-x-full]="!isSidebarOpen"
-        class="w-64 flex flex-col items-center fixed h-full transition-transform duration-300 lg:translate-x-0 z-30 shadow-lg"
+        class="w-64 flex flex-col items-center fixed h-full transition-transform duration-300 z-10 shadow-lg"
         [ngClass]="{
             'bg-[#679436] text-white': role !== 'osws_admin',
             'bg-[#14532d] text-white': role === 'osws_admin'
@@ -106,9 +95,36 @@
         </nav>
     </div>
 
-    <!-- Main Content Area -->
-    <div class="lg:ml-64 flex-1 overflow-y-auto h-screen pt-16 lg:pt-0 z-20 relative"
-        [@routeAnimations]="prepareRoute(outlet)">
+    <!-- Main Content Area: shift right when sidebar is open -->
+    <div [class.ml-64]="isSidebarOpen"
+         class="flex-1 overflow-y-auto h-screen z-20 relative transition-all duration-300"
+         [@routeAnimations]="prepareRoute(outlet)">
+    
+        <!-- Sticky Navbar/Header -->
+        <div class="sticky top-0 left-0 w-full flex items-center justify-between bg-white shadow px-6 py-3 z-30"
+             style="min-height: 64px;">
+            <!-- Left: Menu Button (always visible) -->
+            <button
+              (click)="toggleSidebar()"
+              class="text-gray-500 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
+            >
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+            <!-- Right: Actions (date, user, etc.) -->
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-500 text-sm">
+                    <i class="far fa-calendar-alt mr-1"></i>
+                    {{ today | date:'fullDate' }}
+                </span>
+                <span class="text-gray-500 text-sm">
+                    <i class="far fa-clock mr-1"></i>
+                    {{ currentTime }}
+                </span>
+                <!-- Add more actions/user info here if needed -->
+            </div>
+        </div>
+
+        <!-- Main routed content -->
         <router-outlet #outlet="outlet"></router-outlet>
     </div>
 </div>

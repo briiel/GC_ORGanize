@@ -15,15 +15,22 @@ export class RegistermodalComponent implements OnInit {
   @Input() eventId: number | null = null;
   imageSrcs: string[] = [];
 
+  // For display only (not sent to backend)
+  studentInfo: any = {
+    id: '',
+    first_name: '',
+    last_name: '',
+    middle_initial: '',
+    email: '',
+    suffix: '',
+    department: '',
+    program: ''
+  };
+
+  // Only these fields are sent to backend
   registrationData: any = {
     event_id: '',
     student_id: '',
-    first_name: '',
-    last_name: '',
-    suffix: '',
-    domain_email: '',
-    department: '',
-    program: '',
     proof_of_payment: ''
   };
 
@@ -33,17 +40,21 @@ export class RegistermodalComponent implements OnInit {
     if (this.eventId !== null) {
       this.registrationData.event_id = this.eventId;
     }
+    // Auto-fill student info for display, but only send id to backend
     const studentInfoStr = localStorage.getItem('studentInfo');
     if (studentInfoStr) {
       const student = JSON.parse(studentInfoStr);
-      this.registrationData.student_id = student.student_id || '';
-      this.registrationData.first_name = student.first_name || '';
-      this.registrationData.last_name = student.last_name || '';
-      this.registrationData.middle_initial = student.middle_initial || '';
-      this.registrationData.suffix = student.suffix || '';
-      this.registrationData.domain_email = student.domain_email || '';
-      this.registrationData.department = student.department || '';
-      this.registrationData.program = student.program || '';
+      this.studentInfo = {
+        id: student.student_id || student.id || '',
+        first_name: student.first_name || '',
+        last_name: student.last_name || '',
+        email: student.email || '',
+        middle_initial: student.middle_initial || '',
+        suffix: student.suffix || '',
+        department: student.department || '',
+        program: student.program || ''
+      };
+      this.registrationData.student_id = this.studentInfo.id;
     }
   }
 
