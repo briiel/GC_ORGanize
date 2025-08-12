@@ -9,25 +9,17 @@
     <div class="mb-6 mx-2 lg:mx-6">
         <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
             <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px] flex">
-                <input
-                    type="text"
-                    [(ngModel)]="searchTerm"
-                    placeholder="Search by event title..."
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Search by event title..."
                     class="px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
-                    style="width:100%; min-width:0; max-width:100%; flex:1 1 0;"
-                    (keyup.enter)="onSearch()"
-                />
+                    style="width:100%; min-width:0; max-width:100%; flex:1 1 0;" (keyup.enter)="onSearch()" />
                 <button
                     class="ml-2 px-4 py-2 bg-[#679436] hover:bg-[#4e732b] text-white rounded-md text-sm flex-shrink-0"
-                    (click)="onSearch()"
-                >
+                    (click)="onSearch()">
                     Search
                 </button>
                 <button
                     class="ml-2 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm flex-shrink-0"
-                    (click)="clearSearch()"
-                    *ngIf="searchTerm"
-                >
+                    (click)="clearSearch()" *ngIf="searchTerm">
                     Clear
                 </button>
             </div>
@@ -46,7 +38,8 @@
     </div>
 
     <!-- Certificates Table -->
-    <div *ngIf="filteredCertificates.length > 0" class="mx-2 lg:m-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
+    <div *ngIf="filteredCertificates.length > 0"
+        class="mx-2 lg:m-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
         <div class="overflow-x-auto">
             <table class="w-full text-sm lg:text-base">
                 <thead class="bg-[#679436]">
@@ -58,16 +51,21 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-                    <tr *ngFor="let cert of filteredCertificates; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+                    <tr *ngFor="let cert of filteredCertificates; let i = index"
+                        class="hover:bg-gray-50 transition-colors duration-200">
                         <td class="px-1 lg:px-4 py-2 lg:py-3">{{ i + 1 }}</td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 font-semibold">{{ cert.event_title }}</td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ cert.event_date | date:'mediumDate' }}</td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
                             <button
-                                class="bg-[#679436] hover:bg-[#4e732b] text-white px-4 py-2 rounded-lg text-sm"
-                                (click)="downloadCertificate(cert.certificate_url)">
-                                <i class="fas fa-download mr-2"></i>
-                                Download Certificate
+                                class="bg-[#679436] hover:bg-[#4e732b] text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                [disabled]="isDownloading(cert.id)"
+                                (click)="downloadCertificate(cert.certificate_url, cert.event_title, cert.id)">
+
+                                <i *ngIf="isDownloading(cert.id)" class="fas fa-spinner fa-spin mr-2"></i>
+                                <i *ngIf="!isDownloading(cert.id)" class="fas fa-download mr-2"></i>
+                                <span *ngIf="isDownloading(cert.id)">Downloading...</span>
+                                <span *ngIf="!isDownloading(cert.id)">Download Certificate</span>
                             </button>
                         </td>
                     </tr>

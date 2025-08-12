@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class EventService {
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event'; // Backend API base URL
+  private apiUrl = 'http://localhost:5000/api/event';
 
   constructor(private http: HttpClient) {}
 
