@@ -133,15 +133,17 @@ export class ManageEventComponent implements OnInit {
   }
 
   searchOrgEvents() {
-    const search = this.orgEventsSearchTerm.trim().toLowerCase();
-    if (!search) {
+    const term = this.orgEventsSearchTerm.trim().toLowerCase();
+    if (!term) {
       this.filteredOrgEventsList = this.orgEvents;
       return;
     }
     this.filteredOrgEventsList = this.orgEvents.filter(event =>
-      (event.title && event.title.toLowerCase().includes(search)) ||
-      (event.location && event.location.toLowerCase().includes(search)) ||
-      (event.event_date && (new Date(event.event_date).toLocaleDateString().toLowerCase().includes(search)))
+      (event.title && event.title.toLowerCase().includes(term)) ||
+      (event.location && event.location.toLowerCase().includes(term)) ||
+      (event.department && event.department.toLowerCase().includes(term)) || // <-- Add department
+      (event.start_date && new Date(event.start_date).toLocaleDateString().toLowerCase().includes(term)) ||
+      (event.end_date && new Date(event.end_date).toLocaleDateString().toLowerCase().includes(term))
     );
   }
 
@@ -151,7 +153,7 @@ export class ManageEventComponent implements OnInit {
   }
 
   filteredOrgEvents() {
-    return this.filteredOrgEventsList;
+    return this.filteredOrgEventsList || [];
   }
 
   filteredOswsEvents(): any[] {
