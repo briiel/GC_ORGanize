@@ -46,15 +46,15 @@
       <table *ngIf="!loading && admins.length" class="min-w-full text-sm lg:text-base bg-white">
         <thead class="bg-[#14532d] text-white">
           <tr>
-            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">#</th>
             <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Name</th>
             <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Email</th>
             <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let admin of admins" class="hover:bg-gray-50 transition-colors duration-200">
-            <td class="px-6 py-4 whitespace-nowrap">{{ admin.id }}</td>
+          <tr *ngFor="let admin of admins; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+            <td class="px-6 py-4 whitespace-nowrap">{{ i + 1 }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ admin.name }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ admin.email }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -77,15 +77,15 @@
       <table *ngIf="!loading && organizations.length" class="min-w-full text-sm lg:text-base bg-white">
         <thead class="bg-[#14532d] text-white">
           <tr>
-            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">#</th>
             <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Organization Name</th>
             <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Email</th>
             <th class="px-6 py-3 text-left font-semibold uppercase tracking-wider">Department</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let org of organizations" class="hover:bg-gray-50 transition-colors duration-200">
-            <td class="px-6 py-4 whitespace-nowrap">{{ org.id }}</td>
+          <tr *ngFor="let org of organizations; let i = index" class="hover:bg-gray-50 transition-colors duration-200">
+            <td class="px-6 py-4 whitespace-nowrap">{{ i + 1 }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ org.name }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ org.email }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ org.department }}</td>

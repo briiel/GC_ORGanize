@@ -142,27 +142,19 @@ export class RegistermodalComponent implements OnInit {
       return;
     }
 
-    // Check if proof of payment is provided
-    if (!this.selectedFile) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Proof of Payment Required',
-        text: 'Please upload your proof of payment.',
-        confirmButtonColor: '#679436'
-      });
-      return;
-    }
-
     // Create FormData for file upload
     const formData = new FormData();
     formData.append('event_id', this.registrationData.event_id.toString());
     formData.append('student_id', this.registrationData.student_id.toString());
-    formData.append('proof_of_payment', this.selectedFile);
+    // Append proof of payment only if provided
+    if (this.selectedFile) {
+      formData.append('proof_of_payment', this.selectedFile);
+    }
 
     // Show loading indicator
     Swal.fire({
       title: 'Processing Registration...',
-      text: 'Please wait while we process your registration and upload your proof of payment.',
+      text: 'Please wait while we process your registration.',
       allowOutsideClick: false,
       allowEscapeKey: false,
       showConfirmButton: false,
@@ -172,7 +164,8 @@ export class RegistermodalComponent implements OnInit {
     });
 
     this.http.post(
-      'http://localhost:5000/api/event/events/register',
+  // Dev: 'http://localhost:5000/api/event/events/register',
+  'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/register',
       formData,
       {
         headers: {
@@ -187,10 +180,6 @@ export class RegistermodalComponent implements OnInit {
           title: 'Registration Successful!',
           html: `
             <p>You have been successfully registered for the event.</p>
-            <p class="mt-2 text-sm text-gray-600">
-              <i class="fas fa-envelope mr-1"></i>
-              Check your email for confirmation and your QR code.
-            </p>
           `,
           confirmButtonColor: '#679436',
           confirmButtonText: 'Got it!'

@@ -96,7 +96,8 @@ export class ScanQrComponent implements AfterViewInit, OnDestroy {
     }
 
     this.http.post(
-      'http://localhost:5000/api/event/events/attendance',
+  // Dev: 'http://localhost:5000/api/event/events/attendance',
+  'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/attendance',
       { registration_id, event_id, student_id },
       { headers: { Authorization: `Bearer ${token}` }, observe: 'response' }
     ).subscribe({

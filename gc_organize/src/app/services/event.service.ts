@@ -6,7 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class EventService {
-  private apiUrl = 'http://localhost:5000/api/event';
+  // Dev: 'http://localhost:5000/api/event'
+  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event';
 
   constructor(private http: HttpClient) {}
 
@@ -65,14 +66,16 @@ export class EventService {
 
   // Get notifications
   // getNotifications() {
-  //   return this.http.get<any[]>('http://localhost:5000/api/notifications', {
+  //   Dev: this.http.get<any[]>('http://localhost:5000/api/notifications', {
+  //   return this.http.get<any[]>('https://gcorg-apiv1-8bn5.onrender.com/api/notifications', {
   //     headers: this.getAuthHeaders()
   //   });
   // }
 
   // // Mark notification as read
   // markNotificationAsRead(id: number) {
-  //   return this.http.patch(`http://localhost:5000/api/notifications/${id}/read`, {}, {
+  //   Dev: this.http.patch(`http://localhost:5000/api/notifications/${id}/read`, {}, {
+  //   return this.http.patch(`https://gcorg-apiv1-8bn5.onrender.com/api/notifications/${id}/read`, {}, {
   //     headers: this.getAuthHeaders()
   //   });
   // }

@@ -180,8 +180,22 @@ export class CreateEventComponent implements OnInit {
         formData.append('created_by_org_id', creatorId);
       }
 
+      // Show loading indicator while creating the event
+      Swal.fire({
+        title: 'Creating Event...',
+        text: 'Please wait while we save your event.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       this.eventService.createEvent(formData).subscribe(
         (response) => {
+          // Close loading and show success
+          Swal.close();
           Swal.fire({
             icon: 'success',
             title: 'Event Created!',
@@ -203,6 +217,8 @@ export class CreateEventComponent implements OnInit {
         },
         (error) => {
           console.error('Error creating event:', error);
+          // Close loading and show error
+          Swal.close();
           Swal.fire('Error', 'Failed to create event. Please try again.', 'error');
         }
       );

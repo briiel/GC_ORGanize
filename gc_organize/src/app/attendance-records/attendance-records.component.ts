@@ -24,7 +24,8 @@ export class AttendanceRecordsComponent implements OnInit {
   ngOnInit() {
     this.loading = true;
     const token = localStorage.getItem('authToken');
-    this.http.get<any>('http://localhost:5000/api/event/attendance-records', {
+  // Dev: this.http.get<any>('http://localhost:5000/api/event/attendance-records', {
+  this.http.get<any>('https://gcorg-apiv1-8bn5.onrender.com/api/event/attendance-records', {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: (res) => {

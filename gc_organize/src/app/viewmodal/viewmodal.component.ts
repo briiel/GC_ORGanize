@@ -42,7 +42,8 @@ export class ViewmodalComponent {
   getPosterUrl(): string {
     if (!this.event?.event_poster) return '#';
     if (this.event.event_poster.startsWith('http')) return this.event.event_poster;
-    return `https://gcorg-apiv1-8bn5.onrender.com/${this.event.event_poster.replace(/^\/+/, '')}`;
+  // Dev: `http://localhost:5000/${this.event.event_poster.replace(/^\/+/, '')}`
+  return `https://gcorg-apiv1-8bn5.onrender.com/${this.event.event_poster.replace(/^\/+/, '')}`;
   }
 }
 
