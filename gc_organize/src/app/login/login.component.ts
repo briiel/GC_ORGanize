@@ -17,6 +17,7 @@ export class LoginComponent implements OnInit {
   password: string = '';
   errorMessage: string = '';
   isLoading = false; // Add this line
+  public installPrompt: any;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -33,6 +34,14 @@ export class LoginComponent implements OnInit {
       });
       localStorage.removeItem('justLoggedOut');
     }
+
+    // Check if the app can be installed (PWA)
+    window.addEventListener('beforeinstallprompt', (e: any) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later
+      this.installPrompt = e;
+    });
   }
 
   onLogin(): void {
@@ -110,5 +119,25 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+
+  installApp() {
+    if (!this.installPrompt) {
+      return;
+    }
+    
+    // Show the install prompt
+    this.installPrompt.prompt();
+    
+    // Wait for the user to respond to the prompt
+    this.installPrompt.userChoice.then((choiceResult: any) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      // Clear the saved prompt since it can't be used again
+      this.installPrompt = null;
+    });
   }
 }
