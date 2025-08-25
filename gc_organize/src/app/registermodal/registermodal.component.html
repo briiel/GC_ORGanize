@@ -3,7 +3,7 @@
     style="outline: 2px solid #679436;">
     <form class="modal-flex-form" (ngSubmit)="submitRegistration()">
       <div class="modal-content-scroll flex-1">
-        <h2 class="text-2xl font-bold mb-4">Event Registration</h2>
+  <h2 class="text-2xl font-bold mb-4 text-[#679436]">Event Registration</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
             <label for="firstName" class="block text-sm font-medium text-gray-700">First Name:</label>
@@ -63,67 +63,34 @@
           </div>
         </div>
 
-        <!-- Updated Proof of Payment Section -->
+        <!-- Updated Proof of Payment Section (mirrors Manage Event poster dropzone) -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Proof of Payment <span class="text-red-500">*</span>
           </label>
-          <p class="text-xs text-gray-500 mb-3">Please upload your proof of payment (JPEG, PNG, WebP format, max 5MB)
-          </p>
+          <p class="text-xs text-gray-500 mb-3">Please upload your proof of payment (JPEG, PNG, WebP format, max 5MB)</p>
 
           <div class="flex items-center justify-center w-full">
             <div class="flex flex-col items-center justify-center w-full">
-
-              <!-- Image Preview Section -->
-              <div *ngIf="imageSrcs.length > 0" class="w-full mb-4">
-                <div class="flex items-center justify-between mb-3">
-                  <h4 class="text-sm font-medium text-gray-700">Proof of Payment Preview</h4>
-                  <button type="button" (click)="removeAllImages()"
-                    class="bg-red-600 text-white text-xs font-medium py-1 px-3 rounded hover:bg-red-700 cursor-pointer flex items-center">
-                    <i class="fas fa-trash mr-1"></i> Remove
-                  </button>
+              <!-- Dropzone -->
+              <label for="pop-dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors" *ngIf="!proofPreviewUrl">
+                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                  <svg aria-hidden="true" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                  <p class="mb-1 text-sm text-gray-600"><span class="font-medium">Click to upload</span> or drag and drop</p>
+                  <p class="text-xs text-gray-400">PNG, JPG, JPEG, WEBP (Max: 2MB)</p>
                 </div>
+                <input id="pop-dropzone-file" type="file" class="hidden" accept="image/png,image/jpeg,image/jpg,image/webp" (change)="previewImages($event)" />
+              </label>
 
-                <div class="relative inline-block">
-                  <img [src]="imageSrcs[0]" alt="Proof of Payment Preview"
-                    class="max-w-full max-h-64 object-contain rounded-lg border-2 border-gray-200 shadow-sm">
-                  <button type="button" (click)="removeImage(0)"
-                    class="absolute -top-2 -right-2 bg-red-600 text-white font-bold w-6 h-6 rounded-full hover:bg-red-700 cursor-pointer flex items-center justify-center text-xs">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-
-                <!-- Replace Image Button -->
-                <div class="mt-3">
-                  <button type="button" (click)="triggerFileInput()"
-                    class="bg-[#679436] text-white font-medium py-2 px-4 rounded hover:bg-[#4e732b] cursor-pointer flex items-center text-sm">
-                    <i class="fas fa-sync-alt mr-2"></i> Replace Image
+              <!-- Preview Card -->
+              <div class="mt-3 w-full" *ngIf="proofPreviewUrl">
+                <div class="relative rounded-lg border border-gray-200 shadow-sm bg-white p-2">
+                  <img [src]="proofPreviewUrl" class="w-full max-h-64 object-contain rounded-md" alt="Proof preview" />
+                  <button type="button" (click)="removeImage()" class="absolute top-2 right-2 bg-white text-gray-600 hover:text-red-600 border border-gray-200 rounded-full p-1 shadow-sm" aria-label="Remove image">
+                    <i class="fas fa-times text-sm"></i>
                   </button>
                 </div>
               </div>
-
-              <!-- Upload Dropzone (shown when no image) -->
-              <label *ngIf="imageSrcs.length === 0" for="dropzone-file"
-                class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-                <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                  <svg class="w-10 h-10 mb-4 text-[#679436]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    fill="none" viewBox="0 0 20 16">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2" />
-                  </svg>
-                  <p class="mb-2 text-sm text-gray-600">
-                    <span class="font-semibold text-[#679436]">Click to upload</span> your proof of payment
-                  </p>
-                  <p class="text-xs text-gray-500">PNG, JPG, JPEG or WebP (Max: 5MB)</p>
-                </div>
-                <!-- Changed to single file upload -->
-                <input id="dropzone-file" type="file" class="hidden" accept="image/jpeg,image/jpg,image/png,image/webp"
-                  (change)="previewImages($event)" />
-              </label>
-
-              <!-- Hidden file input for replace functionality -->
-              <input id="hidden-file-input" type="file" class="hidden"
-                accept="image/jpeg,image/jpg,image/png,image/webp" (change)="previewImages($event)" />
             </div>
           </div>
         </div>

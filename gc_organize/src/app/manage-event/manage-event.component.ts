@@ -449,4 +449,58 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       });
     }
   }
+
+  // Build a clean download filename: <studentId>_<event_name>.<ext>
+  getProofDownloadName(p: any): string {
+    const eventSlug = (this.selectedEventTitle || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
+    const student = String(p?.student_id ?? 'student');
+    let ext = '.webp';
+    try {
+      const url: string = p?.proof_of_payment || '';
+      if (url) {
+        const noQuery = url.split('?')[0];
+        const m = noQuery.match(/\.([a-zA-Z0-9]+)$/);
+        if (m && m[1]) ext = `.${m[1].toLowerCase()}`;
+      }
+    } catch {}
+    return `${student}_${eventSlug}${ext}`;
+  }
+
+  // Cloudinary trick: force download with desired filename using fl_attachment
+  getProofAttachmentUrl(p: any): string {
+    const url: string = p?.proof_of_payment || '';
+  if (!url) return '';
+  // Only transform Cloudinary delivery URLs
+  if (!/https?:\/\/res\.cloudinary\.com\//.test(url)) return url;
+
+  // Build a safe base name without extension for fl_attachment
+  const full = this.getProofDownloadName(p).replace(/[^a-zA-Z0-9._-]/g, '_');
+  const base = full.replace(/\.[a-zA-Z0-9]+$/, '');
+
+  // Insert fl_attachment immediately after /upload/
+  // Keep the rest of the path intact (version, folders, public_id)
+  return url.replace('/upload/', `/upload/fl_attachment:${base}/`);
+  }
+
+  async downloadProof(p: any): Promise<void> {
+    const url: string = p?.proof_of_payment || '';
+    if (!url) return;
+    const filename = this.getProofDownloadName(p);
+    try {
+      const res = await fetch(url, { mode: 'cors' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      // Fallback: open in new tab
+      window.open(url, '_blank');
+    }
+  }
 }

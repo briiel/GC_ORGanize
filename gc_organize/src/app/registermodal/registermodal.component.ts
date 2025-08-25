@@ -14,7 +14,8 @@ export class RegistermodalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Input() eventId: number | null = null;
   
-  imageSrcs: string[] = []; // For display only (single image)
+  // Proof of payment upload state (mirror Manage Event poster behavior)
+  proofPreviewUrl: string | null = null; // Data URL for preview
   selectedFile: File | null = null; // Store single file for upload
 
   // For display only (not sent to backend)
@@ -59,66 +60,64 @@ export class RegistermodalComponent implements OnInit {
     }
   }
 
-  previewImages(event: any) {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      
-      // Validate file size (5MB = 5 * 1024 * 1024 bytes)
-      const maxSize = 5 * 1024 * 1024;
-      if (file.size > maxSize) {
-        Swal.fire({
-          icon: 'error',
-          title: 'File Too Large',
-          text: 'Please select an image smaller than 5MB.',
-        });
-        return;
-      }
-
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Invalid File Type',
-          text: 'Please select a JPEG, PNG, or WebP image.',
-        });
-        return;
-      }
-
-      // Clear previous selections and set new file
-      this.imageSrcs = [];
-      this.selectedFile = file;
-      
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.imageSrcs = [e.target.result]; // Single image
-      };
-      reader.readAsDataURL(file);
+  previewImages(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      this.selectedFile = null;
+      this.proofPreviewUrl = null;
+      return;
     }
+
+  // Validate file size (2MB)
+  const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      Swal.fire({
+        icon: 'error',
+        title: 'File Too Large',
+    text: 'Please select an image smaller than 2MB.',
+      });
+      // Reset input
+      input.value = '';
+      return;
+    }
+
+    // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid File Type',
+    text: 'Only PNG, JPG, JPEG, or WEBP images are allowed.',
+      });
+      input.value = '';
+      return;
+    }
+
+    this.selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      if (e.target?.result) {
+        this.proofPreviewUrl = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
   }
 
   triggerFileInput() {
-    const fileInput = document.getElementById('hidden-file-input') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
-    }
+    const fileInput = document.getElementById('pop-dropzone-file') as HTMLInputElement;
+    fileInput?.click();
   }
 
-  removeImage(index: number) {
-    this.imageSrcs = [];
+  removeImage() {
     this.selectedFile = null;
-    
-    // Clear both file inputs
-    const dropzoneInput = document.getElementById('dropzone-file') as HTMLInputElement;
-    const hiddenInput = document.getElementById('hidden-file-input') as HTMLInputElement;
-    
+    this.proofPreviewUrl = null;
+    const dropzoneInput = document.getElementById('pop-dropzone-file') as HTMLInputElement | null;
     if (dropzoneInput) dropzoneInput.value = '';
-    if (hiddenInput) hiddenInput.value = '';
   }
 
   removeAllImages() {
-    this.removeImage(0);
+    this.removeImage();
   }
 
   submitRegistration() {
@@ -196,9 +195,9 @@ export class RegistermodalComponent implements OnInit {
         } else if (err.message) {
           errorMessage = err.message;
         } else if (err.status === 413) {
-          errorMessage = 'File too large. Please upload an image smaller than 5MB.';
+          errorMessage = 'File too large. Please upload an image smaller than 2MB.';
         } else if (err.status === 400) {
-          errorMessage = 'Invalid file format. Please upload a JPEG, PNG, or WebP image.';
+          errorMessage = 'Invalid file format. Only PNG, JPG, JPEG, or WEBP images are allowed.';
         }
         
         Swal.fire({

@@ -307,9 +307,9 @@
 <!-- Participants Modal (responsive update, larger size) -->
 <div *ngIf="showParticipantsModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a]" style="z-index: 3000;">
   <div
-    class="bg-white rounded-lg shadow-lg p-4 sm:p-8 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0"
+  class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0"
     [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
-    style="max-height: 90vh; overflow-y: auto;"
+  style="max-height: 92vh; overflow-y: auto;"
   >
     <button
       (click)="closeParticipantsModal()"
@@ -319,7 +319,7 @@
       <i class="fas fa-times"></i>
     </button>
     <h2
-      class="text-xl sm:text-2xl font-bold mb-6 break-words"
+      class="text-xl sm:text-2xl font-bold mb-4 break-words"
       [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"
     >
       Registered Participants for "{{ selectedEventTitle }}"
@@ -329,7 +329,7 @@
       No participants registered for this event.
     </div>
     <div *ngIf="!participantsLoading && participants.length > 0" class="overflow-x-auto">
-      <table class="w-full text-sm sm:text-base">
+      <table class="w-full text-sm sm:text-base whitespace-nowrap">
         <thead [ngClass]="isOsws ? 'bg-[#14532d] text-white' : 'bg-[#679436] text-white'">
           <tr>
             <th class="px-4 py-3 text-left">Student ID</th>
@@ -338,16 +338,35 @@
             <th class="px-4 py-3 text-left">Suffix</th>
             <th class="px-4 py-3 text-left">Department</th>
             <th class="px-4 py-3 text-left">Program</th>
+            <th class="px-4 py-3 text-left">Proof of Payment</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let p of participants">
-            <td class="px-4 py-3 break-all">{{ p.student_id }}</td>
-            <td class="px-4 py-3 break-all">{{ p.first_name }}</td>
-            <td class="px-4 py-3 break-all">{{ p.last_name }}</td>
-            <td class="px-4 py-3 break-all">{{ p.suffix }}</td>
-            <td class="px-4 py-3 break-all">{{ p.department }}</td>
-            <td class="px-4 py-3 break-all">{{ p.program }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{{ p.student_id }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{{ p.first_name }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{{ p.last_name }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{{ p.suffix }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{{ p.department }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">{{ p.program }}</td>
+            <td class="px-4 py-3 break-all">
+              <ng-container *ngIf="p.proof_of_payment; else noProof">
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#218c4a] focus:ring-[#14532d]' : 'bg-[#679436] hover:bg-[#56732e] focus:ring-[#679436]'"
+                  (click)="downloadProof(p)"
+                  title="Download proof of payment"
+                  aria-label="Download proof of payment"
+                >
+                  <i class="fas fa-download text-sm sm:text-base" aria-hidden="true"></i>
+                  <span>Download</span>
+                </button>
+              </ng-container>
+              <ng-template #noProof>
+                <span class="text-gray-400">No file</span>
+              </ng-template>
+            </td>
           </tr>
         </tbody>
       </table>
