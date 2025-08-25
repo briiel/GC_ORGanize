@@ -192,12 +192,13 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   confirmDeleteEvent(event: any) {
     Swal.fire({
       title: 'Are you sure?',
-      text: `Delete event "${event.title}"? This action cannot be undone.`,
+      text: `Move event "${event.title}" to trash?`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#679436',
-      confirmButtonText: 'Yes, delete it!'
+  confirmButtonText: 'Delete',
+  cancelButtonText: 'Cancel',
+  confirmButtonColor: '#d33',
+  reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
         this.deleteEvent(event.event_id);
@@ -208,7 +209,6 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   deleteEvent(eventId: number) {
     this.eventService.deleteEvent(eventId).subscribe({
       next: () => {
-        Swal.fire('Deleted!', 'The event has been deleted.', 'success');
         if (this.isOsws) {
           this.fetchOswsEvents();
           this.fetchOrgEvents();

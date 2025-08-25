@@ -106,8 +106,13 @@
 						class="px-3 py-2 rounded-md text-white"
 						[ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
 						(click)="restore(ev.event_id)">
-					<i class="fas fa-undo"></i> <span class="ml-1">Restore</span>
+						<i class="fas fa-undo"></i>
 				</button>
+					<button type="button" aria-label="Delete forever"
+							class="px-3 py-2 rounded-md text-white bg-red-600 hover:bg-red-700"
+							(click)="deleteForever(ev.event_id)">
+						<i class="fas fa-trash-alt"></i>
+					</button>
 			</div>
 		</div>
 	</div>

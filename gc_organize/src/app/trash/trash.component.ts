@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { EventService } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
 	selector: 'app-trash',
@@ -50,10 +51,38 @@ export class TrashComponent implements OnInit {
 	}
 
 	deleteForever(eventId: number): void {
-		if (!confirm('Permanently delete this event? This cannot be undone.')) return;
-		// Reuse delete API – on backend it is soft-delete, so here we would need a hard-delete endpoint to truly purge.
-		// For now, just keep as is or extend backend later.
-		alert('Permanent delete is not implemented on backend. Ask admin to purge from DB if needed.');
+		Swal.fire({
+			title: 'Permanently delete this event?',
+			text: 'This action cannot be undone.',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'Delete',
+			cancelButtonText: 'Cancel',
+			confirmButtonColor: '#d33',
+			reverseButtons: true
+		}).then((result) => {
+			if (!result.isConfirmed) return;
+			Swal.fire({
+				title: 'Deleting…',
+				allowOutsideClick: false,
+				allowEscapeKey: false,
+				showConfirmButton: false,
+				didOpen: () => Swal.showLoading()
+			});
+			this.eventService.permanentDelete(eventId).subscribe({
+				next: () => {
+					Swal.close();
+					Swal.fire({ icon: 'success', title: 'Deleted', timer: 1200, showConfirmButton: false });
+					this.loadTrash();
+				},
+				error: (err) => {
+					Swal.close();
+					const msg = err?.error?.message || 'Failed to permanently delete';
+					this.error = msg;
+					Swal.fire({ icon: 'error', title: 'Delete failed', text: msg });
+				}
+			});
+		});
 	}
 
 		get filtered(): any[] {
