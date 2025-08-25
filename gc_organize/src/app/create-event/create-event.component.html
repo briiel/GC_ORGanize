@@ -109,27 +109,32 @@
           <label for="dropzone-file" class="block text-lg font-medium text-gray-700 mb-2">
             Event Poster
           </label>
-          <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+          <!-- Dropzone -->
+          <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
             <div class="flex flex-col items-center justify-center pt-5 pb-6">
-              <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+              <svg class="w-8 h-8 mb-3 text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-            </svg>
-              <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-              <p class="text-xs text-gray-500">PNG or JPG (MAX. 800x400px)</p>
+              </svg>
+              <p class="mb-1 text-sm text-gray-600"><span class="font-medium">Click to upload</span> or drag and drop</p>
+              <p class="text-xs text-gray-400">PNG, JPG, WEBP</p>
             </div>
-            <input id="dropzone-file" name="event_poster" type="file" class="hidden" accept=".png, .jpg" (change)="previewImage($event)" />
+            <input id="dropzone-file" name="event_poster" type="file" class="hidden" accept="image/*" (change)="previewImage($event)" />
           </label>
-          <div id="image-preview" class="mt-4 relative hidden">
-            <p class="text-sm text-gray-500 mb-2">Preview:</p>
-            <img id="preview-img" class="w-64 h-40 object-contain rounded-lg shadow-md" alt="Uploaded image preview" />
-            <button 
-              type="button" 
-              class="absolute top-2 right-2 text-red-500 hover:text-red-700 focus:outline-none" 
-              (click)="removeImage()">
-              <i class="fas fa-times"></i>
-            </button>
+          <!-- Preview Card -->
+          <div id="image-preview" class="mt-4 hidden">
+            <div class="relative rounded-lg border border-gray-200 shadow-sm bg-white p-2">
+              <img id="preview-img" class="w-full max-h-64 object-contain rounded-md" alt="Poster preview" />
+              <button
+                type="button"
+                class="absolute top-2 right-2 bg-white text-gray-600 hover:text-red-600 border border-gray-200 rounded-full p-1 shadow-sm"
+                (click)="removeImage()"
+                aria-label="Remove image"
+              >
+                <i class="fas fa-times text-sm"></i>
+              </button>
+            </div>
           </div>
-        </div> 
+        </div>
 
 
         <!-- Submit Button -->

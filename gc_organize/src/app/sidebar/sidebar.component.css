@@ -1,0 +1,23 @@
+/* Sidebar specific tweaks for better mobile UX */
+
+/* Prevent content from being squeezed by applying margin only on large screens via template */
+
+/* Optional: when sidebar is open on small screens, stop body scroll if desired */
+@media (max-width: 1023.98px) {
+	:host ::ng-deep body.sidebar-open {
+		overflow: hidden;
+	}
+}
+
+/* Ensure the sidebar doesn't take full width on very small devices */
+.max-w-\[85vw\] {
+	max-width: 85vw;
+}
+
+/* Fallback for opacity utility if Tailwind purges it; kept minimal */
+.bg-black\/40 { background-color: rgba(0,0,0,0.4); }
+
+/* Fallbacks for blur utilities if Tailwind CSS purges them */
+.blur-sm { filter: blur(4px); }
+.backdrop-blur-sm { backdrop-filter: blur(4px); }
+

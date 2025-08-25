@@ -8,7 +8,6 @@ import { ProfileComponent } from './profile/profile.component';
 import { EcertificateComponent } from './ecertificate/ecertificate.component';
 import { AuthGuard } from './guards/auth.guard';
 import { SoDashboardComponent } from './so-dashboard/so-dashboard.component';
-import { CreateEventComponent } from './create-event/create-event.component';
 import { ManageEventComponent } from './manage-event/manage-event.component';
 import { ScanQrComponent } from './scan-qr/scan-qr.component';
 import { AttendanceRecordsComponent } from './attendance-records/attendance-records.component';
@@ -21,7 +20,8 @@ export const routes: Routes = [
   { 
     path: 'sidebar', 
     component: SidebarComponent, 
-    canActivate: [AuthGuard], 
+    canActivate: [AuthGuard],
+    canActivateChild: [AuthGuard],
     data: { animation: 'SidebarPage' },
     children: [
       { path: 'home', component: HomeComponent, data: { animation: 'HomePage' }, children: [
@@ -31,10 +31,9 @@ export const routes: Routes = [
       { path: 'eventsreg', component: EventsregComponent, data: { animation: 'EventsRegPage' } },
       { path: 'ecertificate', component: EcertificateComponent, data: { animation: 'ECertificatePage' } },
       { path: 'so-dashboard', component: SoDashboardComponent, data: { animation: 'SoDashboardPage' } },
-      { path: 'create-event', component: CreateEventComponent, data: { animation: 'CreateEventPage' } },
       { path: 'manage-event', component: ManageEventComponent, data: { animation: 'ManageEventPage' } },
-      { path: 'scan-qr', component: ScanQrComponent, data: { animation: 'ScanQrPage' } },
-      { path: 'attendance-records', component: AttendanceRecordsComponent, data: { animation: 'AttendanceRecordsPage' } },
+  { path: 'scan-qr', component: ScanQrComponent, data: { animation: 'ScanQrPage', roles: ['organization', 'osws_admin'] } },
+  { path: 'attendance-records', component: AttendanceRecordsComponent, data: { animation: 'AttendanceRecordsPage', roles: ['organization', 'osws_admin'] } },
       { path: 'admin-dashboard', component: AdminDashboardComponent },
       { path: 'manage-users', component: ManageUsersComponent },
     ] 

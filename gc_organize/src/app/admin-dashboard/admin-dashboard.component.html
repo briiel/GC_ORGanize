@@ -10,41 +10,73 @@
     </div>
   </header>
 
-  <!-- Main Content -->
-  <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <!-- Statistics Cards -->
-    <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
-      <i class="fas fa-users-cog text-[#14532d] text-3xl mb-2"></i>
-      <p class="text-3xl font-bold text-gray-800">12</p>
-      <p class="text-gray-600 text-sm">Total Admins</p>
-    </div>
-    <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
-      <i class="fas fa-users text-[#14532d] text-3xl mb-2"></i>
-      <p class="text-3xl font-bold text-gray-800">245</p>
-      <p class="text-gray-600 text-sm">Total Users</p>
-    </div>
-    <div class="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
-      <i class="fas fa-calendar-alt text-[#14532d] text-3xl mb-2"></i>
-      <p class="text-3xl font-bold text-gray-800">37</p>
-      <p class="text-gray-600 text-sm">Active Events</p>
-    </div>
-  </main>
+  <!-- Actions and Statistics (side-by-side) -->
+  <div class="grid grid-cols-1 gap-6 md:flex md:gap-6 md:items-start">
+    <!-- Quick Actions -->
+  <section class="bg-white rounded-lg shadow-md p-6 w-full md:w-[360px] md:shrink-0 md:self-start">
+      <h2 class="text-xl font-semibold text-[#14532d] mb-4 flex items-center">
+        <i class="fas fa-tools mr-2"></i> Quick Actions
+      </h2>
+  <div class="flex flex-col gap-4">
+  <button [routerLink]="'/sidebar/manage-users'" class="w-full bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
+          <i class="fas fa-users-cog mr-2"></i> Manage Users
+        </button>
+  <button [routerLink]="'/sidebar/manage-event'" class="w-full bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
+          <i class="fas fa-calendar-alt mr-2"></i> Manage Events
+        </button>
+      </div>
+    </section>
 
-  <!-- Quick Actions -->
-  <section class="mt-8 bg-white rounded-lg shadow-md p-6">
-    <h2 class="text-xl font-semibold text-[#14532d] mb-4 flex items-center">
-      <i class="fas fa-tools mr-2"></i> Quick Actions
-    </h2>
-    <div class="flex flex-col sm:flex-row gap-4">
-      <button [routerLink]="'/sidebar/manage-users'" class="bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
-        <i class="fas fa-users-cog mr-2"></i> Manage Users
-      </button>
-      <button [routerLink]="'/sidebar/manage-event'" class="bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
-        <i class="fas fa-calendar-alt mr-2"></i> Manage Events
-      </button>
-      <button [routerLink]="'/sidebar/admin-reports'" class="bg-[#14532d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#166534] flex items-center justify-center transition">
-        <i class="fas fa-chart-bar mr-2"></i> View Reports
-      </button>
-    </div>
-  </section>
+  <!-- Statistics -->
+  <section class="bg-white shadow-md rounded-lg p-6 md:flex-1">
+      <h2 class="text-xl font-semibold text-[#14532d] mb-4 flex items-center">
+        <i class="fas fa-chart-bar text-[#14532d] mr-2"></i> Status
+      </h2>
+  <div class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+        <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
+          <i class="fas fa-calendar-check text-blue-500 text-3xl mb-2"></i>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.upcoming }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Upcoming Events</p>
+        </div>
+        <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
+          <i class="fas fa-play-circle text-yellow-500 text-3xl mb-2"></i>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.ongoing }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Ongoing Events</p>
+        </div>
+        <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
+          <i class="fas fa-check-circle text-green-600 text-3xl mb-2"></i>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.completed }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Completed Events</p>
+        </div>
+        <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
+          <i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.cancelled }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Canceled Events</p>
+        </div>
+        <div class="flex flex-col items-center bg-gray-50 p-4 rounded-lg shadow-sm">
+          <i class="fas fa-users text-teal-600 text-3xl mb-2"></i>
+          <p class="text-3xl font-bold text-gray-800">{{ stats.totalAttendees }}</p>
+          <p class="text-gray-600 text-sm whitespace-nowrap">Total Attendees</p>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- Charts: separate containers -->
+  <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <section class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-[#14532d] mb-4">Events by Department</h3>
+      <div class="relative h-64">
+        <canvas #deptPieChart></canvas>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-lg shadow-md p-6">
+      <h3 class="text-lg font-semibold text-[#14532d] mb-4">Events per Month</h3>
+      <div class="relative h-64">
+        <canvas #eventsBarChart></canvas>
+      </div>
+    </section>
+  </div>
 </div>

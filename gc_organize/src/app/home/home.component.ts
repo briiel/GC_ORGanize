@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalService } from '../modal.service';
 import { RegistermodalComponent } from '../registermodal/registermodal.component';
@@ -15,7 +15,7 @@ import { forkJoin } from 'rxjs';
   standalone: true,
   imports: [CommonModule, RegistermodalComponent, ViewmodalComponent, RouterModule]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   dropdownVisible = false;
   notificationDropdownVisible = false;
 
@@ -89,6 +89,10 @@ export class HomeComponent implements OnInit {
     );
   }
 
+  ngOnDestroy(): void {
+    document.body.classList.remove('modal-open');
+  }
+
   get filteredEvents() {
     const search = this.searchTerm.trim().toLowerCase();
     let filtered = this.events;
@@ -160,11 +164,13 @@ export class HomeComponent implements OnInit {
   openRegisterModal(event: any) {
     this.selectedEventId = event.event_id; 
     this.isRegisterModalOpen = true;
+  this.toggleBodyModalClass();
   }
 
   closeRegisterModal() {
     this.isRegisterModalOpen = false;
     this.selectedEventId = null;
+  this.toggleBodyModalClass();
   }
 
   isViewModalOpen = false;
@@ -173,11 +179,13 @@ export class HomeComponent implements OnInit {
   openViewModal(event: any) {
     this.selectedEvent = event;
     this.isViewModalOpen = true;
+  this.toggleBodyModalClass();
   }
 
   closeViewModal() {
     this.isViewModalOpen = false;
     this.selectedEvent = null;
+  this.toggleBodyModalClass();
   }
 
 
@@ -194,6 +202,11 @@ export class HomeComponent implements OnInit {
   onSearchClick() {
     // This method is for UX clarity; filtering is already reactive.
     // Optionally, you could trigger analytics or focus the results here.
+  }
+
+  private toggleBodyModalClass() {
+    const hasOpenModal = this.isRegisterModalOpen || this.isViewModalOpen;
+    document.body.classList.toggle('modal-open', hasOpenModal);
   }
 
 }

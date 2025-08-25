@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, RouterModule, RouterPreloader } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -31,11 +31,13 @@ import { trigger, transition, style, animate, query } from '@angular/animations'
 })
 export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   isSidebarOpen = false;
+  isMobile = false;
   role: string | null = null;
   today = new Date();
   currentTime: string = '';
 
   private timeInterval: any;
+  private readonly desktopBreakpoint = 1024; // match Tailwind's lg breakpoint
 
   constructor(private authService: AuthService, private router: Router, private cdRef: ChangeDetectorRef) {}
 
@@ -57,6 +59,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateTime();
     this.timeInterval = setInterval(() => this.updateTime(), 1000);
     console.log('Role:', this.role);
+
+  // Set initial sidebar state based on viewport width
+  this.syncSidebarWithViewport();
   }
 
   ngOnDestroy(): void {
@@ -71,7 +76,38 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleSidebar() {
-    this.isSidebarOpen = !this.isSidebarOpen;
+  this.isSidebarOpen = !this.isSidebarOpen;
+  this.toggleBodyScrollLock();
+  }
+
+  closeIfMobile() {
+    if (window.innerWidth < this.desktopBreakpoint) {
+      this.isSidebarOpen = false;
+      this.toggleBodyScrollLock();
+    }
+  }
+
+  // Keep sidebar behavior responsive on resize
+  @HostListener('window:resize')
+  onResize() {
+    this.syncSidebarWithViewport();
+  }
+
+  // Close on Esc key (handy on desktop too)
+  @HostListener('window:keydown.escape')
+  onEsc() {
+    if (this.isSidebarOpen && window.innerWidth < this.desktopBreakpoint) {
+      this.isSidebarOpen = false;
+      this.toggleBodyScrollLock();
+    }
+  }
+
+  private syncSidebarWithViewport() {
+    const isDesktop = window.innerWidth >= this.desktopBreakpoint;
+  this.isMobile = !isDesktop;
+    // Open by default on desktop, closed by default on mobile
+    this.isSidebarOpen = isDesktop;
+  this.toggleBodyScrollLock();
   }
 
   prepareRoute(outlet: RouterOutlet) {
@@ -80,5 +116,14 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.cdRef.detectChanges();
+  }
+
+  private toggleBodyScrollLock() {
+    const body = document.body;
+    if (window.innerWidth < this.desktopBreakpoint && this.isSidebarOpen) {
+      body.classList.add('sidebar-open');
+    } else {
+      body.classList.remove('sidebar-open');
+    }
   }
 }

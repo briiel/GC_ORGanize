@@ -1,19 +1,20 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, CanActivateChild } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate, CanActivateChild {
   constructor(private authService: AuthService, private router: Router) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean | UrlTree {
-    const token = this.authService.getToken();
-    const role = this.authService.getUserRole();
+  const token = this.authService.getToken();
+  let role = this.authService.getUserRole();
+  if (role === 'admin') role = 'osws_admin';
 
     if (!token || !role) {
       // Not authenticated, redirect to login
@@ -28,6 +29,8 @@ export class AuthGuard implements CanActivate {
         return this.router.parseUrl('/sidebar/home');
       } else if (role === 'organization') {
         return this.router.parseUrl('/sidebar/so-dashboard');
+      } else if (role === 'osws_admin' || role === 'admin') {
+        return this.router.parseUrl('/sidebar/admin-dashboard');
       } else {
         return this.router.parseUrl('/login');
       }
@@ -35,5 +38,10 @@ export class AuthGuard implements CanActivate {
 
     // Authenticated and authorized
     return true;
+  }
+
+  canActivateChild(childRoute: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean | UrlTree {
+    // Reuse the same logic for child routes
+    return this.canActivate(childRoute, state);
   }
 }

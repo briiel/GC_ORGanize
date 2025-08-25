@@ -46,13 +46,17 @@ export class AuthService {
     if (token) {
       try {
         const decodedToken: any = jwtDecode(token);
-        return decodedToken.role || null;
+    let role: string | null = decodedToken.role || null;
+    // Normalize backend 'admin' to frontend 'osws_admin'
+    if (role === 'admin') role = 'osws_admin';
+    return role;
       } catch (error) {
         console.error('Error decoding token:', error);
-        return null;
+    // fall through to localStorage below
       }
     }
-    return null;
+  // Fallback to stored role if token decode failed
+  return localStorage.getItem('role');
   }
 
   // Create headers for authenticated requests

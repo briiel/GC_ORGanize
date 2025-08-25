@@ -50,6 +50,20 @@
           <option value="cancelled">Cancelled</option>
         </select>
       </div>
+      <!-- Create Event button -->
+    <div class="flex-none">
+        <button
+          [ngClass]="isOsws
+            ? 'bg-[#14532d] hover:bg-[#218c4a]'
+            : 'bg-[#679436] hover:bg-[#56732e]'"
+          class="text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+          type="button"
+      (click)="openCreateModal()"
+        >
+          <i class="fas fa-plus"></i>
+          Create
+        </button>
+      </div>
     </div>
   </div>
 
@@ -337,6 +351,91 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- Create Event Modal -->
+<div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a]" style="z-index: 3000;">
+  <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0"
+       [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
+       style="max-height: 92vh; overflow-y: auto;">
+    <button (click)="closeCreateModal()" class="absolute top-2 right-2 text-gray-500 hover:text-red-600" aria-label="Close">
+      <i class="fas fa-times"></i>
+    </button>
+  <h2 class="text-xl sm:text-2xl font-bold mb-4" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ isEditing ? 'Edit Event' : 'Create Event' }}</h2>
+
+    <div class="space-y-3">
+      <div>
+        <label class="block text-sm font-medium mb-1">Title</label>
+        <input type="text" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.title" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Description</label>
+        <textarea class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.description" rows="3"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Location</label>
+        <input type="text" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.location" />
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium mb-1">Start Date</label>
+          <input type="date" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.start_date" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Start Time</label>
+          <input type="time" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.start_time" />
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-sm font-medium mb-1">End Date</label>
+          <input type="date" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.end_date" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">End Time</label>
+          <input type="time" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.end_time" />
+        </div>
+      </div>
+
+      <!-- Poster uploader (modern preview) -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Event Poster</label>
+        <!-- Dropzone -->
+        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+          <div class="flex flex-col items-center justify-center pt-5 pb-6">
+            <svg aria-hidden="true" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+            <p class="mb-1 text-sm text-gray-600"><span class="font-medium">Click to upload</span> or drag and drop</p>
+            <p class="text-xs text-gray-400">PNG, JPG, WEBP</p>
+          </div>
+          <input id="dropzone-file" type="file" class="hidden" accept="image/*" (change)="previewImage($event)" />
+        </label>
+        <!-- Preview Card -->
+        <div id="image-preview" class="mt-3" [class.hidden]="!posterPreviewUrl">
+          <div class="relative rounded-lg border border-gray-200 shadow-sm bg-white p-2">
+            <img id="preview-img" [src]="posterPreviewUrl || ''" class="w-full max-h-64 object-contain rounded-md" alt="Poster preview" />
+            <button type="button" (click)="removeImage()" class="absolute top-2 right-2 bg-white text-gray-600 hover:text-red-600 border border-gray-200 rounded-full p-1 shadow-sm" aria-label="Remove image">
+              <i class="fas fa-times text-sm"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2">
+        <button class="px-4 py-2 rounded-md border" (click)="closeCreateModal()">Cancel</button>
+        <button
+          [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#218c4a]' : 'bg-[#679436] hover:bg-[#56732e]'"
+          class="text-white font-semibold px-6 py-2 rounded-md"
+          (click)="createEventFromModal()"
+        >
+          {{ isEditing ? 'Update Event' : 'Create Event' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

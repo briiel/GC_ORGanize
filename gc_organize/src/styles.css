@@ -1,5 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* Ensure all enabled buttons show pointer cursor on hover */
+button:not(:disabled):hover,
+input[type="button"]:not(:disabled):hover,
+input[type="submit"]:not(:disabled):hover,
+input[type="reset"]:not(:disabled):hover {
+    cursor: pointer;
+}
+
 @import "tailwindcss";
 
 body {
@@ -8,4 +16,12 @@ body {
 
 .modal-blur {
     backdrop-filter: blur(5px);
+}
+
+/* When a modal overlay is on screen, blur the sidebar too */
+.modal-blur ~ .sidebar-blur-target,
+.modal-blur + .sidebar-blur-target,
+body.modal-open .sidebar-blur-target {
+    filter: blur(4px);
+    pointer-events: none; /* prevent clicks-through while modal is open */
 }

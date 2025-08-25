@@ -1,11 +1,23 @@
 <div class="flex h-screen relative">
     <!-- Sidebar: always collapsible -->
+        <!-- Mobile overlay backdrop -->
+                <div 
+                    class="fixed inset-0 bg-black/40 lg:hidden transition-opacity duration-300 z-40 backdrop-blur-sm"
+                [class.hidden]="!isSidebarOpen"
+                [style.pointerEvents]="isSidebarOpen ? 'auto' : 'none'"
+                (click)="closeIfMobile()">
+        </div>
+
     <div [class.translate-x-0]="isSidebarOpen" [class.-translate-x-full]="!isSidebarOpen"
-        class="w-64 flex flex-col items-center fixed h-full transition-transform duration-300 z-10 shadow-lg"
+        class="w-64 max-w-[85vw] lg:w-64 flex flex-col items-center fixed top-0 left-0 h-full transition-transform duration-300 z-50 shadow-lg sidebar-blur-target"
         [ngClass]="{
             'bg-[#679436] text-white': role !== 'osws_admin',
             'bg-[#14532d] text-white': role === 'osws_admin'
          }">
+                    <!-- Close button (mobile only) -->
+                    <button (click)="closeIfMobile()" class="lg:hidden absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 text-white">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
         <div class="p-4 flex flex-col items-center space-y-2 mt-8 lg:mt-0">
             <img 
               [src]="role === 'osws_admin' ? 'OSWS.png' : 'GC-Logo.png'" 
@@ -29,7 +41,7 @@
                 </button>
                 <button [routerLink]="'/sidebar/ecertificate'"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
-                    <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificates
+                    <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificate
                 </button>
                 <!-- Logout Button -->
                 <button (click)="onLogout()"
@@ -48,13 +60,13 @@
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-tasks mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
-                <button [routerLink]="'/sidebar/create-event'"
+                <!-- <button [routerLink]="'/sidebar/manage-event'" [queryParams]="{ create: true }"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
-                </button>
+                </button> -->
                 <button [routerLink]="'/sidebar/scan-qr'"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
-                    <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR Attendance
+                    <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
                 </button>
                 <!-- Attendance Records Button -->
                 <button [routerLink]="'/sidebar/attendance-records'"
@@ -72,7 +84,7 @@
             <ng-container *ngIf="role === 'osws_admin'">
                 <button [routerLink]="'/sidebar/admin-dashboard'"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
-                    <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Admin Dashboard
+                    <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
                 <button [routerLink]="'/sidebar/manage-users'"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
@@ -82,10 +94,19 @@
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-calendar-alt mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
-                <button [routerLink]="'/sidebar/create-event'"
+                <button [routerLink]="'/sidebar/scan-qr'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
+                </button>
+                <!-- Attendance Records Button for OSWS Admin -->
+                <button [routerLink]="'/sidebar/attendance-records'"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer whitespace-nowrap">
+                    <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
+                </button>
+                <!-- <button [routerLink]="'/sidebar/manage-event'" [queryParams]="{ create: true }"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
-                </button>
+                </button> -->
                 <!-- Logout Button -->
                 <button (click)="onLogout()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
@@ -95,13 +116,13 @@
         </nav>
     </div>
 
-    <!-- Main Content Area: shift right when sidebar is open -->
-    <div [class.ml-64]="isSidebarOpen"
-         class="flex-1 overflow-y-auto h-screen z-20 relative transition-all duration-300"
+    <!-- Main Content Area: only shift on large screens when sidebar is open -->
+    <div class="flex-1 overflow-y-auto h-screen relative transition-all duration-300 z-0 lg:blur-none"
+         [ngClass]="{ 'lg:ml-64': isSidebarOpen, 'blur-sm': isSidebarOpen && isMobile }"
          [@routeAnimations]="prepareRoute(outlet)">
     
         <!-- Sticky Navbar/Header -->
-        <div class="sticky top-0 left-0 w-full flex items-center justify-between bg-white shadow px-6 py-3 z-30"
+    <div class="sticky top-0 left-0 w-full flex items-center justify-between bg-white shadow px-6 py-3 z-20"
              style="min-height: 64px;">
             <!-- Left: Menu Button (always visible) -->
             <button

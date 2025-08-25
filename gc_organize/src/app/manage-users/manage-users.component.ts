@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
@@ -9,7 +9,7 @@ import { AdminService } from '../services/admin.service';
   templateUrl: './manage-users.component.html',
   styleUrls: ['./manage-users.component.css']
 })
-export class ManageUsersComponent implements OnInit {
+export class ManageUsersComponent implements OnInit, OnDestroy {
   admins: any[] = [];
   organizations: any[] = [];
   loading = true;
@@ -44,10 +44,13 @@ export class ManageUsersComponent implements OnInit {
 
   openAddAdminModal() {
     this.isAddAdminModalOpen = true;
+  // Add a global class so the sidebar can blur while modal is open
+  document.body.classList.add('modal-open');
   }
 
   closeAddAdminModal() {
     this.isAddAdminModalOpen = false;
+  document.body.classList.remove('modal-open');
   }
 
   addAdmin() {
@@ -76,5 +79,10 @@ export class ManageUsersComponent implements OnInit {
         }
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    // Safety: ensure the class is removed if component is destroyed while modal is open
+    document.body.classList.remove('modal-open');
   }
 }
