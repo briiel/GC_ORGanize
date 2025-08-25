@@ -34,6 +34,7 @@ export const routes: Routes = [
       { path: 'manage-event', component: ManageEventComponent, data: { animation: 'ManageEventPage' } },
   { path: 'scan-qr', component: ScanQrComponent, data: { animation: 'ScanQrPage', roles: ['organization', 'osws_admin'] } },
   { path: 'attendance-records', component: AttendanceRecordsComponent, data: { animation: 'AttendanceRecordsPage', roles: ['organization', 'osws_admin'] } },
+  { path: 'trash', loadComponent: () => import('./trash/trash.component').then(m => m.TrashComponent), data: { animation: 'TrashPage', roles: ['organization', 'osws_admin'] } },
       { path: 'admin-dashboard', component: AdminDashboardComponent },
       { path: 'manage-users', component: ManageUsersComponent },
     ] 

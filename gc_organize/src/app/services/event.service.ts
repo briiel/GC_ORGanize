@@ -56,6 +56,18 @@ export class EventService {
     return this.http.delete(`${this.apiUrl}/events/${eventId}`, { headers });
   }
 
+  // List trashed events for current user (org or OSWS, based on token)
+  getTrashedEvents(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/events/trash`, { headers });
+  }
+
+  // Restore an event from trash
+  restoreEvent(eventId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/events/${eventId}/restore`, {}, { headers });
+  }
+
   // Helper method to get Authorization headers
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('authToken');
