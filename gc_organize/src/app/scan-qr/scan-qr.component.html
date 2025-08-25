@@ -12,6 +12,16 @@
 
     <div id="qr-reader" style="width: 100%; min-height: 240px; background:#f8fafc; display:block;"></div>
 
+    <!-- Event selector -->
+    <div class="mt-4" *ngIf="events.length">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Select Event</label>
+      <select class="w-full border rounded px-3 py-2" [ngModel]="selectedEventId" (ngModelChange)="selectedEventId = $event">
+        <option [ngValue]="null">-- Choose an event --</option>
+        <option *ngFor="let e of events" [ngValue]="e.event_id">{{ e.title }}</option>
+      </select>
+      <p class="text-xs text-gray-500 mt-1">Attendance will be recorded for the selected event.</p>
+    </div>
+
     <!-- Status/Error -->
     <p class="text-sm text-gray-600 mt-3" *ngIf="message">{{ message }}</p>
 
