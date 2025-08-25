@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Html5Qrcode, Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import Swal from 'sweetalert2';
 import { AuthService } from '../services/auth.service';
+import { EventService } from '../services/event.service';
 
 @Component({
   selector: 'app-scan-qr',
@@ -24,12 +25,22 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
   role: string | null = null;
   get isOsws(): boolean { return this.role === 'osws_admin'; }
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private auth: AuthService) {}
+  // Event selection for disambiguating which event to record attendance for
+  events: any[] = [];
+  selectedEventId: number | null = null;
+
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef,
+    private auth: AuthService,
+    private eventService: EventService
+  ) {}
 
   ngOnInit() {
     // Set initial UI text before first change detection to avoid NG0100.
     this.message = 'Click Start Scanner and allow camera access.';
   this.role = this.auth.getUserRole();
+  this.fetchScannerEvents();
   }
 
   ngAfterViewInit() {}
@@ -153,9 +164,18 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.scanning) return;
     this.scanning = false; // Pause scanning
 
+    // Require an event selection to make the same QR usable across different events
+    if (!this.selectedEventId) {
+      this.message = 'Please select the event you are scanning for.';
+      Swal.fire('Select Event', 'Please select the event you are scanning for.', 'warning').then(() => {
+        this.scanning = true; // Resume scanning after alert
+      });
+      return;
+    }
+
     // Accept both legacy JSON payload and new plain student_id string
-    let registration_id: number | undefined;
-    let event_id: number | undefined;
+  let registration_id: number | undefined;
+  let event_id: number | undefined;
     let student_id: string | undefined;
     try {
       const parsed: any = JSON.parse(resultString);
@@ -193,9 +213,12 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // Always use the selected event for attendance
+    event_id = this.selectedEventId ?? event_id;
+
     this.http.post(
-  // Dev: 'http://localhost:5000/api/event/events/attendance',
-  'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/attendance',
+      // Production: 'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/attendance',
+      'http://localhost:5000/api/event/events/attendance',
       { registration_id, event_id, student_id },
       { headers: { Authorization: `Bearer ${token}` }, observe: 'response' }
     ).subscribe({
@@ -219,5 +242,30 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     });
+  }
+
+  private fetchScannerEvents() {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+    const role = this.role;
+    if (role === 'osws_admin') {
+      const adminId = Number(localStorage.getItem('adminId'));
+      if (!adminId) return;
+      this.eventService.getEventsByAdmin(adminId).subscribe({
+        next: (res: any) => {
+          this.events = res?.data || res || [];
+        },
+        error: () => {}
+      });
+    } else if (role === 'organization') {
+      const creatorId = Number(localStorage.getItem('creatorId'));
+      if (!creatorId) return;
+      this.eventService.getEventsByCreator(creatorId).subscribe({
+        next: (res: any) => {
+          this.events = res?.data || res || [];
+        },
+        error: () => {}
+      });
+    }
   }
 }

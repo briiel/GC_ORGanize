@@ -68,6 +68,12 @@ export class EventService {
     return this.http.post(`${this.apiUrl}/events/${eventId}/restore`, {}, { headers });
   }
 
+  // Permanently delete an event from trash
+  permanentDelete(eventId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/events/${eventId}/permanent`, { headers });
+  }
+
   // Helper method to get Authorization headers
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('authToken');
