@@ -18,10 +18,19 @@ export class LoginComponent implements OnInit {
   errorMessage: string = '';
   isLoading = false; // Add this line
   public installPrompt: any;
+  capsLockOn = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {
+    // If already authenticated, route to the appropriate dashboard
+    const existingToken = this.authService.getToken();
+    const storedRole = localStorage.getItem('role') || this.authService.getUserRole();
+    if (existingToken && storedRole) {
+      this.redirectByRole(storedRole);
+      return;
+    }
+
     if (localStorage.getItem('justLoggedOut')) {
       Swal.fire({
         toast: true,
@@ -44,6 +53,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
+
   onLogin(): void {
     this.errorMessage = '';
     this.isLoading = true; // Start loading
@@ -54,7 +64,18 @@ export class LoginComponent implements OnInit {
     localStorage.removeItem('role');
     localStorage.removeItem('adminId');
 
-    this.authService.login(this.emailOrId, this.password).subscribe(
+  let emailOrId = this.emailOrId.trim();
+    const password = this.password.trim();
+
+    if (!emailOrId || !password) {
+      this.isLoading = false;
+      this.errorMessage = 'Please enter both your Email/ID and Password.';
+      return;
+    }
+
+  // No auto-append of domain; users must enter full email (e.g., user@gordoncollege.edu.ph) or a numeric Student ID.
+
+    this.authService.login(emailOrId, password).subscribe(
       (response) => {
         this.isLoading = false; // Stop loading
         if (response.success) {
@@ -119,6 +140,38 @@ export class LoginComponent implements OnInit {
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
+  }
+
+  onPasswordKeyEvent(event: KeyboardEvent) {
+    try {
+      // Indicate if Caps Lock is on to help users avoid password mistakes
+      // Some environments may not support getModifierState
+      // so we guard with a try/catch
+      // @ts-ignore
+      if (typeof event.getModifierState === 'function') {
+        // @ts-ignore
+        this.capsLockOn = event.getModifierState('CapsLock');
+      }
+    } catch {
+      this.capsLockOn = false;
+    }
+  }
+
+  private redirectByRole(role: string) {
+    switch (role) {
+      case 'student':
+        this.router.navigate(['/sidebar/home']);
+        break;
+      case 'organization':
+        this.router.navigate(['/sidebar/so-dashboard']);
+        break;
+      case 'osws_admin':
+      case 'admin':
+        this.router.navigate(['/sidebar/admin-dashboard']);
+        break;
+      default:
+        break;
+    }
   }
 
   installApp() {

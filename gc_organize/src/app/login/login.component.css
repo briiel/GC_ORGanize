@@ -1,0 +1,84 @@
+/* Animated moving background behind the login container */
+.animated-bg {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	z-index: 0; /* keep it behind the card */
+	pointer-events: none; /* don't block interactions */
+}
+
+.blob {
+	position: absolute;
+	width: 60vmax; /* larger for more presence */
+	height: 60vmax; /* larger for more presence */
+	filter: blur(60px);
+	opacity: 0.22; /* toned down visibility */
+	border-radius: 50%;
+	will-change: transform;
+}
+
+/* Colorful gradient blobs */
+.blob1 {
+	/* Teal brand tone (#05668D) blending to its darker shade (#045274) */
+	background: radial-gradient(
+		circle at 30% 30%,
+		rgba(5, 102, 141, 0.78) 0%,
+		rgba(4, 82, 116, 0.42) 50%,
+		transparent 80%
+	);
+	animation: float1 14s ease-in-out infinite; /* faster */
+	top: -20vmax;
+	left: -15vmax;
+}
+
+.blob2 {
+	/* Green brand tone (#679436) blending to darker shade (#56732e) */
+	background: radial-gradient(
+		circle at 70% 40%,
+		rgba(103, 148, 54, 0.72) 0%,
+		rgba(86, 115, 46, 0.38) 50%,
+		transparent 80%
+	);
+	animation: float2 18s ease-in-out infinite; /* faster */
+	bottom: -18vmax;
+	right: -10vmax;
+}
+
+.blob3 {
+	/* Bridge: subtle mix from teal to green to harmonize the palette */
+	background: radial-gradient(
+		circle at 40% 70%,
+		rgba(5, 102, 141, 0.50) 0%,
+		rgba(103, 148, 54, 0.36) 42%,
+		transparent 78%
+	);
+	animation: float3 16s ease-in-out infinite; /* faster */
+	top: 10vmax;
+	right: 20vmax;
+}
+
+@keyframes float1 {
+	0%   { transform: translate3d(0, 0, 0) scale(1); }
+	33%  { transform: translate3d(10vmax, 6vmax, 0) scale(1.05); }
+	66%  { transform: translate3d(-6vmax, 10vmax, 0) scale(0.95); }
+	100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes float2 {
+	0%   { transform: translate3d(0, 0, 0) scale(1); }
+	33%  { transform: translate3d(-8vmax, -6vmax, 0) scale(1.08); }
+	66%  { transform: translate3d(6vmax, -10vmax, 0) scale(0.92); }
+	100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes float3 {
+	0%   { transform: translate3d(0, 0, 0) scale(1); }
+	33%  { transform: translate3d(-6vmax, 8vmax, 0) scale(0.98); }
+	66%  { transform: translate3d(10vmax, -6vmax, 0) scale(1.06); }
+	100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+	.blob { animation: none !important; }
+}
