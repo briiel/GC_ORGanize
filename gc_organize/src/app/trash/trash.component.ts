@@ -31,12 +31,12 @@ export class TrashComponent implements OnInit {
 		this.loading = true;
 		this.error = null;
 		this.eventService.getTrashedEvents().subscribe({
-			next: (res) => {
+			next: (res: any) => {
 				const data = res?.data ?? res ?? [];
 				this.trashedEvents = Array.isArray(data) ? data : [];
 				this.loading = false;
 			},
-			error: (err) => {
+			error: (err: any) => {
 				this.error = err?.error?.message || 'Failed to load trash';
 				this.loading = false;
 			}
@@ -46,7 +46,7 @@ export class TrashComponent implements OnInit {
 	restore(eventId: number): void {
 		this.eventService.restoreEvent(eventId).subscribe({
 			next: () => this.loadTrash(),
-			error: (err) => this.error = err?.error?.message || 'Failed to restore'
+			error: (err: any) => this.error = err?.error?.message || 'Failed to restore'
 		});
 	}
 
@@ -75,7 +75,7 @@ export class TrashComponent implements OnInit {
 					Swal.fire({ icon: 'success', title: 'Deleted', timer: 1200, showConfirmButton: false });
 					this.loadTrash();
 				},
-				error: (err) => {
+				error: (err: any) => {
 					Swal.close();
 					const msg = err?.error?.message || 'Failed to permanently delete';
 					this.error = msg;
