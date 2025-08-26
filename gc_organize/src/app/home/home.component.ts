@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   unreadCount: number = 0;
 
   currentPage: number = 1;
-  pageSize: number = 6;
+  pageSize: number = 9; // 3x3 layout per page
 
   constructor(private eventService: EventService, private authService: AuthService, private router: Router) { }
 
@@ -73,11 +73,30 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
         allEvents = Array.from(eventMap.values());
 
-        // Sort by created_at descending (latest first)
+        // Normalize/compute status client-side for consistency (unless cancelled)
+        const now = new Date();
+        allEvents = allEvents.map(e => {
+          const status = String(e.status || '').toLowerCase();
+          if (status === 'cancelled') return e;
+          const start = e.start_date && e.start_time ? new Date(`${e.start_date}T${e.start_time}`) : null;
+          const end = e.end_date && e.end_time ? new Date(`${e.end_date}T${e.end_time}`) : null;
+          let computed = status;
+          if (start && end) {
+            if (start > now) computed = 'not yet started';
+            else if (start <= now && end >= now) computed = 'ongoing';
+            else if (end < now) computed = 'completed';
+          }
+          return { ...e, status: computed };
+        });
+
+        // Sort: non-completed first, completed last; within each group, latest created_at first
+        const weight = (e: any) => (String(e.status || '').toLowerCase() === 'completed' ? 1 : 0);
         allEvents.sort((a, b) => {
+          const wDiff = weight(a) - weight(b);
+          if (wDiff !== 0) return wDiff;
           const dateA = new Date(a.created_at || a.createdAt || 0).getTime();
           const dateB = new Date(b.created_at || b.createdAt || 0).getTime();
-          return dateB - dateA;
+          return dateB - dateA; // latest first
         });
 
         this.events = allEvents;
@@ -207,6 +226,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   private toggleBodyModalClass() {
     const hasOpenModal = this.isRegisterModalOpen || this.isViewModalOpen;
     document.body.classList.toggle('modal-open', hasOpenModal);
+  }
+
+  // Helper to check if event is completed
+  isCompleted(event: any): boolean {
+    return String(event?.status || '').toLowerCase() === 'completed';
   }
 
 }

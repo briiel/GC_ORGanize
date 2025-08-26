@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EventService } from '../services/event.service';
@@ -10,7 +10,7 @@ import Chart from 'chart.js/auto';
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
-export class AdminDashboardComponent implements OnInit, AfterViewInit {
+export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   events: any[] = [];
   stats = {
     upcoming: 0,
@@ -26,10 +26,33 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   private deptChart?: Chart;
   private monthlyChart?: Chart;
   private viewReady = false;
+  private refreshHandle?: ReturnType<typeof setInterval>;
 
   constructor(private eventService: EventService) {}
 
   ngOnInit(): void {
+    // Initial load
+    this.loadEventsAndStats();
+    // Periodic refresh to keep statuses (esp. Completed) up-to-date
+    this.refreshHandle = setInterval(() => this.loadEventsAndStats(), 60_000);
+  }
+
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    // If data already loaded, render now
+    if (this.events && this.events.length) {
+      this.renderCharts();
+    } else {
+      // If no data yet, still render empty charts to avoid layout jump
+      this.renderCharts();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshHandle) clearInterval(this.refreshHandle);
+  }
+
+  private loadEventsAndStats(): void {
     // For OSWS admin, aggregate across all events (OSWS + organizations)
     this.eventService.getAllEvents().subscribe({
       next: (res) => {
@@ -43,19 +66,30 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         }
         this.events = events || [];
 
-  // Compute statistics by status
-  // Upcoming should reflect OSWS-created events only
-  const oswsEvents = this.events.filter((e: any) => e.created_by_osws_id != null);
-  this.stats.upcoming = oswsEvents.filter((e: any) => e.status === 'not yet started').length;
-        this.stats.ongoing = this.events.filter((e: any) => e.status === 'ongoing').length;
-        this.stats.completed = this.events.filter((e: any) => e.status === 'completed').length;
-        this.stats.cancelled = this.events.filter((e: any) => e.status === 'cancelled').length;
+  // Compute statistics by status with date-based fallback
+        this.computeStats();
 
         // Attendance across all events
-        const ids = this.events.map((e: any) => e.event_id || e.id).filter((id: any) => id != null);
+        const ids = this.events
+          .map((e: any) => e.event_id || e.id)
+          .filter((id: any) => id != null);
         if (ids.length) this.fetchAttendanceStats(ids);
 
-  // Render charts when view is ready
+        // Fetch backend OSWS stats to ensure Completed includes trashed until permanent delete
+        this.eventService.getOswsStats().subscribe({
+          next: (s) => {
+            const data = (s as any)?.data ?? s;
+            if (data) {
+              this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
+              this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
+              this.stats.completed = data.completed ?? this.stats.completed;
+              this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
+            }
+          },
+          error: () => { /* keep computeStats() fallback */ }
+        });
+
+        // Render charts when view is ready
         if (this.viewReady) {
           this.renderCharts();
         }
@@ -66,15 +100,27 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.viewReady = true;
-    // If data already loaded, render now
-    if (this.events && this.events.length) {
-      this.renderCharts();
-    } else {
-      // If no data yet, still render empty charts to avoid layout jump
-      this.renderCharts();
-    }
+  private computeStats(): void {
+    const now = new Date();
+    const oswsEvents = this.events.filter((e: any) => e.created_by_osws_id != null);
+
+    const isCompleted = (e: any) => {
+      // Consider it completed if status says so OR its end datetime has passed
+      if (String(e.status).toLowerCase() === 'completed') return true;
+      const endIso = e.end_date && e.end_time ? `${e.end_date}T${e.end_time}` : null;
+      const end = endIso ? new Date(endIso) : undefined;
+      return end instanceof Date && !isNaN(end.getTime()) && end < now;
+    };
+
+    const isOngoing = (e: any) => String(e.status).toLowerCase() === 'ongoing';
+    const isCancelled = (e: any) => String(e.status).toLowerCase() === 'cancelled';
+    const isNotYet = (e: any) => String(e.status).toLowerCase() === 'not yet started';
+
+  // OSWS Dashboard: scope status counters to OSWS-created events only
+  this.stats.upcoming = oswsEvents.filter(isNotYet).length;
+  this.stats.ongoing = oswsEvents.filter(isOngoing).length;
+  this.stats.completed = oswsEvents.filter(isCompleted).length;
+  this.stats.cancelled = oswsEvents.filter(isCancelled).length;
   }
 
   private fetchAttendanceStats(eventIds: number[]): void {

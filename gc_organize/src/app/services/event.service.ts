@@ -128,4 +128,15 @@ export class EventService {
     const headers = this.getAuthHeaders();
     return this.http.put<any>(`${this.apiUrl}/events/${eventId}`, formData, { headers });
   }
+
+  // Dashboard stats endpoints
+  getOrgStats(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/stats/organization`, { headers });
+  }
+
+  getOswsStats(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/stats/osws`, { headers });
+  }
 }

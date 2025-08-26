@@ -253,7 +253,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!adminId) return;
       this.eventService.getEventsByAdmin(adminId).subscribe({
         next: (res: any) => {
-          this.events = res?.data || res || [];
+          const rows = res?.data || res || [];
+          this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
         },
         error: () => {}
       });
@@ -262,7 +263,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!creatorId) return;
       this.eventService.getEventsByCreator(creatorId).subscribe({
         next: (res: any) => {
-          this.events = res?.data || res || [];
+          const rows = res?.data || res || [];
+          this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
         },
         error: () => {}
       });

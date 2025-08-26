@@ -27,11 +27,12 @@
     </div>
   </div>
 
-  <!-- Cards Section -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+  <!-- Cards Section: 3x3 on large screens -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-8 mt-6 mb-8 sm:mb-12 pb-4 sm:pb-6">
     <div
-      class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300"
+      class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative"
       *ngFor="let event of filteredEvents; let i = index"
+      [ngClass]="{ 'opacity-60 grayscale pointer-events-none': isCompleted(event) }"
       style="height: 420px; display: flex; flex-direction: column;"
     >
       <!-- Poster image: taller on mobile -->
@@ -39,6 +40,39 @@
         <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
+        <!-- Mobile-only ribbon (horizontal with tail) -->
+        <div class="absolute top-2 left-0 z-10 sm:hidden" [attr.aria-label]="'Status: ' + (event.status | titlecase)" title="{{ event.status | titlecase }}">
+          <div class="relative pl-2">
+            <span
+              class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-md"
+              [ngClass]="{
+                'bg-yellow-500': event.status === 'not yet started',
+                'bg-blue-600': event.status === 'ongoing',
+                'bg-green-600': event.status === 'completed',
+                'bg-red-600': event.status === 'cancelled'
+              }"
+            >
+              <i class="fas"
+                [ngClass]="{
+                  'fa-hourglass-start': event.status === 'not yet started',
+                  'fa-bolt': event.status === 'ongoing',
+                  'fa-check-circle': event.status === 'completed',
+                  'fa-ban': event.status === 'cancelled'
+                }"
+              ></i>
+              <span>{{ event.status | titlecase }}</span>
+            </span>
+            <!-- ribbon tail -->
+            <span class="absolute -bottom-1 left-2 w-2 h-2 rotate-45"
+              [ngClass]="{
+                'bg-yellow-500': event.status === 'not yet started',
+                'bg-blue-600': event.status === 'ongoing',
+                'bg-green-600': event.status === 'completed',
+                'bg-red-600': event.status === 'cancelled'
+              }"
+            ></span>
+          </div>
+        </div>
       </div>
       <div class="p-0 flex-1 flex flex-col relative">
         <!-- Fixed title on mobile -->
@@ -69,47 +103,85 @@
             <li class="text-sm sm:text-base truncate white" title="{{event.description}}">
               {{event.description}}
             </li>
-            <li><i class="fas fa-map-marker-alt mr-2"></i>Location: {{event.location}}</li>
-            <li>
-              <i class="fas fa-calendar-alt mr-2"></i>
-              Date:
-              {{ event.start_date | date: 'MMMM d, y' }}
-              <span *ngIf="event.end_date && event.end_date !== event.start_date">
-                - {{ event.end_date | date: 'MMMM d, y' }}
+            <!-- Location: label hidden on mobile, visible on sm+; keep aria-label for SRs -->
+            <li
+              [attr.aria-label]="'Location: ' + (event.location || '')"
+              class="text-sm sm:text-base"
+            >
+              <i class="fas fa-map-marker-alt mr-2" aria-hidden="true"></i>
+              <span class="hidden sm:inline text-gray-500">Location:</span>
+              <span class="sm:ml-1">{{ event.location }}</span>
+            </li>
+            <!-- Date: label hidden on mobile, visible on sm+; full phrase for SRs -->
+            <li
+              [attr.aria-label]="'Date: ' + (event.start_date | date:'MMMM d, y') + (event.end_date && event.end_date !== event.start_date ? (' - ' + (event.end_date | date:'MMMM d, y')) : '')"
+              class="text-sm sm:text-base"
+            >
+              <i class="fas fa-calendar-alt mr-2" aria-hidden="true"></i>
+              <span class="hidden sm:inline text-gray-500">Date:</span>
+              <span class="sm:ml-1">
+                {{ event.start_date | date: 'MMMM d, y' }}
+                <span *ngIf="event.end_date && event.end_date !== event.start_date">
+                  - {{ event.end_date | date: 'MMMM d, y' }}
+                </span>
               </span>
             </li>
-            <li>
-              <i class="fas fa-clock mr-2"></i>
-              Time:
-              {{ formatTime(event.start_time) }}
-              <span *ngIf="event.end_time && event.end_time !== event.start_time">
-                - {{ formatTime(event.end_time) }}
+            <!-- Time: label hidden on mobile, visible on sm+; full phrase for SRs -->
+            <li
+              [attr.aria-label]="'Time: ' + formatTime(event.start_time) + (event.end_time && event.end_time !== event.start_time ? (' - ' + formatTime(event.end_time)) : '')"
+              class="text-sm sm:text-base"
+            >
+              <i class="fas fa-clock mr-2" aria-hidden="true"></i>
+              <span class="hidden sm:inline text-gray-500">Time:</span>
+              <span class="sm:ml-1">
+                {{ formatTime(event.start_time) }}
+                <span *ngIf="event.end_time && event.end_time !== event.start_time">
+                  - {{ formatTime(event.end_time) }}
+                </span>
               </span>
             </li>
           </ul>
           <div class="flex flex-col sm:flex-row sm:items-center w-full space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
             <!-- Status badge always on the left -->
-            <div class="flex justify-start sm:flex-1">
+            <div class="hidden sm:flex sm:flex-1">
               <span
-                class="inline-block px-5 py-2 rounded-full text-base font-bold"
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
                 [ngClass]="{
-                  'bg-yellow-100 text-yellow-800': event.status === 'not yet started',
-                  'bg-blue-100 text-blue-800': event.status === 'ongoing',
-                  'bg-green-100 text-green-800': event.status === 'completed',
-                  'bg-red-100 text-red-800': event.status === 'cancelled'
+                  'bg-yellow-50 text-yellow-800 border-yellow-200': event.status === 'not yet started',
+                  'bg-blue-50 text-blue-800 border-blue-200': event.status === 'ongoing',
+                  'bg-green-50 text-green-800 border-green-200': event.status === 'completed',
+                  'bg-red-50 text-red-800 border-red-200': event.status === 'cancelled'
                 }"
+                [attr.aria-label]="'Status: ' + (event.status | titlecase)"
               >
-                {{ event.status | titlecase }}
+                <span class="w-2.5 h-2.5 rounded-full"
+                  [ngClass]="{
+                    'bg-yellow-400': event.status === 'not yet started',
+                    'bg-blue-500': event.status === 'ongoing',
+                    'bg-green-500': event.status === 'completed',
+                    'bg-red-500': event.status === 'cancelled'
+                  }"
+                ></span>
+                <i class="fas"
+                  [ngClass]="{
+                    'fa-hourglass-start': event.status === 'not yet started',
+                    'fa-bolt': event.status === 'ongoing',
+                    'fa-check-circle': event.status === 'completed',
+                    'fa-ban': event.status === 'cancelled'
+                  }"
+                ></i>
+                <span>{{ event.status | titlecase }}</span>
               </span>
             </div>
             <!-- Buttons always on the right in sm+ screens, bottom in mobile -->
             <div class="flex flex-col sm:flex-row items-center w-full sm:w-auto space-y-2 sm:space-y-0 sm:space-x-2 sm:justify-end">
               <button (click)="openViewModal(event)"
-                class="w-full sm:w-auto px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] cursor-pointer">
+                class="w-full sm:w-auto px-4 py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                 View
               </button>
               <button (click)="openRegisterModal(event)"
-                class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] cursor-pointer">
+                [disabled]="isCompleted(event)"
+                class="w-full sm:w-auto px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                 Register
               </button>
             </div>
@@ -124,7 +196,7 @@
     <span>No events found.</span>
   </div>
 
-  <!-- Paginator -->
+  <!-- Paginator (only when more than one page / >9 items) -->
   <div *ngIf="totalPages > 1" class="flex justify-center items-center mt-8">
     <nav class="inline-flex space-x-1" aria-label="Pagination">
       <!-- Previous Arrow -->
@@ -135,10 +207,11 @@
         <i class="fas fa-chevron-left"></i>
       </button>
       <!-- Page Numbers -->
-      <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
         <button
           class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
           [ngClass]="currentPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+      [attr.aria-current]="currentPage === (i + 1) ? 'page' : null"
           (click)="changePage(i + 1)">
           {{ i + 1 }}
         </button>

@@ -72,7 +72,10 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updateTime() {
     const now = new Date();
-    this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Always use 12-hour format
+  this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  // Keep 'today' in sync so the date updates after midnight without reload
+  this.today = now;
   }
 
   toggleSidebar() {

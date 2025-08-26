@@ -55,7 +55,7 @@
                         class="hover:bg-gray-50 transition-colors duration-200">
                         <td class="px-1 lg:px-4 py-2 lg:py-3">{{ i + 1 }}</td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 font-semibold">{{ cert.event_title }}</td>
-                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ cert.event_date | date:'mediumDate' }}</td>
+                        <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ formatEventDate(cert) }}</td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
                             <button
                                 class="bg-[#679436] hover:bg-[#4e732b] text-white px-4 py-2 rounded-lg text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"

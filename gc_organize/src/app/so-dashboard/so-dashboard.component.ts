@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { EventService } from '../services/event.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router'; // <-- Add this import
@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router'; // <-- Add this import
   styleUrls: ['./so-dashboard.component.css'],
   imports: [CommonModule, RouterModule], // <-- Add RouterModule here
 })
-export class SoDashboardComponent implements OnInit {
+export class SoDashboardComponent implements OnInit, OnDestroy {
   orgName: string = 'Student Organization'; // Default fallback
   events: any[] = [];
   stats = {
@@ -20,6 +20,7 @@ export class SoDashboardComponent implements OnInit {
     totalAttendees: 0
   };
 
+  private refreshHandle?: ReturnType<typeof setInterval>;
   constructor(private eventService: EventService) {}
 
   ngOnInit() {
@@ -29,8 +30,18 @@ export class SoDashboardComponent implements OnInit {
       this.events = [];
       return;
     }
-    // Fetch events by creator/org
-    this.eventService.getEventsByCreator(creatorId).subscribe({
+    this.loadOrgEvents(creatorId);
+    // Periodic refresh to reflect status changes
+    this.refreshHandle = setInterval(() => this.loadOrgEvents(creatorId), 60_000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshHandle) clearInterval(this.refreshHandle);
+  }
+
+  private loadOrgEvents(creatorId: number) {
+  // Fetch events by creator/org
+  this.eventService.getEventsByCreator(creatorId).subscribe({
       next: (res) => {
         let events: any[] = [];
         if (res && Array.isArray(res.data)) {
@@ -42,13 +53,37 @@ export class SoDashboardComponent implements OnInit {
         }
         this.events = events;
 
-        // Add explicit type for 'e'
-        this.stats.upcoming = events.filter((e: any) => e.status === 'not yet started').length;
-        this.stats.ongoing = events.filter((e: any) => e.status === 'ongoing').length; // <-- Add this line
-        this.stats.completed = events.filter((e: any) => e.status === 'completed').length;
-        this.stats.cancelled = events.filter((e: any) => e.status === 'cancelled').length;
+        const now = new Date();
+        const isCompleted = (e: any) => {
+          if (String(e.status).toLowerCase() === 'completed') return true;
+          const endIso = e.end_date && e.end_time ? `${e.end_date}T${e.end_time}` : null;
+          const end = endIso ? new Date(endIso) : undefined;
+          return end instanceof Date && !isNaN(end.getTime()) && end < now;
+        };
+        const isOngoing = (e: any) => String(e.status).toLowerCase() === 'ongoing';
+        const isCancelled = (e: any) => String(e.status).toLowerCase() === 'cancelled';
+        const isNotYet = (e: any) => String(e.status).toLowerCase() === 'not yet started';
 
-        // Add explicit type for 'e'
+        // Default computation from events list (for UI), but override with backend stats when available
+        this.stats.upcoming = events.filter(isNotYet).length;
+        this.stats.ongoing = events.filter(isOngoing).length;
+        this.stats.completed = events.filter(isCompleted).length;
+        this.stats.cancelled = events.filter(isCancelled).length;
+
+        // Query backend stats (completed includes trashed)
+        this.eventService.getOrgStats().subscribe({
+          next: (s) => {
+            const data = s?.data ?? s;
+            if (data) {
+              this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
+              this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
+              this.stats.completed = data.completed ?? this.stats.completed;
+              this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
+            }
+          },
+          error: () => { /* keep computed fallback */ }
+        });
+
         this.fetchAttendanceStats(events.map((e: any) => e.event_id));
       },
       error: (err) => {

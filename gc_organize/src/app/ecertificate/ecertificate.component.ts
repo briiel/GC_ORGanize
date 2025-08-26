@@ -129,4 +129,26 @@ export class EcertificateComponent implements OnInit {
   clearSearch() {
     this.searchTerm = '';
   }
+
+  // Format event date range using start_date/end_date from API
+  formatEventDate(cert: any): string {
+    const sd: string | undefined = cert?.start_date;
+    const ed: string | undefined = cert?.end_date;
+    if (!sd && !ed) return '—';
+    if (sd && !ed) return this.formatYmd(sd);
+    if (!sd && ed) return this.formatYmd(ed);
+  if (sd === ed && sd) return this.formatYmd(sd);
+    return `${this.formatYmd(sd!)} – ${this.formatYmd(ed!)}`;
+  }
+
+  private formatYmd(ymd: string): string {
+    // Parse YYYY-MM-DD safely in local time to avoid TZ shifts
+    const parts = ymd.split('-').map(n => parseInt(n, 10));
+    if (parts.length === 3 && !parts.some(isNaN)) {
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+    // Fallback to raw string
+    return ymd;
+  }
 }
