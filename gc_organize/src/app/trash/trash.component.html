@@ -17,8 +17,8 @@
 						[ngClass]="isOsws ? 'focus:ring-2 focus:ring-[#14532d] focus:border-transparent' : 'focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm'"
 						placeholder="Search title, department, host…"
 						aria-label="Search trash"
-						[(ngModel)]="search"
-						(keyup.enter)="loadTrash()"
+						[ngModel]="search"
+						(ngModelChange)="onSearchChange($event)"
 					/>
 					<button *ngIf="search" type="button" aria-label="Clear search"
 							class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
@@ -64,18 +64,12 @@
 			<div class="text-3xl text-gray-400 mb-2"><i class="fas fa-trash"></i></div>
 			<div class="text-lg font-medium">No items in trash</div>
 			<div class="text-sm text-gray-500 mb-4">Deleted events will appear here for quick restore.</div>
-			<button type="button"
-					class="text-white font-semibold px-4 py-2 rounded-md transition-all duration-200 flex items-center gap-2"
-					[ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#218c4a]' : 'bg-[#679436] hover:bg-[#56732e]'"
-					(click)="loadTrash()">
-				<i class="fas fa-rotate"></i> <span>Refresh</span>
-			</button>
 		</div>
 	</div>
 
 	<!-- Results -->
 	<div *ngIf="!loading && !error && filtered.length > 0" class="mx-2 lg:mx-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-		<div *ngFor="let ev of filtered" class="group flex flex-col border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+		<div *ngFor="let ev of paginated" class="group flex flex-col border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
 			<div class="h-36 bg-gray-100 bg-cover bg-center relative" [style.backgroundImage]="posterUrl(ev) ? 'url(' + posterUrl(ev) + ')' : ''">
 				<div class="absolute inset-0 flex items-center justify-center text-gray-300 text-3xl" *ngIf="!posterUrl(ev)">
 					<i class="fas fa-image"></i>
@@ -130,6 +124,29 @@
 						<i class="fas fa-trash-alt"></i>
 					</button>
 			</div>
+		</div>
+		<!-- Paginator for 3x3 pages -->
+		<div *ngIf="!loading && !error && totalPages > 1" class="mx-2 lg:mx-6 mt-4 mb-8 flex justify-center">
+			<nav class="inline-flex space-x-1" aria-label="Pagination">
+				<button class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+						[disabled]="currentPage === 1"
+						(click)="changePage(currentPage - 1)">
+					<i class="fas fa-chevron-left"></i>
+				</button>
+				<ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+					<button class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+							[ngClass]="currentPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+							[attr.aria-current]="currentPage === (i + 1) ? 'page' : null"
+							(click)="changePage(i + 1)">
+						{{ i + 1 }}
+					</button>
+				</ng-container>
+				<button class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+						[disabled]="currentPage === totalPages"
+						(click)="changePage(currentPage + 1)">
+					<i class="fas fa-chevron-right"></i>
+				</button>
+			</nav>
 		</div>
 	</div>
 </div>

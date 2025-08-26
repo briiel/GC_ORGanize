@@ -33,6 +33,54 @@
   }
 }
 
+/* Brand accent bar at the top */
+.brand-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #679436, #88B04B, #679436);
+}
+
+/* Subtle entrance animations */
+.animate-fade-in { animation: fadeIn 160ms ease-out; }
+.animate-scale-in { animation: scaleIn 180ms ease-out; }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes scaleIn { from { transform: translateY(6px) scale(0.98); opacity: .0 } to { transform: translateY(0) scale(1); opacity: 1 } }
+
+/* Status chip: use the same Tailwind classes as cards (no extra theme rules here) */
+
+/* Metadata pill chips */
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .4rem .7rem;
+  border-radius: 9999px;
+  background: #f7faf7;
+  border: 1px solid rgba(103,148,54,.18);
+  color: #374151;
+  font-size: .9rem;
+}
+
+/* Ensure scrollbar is subtle on content area */
+.modal-content .w-full.md\:w-2\/3 { scrollbar-width: thin; }
+.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar { width: 8px; }
+.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 9999px; }
+.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar-track { background: transparent; }
+
+/* Remove click/tap visual effects from the close button */
+.no-click-effects {
+  -webkit-tap-highlight-color: transparent;
+}
+.no-click-effects:active {
+  transform: none !important;
+  background: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
 @media (max-width: 640px) {
   .modal-content {
     max-width: 98vw;

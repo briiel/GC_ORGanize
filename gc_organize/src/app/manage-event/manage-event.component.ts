@@ -1,9 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common'; // <-- Add this import
 import { EventService } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-manage-event',
@@ -65,6 +67,16 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Ensure body class is cleared when component is destroyed
     document.body.classList.remove('modal-open');
+  }
+
+  // Close any open modal when ESC is pressed (matches behavior used in other modals)
+  @HostListener('document:keydown.escape', ['$event'])
+  onEsc(event: KeyboardEvent) {
+    if (this.showParticipantsModal || this.showCreateModal) {
+      event.preventDefault();
+      if (this.showParticipantsModal) this.closeParticipantsModal();
+      if (this.showCreateModal) this.closeCreateModal();
+    }
   }
 
   fetchEvents() {
@@ -502,5 +514,30 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       // Fallback: open in new tab
       window.open(url, '_blank');
     }
+  }
+
+  downloadParticipantsExcel(): void {
+    if (!this.participants || this.participants.length === 0) return;
+
+    const worksheetData = this.participants.map((p, i) => ({
+      '#': i + 1,
+  'Event': this.selectedEventTitle || '-',
+      'Student ID': p.student_id ?? '-',
+      'First Name': p.first_name ?? '-',
+      'Last Name': p.last_name ?? '-',
+      'Suffix': p.suffix ?? '-',
+      'Department': p.department ?? '-',
+      'Program': p.program ?? '-',
+      'Proof of Payment URL': p.proof_of_payment ?? '-'
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(worksheetData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Participants');
+
+    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    const slug = (this.selectedEventTitle || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
+    saveAs(blob, `${slug}_participants.xlsx`);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -15,6 +15,13 @@ export class ViewmodalComponent {
 
   closeModal() {
     this.close.emit();
+  }
+
+  // Close on ESC key for accessibility
+  @HostListener('document:keydown.escape', ['$event'])
+  onEsc(event: KeyboardEvent) {
+    event.preventDefault();
+    this.closeModal();
   }
 
   setImage(url: string) {

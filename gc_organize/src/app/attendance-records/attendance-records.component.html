@@ -12,6 +12,7 @@
             placeholder="Search by event, student name, or student ID..."
             class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
             [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch()"
             (keyup.enter)="onSearch()"
           />
         </div>

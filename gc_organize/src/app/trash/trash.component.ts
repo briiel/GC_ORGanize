@@ -18,6 +18,9 @@ export class TrashComponent implements OnInit {
 	error: string | null = null;
 	search = '';
 	role: string | null = null;
+	// Pagination: 3x3 layout per page
+	currentPage: number = 1;
+	pageSize: number = 9;
 
 	constructor(private eventService: EventService, private auth: AuthService) {}
 
@@ -35,6 +38,8 @@ export class TrashComponent implements OnInit {
 				const data = res?.data ?? res ?? [];
 				this.trashedEvents = Array.isArray(data) ? data : [];
 				this.loading = false;
+				// Reset to first page when data updates
+				this.currentPage = 1;
 			},
 			error: (err: any) => {
 				this.error = err?.error?.message || 'Failed to load trash';
@@ -96,6 +101,26 @@ export class TrashComponent implements OnInit {
 				(e.location && e.location.toLowerCase().includes(q))
 			);
 		}
+
+	// Paginated view of filtered items
+	get paginated(): any[] {
+		const start = (this.currentPage - 1) * this.pageSize;
+		return this.filtered.slice(start, start + this.pageSize);
+	}
+
+	get totalPages(): number {
+		return Math.ceil(this.filtered.length / this.pageSize) || 1;
+	}
+
+	changePage(page: number): void {
+		if (page < 1 || page > this.totalPages) return;
+		this.currentPage = page;
+	}
+
+	onSearchChange(value: string): void {
+		this.search = value;
+		this.currentPage = 1;
+	}
 
 		posterUrl(ev: any): string | null {
 			const url = ev?.event_poster;

@@ -11,7 +11,7 @@
             <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px] flex">
                 <input type="text" [(ngModel)]="searchTerm" placeholder="Search by event title..."
                     class="px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
-                    style="width:100%; min-width:0; max-width:100%; flex:1 1 0;" (keyup.enter)="onSearch()" />
+                    style="width:100%; min-width:0; max-width:100%; flex:1 1 0;" (ngModelChange)="onSearch()" (keyup.enter)="onSearch()" />
                 <button
                     class="ml-2 px-4 py-2 bg-[#679436] hover:bg-[#4e732b] text-white rounded-md text-sm flex-shrink-0"
                     (click)="onSearch()">

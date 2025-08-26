@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
@@ -84,5 +84,14 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Safety: ensure the class is removed if component is destroyed while modal is open
     document.body.classList.remove('modal-open');
+  }
+
+  // Close modal on ESC key press for accessibility and consistency
+  @HostListener('document:keydown.escape', ['$event'])
+  onEsc(event: KeyboardEvent) {
+    if (this.isAddAdminModalOpen) {
+      event.preventDefault();
+      this.closeAddAdminModal();
+    }
   }
 }

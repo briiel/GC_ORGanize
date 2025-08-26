@@ -25,3 +25,9 @@ body.modal-open .sidebar-blur-target {
     filter: blur(4px);
     pointer-events: none; /* prevent clicks-through while modal is open */
 }
+
+/* Modal open animations (global) */
+.animate-fade-in { animation: fadeIn 160ms ease-out; }
+.animate-scale-in { animation: scaleIn 180ms ease-out; }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes scaleIn { from { transform: translateY(6px) scale(0.98); opacity: 0 } to { transform: translateY(0) scale(1); opacity: 1 } }

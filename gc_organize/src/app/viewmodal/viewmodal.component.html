@@ -1,47 +1,96 @@
-<div class="modal-overlay modal-blur flex items-center justify-center fixed inset-0 bg-black bg-opacity-50 p-4" style="z-index: 3000;">
+<div class="modal-overlay modal-blur flex items-center justify-center fixed inset-0 bg-black bg-opacity-50 p-4 animate-fade-in" style="z-index: 3000;" (click)="closeModal()">
   <div
-    class="modal-content relative w-full max-w-sm md:max-w-3xl h-[650px] md:h-[500px] rounded-3xl overflow-hidden shadow-lg flex flex-col md:flex-row border-3 border-[#679436] bg-white mx-auto">
-    <button (click)="closeModal()"
-      class="absolute top-2 right-2 p-2 text-gray-600 hover:text-[#AA0000] cursor-pointer z-10">
+    class="modal-content relative w-full max-w-sm md:max-w-3xl h-[650px] md:h-[520px] rounded-3xl overflow-hidden shadow-xl flex flex-col md:flex-row border border-[#679436]/30 bg-white mx-auto animate-scale-in"
+    role="dialog" aria-modal="true" aria-labelledby="viewmodal-title" (click)="$event.stopPropagation()">
+
+    <!-- Brand accent bar -->
+    <div class="brand-accent" aria-hidden="true"></div>
+
+    <!-- Close button -->
+    <button (click)="closeModal()" aria-label="Close dialog"
+      class="absolute top-2 right-2 p-2 rounded-full text-gray-600 cursor-pointer z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#679436]/50 no-click-effects">
       <i class="fas fa-times text-xl"></i>
     </button>
+
+    <!-- Poster / Visual side -->
     <div
       class="w-full md:w-1/3 h-[300px] md:h-full flex-shrink-0 overflow-hidden flex items-center justify-center relative bg-gray-100">
       <div class="absolute inset-0" id="blurredBackground"
-        style="background-size: cover; background-position: center; filter: blur(8px); opacity: 0.5;"></div>
+        style="background-size: cover; background-position: center; filter: blur(10px); opacity: 0.45;"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-white/10 via-transparent to-[#679436]/10 mix-blend-multiply" aria-hidden="true"></div>
       <img [src]="getPosterUrl()"
-        class="w-auto h-auto max-w-[90%] max-h-[90%] object-contain relative z-[1]" alt="Event Image"
+        class="w-auto h-auto max-w-[90%] max-h-[90%] object-contain relative z-[1] drop-shadow-md rounded-xl"
+        alt="Event poster"
         (load)="updateBackgroundImage($event, 'blurredBackground')">
     </div>
+
+    <!-- Content side -->
     <div class="w-full md:w-2/3 h-[350px] md:h-full overflow-y-auto p-6">
-      <div class="font-bold text-2xl md:text-3xl mb-4">{{ event.title }}</div>
-      <p class="text-gray-700 text-base md:text-lg mb-6 whitespace-pre-line">
+      <div class="flex items-start justify-between gap-3 mb-3">
+        <h2 id="viewmodal-title" class="font-extrabold text-2xl md:text-3xl leading-tight text-gray-900">
+          {{ event.title }}
+        </h2>
+        <!-- Status pill copied from card for consistency -->
+        <span *ngIf="event.status"
+              class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
+              [ngClass]="{
+                'bg-yellow-50 text-yellow-800 border-yellow-200': event.status === 'not yet started',
+                'bg-blue-50 text-blue-800 border-blue-200': event.status === 'ongoing',
+                'bg-green-50 text-green-800 border-green-200': event.status === 'completed',
+                'bg-red-50 text-red-800 border-red-200': event.status === 'cancelled'
+              }"
+              [attr.aria-label]="'Status: ' + (event.status | titlecase)">
+          <span class="w-2.5 h-2.5 rounded-full"
+                [ngClass]="{
+                  'bg-yellow-400': event.status === 'not yet started',
+                  'bg-blue-500': event.status === 'ongoing',
+                  'bg-green-500': event.status === 'completed',
+                  'bg-red-500': event.status === 'cancelled'
+                }"></span>
+          <i class="fas"
+             [ngClass]="{
+               'fa-hourglass-start': event.status === 'not yet started',
+               'fa-bolt': event.status === 'ongoing',
+               'fa-check-circle': event.status === 'completed',
+               'fa-ban': event.status === 'cancelled'
+             }"></i>
+          <span>{{ event.status | titlecase }}</span>
+        </span>
+      </div>
+
+      <p class="text-gray-700 text-base md:text-[1.05rem] leading-relaxed mb-5 whitespace-pre-line">
         {{ event.description }}
       </p>
-      <div class="flex items-center text-gray-600 text-base md:text-lg mb-4">
-        <i class="fas fa-map-marker-alt mr-2"></i>
-        <span>Venue: {{ event.location }}</span>
-      </div>
-      <div class="flex items-center text-gray-600 text-base md:text-lg mb-4">
-        <i class="fas fa-calendar-alt mr-2"></i>
-        <span>Date: {{ event.start_date | date: 'MMMM d, y' }}
-              <span *ngIf="event.end_date && event.end_date !== event.start_date">
-                - {{ event.end_date | date: 'MMMM d, y' }}
-              </span>
+
+      <div class="flex flex-wrap gap-2.5 mb-4">
+        <span class="meta-chip">
+          <i class="fas fa-map-marker-alt mr-1.5"></i>
+          <span>{{ event.location }}</span>
+        </span>
+
+        <span class="meta-chip">
+          <i class="fas fa-calendar-alt mr-1.5"></i>
+          <span>
+            {{ event.start_date | date: 'MMMM d, y' }}
+            <ng-container *ngIf="event.end_date && event.end_date !== event.start_date">
+              – {{ event.end_date | date: 'MMMM d, y' }}
+            </ng-container>
+          </span>
+        </span>
+
+        <span class="meta-chip">
+          <i class="fas fa-clock mr-1.5"></i>
+          <span>
+            {{ formatTime(event.start_time) }}
+            <ng-container *ngIf="event.end_time && event.end_time !== event.start_time">
+              – {{ formatTime(event.end_time) }}
+            </ng-container>
+          </span>
         </span>
       </div>
-      <div class="flex items-center text-gray-600 text-base md:text-lg">
-        <i class="fas fa-clock mr-2"></i>
-        <span>Time:  {{ formatTime(event.start_time) }}
-              <span *ngIf="event.end_time && event.end_time !== event.start_time">
-                - {{ formatTime(event.end_time) }}
-              </span>
-        </span>
-      </div>
-      <div class="flex items-center text-gray-600 text-base md:text-lg mt-4" *ngIf="event.status">
-        <i class="fas fa-info-circle mr-2"></i>
-        <span>Status: {{ event.status | titlecase}}</span>
-      </div>
+
+  <!-- Divider (kept for visual rhythm) -->
+  <div class="h-px bg-gradient-to-r from-transparent via-[#679436]/30 to-transparent"></div>
     </div>
   </div>
 </div>

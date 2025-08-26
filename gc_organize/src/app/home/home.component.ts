@@ -126,7 +126,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           (event.title && event.title.toLowerCase().includes(search)) ||
           (event.department && event.department.toLowerCase().includes(search)) ||
           (event.location && event.location.toLowerCase().includes(search)) ||
-          (event.description && event.description.toLowerCase().includes(search))
+          (event.description && event.description.toLowerCase().includes(search)) ||
+          (event.status && String(event.status).toLowerCase().includes(search))
         );
       });
     }
@@ -147,7 +148,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           (event.title && event.title.toLowerCase().includes(search)) ||
           (event.department && event.department.toLowerCase().includes(search)) ||
           (event.location && event.location.toLowerCase().includes(search)) ||
-          (event.description && event.description.toLowerCase().includes(search))
+          (event.description && event.description.toLowerCase().includes(search)) ||
+          (event.status && String(event.status).toLowerCase().includes(search))
         );
       });
     }

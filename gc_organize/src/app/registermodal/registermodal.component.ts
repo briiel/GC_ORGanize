@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -212,5 +212,12 @@ export class RegistermodalComponent implements OnInit {
 
   closeModal(): void {
     this.close.emit();
+  }
+
+  // Close on ESC key for consistency with view modal
+  @HostListener('document:keydown.escape', ['$event'])
+  onEsc(event: KeyboardEvent) {
+    event.preventDefault();
+    this.closeModal();
   }
 }
