@@ -1,0 +1,30 @@
+# Ensure existing files are served (chunks, assets) and not rewritten
+<IfModule mod_rewrite.c>
+  Options -MultiViews
+  RewriteEngine On
+
+  # If the request is for an existing file or directory, serve it
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Otherwise, fall back to the SPA entry point
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Set correct MIME types for module scripts (in case server defaults differ)
+<IfModule mod_mime.c>
+  AddType application/javascript .js
+  AddType application/javascript .mjs
+  AddType text/css .css
+</IfModule>
+
+# Helpful cache headers: long cache for immutable assets, short/no cache for HTML
+<IfModule mod_headers.c>
+  <FilesMatch "\.(?:js|mjs|css|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(?:html)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
