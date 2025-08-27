@@ -30,13 +30,12 @@
   <!-- Cards Section: 3x3 on large screens -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-8 mt-6 mb-8 sm:mb-12 pb-4 sm:pb-6">
     <div
-      class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative"
+      class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative flex flex-col"
       *ngFor="let event of filteredEvents; let i = index"
       [ngClass]="{ 'opacity-60 grayscale pointer-events-none': isCompleted(event) }"
-      style="height: 420px; display: flex; flex-direction: column;"
     >
       <!-- Poster image: taller on mobile -->
-      <div class="relative h-80 sm:h-72 overflow-hidden">
+      <div class="relative h-48 sm:h-72 overflow-hidden">
         <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
@@ -74,7 +73,7 @@
           </div>
         </div>
       </div>
-      <div class="p-0 flex-1 flex flex-col relative">
+  <div class="p-0 flex-1 flex flex-col relative">
         <!-- Fixed title on mobile -->
         <div class="sticky top-0 z-10 bg-white p-4 border-b border-gray-200 sm:static sm:border-0 sm:p-4">
           <ul class="space-y-2 text-gray-700">
@@ -97,8 +96,8 @@
             </li>
           </ul>
         </div>
-        <!-- Scrollable details on mobile -->
-        <div class="flex-1 overflow-y-auto sm:overflow-visible px-4 py-2 pb-8 sm:pb-4 max-h-[180px] sm:max-h-none" >
+  <!-- Details: no inner scroll at any size; let card grow to fit -->
+  <div class="overflow-visible px-4 py-2 pb-4">
           <ul class="space-y-2 text-gray-700">
             <li class="text-sm sm:text-base truncate white" title="{{event.description}}">
               {{event.description}}

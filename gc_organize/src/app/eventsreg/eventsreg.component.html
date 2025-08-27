@@ -48,14 +48,14 @@
     <!-- Table container -->
     <div *ngIf="filteredEvents.length > 0" class="mx-2 lg:m-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm lg:text-base">
+            <table class="w-full text-sm lg:text-base min-w-[640px]">
                 <thead class="bg-[#679436]">
                     <tr class="uppercase tracking-wider text-white">
-                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">No.</th>
-                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-left">Event Name</th>
-                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">Date (Start–End)</th>
-                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">Time (Start–End)</th>
-                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center">QR Code</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center whitespace-nowrap">No.</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-left whitespace-nowrap">Event Name</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center whitespace-nowrap">Date (Start–End)</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center whitespace-nowrap">Time (Start–End)</th>
+                        <th class="px-1 lg:px-4 py-2 lg:py-3 text-center whitespace-nowrap">QR Code</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
@@ -74,13 +74,13 @@
                         </td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
                             <div class="flex flex-col items-center space-y-3">
-                                <a *ngIf="event.qr_code"
-                                   (click)="downloadQrCode(event.qr_code, event.event_id)"
-                                   class="text-[#679436] hover:underline flex items-center gap-2 cursor-pointer"
-                                   title="Download QR Code">
-                                    <i class="fas fa-download"></i>
-                                    Download QR Code
-                                </a>
+                                <button *ngIf="event.qr_code"
+                                        (click)="downloadQrCode(event.qr_code, event.event_id)"
+                                        class="bg-[#679436] hover:bg-[#4e732b] text-white inline-flex items-center justify-center px-3 sm:px-4 py-2 rounded-lg text-sm transition-colors duration-200 w-10 h-10 sm:w-auto sm:h-auto"
+                                        [attr.aria-label]="'Download QR Code'">
+                                    <i class="fas fa-download mr-0 sm:mr-2"></i>
+                                    <span class="hidden sm:inline">Download QR Code</span>
+                                </button>
                             </div>
                         </td>
                     </tr>
