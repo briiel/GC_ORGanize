@@ -10,6 +10,9 @@ export class EventService {
   // Dev: 'http://localhost:5000/api/event'
   private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event';
 
+  private statusChangedSubject = new Subject<void>();
+  public statusChanged$ = this.statusChangedSubject.asObservable();
+
   constructor(private http: HttpClient) {}
 
   // Fetch all events
@@ -41,7 +44,7 @@ export class EventService {
   updateEventStatus(eventId: number, status: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status })
       .pipe(
-        tap(() => this.statusChanged$.next())
+        tap(() => this.statusChangedSubject.next())
       );
   }
 
