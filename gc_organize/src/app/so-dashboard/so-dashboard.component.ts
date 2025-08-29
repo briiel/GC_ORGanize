@@ -16,7 +16,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   stats = {
     upcoming: 0,
     ongoing: 0,
-    completed: 0,
+    concluded: 0,
     cancelled: 0,
     totalAttendees: 0
   };
@@ -74,7 +74,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   // Helper method to get available status options for an event
   getAvailableStatuses(event: any): string[] {
     const currentStatus = String(event.status).toLowerCase();
-    const allStatuses = ['not yet started', 'ongoing', 'completed', 'cancelled'];
+    const allStatuses = ['not yet started', 'ongoing', 'concluded', 'cancelled'];
     
     // You can customize this logic based on your business rules
     switch (currentStatus) {
@@ -82,9 +82,9 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
       case 'upcoming':
         return ['not yet started', 'ongoing', 'cancelled'];
       case 'ongoing':
-        return ['ongoing', 'completed', 'cancelled'];
-      case 'completed':
-        return ['completed']; // Usually can't change from completed
+        return ['ongoing', 'concluded', 'cancelled'];
+      case 'concluded':
+        return ['concluded']; // Usually can't change from concluded
       case 'cancelled':
         return ['cancelled', 'not yet started']; // Allow reactivation
       default:
@@ -106,13 +106,13 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         this.events = events;
 
         // Count events by status
-        let upcoming = 0, ongoing = 0, completed = 0, cancelled = 0;
+        let upcoming = 0, ongoing = 0, concluded = 0, cancelled = 0;
         for (const e of events) {
           const status = String(e.status).toLowerCase();
           if (status === 'cancelled') {
             cancelled++;
-          } else if (status === 'completed') {
-            completed++;
+          } else if (status === 'concluded') {
+            concluded++;
           } else if (status === 'ongoing') {
             ongoing++;
           } else if (status === 'not yet started' || status === 'upcoming') {
@@ -122,7 +122,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         
         this.stats.upcoming = upcoming;
         this.stats.ongoing = ongoing;
-        this.stats.completed = completed;
+        this.stats.concluded = concluded;
         this.stats.cancelled = cancelled;
 
         // Get backend stats (if needed for additional data)
@@ -134,7 +134,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
               if (data.totalEvents && data.totalEvents !== events.length) {
                 this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
                 this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
-                this.stats.completed = data.completed ?? this.stats.completed;
+                this.stats.concluded = data.concluded ?? this.stats.concluded;
                 this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
               }
             }

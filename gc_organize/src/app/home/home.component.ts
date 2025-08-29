@@ -84,13 +84,13 @@ export class HomeComponent implements OnInit, OnDestroy {
           if (start && end) {
             if (start > now) computed = 'not yet started';
             else if (start <= now && end >= now) computed = 'ongoing';
-            else if (end < now) computed = 'completed';
+            else if (end < now) computed = 'concluded';
           }
           return { ...e, status: computed };
         });
 
-        // Sort: non-completed first, completed last; within each group, latest created_at first
-        const weight = (e: any) => (String(e.status || '').toLowerCase() === 'completed' ? 1 : 0);
+        // Sort: non-concluded first, concluded last; within each group, latest created_at first
+        const weight = (e: any) => (String(e.status || '').toLowerCase() === 'concluded' ? 1 : 0);
         allEvents.sort((a, b) => {
           const wDiff = weight(a) - weight(b);
           if (wDiff !== 0) return wDiff;
@@ -230,9 +230,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     document.body.classList.toggle('modal-open', hasOpenModal);
   }
 
-  // Helper to check if event is completed
-  isCompleted(event: any): boolean {
-    return String(event?.status || '').toLowerCase() === 'completed';
+  // Helper to check if event is concluded
+  isConcluded(event: any): boolean {
+    return String(event?.status || '').toLowerCase() === 'concluded';
+  }
+
+  // Helper to get display status
+  getDisplayStatus(event: any): string {
+    return String(event?.status || '').toLowerCase();
   }
 
 }

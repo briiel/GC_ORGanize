@@ -16,7 +16,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   stats = {
     upcoming: 0,
     ongoing: 0,
-    completed: 0,
+    concluded: 0,
     cancelled: 0,
     totalAttendees: 0
   };
@@ -35,7 +35,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   ngOnInit(): void {
     // Initial load
     this.loadEventsAndStats();
-    // Periodic refresh to keep statuses (esp. Completed) up-to-date
+    // Periodic refresh to keep statuses (esp. Concluded) up-to-date
     this.refreshHandle = setInterval(() => this.loadEventsAndStats(), 60_000);
 
     // Instant update on status change
@@ -85,7 +85,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   // Helper method to get available status options for an event
   getAvailableStatuses(event: any): string[] {
     const currentStatus = String(event.status).toLowerCase();
-    const allStatuses = ['not yet started', 'ongoing', 'completed', 'cancelled'];
+    const allStatuses = ['not yet started', 'ongoing', 'concluded', 'cancelled'];
     
     // Customize this logic based on your business rules
     switch (currentStatus) {
@@ -93,9 +93,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       case 'upcoming':
         return ['not yet started', 'ongoing', 'cancelled'];
       case 'ongoing':
-        return ['ongoing', 'completed', 'cancelled'];
-      case 'completed':
-        return ['completed']; // Usually can't change from completed
+        return ['ongoing', 'concluded', 'cancelled'];
+      case 'concluded':
+        return ['concluded']; // Usually can't change from concluded
       case 'cancelled':
         return ['cancelled', 'not yet started']; // Allow reactivation
       default:
@@ -137,21 +137,21 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           .filter((id: any) => id != null);
         if (ids.length) this.fetchAttendanceStats(ids);
 
-        // Fetch backend OSWS stats to ensure Completed includes trashed until permanent delete
+        // Fetch backend OSWS stats to ensure Concluded includes trashed until permanent delete
         this.eventService.getOswsStats().subscribe({
           next: (s) => {
             const data = (s as any)?.data ?? s;
             if (data) {
               // Only override if backend has different totals (e.g., includes archived)
               const totalBackendEvents = (data.upcoming || 0) + (data.ongoing || 0) + 
-                                       (data.completed || 0) + (data.cancelled || 0);
+                                       (data.concluded || 0) + (data.cancelled || 0);
               const totalLocalEvents = this.stats.upcoming + this.stats.ongoing + 
-                                     this.stats.completed + this.stats.cancelled;
+                                     this.stats.concluded + this.stats.cancelled;
               
               if (totalBackendEvents !== totalLocalEvents) {
                 this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
                 this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
-                this.stats.completed = data.completed ?? this.stats.completed;
+                this.stats.concluded = data.concluded ?? this.stats.concluded;
                 this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
               }
             }
@@ -174,13 +174,13 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     const oswsEvents = this.events.filter((e: any) => e.created_by_osws_id != null);
 
     // Improved: Only count each event in one category with flexible status handling
-    let upcoming = 0, ongoing = 0, completed = 0, cancelled = 0;
+    let upcoming = 0, ongoing = 0, concluded = 0, cancelled = 0;
     for (const e of oswsEvents) {
       const status = String(e.status).toLowerCase();
       if (status === 'cancelled') {
         cancelled++;
-      } else if (status === 'completed') {
-        completed++;
+      } else if (status === 'concluded') {
+        concluded++;
       } else if (status === 'ongoing') {
         ongoing++;
       } else if (status === 'not yet started' || status === 'upcoming') {
@@ -189,7 +189,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     }
     this.stats.upcoming = upcoming;
     this.stats.ongoing = ongoing;
-    this.stats.completed = completed;
+    this.stats.concluded = concluded;
     this.stats.cancelled = cancelled;
   }
 

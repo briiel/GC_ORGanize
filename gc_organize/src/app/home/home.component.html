@@ -30,47 +30,48 @@
   <!-- Cards Section: 3x3 on large screens -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-8 mt-6 mb-8 sm:mb-12 pb-4 sm:pb-6">
     <div
-      class="bg-white rounded-lg shadow-md overflow-hidden border-2 border-[#679436] hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative flex flex-col"
+      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative flex flex-col"
       *ngFor="let event of filteredEvents; let i = index"
-      [ngClass]="{ 'opacity-60 grayscale pointer-events-none': isCompleted(event) }"
+      [ngClass]="{ 'opacity-60 grayscale pointer-events-none': isConcluded(event) }"
     >
+      <!-- Colored top strip based on department -->
+      <div
+        class="h-2 w-full"
+        [ngClass]="{
+          'bg-orange-500': event.department === 'CCS',
+          'bg-yellow-400': event.department === 'CBA',
+          'bg-red-500': event.department === 'CAHS',
+          'bg-blue-500': event.department === 'CEAS',
+          'bg-pink-400': event.department === 'CHTM',
+          'bg-[#14532d]': !event.department || event.department === 'OSWS'
+        }"
+      ></div>
       <!-- Poster image: taller on mobile -->
   <div class="relative h-48 sm:h-56 overflow-hidden">
         <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
-        <!-- Mobile-only ribbon (horizontal with tail) -->
-        <div class="absolute top-2 left-0 z-10 sm:hidden" [attr.aria-label]="'Status: ' + (event.status | titlecase)" title="{{ event.status | titlecase }}">
-          <div class="relative pl-2">
-            <span
-              class="inline-flex items-center gap-1 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow-md"
+        <!-- Mobile status pill positioned like the ribbon was -->
+        <div class="absolute top-2 left-2 z-10 sm:hidden" [attr.aria-label]="'Status: ' + (getDisplayStatus(event) | titlecase)" title="{{ getDisplayStatus(event) | titlecase }}">
+          <span
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
+            [ngClass]="{
+              'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus(event) === 'not yet started',
+              'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus(event) === 'ongoing',
+              'bg-green-50 text-green-800 border-green-200': getDisplayStatus(event) === 'concluded',
+              'bg-red-50 text-red-800 border-red-200': getDisplayStatus(event) === 'cancelled'
+            }"
+          >
+            <span class="w-2.5 h-2.5 rounded-full"
               [ngClass]="{
-                'bg-yellow-500': event.status === 'not yet started',
-                'bg-blue-600': event.status === 'ongoing',
-                'bg-green-600': event.status === 'completed',
-                'bg-red-600': event.status === 'cancelled'
-              }"
-            >
-              <i class="fas"
-                [ngClass]="{
-                  'fa-hourglass-start': event.status === 'not yet started',
-                  'fa-bolt': event.status === 'ongoing',
-                  'fa-check-circle': event.status === 'completed',
-                  'fa-ban': event.status === 'cancelled'
-                }"
-              ></i>
-              <span>{{ event.status | titlecase }}</span>
-            </span>
-            <!-- ribbon tail -->
-            <span class="absolute -bottom-1 left-2 w-2 h-2 rotate-45"
-              [ngClass]="{
-                'bg-yellow-500': event.status === 'not yet started',
-                'bg-blue-600': event.status === 'ongoing',
-                'bg-green-600': event.status === 'completed',
-                'bg-red-600': event.status === 'cancelled'
+                'bg-yellow-400': getDisplayStatus(event) === 'not yet started',
+                'bg-blue-500': getDisplayStatus(event) === 'ongoing',
+                'bg-green-500': getDisplayStatus(event) === 'concluded',
+                'bg-red-500': getDisplayStatus(event) === 'cancelled'
               }"
             ></span>
-          </div>
+            <span>{{ getDisplayStatus(event) | titlecase }}</span>
+          </span>
         </div>
       </div>
   <div class="p-0 flex-1 flex flex-col relative">
@@ -141,35 +142,27 @@
             </li>
           </ul>
           <div class="flex flex-col sm:flex-row sm:items-center w-full space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
-            <!-- Status badge always on the left -->
+            <!-- Status badge on desktop -->
             <div class="hidden sm:flex sm:flex-1">
               <span
                 class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
                 [ngClass]="{
-                  'bg-yellow-50 text-yellow-800 border-yellow-200': event.status === 'not yet started',
-                  'bg-blue-50 text-blue-800 border-blue-200': event.status === 'ongoing',
-                  'bg-green-50 text-green-800 border-green-200': event.status === 'completed',
-                  'bg-red-50 text-red-800 border-red-200': event.status === 'cancelled'
+                  'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus(event) === 'not yet started',
+                  'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus(event) === 'ongoing',
+                  'bg-green-50 text-green-800 border-green-200': getDisplayStatus(event) === 'concluded',
+                  'bg-red-50 text-red-800 border-red-200': getDisplayStatus(event) === 'cancelled'
                 }"
-                [attr.aria-label]="'Status: ' + (event.status | titlecase)"
+                [attr.aria-label]="'Status: ' + (getDisplayStatus(event) | titlecase)"
               >
                 <span class="w-2.5 h-2.5 rounded-full"
                   [ngClass]="{
-                    'bg-yellow-400': event.status === 'not yet started',
-                    'bg-blue-500': event.status === 'ongoing',
-                    'bg-green-500': event.status === 'completed',
-                    'bg-red-500': event.status === 'cancelled'
+                    'bg-yellow-400': getDisplayStatus(event) === 'not yet started',
+                    'bg-blue-500': getDisplayStatus(event) === 'ongoing',
+                    'bg-green-500': getDisplayStatus(event) === 'concluded',
+                    'bg-red-500': getDisplayStatus(event) === 'cancelled'
                   }"
                 ></span>
-                <i class="fas"
-                  [ngClass]="{
-                    'fa-hourglass-start': event.status === 'not yet started',
-                    'fa-bolt': event.status === 'ongoing',
-                    'fa-check-circle': event.status === 'completed',
-                    'fa-ban': event.status === 'cancelled'
-                  }"
-                ></i>
-                <span>{{ event.status | titlecase }}</span>
+                <span>{{ getDisplayStatus(event) | titlecase }}</span>
               </span>
             </div>
             <!-- Buttons always on the right in sm+ screens, bottom in mobile -->
@@ -179,7 +172,7 @@
                 View
               </button>
               <button (click)="openRegisterModal(event)"
-                [disabled]="isCompleted(event)"
+                [disabled]="isConcluded(event)"
         class="w-full sm:w-auto px-4 py-2 sm:px-3 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
                 Register
               </button>

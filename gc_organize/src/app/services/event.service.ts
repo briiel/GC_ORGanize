@@ -42,7 +42,8 @@ export class EventService {
 
   // Update event status
   updateEventStatus(eventId: number, status: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status })
+    const headers = this.getAuthHeaders();
+    return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status }, { headers })
       .pipe(
         tap(() => this.statusChangedSubject.next())
       );

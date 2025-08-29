@@ -77,13 +77,13 @@
 				<!-- Status indicator badge for UX: shows current status even in trash -->
 				<div class="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shadow-sm"
 					 [ngClass]="{
-						'bg-green-100 text-green-800': (ev.status || '').toLowerCase() === 'completed',
+						'bg-green-100 text-green-800': (ev.status || '').toLowerCase() === 'concluded',
 						'bg-yellow-100 text-yellow-800': (ev.status || '').toLowerCase() === 'ongoing',
 						'bg-gray-100 text-gray-800': (ev.status || '').toLowerCase() === 'not yet started',
 						'bg-red-100 text-red-800': (ev.status || '').toLowerCase() === 'cancelled'
 					 }">
 					<i class="fas" [ngClass]="{
-						'fa-circle-check': (ev.status || '').toLowerCase() === 'completed',
+						'fa-circle-check': (ev.status || '').toLowerCase() === 'concluded',
 						'fa-play': (ev.status || '').toLowerCase() === 'ongoing',
 						'fa-clock': (ev.status || '').toLowerCase() === 'not yet started',
 						'fa-ban': (ev.status || '').toLowerCase() === 'cancelled'

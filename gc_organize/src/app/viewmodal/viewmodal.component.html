@@ -4,7 +4,17 @@
     role="dialog" aria-modal="true" aria-labelledby="viewmodal-title" (click)="$event.stopPropagation()">
 
     <!-- Brand accent bar -->
-    <div class="brand-accent" aria-hidden="true"></div>
+    <div
+      class="brand-accent"
+      [ngClass]="{
+        'bg-orange-500': event?.department === 'CCS',
+        'bg-yellow-400': event?.department === 'CBA',
+        'bg-red-500': event?.department === 'CAHS',
+        'bg-blue-500': event?.department === 'CEAS',
+        'bg-pink-400': event?.department === 'CHTM',
+        'bg-[#14532d]': !event?.department || event?.department === 'OSWS'
+      }"
+      aria-hidden="true"></div>
 
     <!-- Close button -->
     <button (click)="closeModal()" aria-label="Close dialog"
@@ -34,27 +44,20 @@
         <span *ngIf="event.status"
               class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
               [ngClass]="{
-                'bg-yellow-50 text-yellow-800 border-yellow-200': event.status === 'not yet started',
-                'bg-blue-50 text-blue-800 border-blue-200': event.status === 'ongoing',
-                'bg-green-50 text-green-800 border-green-200': event.status === 'completed',
-                'bg-red-50 text-red-800 border-red-200': event.status === 'cancelled'
+                'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus() === 'not yet started',
+                'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus() === 'ongoing',
+                'bg-green-50 text-green-800 border-green-200': getDisplayStatus() === 'concluded',
+                'bg-red-50 text-red-800 border-red-200': getDisplayStatus() === 'cancelled'
               }"
-              [attr.aria-label]="'Status: ' + (event.status | titlecase)">
+              [attr.aria-label]="'Status: ' + (getDisplayStatus() | titlecase)">
           <span class="w-2.5 h-2.5 rounded-full"
                 [ngClass]="{
-                  'bg-yellow-400': event.status === 'not yet started',
-                  'bg-blue-500': event.status === 'ongoing',
-                  'bg-green-500': event.status === 'completed',
-                  'bg-red-500': event.status === 'cancelled'
+                  'bg-yellow-400': getDisplayStatus() === 'not yet started',
+                  'bg-blue-500': getDisplayStatus() === 'ongoing',
+                  'bg-green-500': getDisplayStatus() === 'concluded',
+                  'bg-red-500': getDisplayStatus() === 'cancelled'
                 }"></span>
-          <i class="fas"
-             [ngClass]="{
-               'fa-hourglass-start': event.status === 'not yet started',
-               'fa-bolt': event.status === 'ongoing',
-               'fa-check-circle': event.status === 'completed',
-               'fa-ban': event.status === 'cancelled'
-             }"></i>
-          <span>{{ event.status | titlecase }}</span>
+          <span>{{ getDisplayStatus() | titlecase }}</span>
         </span>
       </div>
 
