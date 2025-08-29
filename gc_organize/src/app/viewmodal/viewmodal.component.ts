@@ -54,5 +54,9 @@ export class ViewmodalComponent {
 
   }
 
+  // Helper to get display status
+  getDisplayStatus(): string {
+    return String(this.event?.status || '').toLowerCase();
+  }
 }
 
