@@ -13,13 +13,47 @@ import { saveAs } from 'file-saver';
   styleUrls: ['./manage-event.component.css'],
   imports: [CommonModule, FormsModule]
 })
+
 export class ManageEventComponent implements OnInit, OnDestroy {
+  isSavingInlineEdit = false;
+  // Inline edit mode for details panel
+  isInlineEditing = false;
+  inlineEditEvent: any = null;
   events: any[] = [];
   oswsEvents: any[] = [];
   orgEvents: any[] = [];
   creatorId: number;
   adminId: number;
   searchTerm: string = '';
+  // For inline edit poster
+  inlineEditPosterFile: File | null = null;
+  inlineEditPosterPreviewUrl: string | null = null;
+
+  onInlineEditPosterChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+    if (file) {
+      this.inlineEditPosterFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        if (e.target?.result) {
+          this.inlineEditPosterPreviewUrl = e.target.result as string;
+        }
+      };
+      reader.readAsDataURL(file);
+    } else {
+      this.inlineEditPosterFile = null;
+      this.inlineEditPosterPreviewUrl = null;
+    }
+  }
+
+  removeInlineEditPoster(): void {
+    this.inlineEditPosterFile = null;
+    this.inlineEditPosterPreviewUrl = null;
+    if (this.inlineEditEvent) {
+      this.inlineEditEvent.event_poster = '';
+    }
+  }
   statusFilter: string = '';
   filteredList: any[] = [];
   isOsws: boolean = false;
@@ -47,6 +81,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     end_date: '',
     end_time: ''
   };
+
+  // For vertical event list selection
+  selectedEvent: any = null;
 
   constructor(private eventService: EventService, private router: Router) {
     // Get creator/org ID from localStorage or AuthService
@@ -84,6 +121,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.events = res.data || res;
         this.filteredList = this.events;
+        // Do not auto-select event; only show details when a title is clicked
+        if (this.selectedEvent) {
+          // If the selected event was deleted, clear selection
+          const stillExists = this.filteredList.some(e => e.event_id === this.selectedEvent.event_id);
+          if (!stillExists) this.selectedEvent = null;
+        }
       },
       error: (err) => {
         console.error('Error fetching events:', err);
@@ -160,16 +203,27 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           !this.statusFilter || event.status === this.statusFilter;
         return matchesSearch && matchesStatus;
       });
+      // If the selected event is filtered out, clear selection
+      if (this.selectedEvent && !this.filteredList.some(e => e.event_id === this.selectedEvent.event_id)) {
+        this.selectedEvent = null;
+      }
     }
   }
 
   clearSearch() {
     this.searchTerm = '';
     // Optionally, reset other filters if needed
+    this.searchEvents();
   }
 
   filteredEvents() {
     return this.filteredList;
+  }
+
+  selectEvent(event: any) {
+    this.selectedEvent = event;
+    this.isInlineEditing = false;
+    this.inlineEditEvent = null;
   }
 
   searchOrgEvents() {
@@ -266,9 +320,114 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   this.toggleBodyModalClass();
   }
 
+  // Helper to format date as yyyy-MM-dd
+  private toDateInputValue(date: any): string {
+    if (!date) return '';
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    // Use local time, not UTC, to avoid date shifting
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   editEvent(event: any) {
-    // Open modal and load full event details
+    // If called from the details panel, enable inline editing
+    if (this.selectedEvent && event && this.selectedEvent.event_id === event.event_id) {
+      this.isInlineEditing = true;
+      // Deep copy to avoid mutating selectedEvent until save
+      this.inlineEditEvent = { ...this.selectedEvent };
+      // Ensure date fields are in yyyy-MM-dd format for input type="date"
+      this.inlineEditEvent.start_date = this.toDateInputValue(this.inlineEditEvent.start_date);
+      this.inlineEditEvent.end_date = this.toDateInputValue(this.inlineEditEvent.end_date);
+      return;
+    }
+    // Otherwise, open modal (old logic)
+    if (!event || !event.event_id) return;
     this.openEditModal(event.event_id);
+  }
+
+  cancelInlineEdit() {
+    this.isInlineEditing = false;
+    this.inlineEditEvent = null;
+  }
+
+  saveInlineEdit() {
+    if (!this.inlineEditEvent || !this.inlineEditEvent.event_id) return;
+    // Always send dates as yyyy-MM-dd strings
+    const formatDate = (d: any) => {
+      if (!d) return '';
+      if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+      const dateObj = new Date(d);
+      if (isNaN(dateObj.getTime())) return '';
+      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+      const day = dateObj.getDate().toString().padStart(2, '0');
+      return `${dateObj.getFullYear()}-${month}-${day}`;
+    };
+    let payload: any;
+    let isFormData = false;
+    const startDateStr = formatDate(this.inlineEditEvent.start_date);
+    const endDateStr = formatDate(this.inlineEditEvent.end_date);
+    if (this.inlineEditPosterFile) {
+      payload = new FormData();
+      payload.append('title', this.inlineEditEvent.title);
+      payload.append('description', this.inlineEditEvent.description);
+      payload.append('location', this.inlineEditEvent.location);
+      payload.append('start_date', startDateStr);
+      payload.append('start_time', this.inlineEditEvent.start_time);
+      payload.append('end_date', endDateStr);
+      payload.append('end_time', this.inlineEditEvent.end_time);
+      payload.append('status', this.inlineEditEvent.status || '');
+      payload.append('event_poster', this.inlineEditPosterFile);
+      isFormData = true;
+    } else {
+      payload = {
+        title: this.inlineEditEvent.title,
+        description: this.inlineEditEvent.description,
+        location: this.inlineEditEvent.location,
+        start_date: startDateStr,
+        start_time: this.inlineEditEvent.start_time,
+        end_date: endDateStr,
+        end_time: this.inlineEditEvent.end_time,
+        status: this.inlineEditEvent.status || '',
+        event_poster: this.inlineEditEvent.event_poster || ''
+      };
+    }
+    Swal.fire({
+      title: 'Updating Event...',
+      text: 'Please wait while we update your event.',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => Swal.showLoading()
+    });
+    this.eventService.updateEvent(this.inlineEditEvent.event_id, payload).subscribe({
+      next: () => {
+        Swal.close();
+        // Update selectedEvent and refresh list
+        Object.assign(this.selectedEvent, this.inlineEditEvent);
+        if (this.inlineEditPosterPreviewUrl) {
+          this.selectedEvent.event_poster = this.inlineEditPosterPreviewUrl;
+        }
+        this.isInlineEditing = false;
+        this.inlineEditEvent = null;
+        this.inlineEditPosterFile = null;
+        this.inlineEditPosterPreviewUrl = null;
+        if (this.isOsws) {
+          this.fetchOswsEvents();
+          this.fetchOrgEvents();
+        } else {
+          this.fetchEvents();
+        }
+        Swal.fire('Success', 'Event updated successfully!', 'success');
+      },
+      error: (error) => {
+        Swal.close();
+        Swal.fire('Error', 'Failed to update event.', 'error');
+      }
+    });
   }
 
   // Open Create Event modal
@@ -300,7 +459,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.isEditing = true;
     this.editingEventId = eventId;
     this.showCreateModal = true;
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
     this.isImageUploaded = false;
     this.eventPosterFile = null;
     this.posterPreviewUrl = null;
@@ -308,13 +467,14 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.eventService.getEventById(eventId).subscribe({
       next: (res: any) => {
         const event = res?.data ? res.data : res;
+        // Use toDateInputValue to ensure correct format for date inputs
         this.newEvent = {
           title: event.title || '',
           description: event.description || '',
           location: event.location || '',
-          start_date: event.start_date ? String(event.start_date).substring(0, 10) : '',
+          start_date: this.toDateInputValue(event.start_date),
           start_time: event.start_time ? String(event.start_time).substring(0, 5) : '',
-          end_date: event.end_date ? String(event.end_date).substring(0, 10) : '',
+          end_date: this.toDateInputValue(event.end_date),
           end_time: event.end_time ? String(event.end_time).substring(0, 5) : ''
         };
         // If backend returns poster URL, show it

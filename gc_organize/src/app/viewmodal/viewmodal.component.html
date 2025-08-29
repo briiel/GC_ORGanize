@@ -40,25 +40,27 @@
         <h2 id="viewmodal-title" class="font-extrabold text-2xl md:text-3xl leading-tight text-gray-900">
           {{ event.title }}
         </h2>
-        <!-- Status pill copied from card for consistency -->
-        <span *ngIf="event.status"
-              class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
-              [ngClass]="{
-                'bg-yellow-50 text-yellow-800 border-yellow-200': (event?.status || '').toLowerCase() === 'not yet started',
-                'bg-blue-50 text-blue-800 border-blue-200': (event?.status || '').toLowerCase() === 'ongoing',
-                'bg-green-50 text-green-800 border-green-200': (event?.status || '').toLowerCase() === 'concluded',
-                'bg-red-50 text-red-800 border-red-200': (event?.status || '').toLowerCase() === 'cancelled'
-              }"
-              [attr.aria-label]="'Status: ' + ((event?.status || '') | titlecase)">
-          <span class="w-2.5 h-2.5 rounded-full"
+        <div class="flex items-center gap-2">
+          <!-- Status pill copied from card for consistency -->
+          <span *ngIf="event.status"
+                class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] mr-2 md:mr-4"
                 [ngClass]="{
-                  'bg-yellow-400': (event?.status || '').toLowerCase() === 'not yet started',
-                  'bg-blue-500': (event?.status || '').toLowerCase() === 'ongoing',
-                  'bg-green-500': (event?.status || '').toLowerCase() === 'concluded',
-                  'bg-red-500': (event?.status || '').toLowerCase() === 'cancelled'
-                }"></span>
-          <span>{{ (event?.status || '') | titlecase }}</span>
-        </span>
+                  'bg-yellow-50 text-yellow-800 border-yellow-200': (event?.status || '').toLowerCase() === 'not yet started',
+                  'bg-blue-50 text-blue-800 border-blue-200': (event?.status || '').toLowerCase() === 'ongoing',
+                  'bg-green-50 text-green-800 border-green-200': (event?.status || '').toLowerCase() === 'concluded',
+                  'bg-red-50 text-red-800 border-red-200': (event?.status || '').toLowerCase() === 'cancelled'
+                }"
+                [attr.aria-label]="'Status: ' + ((event?.status || '') | titlecase)">
+            <span class="w-2.5 h-2.5 rounded-full"
+                  [ngClass]="{
+                    'bg-yellow-400': (event?.status || '').toLowerCase() === 'not yet started',
+                    'bg-blue-500': (event?.status || '').toLowerCase() === 'ongoing',
+                    'bg-green-500': (event?.status || '').toLowerCase() === 'concluded',
+                    'bg-red-500': (event?.status || '').toLowerCase() === 'cancelled'
+                  }"></span>
+            <span>{{ (event?.status || '') | titlecase }}</span>
+          </span>
+        </div>
       </div>
 
       <p class="text-gray-700 text-base md:text-[1.05rem] leading-relaxed mb-5 whitespace-pre-line">

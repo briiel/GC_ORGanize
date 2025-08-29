@@ -41,9 +41,10 @@ export class ViewmodalComponent {
     const parts = timeString.split(':');
     if (parts.length < 2) return '';
     const [hours, minutes] = parts;
-    const date = new Date();
-    date.setHours(+hours, +minutes, 0, 0);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    // Use local time for formatting
+    const now = new Date();
+    const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), +hours, +minutes, 0, 0);
+    return localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
   }
 
   getPosterUrl(): string {

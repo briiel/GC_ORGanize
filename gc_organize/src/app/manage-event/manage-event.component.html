@@ -142,6 +142,7 @@
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </div>
+                <!-- Removed extra status select for OSWS events table actions column -->
               </td>
             </tr>
             <tr *ngIf="filteredOswsEvents().length === 0">
@@ -224,86 +225,233 @@
     </div>
   </ng-container>
 
-  <!-- Organization view fallback -->
+
+  <!-- Organization view fallback: Vertical event list and details -->
   <ng-template #orgTable>
-  <div class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-md border border-gray-200">
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm lg:text-base">
-        <thead class="bg-[#679436]">
-          <tr class="uppercase tracking-wider text-white">
-            <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[180px]">Title</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center" colspan="2">Date</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center" colspan="2">Time</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Location</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center">Status</th>
-            <th class="px-4 py-3 border-b border-gray-200 text-center">Actions</th>
-          </tr>
-          <tr class="bg-[#eaf7e0] text-[#14532d] font-semibold">
-            <th></th>
-            <th></th>
-            <th class="text-center border-b border-gray-200">Start</th>
-            <th class="text-center border-b border-gray-200">End</th>
-            <th class="text-center border-b border-gray-200">Start</th>
-            <th class="text-center border-b border-gray-200">End</th>
-            <th></th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-          <tr *ngFor="let event of filteredEvents(); let i = index" class="hover:bg-gray-50 transition-colors duration-200">
-            <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ i + 1 }}</td>
-            <td class="px-4 py-3 font-semibold text-left max-w-[200px] truncate" [title]="event.title">
-              <button class="text-[#679436] hover:underline cursor-pointer font-semibold"
-                      (click)="openParticipantsModal(event)">
+    <ng-container *ngIf="!isOsws">
+  <div class="mx-2 lg:mx-6 flex flex-col md:flex-row gap-6 h-[80vh]" style="min-height: 400px;">
+      <!-- Vertical event title list (narrower, fixed height, scrollable) -->
+  <div class="w-full md:w-1/4 max-w-xs h-full">
+        <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden h-full flex flex-col">
+          <div class="bg-[#679436] text-white px-4 py-3 font-bold text-lg flex-shrink-0">Events</div>
+          <ul class="divide-y divide-gray-200 overflow-y-auto flex-1" style="max-height: 100%;">
+            <li *ngFor="let event of filteredEvents(); let i = index" class="hover:bg-gray-50 transition-colors duration-200 flex items-center">
+              <span class="px-3 py-3 text-gray-400 font-bold">{{ i + 1 }}.</span>
+              <button
+                class="flex-1 text-left px-2 py-3 font-semibold text-[#679436] hover:underline focus:outline-none focus:bg-[#eaf7e0]"
+                [ngClass]="{ 'bg-[#eaf7e0]': selectedEvent && selectedEvent.event_id === event.event_id }"
+                (click)="selectEvent(event)"
+                [title]="event.title"
+              >
                 {{ event.title }}
               </button>
-            </td>
-            <td class="px-4 py-3 text-center">{{ event.start_date | date: 'MMM d, y' }}</td>
-            <td class="px-4 py-3 text-center">{{ event.end_date | date: 'MMM d, y' }}</td>
-            <td class="px-4 py-3 text-center">{{ formatTime(event.start_time) }}</td>
-            <td class="px-4 py-3 text-center">{{ formatTime(event.end_time) }}</td>
-            <td class="px-4 py-3 text-left max-w-[160px] truncate" [title]="event.location">{{ event.location }}</td>
-            <td class="px-4 py-3 text-center">
-              <select
-                class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
-                [ngClass]="{
-                  'bg-yellow-100 text-yellow-800 border-yellow-300': event.status === 'not yet started',
-                  'bg-blue-100 text-blue-800 border-blue-300': event.status === 'ongoing',
-                  'bg-green-100 text-green-800 border-green-300': event.status === 'concluded',
-                  'bg-red-100 text-red-800 border-red-300': event.status === 'cancelled'
-                }"
-                [(ngModel)]="event.status"
-                (change)="updateEventStatus(event)"
-              >
-                <option value="not yet started">Not Yet Started</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="concluded">Concluded</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </td>
-            <td class="px-4 py-3 text-center">
-              <div class="flex items-center justify-center gap-2">
-                <!-- Update/Edit Icon -->
-                <button (click)="editEvent(event)" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Edit Event">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <!-- Delete Icon only, remove label -->
-                <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Delete Event">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
+            </li>
+            <li *ngIf="filteredEvents().length === 0" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No events found.</li>
+          </ul>
+        </div>
+      </div>
+      <!-- Event details panel: only show when selectedEvent is set, fixed height, modern layout -->
+  <div class="w-full md:flex-1 h-full">
+    <div *ngIf="selectedEvent" class="relative h-full flex flex-col justify-center">
+  <div class="bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-gray-200 p-8 flex flex-col gap-8 animate-fade-in h-full relative">
+      <!-- Close details button -->
+      <button (click)="selectedEvent = null" class="absolute top-4 right-4 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-full p-2 shadow transition z-10" title="Close details">
+        <span class="text-xl font-bold">&times;</span>
+        <style>
+          button[title="Close details"] {
+            border-radius: 9999px !important;
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 !important;
+          }
+        </style>
+        <style>
+          /* Make the close button a perfect circle on hover */
+          button[title="Close details"]:hover {
+            border-radius: 9999px !important;
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        </style>
+      </button>
+      <div class="overflow-y-auto h-full pr-2">
+        <div class="mb-4">
+              <h2 class="text-3xl font-extrabold text-[#679436] break-words">
+                <ng-container *ngIf="!isInlineEditing; else editTitleField">{{ selectedEvent.title }}</ng-container>
+                <ng-template #editTitleField>
+                  <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.title" />
+                </ng-template>
+              </h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-5">
+                <div>
+                  <label class="block text-sm font-medium mb-1 text-gray-700">Title</label>
+                  <ng-container *ngIf="!isInlineEditing; else editTitleField2">
+                    <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.title" readonly />
+                  </ng-container>
+                  <ng-template #editTitleField2>
+                    <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.title" />
+                  </ng-template>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium mb-1 text-gray-700">Location</label>
+                  <ng-container *ngIf="!isInlineEditing; else editLocationField">
+                    <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.location" readonly />
+                  </ng-container>
+                  <ng-template #editLocationField>
+                    <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.location" />
+                  </ng-template>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Start Date</label>
+                    <ng-container *ngIf="!isInlineEditing; else editStartDateField">
+                      <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.start_date | date: 'yyyy-MM-dd'" readonly />
+                    </ng-container>
+                    <ng-template #editStartDateField>
+                      <input type="date" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.start_date" />
+                    </ng-template>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Start Time</label>
+                    <ng-container *ngIf="!isInlineEditing; else editStartTimeField">
+                      <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="formatTime(selectedEvent.start_time)" readonly />
+                    </ng-container>
+                    <ng-template #editStartTimeField>
+                      <input type="time" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.start_time" />
+                    </ng-template>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">End Date</label>
+                    <ng-container *ngIf="!isInlineEditing; else editEndDateField">
+                      <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.end_date | date: 'yyyy-MM-dd'" readonly />
+                    </ng-container>
+                    <ng-template #editEndDateField>
+                      <input type="date" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.end_date" />
+                    </ng-template>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium mb-1 text-gray-700">End Time</label>
+                    <ng-container *ngIf="!isInlineEditing; else editEndTimeField">
+                      <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="formatTime(selectedEvent.end_time)" readonly />
+                    </ng-container>
+                    <ng-template #editEndTimeField>
+                      <input type="time" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.end_time" />
+                    </ng-template>
+                  </div>
+                  <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Status</label>
+                    <ng-container *ngIf="!isInlineEditing; else editStatusField">
+                      <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [value]="selectedEvent.status || ''" disabled>
+                        <option value="">-- No Status --</option>
+                        <option value="not yet started">Not Yet Started</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="concluded">Concluded</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </ng-container>
+                    <ng-template #editStatusField>
+                      <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [(ngModel)]="inlineEditEvent.status">
+                        <option value="">-- No Status --</option>
+                        <option value="not yet started">Not Yet Started</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="concluded">Concluded</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </ng-template>
+                  </div>
+                </div>
               </div>
-            </td>
-          </tr>
-          <tr *ngIf="filteredEvents().length === 0">
-            <td colspan="9" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No events found.</td>
-          </tr>
-        </tbody>
-      </table>
+              <div class="space-y-5">
+                <div>
+                  <label class="block text-sm font-medium mb-1 text-gray-700">Description</label>
+                  <ng-container *ngIf="!isInlineEditing; else editDescField">
+                    <textarea class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.description" readonly rows="5">{{ selectedEvent.description }}</textarea>
+                  </ng-container>
+                  <ng-template #editDescField>
+                    <textarea class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.description" rows="5"></textarea>
+                  </ng-template>
+                </div>
+                <div class="flex flex-col items-start">
+                  <label class="block text-sm font-medium mb-1 text-gray-700">Poster</label>
+                  <ng-container *ngIf="!isInlineEditing">
+                    <div class="rounded-xl bg-white shadow-lg p-2 max-w-xs" *ngIf="selectedEvent.event_poster">
+                      <img [src]="selectedEvent.event_poster" alt="Event Poster" class="object-contain w-full max-h-56 rounded-md" style="max-width: 320px; border: none;" />
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="isInlineEditing">
+                    <div class="relative rounded-xl bg-white shadow-lg p-2 max-w-xs w-full">
+                      <ng-container *ngIf="inlineEditPosterPreviewUrl || inlineEditEvent.event_poster">
+                        <img [src]="inlineEditPosterPreviewUrl || inlineEditEvent.event_poster" alt="Poster Preview" class="object-contain w-full max-h-56 rounded-md mb-2" style="max-width: 320px; border: none;" />
+                        <button (click)="removeInlineEditPoster()" class="absolute top-2 right-2 bg-white bg-opacity-80 rounded-full p-1 shadow hover:bg-red-100 transition" title="Remove poster">
+                          <span class="text-red-600 text-lg font-bold">&times;</span>
+                          <style>
+                            button[title="Remove poster"] {
+                              border-radius: 9999px !important;
+                              width: 32px !important;
+                              height: 32px !important;
+                              min-width: 32px !important;
+                              min-height: 32px !important;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              padding: 0 !important;
+                            }
+                          </style>
+                        </button>
+                      </ng-container>
+                      <input type="file" accept="image/*" (change)="onInlineEditPosterChange($event)" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200 mt-2" />
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
     </div>
-  </div>
-</ng-template>
+    <!-- Action buttons fixed at lower left, outside scrollable area -->
+  <div class="fixed md:absolute left-4 bottom-4 md:top-auto md:bottom-0 md:left-0 z-20 w-24 h-auto md:w-full md:h-auto m-0 p-2 md:p-4 rounded-xl md:rounded-b-xl md:rounded-t-none shadow-lg border border-gray-200 bg-white/90 flex flex-col md:flex-row items-center justify-center md:justify-end gap-2 overflow-hidden">
+      <ng-container *ngIf="!isInlineEditing">
+        <button (click)="editEvent(selectedEvent)" class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto" title="Edit Event">
+          <i class="fas fa-edit mr-0 md:mr-2"></i>
+          <span class="hidden md:inline">Edit</span>
+        </button>
+        <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-red-600 hover:bg-red-800 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto" title="Delete Event">
+          <i class="fas fa-trash-alt mr-0 md:mr-2"></i>
+          <span class="hidden md:inline">Delete</span>
+        </button>
+        <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto" title="View Participants">
+          <i class="fas fa-users mr-0 md:mr-2"></i>
+          <span class="hidden md:inline">Participants</span>
+        </button>
+      </ng-container>
+      <ng-container *ngIf="isInlineEditing">
+        <button (click)="saveInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow disabled:opacity-60 disabled:cursor-not-allowed w-full md:w-auto" title="Save Changes">
+          <i *ngIf="!isSavingInlineEdit" class="fas fa-save mr-0 md:mr-2"></i>
+          <svg *ngIf="isSavingInlineEdit" class="animate-spin h-5 w-5 mr-0 md:mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+          <span class="hidden md:inline">Save</span>
+        </button>
+        <button (click)="cancelInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow disabled:opacity-60 disabled:cursor-not-allowed w-full md:w-auto" title="Cancel Edit">
+          <i class="fas fa-times mr-0 md:mr-2"></i>
+          <span class="hidden md:inline">Cancel</span>
+        </button>
+      </ng-container>
+    </div>
+          </div>
+        </div>
+      </div>
+    </div>
+      </ng-container>
+    </ng-template>
 
 <!-- Participants Modal (responsive update, larger size) -->
 <div *ngIf="showParticipantsModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">

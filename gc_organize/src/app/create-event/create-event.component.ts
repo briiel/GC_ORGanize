@@ -46,6 +46,18 @@ export class CreateEventComponent implements OnInit {
     });
   }
 
+  // Helper to format date as yyyy-MM-dd using local time
+  private toDateInputValue(date: any): string {
+    if (!date) return '';
+    if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   loadEventDetails(eventId: number) {
     this.eventService.getEventById(eventId).subscribe(
       (res: any) => {
@@ -54,10 +66,10 @@ export class CreateEventComponent implements OnInit {
           title: event.title || '',
           description: event.description || '',
           location: event.location || '',
-          start_date: event.start_date ? event.start_date.substring(0, 10) : '', // <-- Fix here
-          start_time: event.start_time ? event.start_time.substring(0, 5) : '', // <-- Fix here
-          end_date: event.end_date ? event.end_date.substring(0, 10) : '',     // <-- Fix here
-          end_time: event.end_time ? event.end_time.substring(0, 5) : ''       // <-- Fix here
+          start_date: this.toDateInputValue(event.start_date),
+          start_time: event.start_time ? event.start_time.substring(0, 5) : '',
+          end_date: this.toDateInputValue(event.end_date),
+          end_time: event.end_time ? event.end_time.substring(0, 5) : ''
         };
         // Optionally handle event poster preview here
       },
@@ -104,8 +116,15 @@ export class CreateEventComponent implements OnInit {
   }
 
   createEvent(): void {
-    // Combine start date and time to a Date object
-    const startDateTime = new Date(`${this.event.start_date}T${this.event.start_time}`);
+    // Combine start date and time to a Date object using local time
+    function parseLocalDateTime(dateStr: string, timeStr: string): Date {
+      if (!dateStr || !timeStr) return new Date('');
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const [hour, minute] = timeStr.split(':').map(Number);
+      return new Date(year, month - 1, day, hour, minute, 0, 0);
+    }
+
+    const startDateTime = parseLocalDateTime(this.event.start_date, this.event.start_time);
     const now = new Date();
 
     if (isNaN(startDateTime.getTime()) || startDateTime < now) {
@@ -120,7 +139,7 @@ export class CreateEventComponent implements OnInit {
 
     // Optionally, you can also check that end date/time is after start date/time
     if (this.event.end_date && this.event.end_time) {
-      const endDateTime = new Date(`${this.event.end_date}T${this.event.end_time}`);
+      const endDateTime = parseLocalDateTime(this.event.end_date, this.event.end_time);
       if (endDateTime < startDateTime) {
         Swal.fire({
           icon: 'error',

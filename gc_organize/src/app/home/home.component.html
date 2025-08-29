@@ -32,7 +32,10 @@
     <div
       class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative flex flex-col"
       *ngFor="let event of filteredEvents; let i = index"
-      [ngClass]="{ 'opacity-60 grayscale pointer-events-none': isConcluded(event) }"
+      [ngClass]="{
+        'pointer-events-none bg-green-100 bg-opacity-80 border border-green-300': isConcluded(event),
+        'pointer-events-none opacity-60 grayscale bg-gray-200 border border-gray-300': getDisplayStatus(event) === 'cancelled'
+      }"
     >
       <!-- Colored top strip based on department -->
       <div

@@ -78,8 +78,14 @@ export class HomeComponent implements OnInit, OnDestroy {
         allEvents = allEvents.map(e => {
           const status = String(e.status || '').toLowerCase();
           if (status === 'cancelled') return e;
-          const start = e.start_date && e.start_time ? new Date(`${e.start_date}T${e.start_time}`) : null;
-          const end = e.end_date && e.end_time ? new Date(`${e.end_date}T${e.end_time}`) : null;
+          function parseLocalDateTime(dateStr: string, timeStr: string): Date {
+            if (!dateStr || !timeStr) return new Date('');
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const [hour, minute] = timeStr.split(':').map(Number);
+            return new Date(year, month - 1, day, hour, minute, 0, 0);
+          }
+          const start = e.start_date && e.start_time ? parseLocalDateTime(e.start_date, e.start_time) : null;
+          const end = e.end_date && e.end_time ? parseLocalDateTime(e.end_date, e.end_time) : null;
           let computed = status;
           if (start && end) {
             if (start > now) computed = 'not yet started';
@@ -89,8 +95,13 @@ export class HomeComponent implements OnInit, OnDestroy {
           return { ...e, status: computed };
         });
 
-        // Sort: non-concluded first, concluded last; within each group, latest created_at first
-        const weight = (e: any) => (String(e.status || '').toLowerCase() === 'concluded' ? 1 : 0);
+        // Sort: normal < concluded < cancelled; within each group, latest created_at first
+        const weight = (e: any) => {
+          const status = String(e.status || '').toLowerCase();
+          if (status === 'cancelled') return 2;
+          if (status === 'concluded') return 1;
+          return 0;
+        };
         allEvents.sort((a, b) => {
           const wDiff = weight(a) - weight(b);
           if (wDiff !== 0) return wDiff;
