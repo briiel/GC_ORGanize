@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +39,10 @@ export class EventService {
 
   // Update event status
   updateEventStatus(eventId: number, status: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status });
+    return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status })
+      .pipe(
+        tap(() => this.statusChanged$.next())
+      );
   }
 
   // Fetch all attendance records

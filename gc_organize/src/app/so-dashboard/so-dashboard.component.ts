@@ -1,26 +1,29 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { EventService } from '../services/event.service';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // <-- Add this import
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-so-dashboard',
   templateUrl: './so-dashboard.component.html',
   styleUrls: ['./so-dashboard.component.css'],
-  imports: [CommonModule, RouterModule], // <-- Add RouterModule here
+  imports: [CommonModule, RouterModule],
 })
 export class SoDashboardComponent implements OnInit, OnDestroy {
-  orgName: string = 'Student Organization'; // Default fallback
+  orgName: string = 'Student Organization';
   events: any[] = [];
   stats = {
     upcoming: 0,
-    ongoing: 0, // <-- Add this line
+    ongoing: 0,
     completed: 0,
     cancelled: 0,
     totalAttendees: 0
   };
 
   private refreshHandle?: ReturnType<typeof setInterval>;
+  private statusChangedSub?: Subscription;
+  
   constructor(private eventService: EventService) {}
 
   ngOnInit() {
@@ -31,17 +34,66 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
       return;
     }
     this.loadOrgEvents(creatorId);
-    // Periodic refresh to reflect status changes
     this.refreshHandle = setInterval(() => this.loadOrgEvents(creatorId), 60_000);
+
+    this.statusChangedSub = this.eventService.statusChanged$.subscribe(() => {
+      this.loadOrgEvents(creatorId);
+    });
   }
 
   ngOnDestroy(): void {
     if (this.refreshHandle) clearInterval(this.refreshHandle);
+    if (this.statusChangedSub) this.statusChangedSub.unsubscribe();
+  }
+
+  // New method to manually update event status
+  updateEventStatus(eventId: number, newStatus: string): void {
+    this.eventService.updateEventStatus(eventId, newStatus).subscribe({
+      next: (response) => {
+        console.log('Status updated successfully:', response);
+        // Refresh the events list to reflect the change
+        const creatorId = Number(localStorage.getItem('creatorId'));
+        if (creatorId) {
+          this.loadOrgEvents(creatorId);
+        }
+      },
+      error: (error) => {
+        console.error('Error updating event status:', error);
+        // You might want to show a toast notification here
+      }
+    });
+  }
+
+  // Helper method to check if an event can be set to ongoing
+  canSetToOngoing(event: any): boolean {
+    const status = String(event.status).toLowerCase();
+    // Allow setting to ongoing if it's currently upcoming or if it was previously ongoing
+    return status === 'not yet started' || status === 'upcoming' || status === 'ongoing';
+  }
+
+  // Helper method to get available status options for an event
+  getAvailableStatuses(event: any): string[] {
+    const currentStatus = String(event.status).toLowerCase();
+    const allStatuses = ['not yet started', 'ongoing', 'completed', 'cancelled'];
+    
+    // You can customize this logic based on your business rules
+    switch (currentStatus) {
+      case 'not yet started':
+      case 'upcoming':
+        return ['not yet started', 'ongoing', 'cancelled'];
+      case 'ongoing':
+        return ['ongoing', 'completed', 'cancelled'];
+      case 'completed':
+        return ['completed']; // Usually can't change from completed
+      case 'cancelled':
+        return ['cancelled', 'not yet started']; // Allow reactivation
+      default:
+        return allStatuses;
+    }
   }
 
   private loadOrgEvents(creatorId: number) {
-  // Fetch events by creator/org
-  this.eventService.getEventsByCreator(creatorId).subscribe({
+    this.eventService.getEventsByCreator(creatorId).subscribe({
       next: (res) => {
         let events: any[] = [];
         if (res && Array.isArray(res.data)) {
@@ -53,32 +105,38 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         }
         this.events = events;
 
-        const now = new Date();
-        const isCompleted = (e: any) => {
-          if (String(e.status).toLowerCase() === 'completed') return true;
-          const endIso = e.end_date && e.end_time ? `${e.end_date}T${e.end_time}` : null;
-          const end = endIso ? new Date(endIso) : undefined;
-          return end instanceof Date && !isNaN(end.getTime()) && end < now;
-        };
-        const isOngoing = (e: any) => String(e.status).toLowerCase() === 'ongoing';
-        const isCancelled = (e: any) => String(e.status).toLowerCase() === 'cancelled';
-        const isNotYet = (e: any) => String(e.status).toLowerCase() === 'not yet started';
+        // Count events by status
+        let upcoming = 0, ongoing = 0, completed = 0, cancelled = 0;
+        for (const e of events) {
+          const status = String(e.status).toLowerCase();
+          if (status === 'cancelled') {
+            cancelled++;
+          } else if (status === 'completed') {
+            completed++;
+          } else if (status === 'ongoing') {
+            ongoing++;
+          } else if (status === 'not yet started' || status === 'upcoming') {
+            upcoming++;
+          }
+        }
+        
+        this.stats.upcoming = upcoming;
+        this.stats.ongoing = ongoing;
+        this.stats.completed = completed;
+        this.stats.cancelled = cancelled;
 
-        // Default computation from events list (for UI), but override with backend stats when available
-        this.stats.upcoming = events.filter(isNotYet).length;
-        this.stats.ongoing = events.filter(isOngoing).length;
-        this.stats.completed = events.filter(isCompleted).length;
-        this.stats.cancelled = events.filter(isCancelled).length;
-
-        // Query backend stats (completed includes trashed)
+        // Get backend stats (if needed for additional data)
         this.eventService.getOrgStats().subscribe({
           next: (s) => {
             const data = s?.data ?? s;
             if (data) {
-              this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
-              this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
-              this.stats.completed = data.completed ?? this.stats.completed;
-              this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
+              // Only override if backend has different totals (e.g., includes archived events)
+              if (data.totalEvents && data.totalEvents !== events.length) {
+                this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
+                this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
+                this.stats.completed = data.completed ?? this.stats.completed;
+                this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
+              }
             }
           },
           error: () => { /* keep computed fallback */ }
@@ -101,7 +159,6 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         } else if (Array.isArray(res)) {
           records = res;
         }
-        // Add explicit type for 'r'
         this.stats.totalAttendees = records.filter((r: any) => eventIds.includes(r.event_id)).length;
       },
       error: (err) => {

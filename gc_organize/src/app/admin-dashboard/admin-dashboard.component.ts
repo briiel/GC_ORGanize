@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EventService } from '../services/event.service';
@@ -27,6 +28,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private monthlyChart?: Chart;
   private viewReady = false;
   private refreshHandle?: ReturnType<typeof setInterval>;
+  private statusChangedSub?: Subscription;
 
   constructor(private eventService: EventService) {}
 
@@ -35,6 +37,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     this.loadEventsAndStats();
     // Periodic refresh to keep statuses (esp. Completed) up-to-date
     this.refreshHandle = setInterval(() => this.loadEventsAndStats(), 60_000);
+
+    // Instant update on status change
+    this.statusChangedSub = this.eventService.statusChanged$.subscribe(() => {
+      this.loadEventsAndStats();
+    });
   }
 
   ngAfterViewInit(): void {
@@ -50,6 +57,61 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
   ngOnDestroy(): void {
     if (this.refreshHandle) clearInterval(this.refreshHandle);
+    if (this.statusChangedSub) this.statusChangedSub.unsubscribe();
+  }
+
+  // New method to manually update event status
+  updateEventStatus(eventId: number, newStatus: string): void {
+    this.eventService.updateEventStatus(eventId, newStatus).subscribe({
+      next: (response) => {
+        console.log('Status updated successfully:', response);
+        // Refresh the events list and charts to reflect the change
+        this.loadEventsAndStats();
+      },
+      error: (error) => {
+        console.error('Error updating event status:', error);
+        // You might want to show a toast notification here
+      }
+    });
+  }
+
+  // Helper method to check if an event can be set to ongoing
+  canSetToOngoing(event: any): boolean {
+    const status = String(event.status).toLowerCase();
+    // Allow setting to ongoing if it's currently upcoming or if it was previously ongoing
+    return status === 'not yet started' || status === 'upcoming' || status === 'ongoing';
+  }
+
+  // Helper method to get available status options for an event
+  getAvailableStatuses(event: any): string[] {
+    const currentStatus = String(event.status).toLowerCase();
+    const allStatuses = ['not yet started', 'ongoing', 'completed', 'cancelled'];
+    
+    // Customize this logic based on your business rules
+    switch (currentStatus) {
+      case 'not yet started':
+      case 'upcoming':
+        return ['not yet started', 'ongoing', 'cancelled'];
+      case 'ongoing':
+        return ['ongoing', 'completed', 'cancelled'];
+      case 'completed':
+        return ['completed']; // Usually can't change from completed
+      case 'cancelled':
+        return ['cancelled', 'not yet started']; // Allow reactivation
+      default:
+        return allStatuses;
+    }
+  }
+
+  // Helper method to check if event is OSWS-created (for admin permissions)
+  isOswsEvent(event: any): boolean {
+    return event.created_by_osws_id != null;
+  }
+
+  // Helper method to check if admin can modify event status
+  canModifyEventStatus(event: any): boolean {
+    // Admin can modify all events, but you might want to add additional rules
+    return true;
   }
 
   private loadEventsAndStats(): void {
@@ -66,7 +128,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         }
         this.events = events || [];
 
-  // Compute statistics by status with date-based fallback
+        // Compute statistics by status with date-based fallback
         this.computeStats();
 
         // Attendance across all events
@@ -80,10 +142,18 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           next: (s) => {
             const data = (s as any)?.data ?? s;
             if (data) {
-              this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
-              this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
-              this.stats.completed = data.completed ?? this.stats.completed;
-              this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
+              // Only override if backend has different totals (e.g., includes archived)
+              const totalBackendEvents = (data.upcoming || 0) + (data.ongoing || 0) + 
+                                       (data.completed || 0) + (data.cancelled || 0);
+              const totalLocalEvents = this.stats.upcoming + this.stats.ongoing + 
+                                     this.stats.completed + this.stats.cancelled;
+              
+              if (totalBackendEvents !== totalLocalEvents) {
+                this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
+                this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
+                this.stats.completed = data.completed ?? this.stats.completed;
+                this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
+              }
             }
           },
           error: () => { /* keep computeStats() fallback */ }
@@ -101,26 +171,26 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private computeStats(): void {
-    const now = new Date();
     const oswsEvents = this.events.filter((e: any) => e.created_by_osws_id != null);
 
-    const isCompleted = (e: any) => {
-      // Consider it completed if status says so OR its end datetime has passed
-      if (String(e.status).toLowerCase() === 'completed') return true;
-      const endIso = e.end_date && e.end_time ? `${e.end_date}T${e.end_time}` : null;
-      const end = endIso ? new Date(endIso) : undefined;
-      return end instanceof Date && !isNaN(end.getTime()) && end < now;
-    };
-
-    const isOngoing = (e: any) => String(e.status).toLowerCase() === 'ongoing';
-    const isCancelled = (e: any) => String(e.status).toLowerCase() === 'cancelled';
-    const isNotYet = (e: any) => String(e.status).toLowerCase() === 'not yet started';
-
-  // OSWS Dashboard: scope status counters to OSWS-created events only
-  this.stats.upcoming = oswsEvents.filter(isNotYet).length;
-  this.stats.ongoing = oswsEvents.filter(isOngoing).length;
-  this.stats.completed = oswsEvents.filter(isCompleted).length;
-  this.stats.cancelled = oswsEvents.filter(isCancelled).length;
+    // Improved: Only count each event in one category with flexible status handling
+    let upcoming = 0, ongoing = 0, completed = 0, cancelled = 0;
+    for (const e of oswsEvents) {
+      const status = String(e.status).toLowerCase();
+      if (status === 'cancelled') {
+        cancelled++;
+      } else if (status === 'completed') {
+        completed++;
+      } else if (status === 'ongoing') {
+        ongoing++;
+      } else if (status === 'not yet started' || status === 'upcoming') {
+        upcoming++;
+      }
+    }
+    this.stats.upcoming = upcoming;
+    this.stats.ongoing = ongoing;
+    this.stats.completed = completed;
+    this.stats.cancelled = cancelled;
   }
 
   private fetchAttendanceStats(eventIds: number[]): void {
@@ -143,7 +213,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
   private renderCharts(): void {
     // Safeguard against missing canvas
-  if (!this.deptPieChart || !this.eventsBarChart) return;
+    if (!this.deptPieChart || !this.eventsBarChart) return;
 
     // Pie/Donut: events by department (EXCLUDES OSWS-created)
     const departmentCounts = new Map<string, number>();
@@ -192,11 +262,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       });
     }
 
-  // Bar: events per month (OSWS-created ONLY)
+    // Bar: events per month (OSWS-created ONLY)
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const monthlyCounts = new Array(12).fill(0);
-  const oswsOnly = this.events.filter((e: any) => e.created_by_osws_id != null);
-  for (const e of oswsOnly) {
+    const oswsOnly = this.events.filter((e: any) => e.created_by_osws_id != null);
+    for (const e of oswsOnly) {
       const d = e.start_date ? new Date(e.start_date) : undefined;
       if (d && !isNaN(d.getTime())) {
         monthlyCounts[d.getMonth()]++;
