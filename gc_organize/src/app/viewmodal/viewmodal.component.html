@@ -44,20 +44,20 @@
         <span *ngIf="event.status"
               class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
               [ngClass]="{
-                'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus() === 'not yet started',
-                'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus() === 'ongoing',
-                'bg-green-50 text-green-800 border-green-200': getDisplayStatus() === 'concluded',
-                'bg-red-50 text-red-800 border-red-200': getDisplayStatus() === 'cancelled'
+                'bg-yellow-50 text-yellow-800 border-yellow-200': (event?.status || '').toLowerCase() === 'not yet started',
+                'bg-blue-50 text-blue-800 border-blue-200': (event?.status || '').toLowerCase() === 'ongoing',
+                'bg-green-50 text-green-800 border-green-200': (event?.status || '').toLowerCase() === 'concluded',
+                'bg-red-50 text-red-800 border-red-200': (event?.status || '').toLowerCase() === 'cancelled'
               }"
-              [attr.aria-label]="'Status: ' + (getDisplayStatus() | titlecase)">
+              [attr.aria-label]="'Status: ' + ((event?.status || '') | titlecase)">
           <span class="w-2.5 h-2.5 rounded-full"
                 [ngClass]="{
-                  'bg-yellow-400': getDisplayStatus() === 'not yet started',
-                  'bg-blue-500': getDisplayStatus() === 'ongoing',
-                  'bg-green-500': getDisplayStatus() === 'concluded',
-                  'bg-red-500': getDisplayStatus() === 'cancelled'
+                  'bg-yellow-400': (event?.status || '').toLowerCase() === 'not yet started',
+                  'bg-blue-500': (event?.status || '').toLowerCase() === 'ongoing',
+                  'bg-green-500': (event?.status || '').toLowerCase() === 'concluded',
+                  'bg-red-500': (event?.status || '').toLowerCase() === 'cancelled'
                 }"></span>
-          <span>{{ getDisplayStatus() | titlecase }}</span>
+          <span>{{ (event?.status || '') | titlecase }}</span>
         </span>
       </div>
 

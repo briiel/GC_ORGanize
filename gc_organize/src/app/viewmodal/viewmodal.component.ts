@@ -57,6 +57,10 @@ export class ViewmodalComponent {
     return String(this.event?.status || '').toLowerCase();
   }
 
-  //force build comment
+  // // Helper to get display status
+  // getDisplayStatus(): string {
+  //   return String(this.event?.status || '').toLowerCase();
+  // }
+  // //force build comment
 }
 
