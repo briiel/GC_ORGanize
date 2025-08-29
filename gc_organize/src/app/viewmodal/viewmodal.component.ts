@@ -52,15 +52,7 @@ export class ViewmodalComponent {
   // Dev: `http://localhost:5000/${this.event.event_poster.replace(/^\/+/, '')}`
   return `https://gcorg-apiv1-8bn5.onrender.com/${this.event.event_poster.replace(/^\/+/, '')}`;
 
-  // Helper to get display status
-  getDisplayStatus(): string {
-    return String(this.event?.status || '').toLowerCase();
   }
 
-  // // Helper to get display status
-  // getDisplayStatus(): string {
-  //   return String(this.event?.status || '').toLowerCase();
-  // }
-  // //force build comment
 }
 
