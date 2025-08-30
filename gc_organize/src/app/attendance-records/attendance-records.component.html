@@ -9,28 +9,30 @@
     <!-- Vertical event list -->
     <div class="w-full md:w-1/4 max-w-xs">
   <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden flex flex-col" style="height: auto; min-height: 540px; max-height: none;">
-        <div class="bg-[#679436] text-white flex-shrink-0 px-4 py-2" [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
+  <div class="text-white flex-shrink-0 px-4 py-2" [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
           <span class="font-bold text-base block">Events</span>
         </div>
         <div class="px-4 py-2 bg-white flex gap-1 items-center border-b border-gray-200">
           <input
             type="text"
             [(ngModel)]="eventSearchTerm"
-            (keyup.enter)="onEventSearch()"
+            (ngModelChange)="onEventSearch()"
             placeholder="Search events..."
-            class="flex-1 px-2 py-1 rounded border border-gray-300 text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent"
+            class="flex-1 px-2 py-1 rounded border border-gray-300 text-black text-sm focus:outline-none"
             style="min-width:0;"
           />
-          <button (click)="onEventSearch()" class="px-2 py-1 rounded bg-[#679436] text-white font-semibold border border-gray-200 hover:bg-[#56732e] transition text-sm">Search</button>
         </div>
   <ul class="divide-y divide-gray-200 flex-1 min-h-[220px]" style="max-height: none; overflow-y: visible;">
-          <li *ngFor="let event of pagedEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200 flex items-center">
-            <span class="px-3 py-3 text-gray-400 font-bold">{{ (eventPage - 1) * eventsPerPage + i + 1 }}.</span>
+            <li *ngFor="let event of pagedEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200 flex items-center">
+            <span class="px-3 py-3 text-gray-400 font-bold"
+              [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-gray-50' : ''"
+            >{{ (eventPage - 1) * eventsPerPage + i + 1 }}.</span>
             <button
               class="flex-1 text-left px-2 py-3 font-semibold hover:underline focus:outline-none"
               [ngClass]="[
-                isOsws ? 'text-[#14532d] focus:bg-[#eaf7e0]' : 'text-[#679436] focus:bg-[#eaf7e0]',
-                selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-[#eaf7e0]' : ''
+                isOsws ? 'text-[#14532d]' : 'text-[#679436]',
+                selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-gray-50' : '',
+                'focus:bg-gray-50'
               ]"
               (click)="selectEvent(event)"
               [title]="event.title"

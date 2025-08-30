@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from './services/auth.service';
 import { RouterOutlet } from '@angular/router';
 import { trigger, transition, style, animate, query } from '@angular/animations';
 
@@ -28,6 +29,10 @@ import { trigger, transition, style, animate, query } from '@angular/animations'
 })
 export class AppComponent {
   title = 'gc_organize';
+
+  constructor(private authService: AuthService) {
+    this.authService.checkTokenOnStartup();
+  }
 
   prepareRoute(outlet: RouterOutlet) {
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];

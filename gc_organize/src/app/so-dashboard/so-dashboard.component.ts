@@ -10,6 +10,7 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./so-dashboard.component.css'],
   imports: [CommonModule, RouterModule],
 })
+
 export class SoDashboardComponent implements OnInit, OnDestroy {
   orgName: string = 'Student Organization';
   events: any[] = [];
@@ -21,9 +22,13 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
     totalAttendees: 0
   };
 
+  // Pagination for upcoming events
+  upcomingPage: number = 1;
+  readonly upcomingPageSize: number = 5;
+
   private refreshHandle?: ReturnType<typeof setInterval>;
   private statusChangedSub?: Subscription;
-  
+
   constructor(private eventService: EventService) {}
 
   ngOnInit() {
@@ -105,6 +110,9 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         }
         this.events = events;
 
+        // Reset to first page if events change
+        this.upcomingPage = 1;
+
         // Count events by status
         let upcoming = 0, ongoing = 0, concluded = 0, cancelled = 0;
         for (const e of events) {
@@ -119,7 +127,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
             upcoming++;
           }
         }
-        
+
         this.stats.upcoming = upcoming;
         this.stats.ongoing = ongoing;
         this.stats.concluded = concluded;
@@ -148,6 +156,37 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         console.error('Error fetching events:', err);
       }
     });
+  }
+
+  // Get paginated upcoming events
+  get pagedUpcomingEvents(): any[] {
+    const upcoming = this.events
+      .filter(e => {
+        const status = String(e.status).toLowerCase();
+        return status === 'not yet started' || status === 'upcoming';
+      })
+      .sort((a, b) => {
+        // Compare by start_date (assume format YYYY-MM-DD)
+        if (!a.start_date) return 1;
+        if (!b.start_date) return -1;
+        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+      });
+    const start = (this.upcomingPage - 1) * this.upcomingPageSize;
+    return upcoming.slice(start, start + this.upcomingPageSize);
+  }
+
+  get totalUpcomingPages(): number {
+    const count = this.events.filter(e => {
+      const status = String(e.status).toLowerCase();
+      return status === 'not yet started' || status === 'upcoming';
+    }).length;
+    return Math.max(1, Math.ceil(count / this.upcomingPageSize));
+  }
+
+  setUpcomingPage(page: number) {
+    if (page >= 1 && page <= this.totalUpcomingPages) {
+      this.upcomingPage = page;
+    }
   }
 
   fetchAttendanceStats(eventIds: number[]) {

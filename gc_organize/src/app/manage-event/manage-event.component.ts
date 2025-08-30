@@ -93,6 +93,30 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   isOsws: boolean = false;
   orgEventsSearchTerm: string = '';
   filteredOrgEventsList: any[] = [];
+  orgEventPage: number = 1;
+  orgEventPageSize: number = 10;
+  get orgEventTotalPages(): number {
+    return Math.ceil((this.filteredOrgEventsList?.length || 0) / this.orgEventPageSize) || 1;
+  }
+  get pagedOrgEvents(): any[] {
+    const sorted = (this.filteredOrgEventsList || []).slice().sort((a, b) => {
+      const tA = (a.title || '').toLowerCase();
+      const tB = (b.title || '').toLowerCase();
+      return tA.localeCompare(tB, undefined, { sensitivity: 'base' });
+    });
+    const start = (this.orgEventPage - 1) * this.orgEventPageSize;
+    return sorted.slice(start, start + this.orgEventPageSize);
+  }
+  goToOrgEventPage(page: number) {
+    if (page < 1 || page > this.orgEventTotalPages) return;
+    this.orgEventPage = page;
+  }
+  nextOrgEventPage() {
+    if (this.orgEventPage < this.orgEventTotalPages) this.orgEventPage++;
+  }
+  prevOrgEventPage() {
+    if (this.orgEventPage > 1) this.orgEventPage--;
+  }
 
   showParticipantsModal = false;
   participants: any[] = [];
@@ -186,6 +210,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.orgEvents = res.data || res;
         this.filteredOrgEventsList = this.orgEvents;
+  this.orgEventPage = 1;
       },
       error: (err) => {
         console.error('Error fetching org events:', err);
@@ -268,24 +293,27 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const term = this.orgEventsSearchTerm.trim().toLowerCase();
     if (!term) {
       this.filteredOrgEventsList = this.orgEvents;
+      this.orgEventPage = 1;
       return;
     }
     this.filteredOrgEventsList = this.orgEvents.filter(event =>
       (event.title && event.title.toLowerCase().includes(term)) ||
       (event.location && event.location.toLowerCase().includes(term)) ||
-      (event.department && event.department.toLowerCase().includes(term)) || // <-- Add department
+      (event.department && event.department.toLowerCase().includes(term)) ||
       (event.start_date && new Date(event.start_date).toLocaleDateString().toLowerCase().includes(term)) ||
       (event.end_date && new Date(event.end_date).toLocaleDateString().toLowerCase().includes(term))
     );
+    this.orgEventPage = 1;
   }
 
   clearOrgEventsSearch() {
-    this.orgEventsSearchTerm = '';
-    this.filteredOrgEventsList = this.orgEvents;
+  this.orgEventsSearchTerm = '';
+  this.filteredOrgEventsList = this.orgEvents;
+  this.orgEventPage = 1;
   }
 
   filteredOrgEvents() {
-    return this.filteredOrgEventsList || [];
+  return this.filteredOrgEventsList || [];
   }
 
   filteredOswsEvents(): any[] {
