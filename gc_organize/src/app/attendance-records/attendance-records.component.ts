@@ -14,8 +14,6 @@ import { EventService } from '../services/event.service';
   templateUrl: './attendance-records.component.html',
   styleUrls: ['./attendance-records.component.css']
 })
-
-
 export class AttendanceRecordsComponent implements OnInit {
   // Pagination for event list
   eventPage: number = 1;
@@ -33,43 +31,51 @@ export class AttendanceRecordsComponent implements OnInit {
   role: string | null = null;
   showMobileModal: boolean = false;
 
-  get isOsws(): boolean { return this.role === 'osws_admin'; }
+  get isOsws(): boolean { 
+    return this.role === 'osws_admin'; 
+  }
 
   get filteredEvents() {
     const term = this.eventSearchTerm.trim().toLowerCase();
     if (!term) return this.events;
     return this.events.filter(e => (e.title || '').toLowerCase().includes(term));
   }
+  
   get sortedEvents() {
-    return [...this.filteredEvents].sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' }));
+    return [...this.filteredEvents].sort((a, b) => 
+      (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' })
+    );
   }
+  
   get pagedEvents() {
     const start = (this.eventPage - 1) * this.eventsPerPage;
     return this.sortedEvents.slice(start, start + this.eventsPerPage);
   }
+  
   get totalEventPages() {
     return Math.ceil(this.filteredEvents.length / this.eventsPerPage) || 1;
   }
+  
   setEventPage(page: number) {
     if (page >= 1 && page <= this.totalEventPages) {
       this.eventPage = page;
     }
   }
+  
   onEventSearch() {
     this.eventPage = 1;
   }
 
-  constructor(private eventService: EventService, private auth: AuthService, private http: HttpClient) {}
+  constructor(
+    private eventService: EventService, 
+    private auth: AuthService, 
+    private http: HttpClient
+  ) {}
 
   ngOnInit() {
     this.loading = true;
-  this.role = this.auth.getUserRole();
-    const token = localStorage.getItem('authToken');
-  // Dev: this.http.get<any>('http://localhost:5000/api/event/attendance-records', {
-  this.http.get<any>('https://gcorg-apiv1-8bn5.onrender.com/api/event/attendance-records', {
-      headers: { Authorization: `Bearer ${token}` }
-    }).subscribe({
     this.role = this.auth.getUserRole();
+    
     if (this.role === 'osws_admin') {
       const adminId = Number(localStorage.getItem('adminId'));
       this.eventService.getEventsByAdmin(adminId).subscribe({
@@ -140,11 +146,13 @@ export class AttendanceRecordsComponent implements OnInit {
       this.filteredRecords = [];
       return;
     }
+    
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) {
       this.filteredRecords = this.attendanceRecords;
       return;
     }
+    
     this.filteredRecords = this.attendanceRecords.filter(record => {
       const fullName = `${(record.first_name || '').toLowerCase()} ${(record.last_name || '').toLowerCase()}`.trim();
       return (
@@ -178,6 +186,7 @@ export class AttendanceRecordsComponent implements OnInit {
 
     const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-    saveAs(blob, 'attendees-' + (this.selectedEvent ? this.selectedEvent.replace(/\s+/g, '_') : 'event') + '.xlsx');
+    const eventTitle = this.selectedEvent?.title || 'event';
+    saveAs(blob, `attendees-${eventTitle.replace(/\s+/g, '_')}.xlsx`);
   }
 }
