@@ -15,6 +15,10 @@ import { EventService } from '../services/event.service';
   styleUrls: ['./attendance-records.component.css']
 })
 export class AttendanceRecordsComponent implements OnInit {
+  // Pagination for records table
+  recordPage: number = 1;
+  recordsPerPage: number = 10;
+
   // Pagination for event list
   eventPage: number = 1;
   eventsPerPage: number = 10;
@@ -114,6 +118,7 @@ export class AttendanceRecordsComponent implements OnInit {
       next: (res) => {
         this.attendanceRecords = res.data || res;
         this.filteredRecords = this.attendanceRecords;
+        this.recordPage = 1;
         this.loading = false;
       },
       error: (err) => {
@@ -127,6 +132,7 @@ export class AttendanceRecordsComponent implements OnInit {
     this.selectedEvent = event;
     this.searchTerm = '';
     this.fetchAttendanceForEvent(event.event_id);
+    this.recordPage = 1;
     // Automatically open modal on mobile
     if (window.innerWidth < 768) {
       this.showMobileModal = true;
@@ -139,6 +145,7 @@ export class AttendanceRecordsComponent implements OnInit {
       return;
     }
     this.filteredRecords = this.attendanceRecords;
+    this.recordPage = 1;
   }
 
   onSearch() {
@@ -146,13 +153,12 @@ export class AttendanceRecordsComponent implements OnInit {
       this.filteredRecords = [];
       return;
     }
-    
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) {
       this.filteredRecords = this.attendanceRecords;
+      this.recordPage = 1;
       return;
     }
-    
     this.filteredRecords = this.attendanceRecords.filter(record => {
       const fullName = `${(record.first_name || '').toLowerCase()} ${(record.last_name || '').toLowerCase()}`.trim();
       return (
@@ -162,6 +168,21 @@ export class AttendanceRecordsComponent implements OnInit {
         (record.program && record.program.toLowerCase().includes(term))
       );
     });
+    this.recordPage = 1;
+  }
+  get pagedRecords() {
+    const start = (this.recordPage - 1) * this.recordsPerPage;
+    return this.filteredRecords.slice(start, start + this.recordsPerPage);
+  }
+
+  get totalRecordPages() {
+    return Math.ceil(this.filteredRecords.length / this.recordsPerPage) || 1;
+  }
+
+  setRecordPage(page: number) {
+    if (page >= 1 && page <= this.totalRecordPages) {
+      this.recordPage = page;
+    }
   }
 
   clearSearch() {

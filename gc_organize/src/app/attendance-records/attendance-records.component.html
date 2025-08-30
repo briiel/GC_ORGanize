@@ -3,7 +3,6 @@
   <div class="mb-6 mx-2 lg:mx-6">
     <h1 class="text-3xl font-bold mb-2 min-w-max" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">Attendance Records</h1>
   </div>
-  <div *ngIf="loading" class="text-[#679436]">Loading...</div>
   <div *ngIf="error" class="text-red-600">{{ error }}</div>
   <div class="mx-2 lg:mx-6 flex flex-col md:flex-row gap-6 min-h-[400px]">
     <!-- Vertical event list -->
@@ -54,10 +53,10 @@
       </div>
     </div>
     <!-- Attendees table for selected event -->
-  <div class="w-full md:flex-1 h-[420px] md:h-[520px] hidden md:block">
-  <div class="flex flex-col gap-4 h-full">
+  <div class="w-full md:flex-1 hidden md:block">
+  <div class="flex flex-col gap-4">
   <ng-container *ngIf="selectedEvent; else selectEventMsg">
-          <div class="flex flex-row gap-2 items-center mb-2 mt-4">
+          <div class="flex flex-row gap-2 items-center mb-2">
             <div class="flex flex-row gap-2 w-full">
               <input
                 type="text"
@@ -95,10 +94,10 @@
               </button>
             </div>
           </div>
-            <div class="overflow-x-auto flex-1">
-              <div class="overflow-y-auto" style="max-height: 100%;">
+            <div class="overflow-x-auto">
+              <div>
                 <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMsg">
-                  <table *ngIf="!error" class="w-full text-sm lg:text-base rounded-xl overflow-hidden shadow-sm border border-gray-200">
+                  <table *ngIf="!error" class="w-full text-xs md:text-sm rounded-xl overflow-hidden shadow-sm border border-gray-200">
                     <thead class="sticky top-0 z-10" [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
                       <tr class="uppercase tracking-wider text-white">
                         <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
@@ -111,9 +110,9 @@
                       </tr>
                     </thead>
                     <tbody class="bg-white text-gray-800 divide-y divide-gray-200" style="min-height: 220px;">
-                      <tr *ngFor="let record of filteredRecords; let i = index" 
+                      <tr *ngFor="let record of pagedRecords; let i = index" 
                           class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50">
-                        <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ i + 1 }}</td>
+                        <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</td>
                         <td class="px-4 py-3 text-center">{{ record.student_id || '-' }}</td>
                         <td class="px-4 py-3 text-left truncate" [title]="record.first_name">{{ record.first_name || '-' }}</td>
                         <td class="px-4 py-3 text-left truncate" [title]="record.last_name">{{ record.last_name || '-' }}</td>
@@ -123,6 +122,16 @@
                       </tr>
                     </tbody>
                   </table>
+                  <!-- Pagination for records table -->
+                  <div *ngIf="filteredRecords.length > recordsPerPage" class="flex justify-center items-center gap-2 mt-4">
+                    <button (click)="setRecordPage(recordPage - 1)" [disabled]="recordPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
+                      <span aria-hidden="true">&#8592;</span>
+                    </button>
+                    <span class="text-gray-600 text-sm">Page {{ recordPage }} of {{ totalRecordPages }}</span>
+                    <button (click)="setRecordPage(recordPage + 1)" [disabled]="recordPage === totalRecordPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
+                      <span aria-hidden="true">&#8594;</span>
+                    </button>
+                  </div>
                 </ng-container>
                 <ng-template #noAttendeesMsg>
                   <div class="text-center py-10 text-gray-500 font-semibold bg-gray-50 rounded-lg">No attendees found for this event.</div>
@@ -187,38 +196,48 @@
           </button>
         </div>
       </div>
-      <div class="overflow-x-auto max-h-[60vh]">
-        <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMobileMsg">
-          <table *ngIf="!error" class="w-full text-sm rounded-xl overflow-hidden shadow-sm border border-gray-200">
-            <thead class="sticky top-0 z-10" [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
-              <tr class="uppercase tracking-wider text-white">
-                <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
-                <th class="px-4 py-3 border-b border-gray-200 text-center min-w-[100px]">Student ID</th>
-                <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">First Name</th>
-                <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Last Name</th>
-                <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[60px]">Suffix</th>
-                <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Department</th>
-                <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Program</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-              <tr *ngFor="let record of filteredRecords; let i = index" 
-                  class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50">
-                <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ i + 1 }}</td>
-                <td class="px-4 py-3 text-center">{{ record.student_id || '-' }}</td>
-                <td class="px-4 py-3 text-left truncate" [title]="record.first_name">{{ record.first_name || '-' }}</td>
-                <td class="px-4 py-3 text-left truncate" [title]="record.last_name">{{ record.last_name || '-' }}</td>
-                <td class="px-4 py-3 text-left">{{ record.suffix || '-' }}</td>
-                <td class="px-4 py-3 text-left truncate" [title]="record.department">{{ record.department || '-' }}</td>
-                <td class="px-4 py-3 text-left truncate" [title]="record.program">{{ record.program || '-' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </ng-container>
-        <ng-template #noAttendeesMobileMsg>
-          <div class="text-center py-10 text-gray-500 font-semibold bg-gray-50 rounded-lg">No attendees found for this event.</div>
-        </ng-template>
-      </div>
+  <div class="overflow-x-auto">
+    <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMobileMsg">
+      <table *ngIf="!error" class="w-full text-sm rounded-xl overflow-hidden shadow-sm border border-gray-200">
+        <thead class="sticky top-0 z-10" [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
+          <tr class="uppercase tracking-wider text-white">
+            <th class="px-4 py-3 border-b border-gray-200 text-center w-12">#</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-center min-w-[100px]">Student ID</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">First Name</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Last Name</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[60px]">Suffix</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Department</th>
+            <th class="px-4 py-3 border-b border-gray-200 text-left min-w-[120px]">Program</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+          <tr *ngFor="let record of pagedRecords; let i = index" 
+              class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50">
+            <td class="px-4 py-3 text-center text-[#679436] font-semibold">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</td>
+            <td class="px-4 py-3 text-center">{{ record.student_id || '-' }}</td>
+            <td class="px-4 py-3 text-left truncate" [title]="record.first_name">{{ record.first_name || '-' }}</td>
+            <td class="px-4 py-3 text-left truncate" [title]="record.last_name">{{ record.last_name || '-' }}</td>
+            <td class="px-4 py-3 text-left">{{ record.suffix || '-' }}</td>
+            <td class="px-4 py-3 text-left truncate" [title]="record.department">{{ record.department || '-' }}</td>
+            <td class="px-4 py-3 text-left truncate" [title]="record.program">{{ record.program || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
+    <ng-template #noAttendeesMobileMsg>
+      <div class="text-center py-10 text-gray-500 font-semibold bg-gray-50 rounded-lg">No attendees found for this event.</div>
+    </ng-template>
+  </div>
+  <!-- Pagination for records table (mobile modal) -->
+  <div *ngIf="filteredRecords.length > recordsPerPage" class="flex justify-center items-center gap-2 mt-4">
+    <button (click)="setRecordPage(recordPage - 1)" [disabled]="recordPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
+      <span aria-hidden="true">&#8592;</span>
+    </button>
+    <span class="text-gray-600 text-sm">Page {{ recordPage }} of {{ totalRecordPages }}</span>
+    <button (click)="setRecordPage(recordPage + 1)" [disabled]="recordPage === totalRecordPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
+      <span aria-hidden="true">&#8594;</span>
+    </button>
+  </div>
     </div>
   </div>
 </div>
