@@ -28,9 +28,10 @@
   </div>
 
   <!-- Cards Section: 3x3 on large screens -->
+
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-8 mt-6 mb-8 sm:mb-12 pb-4 sm:pb-6">
     <div
-      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative flex flex-col"
+      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative flex flex-col h-full"
       *ngFor="let event of filteredEvents; let i = index"
       [ngClass]="{
         'pointer-events-none bg-green-100 bg-opacity-80 border border-green-300': isConcluded(event),
@@ -50,7 +51,7 @@
         }"
       ></div>
       <!-- Poster image: taller on mobile -->
-  <div class="relative h-48 sm:h-56 overflow-hidden">
+      <div class="relative h-48 sm:h-56 overflow-hidden">
         <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
@@ -77,11 +78,11 @@
           </span>
         </div>
       </div>
-  <div class="p-0 flex-1 flex flex-col relative">
-        <!-- Fixed title on mobile -->
-    <div class="sticky top-0 z-10 bg-white p-4 border-b border-gray-200 sm:static sm:border-0 sm:p-3">
+        <div class="flex flex-col flex-1 min-h-0">
+        <!-- Title -->
+        <div class="sticky top-0 z-10 bg-white p-4 border-b border-gray-200 sm:static sm:border-0 sm:p-3">
           <ul class="space-y-2 text-gray-700">
-      <li class="text-xl sm:text-xl font-bold flex items-center">
+            <li class="text-xl sm:text-xl font-bold flex items-center">
               {{event.title}}
               <span
                 *ngIf="event.department || !event.department"
@@ -100,13 +101,12 @@
             </li>
           </ul>
         </div>
-  <!-- Details: no inner scroll at any size; let card grow to fit -->
-  <div class="overflow-visible px-4 py-2 pb-4 sm:px-3 sm:py-2 sm:pb-3">
+        <!-- Details -->
+        <div class="overflow-visible px-4 py-2 pb-4 sm:px-3 sm:py-2 sm:pb-3 flex-1">
           <ul class="space-y-2 text-gray-700">
             <li class="text-sm sm:text-base truncate white" title="{{event.description}}">
               {{event.description}}
             </li>
-            <!-- Location: label hidden on mobile, visible on sm+; keep aria-label for SRs -->
             <li
               [attr.aria-label]="'Location: ' + (event.location || '')"
               class="text-sm sm:text-base"
@@ -115,7 +115,6 @@
               <span class="hidden sm:inline text-gray-500">Location:</span>
               <span class="sm:ml-1">{{ event.location }}</span>
             </li>
-            <!-- Date: label hidden on mobile, visible on sm+; full phrase for SRs -->
             <li
               [attr.aria-label]="'Date: ' + (event.start_date | date:'MMMM d, y') + (event.end_date && event.end_date !== event.start_date ? (' - ' + (event.end_date | date:'MMMM d, y')) : '')"
               class="text-sm sm:text-base"
@@ -129,7 +128,6 @@
                 </span>
               </span>
             </li>
-            <!-- Time: label hidden on mobile, visible on sm+; full phrase for SRs -->
             <li
               [attr.aria-label]="'Time: ' + formatTime(event.start_time) + (event.end_time && event.end_time !== event.start_time ? (' - ' + formatTime(event.end_time)) : '')"
               class="text-sm sm:text-base"
@@ -144,42 +142,43 @@
               </span>
             </li>
           </ul>
-          <div class="flex flex-col sm:flex-row sm:items-center w-full space-y-2 sm:space-y-0 sm:space-x-2 mt-2">
-            <!-- Status badge on desktop -->
-            <div class="hidden sm:flex sm:flex-1">
-              <span
-                class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
+        </div>
+        <!-- Status and Buttons always at the bottom -->
+        <div class="mt-auto px-4 pb-4 sm:px-3 sm:pb-3 flex flex-col sm:flex-row sm:items-center w-full space-y-2 sm:space-y-0 sm:space-x-2">
+          <!-- Status badge on desktop -->
+          <div class="hidden sm:flex sm:flex-1">
+            <span
+              class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
+              [ngClass]="{
+                'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus(event) === 'not yet started',
+                'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus(event) === 'ongoing',
+                'bg-green-50 text-green-800 border-green-200': getDisplayStatus(event) === 'concluded',
+                'bg-red-50 text-red-800 border-red-200': getDisplayStatus(event) === 'cancelled'
+              }"
+              [attr.aria-label]="'Status: ' + (getDisplayStatus(event) | titlecase)"
+            >
+              <span class="w-2.5 h-2.5 rounded-full"
                 [ngClass]="{
-                  'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus(event) === 'not yet started',
-                  'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus(event) === 'ongoing',
-                  'bg-green-50 text-green-800 border-green-200': getDisplayStatus(event) === 'concluded',
-                  'bg-red-50 text-red-800 border-red-200': getDisplayStatus(event) === 'cancelled'
+                  'bg-yellow-400': getDisplayStatus(event) === 'not yet started',
+                  'bg-blue-500': getDisplayStatus(event) === 'ongoing',
+                  'bg-green-500': getDisplayStatus(event) === 'concluded',
+                  'bg-red-500': getDisplayStatus(event) === 'cancelled'
                 }"
-                [attr.aria-label]="'Status: ' + (getDisplayStatus(event) | titlecase)"
-              >
-                <span class="w-2.5 h-2.5 rounded-full"
-                  [ngClass]="{
-                    'bg-yellow-400': getDisplayStatus(event) === 'not yet started',
-                    'bg-blue-500': getDisplayStatus(event) === 'ongoing',
-                    'bg-green-500': getDisplayStatus(event) === 'concluded',
-                    'bg-red-500': getDisplayStatus(event) === 'cancelled'
-                  }"
-                ></span>
-                <span>{{ getDisplayStatus(event) | titlecase }}</span>
-              </span>
-            </div>
-            <!-- Buttons always on the right in sm+ screens, bottom in mobile -->
-      <div class="flex flex-col sm:flex-row items-center w-full sm:w-auto space-y-2 sm:space-y-0 sm:space-x-2 sm:justify-end">
-              <button (click)="openViewModal(event)"
-        class="w-full sm:w-auto px-4 py-2 sm:px-3 sm:py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
-                View
-              </button>
-              <button (click)="openRegisterModal(event)"
-                [disabled]="isConcluded(event)"
-        class="w-full sm:w-auto px-4 py-2 sm:px-3 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
-                Register
-              </button>
-            </div>
+              ></span>
+              <span>{{ getDisplayStatus(event) | titlecase }}</span>
+            </span>
+          </div>
+          <!-- Buttons always on the right in sm+ screens, bottom in mobile -->
+          <div class="flex flex-col sm:flex-row items-center w-full sm:w-auto space-y-2 sm:space-y-0 sm:space-x-2 sm:justify-end">
+            <button (click)="openViewModal(event)"
+              class="w-full sm:w-auto px-4 py-2 sm:px-3 sm:py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+              View
+            </button>
+            <button (click)="openRegisterModal(event)"
+              [disabled]="isConcluded(event)"
+              class="w-full sm:w-auto px-4 py-2 sm:px-3 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
+              Register
+            </button>
           </div>
         </div>
       </div>

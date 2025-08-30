@@ -15,6 +15,7 @@ import { saveAs } from 'file-saver';
 })
 
 export class ManageEventComponent implements OnInit, OnDestroy {
+  showMobileModal = false;
   isSavingInlineEdit = false;
   // Inline edit mode for details panel
   isInlineEditing = false;
@@ -24,10 +25,43 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   orgEvents: any[] = [];
   creatorId: number;
   adminId: number;
-  searchTerm: string = '';
+  private _searchTerm: string = '';
+  get searchTerm(): string {
+    return this._searchTerm;
+  }
+  set searchTerm(val: string) {
+    this._searchTerm = val;
+    this.searchEvents();
+  }
   // For inline edit poster
   inlineEditPosterFile: File | null = null;
   inlineEditPosterPreviewUrl: string | null = null;
+
+  // Pagination for event list
+  eventPage: number = 1;
+  eventPageSize: number = 10;
+  get eventTotalPages(): number {
+    return Math.ceil((this.filteredList?.length || 0) / this.eventPageSize) || 1;
+  }
+  get pagedEvents(): any[] {
+    const sorted = (this.filteredList || []).slice().sort((a, b) => {
+      const tA = (a.title || '').toLowerCase();
+      const tB = (b.title || '').toLowerCase();
+      return tA.localeCompare(tB, undefined, { sensitivity: 'base' });
+    });
+    const start = (this.eventPage - 1) * this.eventPageSize;
+    return sorted.slice(start, start + this.eventPageSize);
+  }
+  goToEventPage(page: number) {
+    if (page < 1 || page > this.eventTotalPages) return;
+    this.eventPage = page;
+  }
+  nextEventPage() {
+    if (this.eventPage < this.eventTotalPages) this.eventPage++;
+  }
+  prevEventPage() {
+    if (this.eventPage > 1) this.eventPage--;
+  }
 
   onInlineEditPosterChange(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -54,7 +88,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       this.inlineEditEvent.event_poster = '';
     }
   }
-  statusFilter: string = '';
+  // statusFilter removed
   filteredList: any[] = [];
   isOsws: boolean = false;
   orgEventsSearchTerm: string = '';
@@ -109,10 +143,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   // Close any open modal when ESC is pressed (matches behavior used in other modals)
   @HostListener('document:keydown.escape', ['$event'])
   onEsc(event: KeyboardEvent) {
-    if (this.showParticipantsModal || this.showCreateModal) {
+    if (this.showParticipantsModal || this.showCreateModal || this.showMobileModal) {
       event.preventDefault();
       if (this.showParticipantsModal) this.closeParticipantsModal();
       if (this.showCreateModal) this.closeCreateModal();
+      if (this.showMobileModal) this.closeMobileModal();
     }
   }
 
@@ -188,21 +223,18 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   searchEvents() {
-    // For OSWS, search both tables
+    // For OSWS, search both tables (not handled here)
     if (this.isOsws) {
       // Optionally implement search for both tables if needed
     } else {
-      this.filteredList = this.events.filter(event => {
-        const search = this.searchTerm.trim().toLowerCase();
-        const matchesSearch =
-          !search ||
-          event.title.toLowerCase().includes(search) ||
-          event.location.toLowerCase().includes(search) ||
-          (event.event_date && (new Date(event.event_date).toLocaleDateString().toLowerCase().includes(search)));
-        const matchesStatus =
-          !this.statusFilter || event.status === this.statusFilter;
-        return matchesSearch && matchesStatus;
-      });
+      const search = this.searchTerm.trim().toLowerCase();
+      if (!search) {
+        this.filteredList = this.events;
+      } else {
+        this.filteredList = this.events.filter(event =>
+          event.title && event.title.toLowerCase().includes(search)
+        );
+      }
       // If the selected event is filtered out, clear selection
       if (this.selectedEvent && !this.filteredList.some(e => e.event_id === this.selectedEvent.event_id)) {
         this.selectedEvent = null;
@@ -210,11 +242,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
   }
 
-  clearSearch() {
-    this.searchTerm = '';
-    // Optionally, reset other filters if needed
-    this.searchEvents();
-  }
+  // clearSearch removed as requested
 
   filteredEvents() {
     return this.filteredList;
@@ -224,6 +252,16 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.selectedEvent = event;
     this.isInlineEditing = false;
     this.inlineEditEvent = null;
+    // Open modal on mobile
+    if (window.innerWidth < 768) {
+      this.showMobileModal = true;
+      this.toggleBodyModalClass();
+    }
+  }
+
+  closeMobileModal() {
+    this.showMobileModal = false;
+    this.toggleBodyModalClass();
   }
 
   searchOrgEvents() {

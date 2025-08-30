@@ -15,6 +15,13 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
+
+  // Fetch attendance records for a specific event
+  getEventAttendance(eventId: number) {
+    const headers = this.getAuthHeaders();
+    return this.http.get<any>(`${this.apiUrl}/attendance-records/event/${eventId}`, { headers });
+  }
+
   // Fetch all events
   getAllEvents(): Observable<any> {
     const headers = this.getAuthHeaders();
