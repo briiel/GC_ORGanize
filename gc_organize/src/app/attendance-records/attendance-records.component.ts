@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { AuthService } from '../services/auth.service';
@@ -58,7 +59,7 @@ export class AttendanceRecordsComponent implements OnInit {
     this.eventPage = 1;
   }
 
-  constructor(private eventService: EventService, private auth: AuthService) {}
+  constructor(private eventService: EventService, private auth: AuthService, private http: HttpClient) {}
 
   ngOnInit() {
     this.loading = true;
