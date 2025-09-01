@@ -199,7 +199,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.eventService.getEventsByCreator(this.creatorId).subscribe({
       next: (res) => {
         this.events = res.data || res;
-        this.filteredList = this.events;
+  // Default view excludes concluded events; they remain searchable
+  this.filteredList = (this.events || []).filter(e => (String(e?.status || '').toLowerCase()) !== 'concluded');
+  // Reset page within bounds
+  this.eventPage = 1;
         // Do not auto-select event; only show details when a title is clicked
         if (this.selectedEvent) {
           // If the selected event was deleted, clear selection
@@ -274,16 +277,22 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     } else {
       const search = this.searchTerm.trim().toLowerCase();
       if (!search) {
-        this.filteredList = this.events;
+  // No search: hide concluded
+  this.filteredList = (this.events || []).filter(e => (String(e?.status || '').toLowerCase()) !== 'concluded');
       } else {
-        this.filteredList = this.events.filter(event =>
-          event.title && event.title.toLowerCase().includes(search)
-        );
+        // With search: include concluded results if they match title or status
+        this.filteredList = (this.events || []).filter(event => {
+          const title = String(event?.title || '').toLowerCase();
+          const status = String(event?.status || '').toLowerCase();
+          return title.includes(search) || status.includes(search);
+        });
       }
       // If the selected event is filtered out, clear selection
       if (this.selectedEvent && !this.filteredList.some(e => e.event_id === this.selectedEvent.event_id)) {
         this.selectedEvent = null;
       }
+  // Reset to first page for new results
+  this.eventPage = 1;
     }
   }
 

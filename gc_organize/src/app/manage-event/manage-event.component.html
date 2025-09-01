@@ -200,6 +200,32 @@
   <!-- Organization view fallback: Vertical event list and details -->
   <ng-template #orgTable>
     <ng-container *ngIf="!isOsws">
+  <!-- Status legend outside the event list card -->
+  <div class="mx-2 lg:mx-6 mb-2 flex justify-end">
+    <div class="bg-white rounded-md border border-gray-200 px-4 py-2 text-[11px] text-gray-600 inline-block">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <span class="inline-flex items-center gap-1">
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-400 border border-yellow-500"></span>
+          <span>Not Yet Started</span>
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <span class="relative flex h-3 w-3">
+            <span class="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping bg-blue-400"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-blue-600"></span>
+          </span>
+          <span>Ongoing</span>
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500 border border-green-600"></span>
+          <span>Concluded</span>
+        </span>
+        <span class="inline-flex items-center gap-1">
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-red-600"></span>
+          <span>Cancelled</span>
+        </span>
+      </div>
+    </div>
+  </div>
   <div class="mx-2 lg:mx-6 flex flex-col md:flex-row gap-6 min-h-[400px]">
     <!-- Vertical event list layout (matches attendance records) -->
     <div class="w-full md:w-1/4 max-w-xs">
@@ -231,6 +257,27 @@
               [title]="event.title"
             >
               {{ event.title }}
+              <span *ngIf="event.status"
+                    class="ml-2 inline-flex items-center"
+                    [title]="(event.status || '') | titlecase"
+                    [attr.aria-label]="'Status: ' + ((event.status || '') | titlecase)">
+                <span class="relative flex h-3.5 w-3.5">
+                  <!-- Subtle pulse for ongoing -->
+                  <span *ngIf="event.status === 'ongoing'"
+                        class="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping"
+                        [ngClass]="{
+                          'bg-blue-400': event.status === 'ongoing'
+                        }"></span>
+                  <!-- Solid dot with ring/border based on status -->
+                  <span class="relative inline-flex rounded-full h-3.5 w-3.5 border"
+                        [ngClass]="{
+                          'bg-yellow-400 border-yellow-500': event.status === 'not yet started',
+                          'bg-blue-500 border-blue-600': event.status === 'ongoing',
+                          'bg-green-500 border-green-600': event.status === 'concluded',
+                          'bg-red-500 border-red-600': event.status === 'cancelled'
+                        }"></span>
+                </span>
+              </span>
             </button>
           </li>
           <li *ngIf="events.length > eventPageSize" class="px-3 py-2 bg-white border-t border-gray-200 flex justify-center items-center gap-2">

@@ -41,8 +41,19 @@ export class AttendanceRecordsComponent implements OnInit {
 
   get filteredEvents() {
     const term = this.eventSearchTerm.trim().toLowerCase();
-    if (!term) return this.events;
-    return this.events.filter(e => (e.title || '').toLowerCase().includes(term));
+    // Organization: hide concluded by default; include when searching.
+    if (!term) {
+      if (!this.isOsws) {
+        return (this.events || []).filter(e => (String(e?.status || '').toLowerCase()) !== 'concluded');
+      }
+      return this.events;
+    }
+    // With search: match by title or status, include concluded if matched
+    return (this.events || []).filter(e => {
+      const title = String(e?.title || '').toLowerCase();
+      const status = String(e?.status || '').toLowerCase();
+      return title.includes(term) || status.includes(term);
+    });
   }
   
   get sortedEvents() {
