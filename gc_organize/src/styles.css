@@ -31,3 +31,29 @@ body.modal-open .sidebar-blur-target {
 .animate-scale-in { animation: scaleIn 180ms ease-out; }
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 @keyframes scaleIn { from { transform: translateY(6px) scale(0.98); opacity: 0 } to { transform: translateY(0) scale(1); opacity: 1 } }
+
+/* Mobile modal sizing: make panels smaller so they don't cover the full screen */
+@media (max-width: 640px) {
+    /* Add comfortable padding around overlays on small screens */
+    .modal-blur {
+        padding: 1rem !important;
+    }
+
+    /* Constrain width of the immediate modal panel inside overlays */
+    .modal-blur > * {
+        max-width: 92vw !important;
+        width: auto !important;
+        margin: 0 auto !important;
+    }
+
+    /* Normalize height of common modal containers and ensure scroll inside */
+    .modal-blur [role="dialog"],
+    .modal-blur > .bg-white,
+    .modal-blur > .scrollable-container,
+    .modal-blur .modal-content {
+        height: auto !important;
+        max-height: 80vh !important;
+        overflow-y: auto !important;
+        border-radius: 1rem !important;
+    }
+}

@@ -178,21 +178,20 @@
             <tr *ngIf="filteredOrgEvents().length === 0">
               <td colspan="6" class="text-center py-6 text-gray-500 bg-[#f3fafd] font-semibold">No organization events found.</td>
             </tr>
-            <tr *ngIf="filteredOrgEvents().length > orgEventPageSize">
-              <td colspan="6" class="bg-white py-2">
-                <div class="flex justify-center items-center gap-2">
-                  <button (click)="prevOrgEventPage()" [disabled]="orgEventPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
-                    <span aria-hidden="true">&#8592;</span>
-                  </button>
-                  <span class="text-gray-600 text-sm">Page {{ orgEventPage }} of {{ orgEventTotalPages }}</span>
-                  <button (click)="nextOrgEventPage()" [disabled]="orgEventPage === orgEventTotalPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
-                    <span aria-hidden="true">&#8594;</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
           </tbody>
         </table>
+      </div>
+      <!-- Pagination moved outside horizontal scroll -->
+      <div *ngIf="filteredOrgEvents().length > orgEventPageSize" class="bg-white py-2 px-2">
+        <div class="flex justify-center items-center gap-2">
+          <button (click)="prevOrgEventPage()" [disabled]="orgEventPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
+            <span aria-hidden="true">&#8592;</span>
+          </button>
+          <span class="text-gray-600 text-sm">Page {{ orgEventPage }} of {{ orgEventTotalPages }}</span>
+          <button (click)="nextOrgEventPage()" [disabled]="orgEventPage === orgEventTotalPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
+            <span aria-hidden="true">&#8594;</span>
+          </button>
+        </div>
       </div>
     </div>
   </ng-container>
@@ -253,8 +252,8 @@
         <p class="text-gray-500 text-center py-10">Select an event to view event details.</p>
       </div>
       
-      <!-- Event details when an event is selected -->
-      <div *ngIf="selectedEvent" class="relative flex flex-col flex-1 justify-center min-h-0">
+  <!-- Event details when an event is selected (desktop only) -->
+  <div *ngIf="selectedEvent" class="relative flex flex-col flex-1 justify-center min-h-0 hidden md:flex">
         <div class="bg-white/90 backdrop-blur rounded-2xl shadow-2xl border border-gray-200 p-8 flex flex-col gap-8 animate-fade-in flex-1 relative min-h-0">
           <button (click)="selectedEvent = null" class="absolute top-4 right-4 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 rounded-full w-10 h-10 flex items-center justify-center shadow transition z-10" title="Close details">
             <span class="text-xl font-bold">&times;</span>
