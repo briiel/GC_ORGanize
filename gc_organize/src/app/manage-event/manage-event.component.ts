@@ -122,6 +122,26 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   participants: any[] = [];
   participantsLoading = false;
   selectedEventTitle = '';
+  // Participants pagination (10 per page)
+  participantsPage: number = 1;
+  participantsPageSize: number = 10;
+  get participantsTotalPages(): number {
+    return Math.ceil((this.participants?.length || 0) / this.participantsPageSize) || 1;
+  }
+  get pagedParticipants(): any[] {
+    const start = (this.participantsPage - 1) * this.participantsPageSize;
+    return (this.participants || []).slice(start, start + this.participantsPageSize);
+  }
+  goToParticipantsPage(page: number) {
+    if (page < 1 || page > this.participantsTotalPages) return;
+    this.participantsPage = page;
+  }
+  nextParticipantsPage() {
+    if (this.participantsPage < this.participantsTotalPages) this.participantsPage++;
+  }
+  prevParticipantsPage() {
+    if (this.participantsPage > 1) this.participantsPage--;
+  }
 
   // Create Event modal state
   showCreateModal = false;
@@ -366,11 +386,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.showParticipantsModal = true;
     this.participantsLoading = true;
     this.participants = [];
+  this.participantsPage = 1;
   this.toggleBodyModalClass();
     this.eventService.getEventParticipants(event.event_id).subscribe({
       next: (res) => {
         this.participants = res.data || res;
         this.participantsLoading = false;
+    // Ensure current page is within bounds after load
+    const total = this.participantsTotalPages;
+    if (this.participantsPage > total) this.participantsPage = total;
       },
       error: () => {
         this.participants = [];
@@ -383,6 +407,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.showParticipantsModal = false;
     this.participants = [];
     this.selectedEventTitle = '';
+  this.participantsPage = 1;
   this.toggleBodyModalClass();
   }
 

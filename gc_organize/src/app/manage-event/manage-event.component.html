@@ -607,8 +607,8 @@
             <th class="px-4 py-3 text-left">Proof of Payment</th>
           </tr>
         </thead>
-        <tbody>
-          <tr *ngFor="let p of participants">
+  <tbody class="text-xs sm:text-sm">
+          <tr *ngFor="let p of pagedParticipants">
             <td class="px-4 py-3 whitespace-nowrap">{{ p.student_id }}</td>
             <td class="px-4 py-3 whitespace-nowrap">{{ p.first_name }}</td>
             <td class="px-4 py-3 whitespace-nowrap">{{ p.last_name }}</td>
@@ -636,6 +636,16 @@
           </tr>
         </tbody>
       </table>
+      <!-- Pagination controls -->
+      <div *ngIf="participants.length > participantsPageSize" class="flex justify-center items-center gap-2 mt-4">
+        <button (click)="prevParticipantsPage()" [disabled]="participantsPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
+          <span aria-hidden="true">&#8592;</span>
+        </button>
+        <span class="text-gray-600 text-sm">Page {{ participantsPage }} of {{ participantsTotalPages }}</span>
+        <button (click)="nextParticipantsPage()" [disabled]="participantsPage === participantsTotalPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
+          <span aria-hidden="true">&#8594;</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

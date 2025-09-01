@@ -1,0 +1,24 @@
+/* Mobile typography tweaks for the attendance records modal */
+@media (max-width: 640px) {
+	.mobile-attendance-modal {
+		font-size: 0.95rem; /* Slightly smaller base text */
+		line-height: 1.3;
+	}
+
+	.mobile-attendance-modal h1,
+	.mobile-attendance-modal h2,
+	.mobile-attendance-modal h3 {
+		font-size: 1.05rem;
+		line-height: 1.25;
+	}
+
+	/* Records table: make text a bit smaller than base for better fit */
+	.mobile-attendance-modal table { font-size: 0.82rem; }
+			.mobile-attendance-modal thead th { font-size: 0.78rem !important; line-height: 1.2; text-align: center !important; }
+	.mobile-attendance-modal th,
+	.mobile-attendance-modal td { font-size: 0.82rem !important; line-height: 1.2; }
+
+	/* Tighter cell paddings to match smaller type */
+	.mobile-attendance-modal .px-4 { padding-left: 0.75rem; padding-right: 0.75rem; }
+	.mobile-attendance-modal .py-3 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+}
