@@ -41,6 +41,12 @@ export class EventService {
     return this.http.get(`${this.apiUrl}/participants/${studentId}/events`, { headers });
   }
 
+  // Fetch attended events (history) for a student
+  getAttendedEvents(studentId: string | null): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/students/${studentId}/attended`, { headers });
+  }
+
   // Fetch events by creator/org ID
   getEventsByCreator(creatorId: number): Observable<any> {
     const headers = this.getAuthHeaders();

@@ -13,6 +13,8 @@ import { ScanQrComponent } from './scan-qr/scan-qr.component';
 import { AttendanceRecordsComponent } from './attendance-records/attendance-records.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { ManageUsersComponent } from './manage-users/manage-users.component';
+import { HistoryComponent } from './history/history.component';
+import { LandingComponent } from './landing/landing.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, data: { animation: 'LoginPage' } },
@@ -30,6 +32,7 @@ export const routes: Routes = [
       },
       { path: 'eventsreg', component: EventsregComponent, data: { animation: 'EventsRegPage' } },
       { path: 'ecertificate', component: EcertificateComponent, data: { animation: 'ECertificatePage' } },
+  { path: 'history', component: HistoryComponent, data: { animation: 'HistoryPage', roles: ['student'] } },
       { path: 'so-dashboard', component: SoDashboardComponent, data: { animation: 'SoDashboardPage' } },
       { path: 'manage-event', component: ManageEventComponent, data: { animation: 'ManageEventPage' } },
   { path: 'scan-qr', component: ScanQrComponent, data: { animation: 'ScanQrPage', roles: ['organization', 'osws_admin'] } },
@@ -39,5 +42,5 @@ export const routes: Routes = [
       { path: 'manage-users', component: ManageUsersComponent },
     ] 
   },
-  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', component: LandingComponent, data: { animation: 'LandingPage' } },
 ];

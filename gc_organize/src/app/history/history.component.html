@@ -1,0 +1,131 @@
+<div class="min-h-screen bg-gray-100 p-6">
+    <!-- Header: exactly match Events Registered spacing/typography -->
+  <div class="mb-2 mx-2 lg:mx-6">
+      <h1 class="text-2xl lg:text-4xl font-bold mb-1 text-[#679436]">Events Attended</h1>
+      <p class="text-gray-600">View and manage your attended events</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="mb-4 mx-2 lg:mx-6 p-3 rounded border border-red-200 bg-red-50 text-red-700">
+      {{ error }}
+    </div>
+
+  <!-- Search: match Events Registered design -->
+  <div class="mb-6 mx-2 lg:mx-6">
+      <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+        <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px] flex">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Search events..."
+            class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
+            (ngModelChange)="onSearch()"
+            (keyup.enter)="onSearch()"
+          />
+          <button
+            class="ml-2 px-4 py-2 bg-[#679436] hover:bg-[#4e732b] text-white rounded-md text-sm flex-shrink-0"
+            (click)="onSearch()"
+          >
+            Search
+          </button>
+          <button
+            class="ml-2 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm flex-shrink-0"
+            (click)="clearSearch()"
+            *ngIf="searchTerm"
+          >
+            Clear
+          </button>
+        </div>
+        <!-- Extra controls aligned right (only sort now) -->
+  <div class="flex gap-2 sm:ml-auto">
+    <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()"
+      class="w-48 px-3 py-2 rounded border border-gray-300 text-sm focus:outline-none">
+            <option value="attended_desc">Sort: Attended (newest)</option>
+            <option value="attended_asc">Sort: Attended (oldest)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+  <!-- Loading / Empty -->
+  <div *ngIf="loading" class="text-gray-500">Loading...</div>
+  <div *ngIf="!loading && items.length === 0" class="text-gray-500">No attended events found.</div>
+
+    <!-- Cards grid with reduced outer spacing -->
+    <div class="mx-2 lg:m-6" *ngIf="!loading && items.length > 0">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div *ngFor="let e of pagedItems" class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <div class="h-28 bg-gray-100 flex items-center justify-center">
+            <img *ngIf="e.event_poster" [src]="e.event_poster" alt="Poster" class="w-full h-full object-cover"/>
+            <i *ngIf="!e.event_poster" class="fas fa-image text-gray-300 text-4xl"></i>
+          </div>
+  <div class="p-3">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="font-semibold text-gray-800 text-base line-clamp-2" [title]="e.event_title || e.title">{{ e.event_title || e.title }}</h3>
+              <span class="text-[10px] px-2 py-1 rounded-full border font-medium whitespace-nowrap"
+                    [ngClass]="statusColor(e.status)">{{ (e.status || '') | titlecase }}</span>
+            </div>
+            <div class="text-xs text-gray-500 mt-1">
+              <span *ngIf="e.org_name">{{ e.org_name }}</span>
+              <span *ngIf="!e.org_name && e.osws_name">OSWS</span>
+              <span *ngIf="e.department"> • {{ e.department }}</span>
+            </div>
+            <div class="text-sm text-gray-600 mt-2 flex items-start gap-2">
+              <i class="far fa-clock mt-0.5"></i>
+              <div class="space-y-0.5">
+                <div>
+                  <span class="font-medium">Date:</span>
+                  {{ formatDate(e.start_date) }}
+                  <span class="mx-1">–</span>
+                  {{ formatDate(e.end_date) }}
+                </div>
+                <div>
+                  <span class="font-medium">Time:</span>
+                  {{ formatTime(e.start_time) }}
+                  <span class="mx-1">–</span>
+                  {{ formatTime(e.end_time) }}
+                </div>
+              </div>
+            </div>
+            <div class="text-sm text-gray-600 mt-1 flex items-center gap-2 truncate" [title]="e.location">
+              <i class="fas fa-map-marker-alt"></i>
+              <span class="truncate">{{ e.location }}</span>
+            </div>
+            <div class="text-xs text-gray-500 mt-2">
+              Attended at: <span class="font-medium">{{ e.attended_at | date:'medium' }}</span>
+            </div>
+          </div>
+        </div>
+
+      <!-- Pagination controls (match Home page design) -->
+      <div *ngIf="totalPages > 1" class="flex justify-center items-center mt-8">
+        <nav class="inline-flex space-x-1" aria-label="Pagination">
+          <!-- Previous Arrow -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="page === 1"
+            (click)="goToPage(page - 1)">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <!-- Page Numbers -->
+          <ng-container *ngFor="let _ of [].constructor(totalPages); let i = index">
+            <button
+              class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+              [ngClass]="page === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+              [attr.aria-current]="page === (i + 1) ? 'page' : null"
+              (click)="goToPage(i + 1)">
+              {{ i + 1 }}
+            </button>
+          </ng-container>
+          <!-- Next Arrow -->
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="page === totalPages"
+            (click)="goToPage(page + 1)">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </nav>
+      </div>
+      </div>
+    </div>
+  </div>

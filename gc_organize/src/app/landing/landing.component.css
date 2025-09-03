@@ -1,0 +1,19 @@
+/* Landing component specific styles (Tailwind handles most layout) */
+
+:host {
+  display: block;
+}
+
+/* Smooth rotation for FAQ chevron */
+details > summary i { transition: transform 150ms ease; }
+
+/* Offset scroll position for sticky 64px navbar */
+section[id] {
+  scroll-margin-top: 4.5rem; /* a bit more than 4rem for breathing room */
+}
+
+/* Slightly stronger overlay on small screens for readability */
+@media (max-width: 640px) {
+  header > .absolute.inset-0 { background-color: rgba(0,0,0,0.55) !important; }
+}
+

@@ -1,0 +1,10 @@
+/* History component styles */
+:host { display: block; }
+/* line-clamp utility fallback if Tailwind plugin not present */
+.line-clamp-2 {
+	display: -webkit-box;
+	line-clamp: 2;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}

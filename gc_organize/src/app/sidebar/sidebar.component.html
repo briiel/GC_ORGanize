@@ -39,6 +39,10 @@
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-calendar-check mr-2 text-lg sm:text-xl"></i> Events Registered
                 </button>
+                <button [routerLink]="'/sidebar/history'" (click)="closeIfMobile()"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    <i class="fas fa-history mr-2 text-lg sm:text-xl"></i> Events Attended
+                </button>
                 <button [routerLink]="'/sidebar/ecertificate'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificate
