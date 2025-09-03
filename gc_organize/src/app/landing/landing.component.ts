@@ -58,4 +58,13 @@ export class LandingComponent implements OnInit {
   scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
+  // Manually scroll to a section id without triggering router navigation
+  scrollTo(id: string, ev?: Event): void {
+    if (ev) ev.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 }

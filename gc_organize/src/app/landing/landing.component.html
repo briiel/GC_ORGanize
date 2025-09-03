@@ -1,6 +1,6 @@
 <nav class="w-full bg-[#679436]/95 backdrop-blur sticky top-0 z-40 shadow">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between text-white">
-    <a class="flex items-center gap-3" [routerLink]="['/']" aria-label="GC-ORGANIZE home">
+  <a class="flex items-center gap-3" [routerLink]="['/home']" aria-label="GC-ORGANIZE home">
       <img src="GC-Logo.png" alt="GC-ORGANIZE Logo" class="h-9 w-9 sm:h-10 sm:w-10 object-contain" />
       <span class="text-base sm:text-lg font-semibold text-white">GC-ORGANIZE</span>
     </a>
@@ -10,18 +10,18 @@
     </button>
 
     <div class="hidden md:flex items-center gap-6 text-sm font-medium">
-      <a href="#features" class="text-white/90 hover:text-white">Features</a>
-      <a href="#how-it-works" class="text-white/90 hover:text-white">How it works</a>
-      <a href="#faqs" class="text-white/90 hover:text-white">FAQs</a>
+      <a href="#features" (click)="scrollTo('features', $event)" class="text-white/90 hover:text-white">Features</a>
+      <a href="#how-it-works" (click)="scrollTo('how-it-works', $event)" class="text-white/90 hover:text-white">How it works</a>
+      <a href="#faqs" (click)="scrollTo('faqs', $event)" class="text-white/90 hover:text-white">FAQs</a>
       <a class="ml-2 px-4 py-2 rounded-md bg-white text-[#679436] hover:bg-gray-100 transition-colors" [routerLink]="['/login']">Login</a>
     </div>
   </div>
 
   <div *ngIf="mobileMenuOpen" class="md:hidden border-t border-gray-200 bg-white">
     <div class="px-4 py-3 flex flex-col gap-2">
-      <a href="#features" (click)="closeMobileMenu()" class="py-2 text-gray-700 hover:text-gray-900">Features</a>
-      <a href="#how-it-works" (click)="closeMobileMenu()" class="py-2 text-gray-700 hover:text-gray-900">How it works</a>
-      <a href="#faqs" (click)="closeMobileMenu()" class="py-2 text-gray-700 hover:text-gray-900">FAQs</a>
+      <a href="#features" (click)="scrollTo('features', $event); closeMobileMenu()" class="py-2 text-gray-700 hover:text-gray-900">Features</a>
+      <a href="#how-it-works" (click)="scrollTo('how-it-works', $event); closeMobileMenu()" class="py-2 text-gray-700 hover:text-gray-900">How it works</a>
+      <a href="#faqs" (click)="scrollTo('faqs', $event); closeMobileMenu()" class="py-2 text-gray-700 hover:text-gray-900">FAQs</a>
       <a (click)="closeMobileMenu()" [routerLink]="['/login']" class="mt-1 inline-flex items-center justify-center rounded-md bg-[#679436] px-4 py-2 font-semibold text-white hover:bg-[#56732e]">Login</a>
     </div>
   </div>
@@ -43,7 +43,7 @@
           <a [routerLink]="['/login']" class="inline-flex items-center justify-center rounded-md bg-[#679436] px-5 py-3 sm:px-6 sm:py-3 font-semibold text-white shadow-sm hover:bg-[#56732e] transition-colors w-full sm:w-auto">
             Browse Events
           </a>
-          <a [routerLink]="['/']" class="inline-flex items-center justify-center rounded-md bg-white px-5 py-3 sm:px-6 sm:py-3 font-semibold text-gray-800 hover:bg-gray-100 w-full sm:w-auto">
+          <a href="#how-it-works" (click)="scrollTo('how-it-works', $event)" class="inline-flex items-center justify-center rounded-md bg-white px-5 py-3 sm:px-6 sm:py-3 font-semibold text-gray-800 hover:bg-gray-100 w-full sm:w-auto">
             Learn More
           </a>
         </div>
