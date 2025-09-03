@@ -15,9 +15,10 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { ManageUsersComponent } from './manage-users/manage-users.component';
 import { HistoryComponent } from './history/history.component';
 import { LandingComponent } from './landing/landing.component';
+import { GuestGuard } from './guards/guest.guard';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent, data: { animation: 'LoginPage' } },
+  { path: 'login', component: LoginComponent, canActivate: [GuestGuard], data: { animation: 'LoginPage' } },
   { path: 'profile', component: ProfileComponent, data: { animation: 'ProfilePage' } },
   { 
     path: 'sidebar', 
@@ -42,5 +43,10 @@ export const routes: Routes = [
       { path: 'manage-users', component: ManageUsersComponent },
     ] 
   },
-  { path: '', component: LandingComponent, data: { animation: 'LandingPage' } },
+  // Public landing page at /home, blocked when logged-in
+  { path: 'home', component: LandingComponent, canActivate: [GuestGuard], data: { animation: 'LandingPage' } },
+  // Redirect root to /home
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
+  // Fallback
+  { path: '**', redirectTo: 'home' },
 ];
