@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-history',
@@ -22,6 +23,8 @@ export class HistoryComponent implements OnInit {
   // Pagination
   page = 1;
   readonly pageSize = 9;
+  // per-card request state
+  sendingId: number | null = null;
 
   constructor(private eventService: EventService) {}
 
@@ -140,4 +143,48 @@ export class HistoryComponent implements OnInit {
   }
   prevPage() { this.goToPage(this.page - 1); }
   nextPage() { this.goToPage(this.page + 1); }
+
+  async requestCertificate(eventId?: number) {
+    if (!eventId) return;
+    const res = await Swal.fire({
+      title: 'Request e-certificate?',
+      text: 'We\'ll email the event organizer with your request.',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Send request',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#679436'
+    });
+    if (!res.isConfirmed) return;
+    this.sendingId = eventId;
+    this.eventService.requestCertificate(eventId).subscribe({
+      next: () => {
+        this.sendingId = null;
+        Swal.fire({
+          title: 'Request sent',
+          text: 'The organizer has been notified. Please check your email for updates.',
+          icon: 'success',
+          confirmButtonColor: '#679436'
+        });
+      },
+      error: (err) => {
+        this.sendingId = null;
+        const msg = err?.error?.message || 'Failed to send request.';
+        Swal.fire({
+          title: 'Could not send',
+          text: msg,
+          icon: 'error'
+        });
+      }
+    });
+  }
+
+  // Mirror Home: set blurred background from poster on load
+  updateBackgroundImage(event: Event, bgElementId: string): void {
+    const imgElement = event.target as HTMLImageElement;
+    const bgElement = document.getElementById(bgElementId);
+    if (bgElement && imgElement && imgElement.src) {
+      bgElement.style.backgroundImage = `url('${imgElement.src}')`;
+    }
+  }
 }

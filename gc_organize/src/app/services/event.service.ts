@@ -47,6 +47,12 @@ export class EventService {
     return this.http.get(`${this.apiUrl}/students/${studentId}/attended`, { headers });
   }
 
+  // Request e-certificate via email to organizer
+  requestCertificate(eventId: number): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/events/${eventId}/request-certificate`, {}, { headers });
+  }
+
   // Fetch events by creator/org ID
   getEventsByCreator(creatorId: number): Observable<any> {
     const headers = this.getAuthHeaders();

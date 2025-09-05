@@ -359,7 +359,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   confirmDeleteEvent(event: any) {
     Swal.fire({
       title: 'Are you sure?',
-      text: `Move event "${event.title}" to trash?`,
+      text: `Move event "${event.title}" to archive?`,
       icon: 'warning',
       showCancelButton: true,
   confirmButtonText: 'Delete',

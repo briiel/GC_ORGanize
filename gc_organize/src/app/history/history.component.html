@@ -54,10 +54,36 @@
     <!-- Cards grid with reduced outer spacing -->
     <div class="mx-2 lg:m-6" *ngIf="!loading && items.length > 0">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div *ngFor="let e of pagedItems" class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <div class="h-28 bg-gray-100 flex items-center justify-center">
-            <img *ngIf="e.event_poster" [src]="e.event_poster" alt="Poster" class="w-full h-full object-cover"/>
-            <i *ngIf="!e.event_poster" class="fas fa-image text-gray-300 text-4xl"></i>
+        <div *ngFor="let e of pagedItems; let i = index" class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <!-- Colored top strip based on department (match Home cards) -->
+          <div
+            class="h-2 w-full"
+            [ngClass]="{
+              'bg-orange-500': e.department === 'CCS',
+              'bg-yellow-400': e.department === 'CBA',
+              'bg-red-500': e.department === 'CAHS',
+              'bg-blue-500': e.department === 'CEAS',
+              'bg-pink-400': e.department === 'CHTM',
+              'bg-[#14532d]': !e.department || e.department === 'OSWS'
+            }"
+          ></div>
+          <!-- Poster image: match Home with blurred background and fixed height -->
+          <div class="relative h-48 sm:h-56 overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-hist-' + (e.event_id || e.id || i)"></div>
+            <ng-container *ngIf="e.event_poster; else noPoster">
+              <img
+                [src]="e.event_poster"
+                [alt]="e.event_title || e.title || 'Event poster'"
+                class="relative w-full h-full object-contain"
+                loading="lazy"
+                (load)="updateBackgroundImage($event, 'bg-image-hist-' + (e.event_id || e.id || i))"
+              />
+            </ng-container>
+            <ng-template #noPoster>
+              <div class="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <i class="fas fa-image text-gray-300 text-4xl"></i>
+              </div>
+            </ng-template>
           </div>
   <div class="p-3">
             <div class="flex items-start justify-between gap-2">
@@ -93,6 +119,21 @@
             </div>
             <div class="text-xs text-gray-500 mt-2">
               Attended at: <span class="font-medium">{{ e.attended_at | date:'medium' }}</span>
+            </div>
+            <div class="mt-3 flex justify-end">
+              <button
+                class="px-3 py-2 rounded text-xs transition-colors inline-flex items-center gap-2"
+                [ngClass]="(e.created_by_osws_id || sendingId===e.event_id) ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-[#679436] hover:bg-[#4e732b] text-white'"
+                [title]="e.created_by_osws_id ? 'Certificates are auto-generated for OSWS events' : (sendingId===e.event_id ? 'Sending request…' : 'Request e‑certificate via email to organizer')"
+                [disabled]="!!e.created_by_osws_id || sendingId===e.event_id"
+                (click)="requestCertificate(e.event_id)"
+              >
+                <ng-container *ngIf="sendingId===e.event_id; else reqLabel">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Sending…</span>
+                </ng-container>
+                <ng-template #reqLabel>Request</ng-template>
+              </button>
             </div>
           </div>
         </div>
