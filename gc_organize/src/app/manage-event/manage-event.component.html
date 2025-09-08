@@ -181,16 +181,32 @@
           </tbody>
         </table>
       </div>
-      <!-- Pagination moved outside horizontal scroll -->
+      <!-- Pagination moved outside horizontal scroll (Home paginator style) -->
       <div *ngIf="filteredOrgEvents().length > orgEventPageSize" class="bg-white py-2 px-2">
-        <div class="flex justify-center items-center gap-2">
-          <button (click)="prevOrgEventPage()" [disabled]="orgEventPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
-            <span aria-hidden="true">&#8592;</span>
-          </button>
-          <span class="text-gray-600 text-sm">Page {{ orgEventPage }} of {{ orgEventTotalPages }}</span>
-          <button (click)="nextOrgEventPage()" [disabled]="orgEventPage === orgEventTotalPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
-            <span aria-hidden="true">&#8594;</span>
-          </button>
+        <div class="flex justify-center items-center">
+          <nav class="inline-flex space-x-1" aria-label="Pagination">
+            <button
+              class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+              [disabled]="orgEventPage === 1"
+              (click)="prevOrgEventPage()">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <ng-container *ngFor="let _ of [].constructor(orgEventTotalPages); let i = index">
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+                [ngClass]="orgEventPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                [attr.aria-current]="orgEventPage === (i + 1) ? 'page' : null"
+                (click)="goToOrgEventPage(i + 1)">
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+            <button
+              class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+              [disabled]="orgEventPage === orgEventTotalPages"
+              (click)="nextOrgEventPage()">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </nav>
         </div>
       </div>
     </div>
@@ -280,14 +296,30 @@
               </span>
             </button>
           </li>
-          <li *ngIf="events.length > eventPageSize" class="px-3 py-2 bg-white border-t border-gray-200 flex justify-center items-center gap-2">
-            <button (click)="prevEventPage()" [disabled]="eventPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
-              <span aria-hidden="true">&#8592;</span>
-            </button>
-            <span class="text-gray-600 text-sm">Page {{ eventPage }} of {{ eventTotalPages }}</span>
-            <button (click)="nextEventPage()" [disabled]="eventPage === eventTotalPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
-              <span aria-hidden="true">&#8594;</span>
-            </button>
+          <li *ngIf="events.length > eventPageSize" class="px-3 py-2 bg-white border-t border-gray-200 flex justify-center items-center">
+            <nav class="inline-flex space-x-1" aria-label="Pagination">
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                [disabled]="eventPage === 1"
+                (click)="prevEventPage()">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <ng-container *ngFor="let _ of [].constructor(eventTotalPages); let i = index">
+                <button
+                  class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+                  [ngClass]="eventPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                  [attr.aria-current]="eventPage === (i + 1) ? 'page' : null"
+                  (click)="goToEventPage(i + 1)">
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                [disabled]="eventPage === eventTotalPages"
+                (click)="nextEventPage()">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </nav>
           </li>
           <li *ngIf="events.length === 0" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No events found.</li>
         </ul>
@@ -683,15 +715,31 @@
           </tr>
         </tbody>
       </table>
-      <!-- Pagination controls -->
-      <div *ngIf="participants.length > participantsPageSize" class="flex justify-center items-center gap-2 mt-4">
-        <button (click)="prevParticipantsPage()" [disabled]="participantsPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
-          <span aria-hidden="true">&#8592;</span>
-        </button>
-        <span class="text-gray-600 text-sm">Page {{ participantsPage }} of {{ participantsTotalPages }}</span>
-        <button (click)="nextParticipantsPage()" [disabled]="participantsPage === participantsTotalPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
-          <span aria-hidden="true">&#8594;</span>
-        </button>
+      <!-- Pagination controls (Home paginator style) -->
+      <div *ngIf="participants.length > participantsPageSize" class="flex justify-center items-center mt-4">
+        <nav class="inline-flex space-x-1" aria-label="Pagination">
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="participantsPage === 1"
+            (click)="prevParticipantsPage()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <ng-container *ngFor="let _ of [].constructor(participantsTotalPages); let i = index">
+            <button
+              class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+              [ngClass]="participantsPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+              [attr.aria-current]="participantsPage === (i + 1) ? 'page' : null"
+              (click)="goToParticipantsPage(i + 1)">
+              {{ i + 1 }}
+            </button>
+          </ng-container>
+          <button
+            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            [disabled]="participantsPage === participantsTotalPages"
+            (click)="nextParticipantsPage()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </nav>
       </div>
     </div>
   </div>

@@ -81,14 +81,30 @@
               </span>
             </button>
           </li>
-          <li *ngIf="filteredEvents.length > eventsPerPage" class="px-3 py-2 bg-white border-t border-gray-200 flex justify-center items-center gap-2">
-            <button (click)="setEventPage(eventPage - 1)" [disabled]="eventPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
-              <span aria-hidden="true">&#8592;</span>
-            </button>
-            <span class="text-gray-600 text-sm">Page {{ eventPage }} of {{ totalEventPages }}</span>
-            <button (click)="setEventPage(eventPage + 1)" [disabled]="eventPage === totalEventPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
-              <span aria-hidden="true">&#8594;</span>
-            </button>
+          <li *ngIf="filteredEvents.length > eventsPerPage" class="px-3 py-2 bg-white border-t border-gray-200 flex justify-center items-center">
+            <nav class="inline-flex space-x-1" aria-label="Pagination">
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                [disabled]="eventPage === 1"
+                (click)="setEventPage(eventPage - 1)">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <ng-container *ngFor="let _ of [].constructor(totalEventPages); let i = index">
+                <button
+                  class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+                  [ngClass]="eventPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                  [attr.aria-current]="eventPage === (i + 1) ? 'page' : null"
+                  (click)="setEventPage(i + 1)">
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                [disabled]="eventPage === totalEventPages"
+                (click)="setEventPage(eventPage + 1)">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </nav>
           </li>
           <li *ngIf="filteredEvents.length === 0" class="text-center py-6 text-gray-500 bg-gray-50 font-semibold">No events found.</li>
         </ul>
@@ -164,15 +180,31 @@
                       </tr>
                     </tbody>
                   </table>
-                  <!-- Pagination for records table -->
-                  <div *ngIf="filteredRecords.length > recordsPerPage" class="flex justify-center items-center gap-2 mt-4">
-                    <button (click)="setRecordPage(recordPage - 1)" [disabled]="recordPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
-                      <span aria-hidden="true">&#8592;</span>
-                    </button>
-                    <span class="text-gray-600 text-sm">Page {{ recordPage }} of {{ totalRecordPages }}</span>
-                    <button (click)="setRecordPage(recordPage + 1)" [disabled]="recordPage === totalRecordPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
-                      <span aria-hidden="true">&#8594;</span>
-                    </button>
+                  <!-- Pagination for records table (Home paginator style) -->
+                  <div *ngIf="filteredRecords.length > recordsPerPage" class="flex justify-center items-center mt-4">
+                    <nav class="inline-flex space-x-1" aria-label="Pagination">
+                      <button
+                        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                        [disabled]="recordPage === 1"
+                        (click)="setRecordPage(recordPage - 1)">
+                        <i class="fas fa-chevron-left"></i>
+                      </button>
+                      <ng-container *ngFor="let _ of [].constructor(totalRecordPages); let i = index">
+                        <button
+                          class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+                          [ngClass]="recordPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                          [attr.aria-current]="recordPage === (i + 1) ? 'page' : null"
+                          (click)="setRecordPage(i + 1)">
+                          {{ i + 1 }}
+                        </button>
+                      </ng-container>
+                      <button
+                        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+                        [disabled]="recordPage === totalRecordPages"
+                        (click)="setRecordPage(recordPage + 1)">
+                        <i class="fas fa-chevron-right"></i>
+                      </button>
+                    </nav>
                   </div>
                 </ng-container>
                 <ng-template #noAttendeesMsg>
@@ -270,15 +302,31 @@
       <div class="text-center py-10 text-gray-500 font-semibold bg-gray-50 rounded-lg">No attendees found for this event.</div>
     </ng-template>
   </div>
-  <!-- Pagination for records table (mobile modal) -->
-  <div *ngIf="filteredRecords.length > recordsPerPage" class="flex justify-center items-center gap-2 mt-4">
-    <button (click)="setRecordPage(recordPage - 1)" [disabled]="recordPage === 1" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Previous">
-      <span aria-hidden="true">&#8592;</span>
-    </button>
-    <span class="text-gray-600 text-sm">Page {{ recordPage }} of {{ totalRecordPages }}</span>
-    <button (click)="setRecordPage(recordPage + 1)" [disabled]="recordPage === totalRecordPages" class="px-2 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50" title="Next">
-      <span aria-hidden="true">&#8594;</span>
-    </button>
+  <!-- Pagination for records table (mobile modal, Home paginator style) -->
+  <div *ngIf="filteredRecords.length > recordsPerPage" class="flex justify-center items-center mt-4">
+    <nav class="inline-flex space-x-1" aria-label="Pagination">
+      <button
+        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        [disabled]="recordPage === 1"
+        (click)="setRecordPage(recordPage - 1)">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <ng-container *ngFor="let _ of [].constructor(totalRecordPages); let i = index">
+        <button
+          class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
+          [ngClass]="recordPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+          [attr.aria-current]="recordPage === (i + 1) ? 'page' : null"
+          (click)="setRecordPage(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </ng-container>
+      <button
+        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        [disabled]="recordPage === totalRecordPages"
+        (click)="setRecordPage(recordPage + 1)">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </nav>
   </div>
     </div>
   </div>
