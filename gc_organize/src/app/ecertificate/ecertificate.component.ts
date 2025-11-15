@@ -3,9 +3,11 @@ import { CertificateService } from '../services/certificate.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ecertificate',
+  standalone: true,
   templateUrl: './ecertificate.component.html',
   styleUrls: ['./ecertificate.component.css'],
   imports: [CommonModule, FormsModule]
@@ -18,7 +20,8 @@ export class EcertificateComponent implements OnInit {
 
   constructor(
     private certificateService: CertificateService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -26,7 +29,8 @@ export class EcertificateComponent implements OnInit {
     if (studentId) {
       this.certificateService.getCertificates(studentId).subscribe({
         next: (res) => {
-          this.certificates = res.data || [];
+          // Filter to only show OSWS events (where is_osws_event is true)
+          this.certificates = (res.data || []).filter((cert: any) => cert.is_osws_event === true);
           this.loading = false;
         },
         error: () => {
@@ -74,6 +78,12 @@ export class EcertificateComponent implements OnInit {
           this.downloadingCertIds.delete(certId);
         }
       });
+  }
+
+  goToEvaluation(eventId: number, eventTitle: string) {
+    this.router.navigate(['/sidebar/evaluation', eventId], {
+      queryParams: { title: eventTitle }
+    });
   }
 
   downloadCertificateWithHttp(certUrl: string, eventTitle: string, certId?: number) {

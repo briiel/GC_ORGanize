@@ -57,17 +57,35 @@
                         <td class="px-1 lg:px-4 py-2 lg:py-3 font-semibold">{{ cert.event_title }}</td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">{{ formatEventDate(cert) }}</td>
                         <td class="px-1 lg:px-4 py-2 lg:py-3 text-center">
+                            <!-- Show evaluation button if not evaluated yet -->
                             <button
+                                *ngIf="!cert.evaluation_submitted"
+                                class="bg-orange-500 hover:bg-orange-600 text-white inline-flex items-center justify-center px-3 sm:px-4 py-2 rounded-lg text-sm transition-colors duration-200 w-10 h-10 sm:w-auto sm:h-auto"
+                                (click)="goToEvaluation(cert.event_id, cert.event_title)"
+                                title="Complete evaluation to unlock certificate">
+                                <i class="fas fa-clipboard-check mr-0 sm:mr-2"></i>
+                                <span class="hidden sm:inline">Answer Evaluation</span>
+                            </button>
+                            
+                            <!-- Show download button if evaluated and certificate exists -->
+                            <button
+                                *ngIf="cert.evaluation_submitted && cert.certificate_url"
                                 class="bg-[#679436] hover:bg-[#4e732b] text-white inline-flex items-center justify-center px-3 sm:px-4 py-2 rounded-lg text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-10 h-10 sm:w-auto sm:h-auto"
                                 [disabled]="isDownloading(cert.id)"
                                 [attr.aria-label]="isDownloading(cert.id) ? 'Downloading certificate' : 'Download certificate'"
                                 (click)="downloadCertificate(cert.certificate_url, cert.event_title, cert.id)">
-
                                 <i *ngIf="isDownloading(cert.id)" class="fas fa-spinner fa-spin mr-0 sm:mr-2"></i>
                                 <i *ngIf="!isDownloading(cert.id)" class="fas fa-download mr-0 sm:mr-2"></i>
                                 <span class="hidden sm:inline" *ngIf="isDownloading(cert.id)">Downloading...</span>
                                 <span class="hidden sm:inline" *ngIf="!isDownloading(cert.id)">Download Certificate</span>
                             </button>
+                            
+                            <!-- Show waiting message if evaluated but certificate not ready -->
+                            <span
+                                *ngIf="cert.evaluation_submitted && !cert.certificate_url"
+                                class="text-gray-500 text-sm italic">
+                                Certificate pending...
+                            </span>
                         </td>
                     </tr>
                 </tbody>

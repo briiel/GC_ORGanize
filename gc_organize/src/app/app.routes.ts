@@ -16,6 +16,7 @@ import { ManageUsersComponent } from './manage-users/manage-users.component';
 import { HistoryComponent } from './history/history.component';
 import { LandingComponent } from './landing/landing.component';
 import { GuestGuard } from './guards/guest.guard';
+import { EvaluationFormComponent } from './evaluation-form/evaluation-form.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [GuestGuard], data: { animation: 'LoginPage' } },
@@ -33,6 +34,7 @@ export const routes: Routes = [
       },
       { path: 'eventsreg', component: EventsregComponent, data: { animation: 'EventsRegPage' } },
       { path: 'ecertificate', component: EcertificateComponent, data: { animation: 'ECertificatePage' } },
+      { path: 'evaluation/:eventId', component: EvaluationFormComponent, data: { animation: 'EvaluationPage', roles: ['student'] } },
   { path: 'history', component: HistoryComponent, data: { animation: 'HistoryPage', roles: ['student'] } },
       { path: 'so-dashboard', component: SoDashboardComponent, data: { animation: 'SoDashboardPage' } },
       { path: 'manage-event', component: ManageEventComponent, data: { animation: 'ManageEventPage' } },

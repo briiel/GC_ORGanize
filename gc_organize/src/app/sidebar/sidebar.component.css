@@ -1,5 +1,19 @@
 /* Sidebar specific tweaks for better mobile UX */
 
+/* 
+ * Z-INDEX HIERARCHY FOR THE APPLICATION:
+ * =======================================
+ * z-0     : Main content area (default layer)
+ * z-10    : Sticky header/navbar
+ * z-30    : Mobile sidebar overlay backdrop
+ * z-40    : Sidebar navigation
+ * z-50    : Dropdowns, tooltips, popovers
+ * z-[1000-2999] : Reserved for future use
+ * z-[3000+] : Modals and overlays (Create Event, Participants, Evaluations, etc.)
+ * 
+ * IMPORTANT: Always use z-index >= 3000 for any modal dialogs to ensure they appear above all navigation elements.
+ */
+
 /* Prevent content from being squeezed by applying margin only on large screens via template */
 
 /* Optional: when sidebar is open on small screens, stop body scroll if desired */

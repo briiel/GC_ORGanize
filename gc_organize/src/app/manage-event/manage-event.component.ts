@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common'; // <-- Add this import
 import { EventService } from '../services/event.service';
+import { EvaluationService } from '../services/evaluation.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -16,6 +17,7 @@ import { saveAs } from 'file-saver';
 })
 
 export class ManageEventComponent implements OnInit, OnDestroy {
+  Math = Math; // Expose Math to template
   showMobileModal = false;
   isSavingInlineEdit = false;
   // Inline edit mode for details panel
@@ -96,6 +98,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   filteredOrgEventsList: any[] = [];
   orgEventPage: number = 1;
   orgEventPageSize: number = 10;
+  orgEventDepartmentFilter: string = ''; // Filter by department
+  orgEventStatusFilter: string = 'active'; // Default to show only active events (not yet started + ongoing)
+  
   get orgEventTotalPages(): number {
     return Math.ceil((this.filteredOrgEventsList?.length || 0) / this.orgEventPageSize) || 1;
   }
@@ -108,6 +113,16 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const start = (this.orgEventPage - 1) * this.orgEventPageSize;
     return sorted.slice(start, start + this.orgEventPageSize);
   }
+  
+  // Get unique departments from org events
+  get uniqueDepartments(): string[] {
+    const departments = this.orgEvents
+      .map(event => event.department)
+      .filter((dept, index, self) => dept && self.indexOf(dept) === index)
+      .sort();
+    return departments;
+  }
+  
   goToOrgEventPage(page: number) {
     if (page < 1 || page > this.orgEventTotalPages) return;
     this.orgEventPage = page;
@@ -118,6 +133,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   prevOrgEventPage() {
     if (this.orgEventPage > 1) this.orgEventPage--;
   }
+  
+  changeOrgEventPageSize(size: number) {
+    this.orgEventPageSize = size;
+    this.orgEventPage = 1; // Reset to first page
+  }
 
   showParticipantsModal = false;
   participants: any[] = [];
@@ -125,15 +145,39 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   selectedEventTitle = '';
   // Track selections for bulk actions
   selectedRegistrations = new Set<number>();
-  // Participants pagination (10 per page)
+  // Participants pagination with flexible page size
   participantsPage: number = 1;
   participantsPageSize: number = 10;
+  participantsSearchTerm: string = ''; // Search term for filtering participants
+  expandedParticipants: Set<number> = new Set(); // Track which participants are expanded
+  
+  get filteredParticipants(): any[] {
+    if (!this.participantsSearchTerm.trim()) {
+      return this.participants || [];
+    }
+    const term = this.participantsSearchTerm.toLowerCase();
+    return (this.participants || []).filter(participant => {
+      const studentId = (participant.student_id || '').toLowerCase();
+      const firstName = (participant.first_name || '').toLowerCase();
+      const lastName = (participant.last_name || '').toLowerCase();
+      const department = (participant.department || '').toLowerCase();
+      const program = (participant.program || '').toLowerCase();
+      const fullName = `${firstName} ${lastName}`;
+      return studentId.includes(term) || 
+             fullName.includes(term) || 
+             firstName.includes(term) || 
+             lastName.includes(term) ||
+             department.includes(term) ||
+             program.includes(term);
+    });
+  }
+  
   get participantsTotalPages(): number {
-    return Math.ceil((this.participants?.length || 0) / this.participantsPageSize) || 1;
+    return Math.ceil((this.filteredParticipants?.length || 0) / this.participantsPageSize) || 1;
   }
   get pagedParticipants(): any[] {
     const start = (this.participantsPage - 1) * this.participantsPageSize;
-    return (this.participants || []).slice(start, start + this.participantsPageSize);
+    return (this.filteredParticipants || []).slice(start, start + this.participantsPageSize);
   }
   goToParticipantsPage(page: number) {
     if (page < 1 || page > this.participantsTotalPages) return;
@@ -144,6 +188,27 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
   prevParticipantsPage() {
     if (this.participantsPage > 1) this.participantsPage--;
+  }
+  onParticipantsSearchChange() {
+    this.participantsPage = 1; // Reset to first page when searching
+  }
+  changeParticipantsPageSize(size: number) {
+    this.participantsPageSize = size;
+    this.participantsPage = 1; // Reset to first page
+  }
+
+  // Toggle participant expanded state
+  toggleParticipantExpanded(index: number) {
+    if (this.expandedParticipants.has(index)) {
+      this.expandedParticipants.delete(index);
+    } else {
+      this.expandedParticipants.add(index);
+    }
+  }
+
+  // Check if participant is expanded
+  isParticipantExpanded(index: number): boolean {
+    return this.expandedParticipants.has(index);
   }
 
   // Create Event modal state
@@ -168,7 +233,72 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   // For vertical event list selection
   selectedEvent: any = null;
 
-  constructor(private eventService: EventService, private router: Router) {
+  // Evaluations modal state
+  showEvaluationsModal = false;
+  evaluations: any[] = [];
+  evaluationsLoading = false;
+  evaluationStats: any = null;
+  selectedEventForEvaluation: any = null;
+  evaluationsPage: number = 1;
+  evaluationsPageSize: number = 10;
+  expandedEvaluations: Set<number> = new Set(); // Track which evaluations are expanded
+  evaluationSearchTerm: string = ''; // Search term for filtering evaluations
+  showAverageRatings: boolean = true; // Toggle for average ratings section
+  
+  get filteredEvaluations(): any[] {
+    if (!this.evaluationSearchTerm.trim()) {
+      return this.evaluations || [];
+    }
+    const term = this.evaluationSearchTerm.toLowerCase();
+    return (this.evaluations || []).filter(evaluation => {
+      const studentId = (evaluation.student_id || '').toLowerCase();
+      const firstName = (evaluation.first_name || '').toLowerCase();
+      const lastName = (evaluation.last_name || '').toLowerCase();
+      const fullName = `${firstName} ${lastName}`;
+      return studentId.includes(term) || fullName.includes(term) || firstName.includes(term) || lastName.includes(term);
+    });
+  }
+  
+  get evaluationsTotalPages(): number {
+    return Math.ceil((this.filteredEvaluations?.length || 0) / this.evaluationsPageSize) || 1;
+  }
+  get pagedEvaluations(): any[] {
+    const start = (this.evaluationsPage - 1) * this.evaluationsPageSize;
+    return (this.filteredEvaluations || []).slice(start, start + this.evaluationsPageSize);
+  }
+  goToEvaluationsPage(page: number) {
+    if (page < 1 || page > this.evaluationsTotalPages) return;
+    this.evaluationsPage = page;
+  }
+  nextEvaluationsPage() {
+    if (this.evaluationsPage < this.evaluationsTotalPages) this.evaluationsPage++;
+  }
+  prevEvaluationsPage() {
+    if (this.evaluationsPage > 1) this.evaluationsPage--;
+  }
+  toggleEvaluationExpanded(index: number) {
+    if (this.expandedEvaluations.has(index)) {
+      this.expandedEvaluations.delete(index);
+    } else {
+      this.expandedEvaluations.add(index);
+    }
+  }
+  isEvaluationExpanded(index: number): boolean {
+    return this.expandedEvaluations.has(index);
+  }
+  onEvaluationSearchChange() {
+    this.evaluationsPage = 1; // Reset to first page when searching
+  }
+  changeEvaluationsPageSize(size: number) {
+    this.evaluationsPageSize = size;
+    this.evaluationsPage = 1; // Reset to first page
+  }
+
+  constructor(
+    private eventService: EventService, 
+    private evaluationService: EvaluationService,
+    private router: Router
+  ) {
     // Get creator/org ID from localStorage or AuthService
     this.creatorId = Number(localStorage.getItem('creatorId'));
     this.adminId = Number(localStorage.getItem('adminId'));
@@ -192,11 +322,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   // Close any open modal when ESC is pressed (matches behavior used in other modals)
   @HostListener('document:keydown.escape', ['$event'])
   onEsc(event: KeyboardEvent) {
-    if (this.showParticipantsModal || this.showCreateModal || this.showMobileModal) {
+    if (this.showParticipantsModal || this.showCreateModal || this.showMobileModal || this.showEvaluationsModal) {
       event.preventDefault();
       if (this.showParticipantsModal) this.closeParticipantsModal();
       if (this.showCreateModal) this.closeCreateModal();
       if (this.showMobileModal) this.closeMobileModal();
+      if (this.showEvaluationsModal) this.closeEvaluationsModal();
     }
   }
 
@@ -237,8 +368,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.eventService.getAllOrgEvents().subscribe({
       next: (res) => {
         this.orgEvents = res.data || res;
-        this.filteredOrgEventsList = this.orgEvents;
-  this.orgEventPage = 1;
+        this.searchOrgEvents(); // Apply initial filters
       },
       error: (err) => {
         console.error('Error fetching org events:', err);
@@ -347,26 +477,59 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   searchOrgEvents() {
-    const term = this.orgEventsSearchTerm.trim().toLowerCase();
-    if (!term) {
-      this.filteredOrgEventsList = this.orgEvents;
-      this.orgEventPage = 1;
-      return;
+    let results = this.orgEvents;
+    
+    // Apply status filter
+    if (this.orgEventStatusFilter === 'active') {
+      // Show only 'not yet started' and 'ongoing' events
+      results = results.filter(event => 
+        event.status === 'not yet started' || event.status === 'ongoing'
+      );
+    } else if (this.orgEventStatusFilter === 'all') {
+      // Show all events (no status filter)
+      results = results;
+    } else if (this.orgEventStatusFilter) {
+      // Filter by specific status
+      results = results.filter(event => event.status === this.orgEventStatusFilter);
     }
-    this.filteredOrgEventsList = this.orgEvents.filter(event =>
-      (event.title && event.title.toLowerCase().includes(term)) ||
-      (event.location && event.location.toLowerCase().includes(term)) ||
-      (event.department && event.department.toLowerCase().includes(term)) ||
-      (event.start_date && new Date(event.start_date).toLocaleDateString().toLowerCase().includes(term)) ||
-      (event.end_date && new Date(event.end_date).toLocaleDateString().toLowerCase().includes(term))
-    );
+    
+    // Apply department filter
+    if (this.orgEventDepartmentFilter) {
+      results = results.filter(event => event.department === this.orgEventDepartmentFilter);
+    }
+    
+    // Apply search term filter
+    const term = this.orgEventsSearchTerm.trim().toLowerCase();
+    if (term) {
+      results = results.filter(event =>
+        (event.title && event.title.toLowerCase().includes(term)) ||
+        (event.location && event.location.toLowerCase().includes(term)) ||
+        (event.department && event.department.toLowerCase().includes(term)) ||
+        (event.start_date && new Date(event.start_date).toLocaleDateString().toLowerCase().includes(term)) ||
+        (event.end_date && new Date(event.end_date).toLocaleDateString().toLowerCase().includes(term)) ||
+        (event.status && event.status.toLowerCase().includes(term))
+      );
+    }
+    
+    this.filteredOrgEventsList = results;
     this.orgEventPage = 1;
   }
 
   clearOrgEventsSearch() {
-  this.orgEventsSearchTerm = '';
-  this.filteredOrgEventsList = this.orgEvents;
-  this.orgEventPage = 1;
+    this.orgEventsSearchTerm = '';
+    this.orgEventDepartmentFilter = '';
+    this.orgEventStatusFilter = 'active'; // Reset to default
+    this.searchOrgEvents(); // Re-apply filters
+  }
+  
+  onOrgEventDepartmentChange() {
+    this.orgEventPage = 1;
+    this.searchOrgEvents();
+  }
+  
+  onOrgEventStatusChange() {
+    this.orgEventPage = 1;
+    this.searchOrgEvents();
   }
 
   filteredOrgEvents() {
@@ -446,6 +609,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.participants = [];
     this.selectedEventTitle = '';
   this.participantsPage = 1;
+    this.participantsSearchTerm = ''; // Clear search term
+    this.expandedParticipants.clear(); // Clear expanded participants
     this.selectedRegistrations.clear();
   this.toggleBodyModalClass();
   }
@@ -590,7 +755,25 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     return `${year}-${month}-${day}`;
   }
 
+  // Helper to check if an event is concluded
+  isEventConcluded(event: any): boolean {
+    if (!event) return false;
+    const status = String(event.status || '').toLowerCase();
+    return status === 'concluded';
+  }
+
   editEvent(event: any) {
+    // Prevent editing concluded events
+    if (this.isEventConcluded(event)) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Cannot Edit',
+        text: 'This event has concluded and cannot be edited.',
+        confirmButtonColor: this.isOsws ? '#14532d' : '#679436'
+      });
+      return;
+    }
+    
     // If called from the details panel, enable inline editing
     if (this.selectedEvent && event && this.selectedEvent.event_id === event.event_id) {
       this.isInlineEditing = true;
@@ -981,4 +1164,176 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const slug = (this.selectedEventTitle || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
     saveAs(blob, `${slug}_participants.xlsx`);
   }
+
+  // ============ EVALUATION METHODS ============
+
+  openEvaluationsModal(event: any): void {
+    this.selectedEventForEvaluation = event;
+    this.evaluations = [];
+    this.evaluationStats = null;
+    this.evaluationsPage = 1;
+    this.evaluationsLoading = true;
+    this.showEvaluationsModal = true;
+    document.body.classList.add('modal-open');
+
+    this.evaluationService.getEventEvaluations(event.event_id).subscribe({
+      next: (response) => {
+        this.evaluationsLoading = false;
+        const data = response.data || response;
+        this.evaluations = data.evaluations || [];
+        this.evaluationStats = data.stats || { total_evaluations: 0, unique_participants: 0 };
+      },
+      error: (error) => {
+        console.error('Error fetching evaluations:', error);
+        this.evaluationsLoading = false;
+        Swal.fire('Error', 'Failed to load evaluations. ' + (error.error?.message || ''), 'error');
+      }
+    });
+  }
+
+  closeEvaluationsModal(): void {
+    this.showEvaluationsModal = false;
+    this.selectedEventForEvaluation = null;
+    this.evaluations = [];
+    this.evaluationStats = null;
+    this.evaluationsPage = 1;
+    this.evaluationSearchTerm = '';
+    this.expandedEvaluations.clear();
+    document.body.classList.remove('modal-open');
+  }
+
+  // Calculate average rating for a specific question
+  getAverageRating(questionKey: string): number {
+    if (!this.evaluations || this.evaluations.length === 0) return 0;
+    
+    let sum = 0;
+    let count = 0;
+    
+    this.evaluations.forEach(evaluation => {
+      const responses = evaluation.responses;
+      if (responses && responses.ratings && responses.ratings[questionKey]) {
+        const value = responses.ratings[questionKey];
+        if (value !== 'NA' && !isNaN(Number(value))) {
+          sum += Number(value);
+          count++;
+        }
+      }
+    });
+    
+    return count > 0 ? sum / count : 0;
+  }
+
+  // Get rating label
+  getRatingLabel(rating: number): string {
+    if (rating >= 4.5) return 'Excellent';
+    if (rating >= 3.5) return 'Very Good';
+    if (rating >= 2.5) return 'Good';
+    if (rating >= 1.5) return 'Fair';
+    return 'Needs Improvement';
+  }
+
+  // Get individual evaluation average rating
+  getIndividualAverageRating(evaluation: any): number {
+    const responses = evaluation?.responses;
+    if (!responses || !responses.ratings) return 0;
+    
+    const ratings = responses.ratings;
+    const ratingQuestions = ['question1', 'question2', 'question3', 'question4', 'question5', 
+                             'question6', 'question7', 'question8', 'question9', 'question10', 
+                             'question11', 'question12', 'question13'];
+    
+    let sum = 0;
+    let count = 0;
+    
+    ratingQuestions.forEach(q => {
+      const value = ratings[q];
+      // Only count numeric values (skip 'NA' and null/undefined)
+      if (value && value !== 'NA' && !isNaN(Number(value))) {
+        sum += Number(value);
+        count++;
+      }
+    });
+    
+    return count > 0 ? sum / count : 0;
+  }
+
+  // Get rating color class
+  getRatingColorClass(rating: number): string {
+    if (rating >= 4.5) return 'text-green-600';
+    if (rating >= 3.5) return 'text-blue-600';
+    if (rating >= 2.5) return 'text-yellow-600';
+    if (rating >= 1.5) return 'text-orange-600';
+    return 'text-red-600';
+  }
+
+  // Download evaluations as Excel
+  downloadEvaluationsExcel(): void {
+    if (!this.evaluations || this.evaluations.length === 0) return;
+
+    const worksheetData = this.evaluations.map((evaluation, i) => {
+      const responses = evaluation.responses || {};
+      const ratings = responses.ratings || {};
+      const comments = responses.comments || {};
+      
+      return {
+        '#': i + 1,
+        'Event': this.selectedEventForEvaluation?.title || '-',
+        'Student ID': evaluation.student_id ?? '-',
+        'Student Name': `${evaluation.first_name || ''} ${evaluation.middle_initial || ''} ${evaluation.last_name || ''} ${evaluation.suffix || ''}`.trim(),
+        'Department': evaluation.department ?? '-',
+        'Program': evaluation.program ?? '-',
+        'Submitted At': evaluation.submitted_at ? new Date(evaluation.submitted_at).toLocaleString() : '-',
+        
+        // Ratings (Questions 1-13)
+        'Q1: Venue': ratings.question1 ?? '-',
+        'Q2: Time Management': ratings.question2 ?? '-',
+        'Q3: Facilitator Knowledge': ratings.question3 ?? '-',
+        'Q4: Topic Relevance': ratings.question4 ?? '-',
+        'Q5: Learning Materials': ratings.question5 ?? '-',
+        'Q6: Activities': ratings.question6 ?? '-',
+        'Q7: Engagement': ratings.question7 ?? '-',
+        'Q8: Objectives Met': ratings.question8 ?? '-',
+        'Q9: Overall Satisfaction': ratings.question9 ?? '-',
+        'Q10: Organization': ratings.question10 ?? '-',
+        'Q11: Support Staff': ratings.question11 ?? '-',
+        'Q12: Registration Process': ratings.question12 ?? '-',
+        'Q13: Would Recommend': ratings.question13 ?? '-',
+        
+        // Comments (Questions 14-16)
+        'Most Helpful Aspects': comments.question14 ?? '-',
+        'Suggestions for Improvement': comments.question15 ?? '-',
+        'Additional Comments': comments.question16 ?? '-'
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(worksheetData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Evaluations');
+
+    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+    const slug = (this.selectedEventForEvaluation?.title || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
+    saveAs(blob, `${slug}_evaluations.xlsx`);
+  }
+
+  // Get question labels for display
+  getQuestionLabel(questionKey: string): string {
+    const labels: { [key: string]: string } = {
+      'question1': 'The title or theme aligns with the goals of the activity',
+      'question2': 'The goals were aligned with the College\'s vision and mission',
+      'question3': 'The activity supported the overall development of the students',
+      'question4': 'The objectives met the students\' needs and advanced the aims of the relevant organizations',
+      'question5': 'The location of the activity was suitable for its execution',
+      'question6': 'The activity was conducted as planned',
+      'question7': 'The quality of food and the service provided were satisfactory',
+      'question8': 'The activity was carried out successfully from beginning to end',
+      'question9': 'Participants demonstrated good behavior throughout the event',
+      'question10': 'The speakers provided valuable and relevant information and insights',
+      'question11': 'Faculty members/advisers were present for the entire duration of the activity',
+      'question12': 'There was clear support from the administration/management',
+      'question13': 'Cleanliness was upheld during and after the event'
+    };
+    return labels[questionKey] || questionKey;
+  }
 }
+

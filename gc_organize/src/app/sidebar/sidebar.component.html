@@ -2,14 +2,14 @@
     <!-- Sidebar: always collapsible -->
         <!-- Mobile overlay backdrop -->
                 <div 
-                    class="fixed inset-0 bg-black/40 lg:hidden transition-opacity duration-300 z-40 backdrop-blur-sm"
+                    class="fixed inset-0 bg-black/40 lg:hidden transition-opacity duration-300 z-30 backdrop-blur-sm"
                 [class.hidden]="!isSidebarOpen"
                 [style.pointerEvents]="isSidebarOpen ? 'auto' : 'none'"
                 (click)="closeIfMobile()">
         </div>
 
     <div [class.translate-x-0]="isSidebarOpen" [class.-translate-x-full]="!isSidebarOpen"
-        class="w-64 max-w-[85vw] lg:w-64 flex flex-col items-center fixed top-0 left-0 h-full transition-transform duration-300 z-50 shadow-lg sidebar-blur-target"
+        class="w-64 max-w-[85vw] lg:w-64 flex flex-col items-center fixed top-0 left-0 h-full transition-transform duration-300 z-40 shadow-lg sidebar-blur-target"
         [ngClass]="{
             'bg-[#679436] text-white': role !== 'osws_admin',
             'bg-[#14532d] text-white': role === 'osws_admin'
@@ -131,12 +131,12 @@
     </div>
 
     <!-- Main Content Area: only shift on large screens when sidebar is open -->
-    <div class="flex-1 overflow-y-auto h-screen relative transition-all duration-300 z-0 lg:blur-none"
+    <div class="flex-1 overflow-y-auto h-screen transition-all duration-300 lg:blur-none"
          [ngClass]="{ 'lg:ml-64': isSidebarOpen, 'blur-sm': isSidebarOpen && isMobile }"
          [@routeAnimations]="prepareRoute(outlet)">
     
         <!-- Sticky Navbar/Header -->
-    <div class="sticky top-0 left-0 w-full flex items-center justify-between bg-white shadow px-4 sm:px-6 py-3 z-20"
+    <div class="sticky top-0 left-0 w-full flex items-center justify-between bg-white shadow px-4 sm:px-6 py-3 z-10"
              style="min-height: 64px;">
             <!-- Left: Menu Button (always visible) -->
             <button

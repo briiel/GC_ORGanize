@@ -28,67 +28,80 @@
   <!-- OSWS VIEW: Show two tables with OSWS palette -->
   <ng-container *ngIf="isOsws; else orgTable">
     <!-- Table 1: Events made by OSWS -->
-    <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-lg shadow-md bg-white">
-      <h2 class="text-xl font-bold text-[#14532d] p-4 bg-[#e6f7ef] border-b-2 border-[#14532d]">
-        Events Created by OSWS
-      </h2>
+    <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
+      <!-- Enhanced Header with Gradient -->
+      <div class="px-6 py-4 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-building text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl lg:text-2xl font-bold text-white">
+            Events Created by OSWS
+          </h2>
+        </div>
+      </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm lg:text-base">
-          <thead class="bg-[#14532d]">
-            <tr class="uppercase tracking-wider text-white">
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center w-12">#</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left min-w-[180px]">Title</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center" colspan="2">Date</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center" colspan="2">Time</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left min-w-[120px]">Location</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Status</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Actions</th>
-            </tr>
-            <tr class="bg-[#e6f7ef] text-[#14532d] font-semibold">
-              <th></th>
-              <th></th>
-              <th class="text-center border-b border-[#e6f7ef]">Start</th>
-              <th class="text-center border-b border-[#e6f7ef]">End</th>
-              <th class="text-center border-b border-[#e6f7ef]">Start</th>
-              <th class="text-center border-b border-[#e6f7ef]">End</th>
-              <th></th>
-              <th></th>
-              <th></th>
+          <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+            <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
+              <th class="px-4 py-4 text-center w-12 font-bold">#</th>
+              <th class="px-4 py-4 text-left min-w-[180px] font-bold">Title</th>
+              <th class="px-4 py-4 text-center font-bold">Type</th>
+              <th class="px-4 py-4 text-center font-bold">Date</th>
+              <th class="px-4 py-4 text-center font-bold">Time</th>
+              <th class="px-4 py-4 text-left min-w-[120px] font-bold">Location</th>
+              <th class="px-4 py-4 text-center font-bold">Status</th>
+              <th class="px-4 py-4 text-center font-bold">Actions</th>
             </tr>
           </thead>
-          <tbody class="bg-white text-gray-800 divide-y divide-[#e6f7ef]">
-            <tr *ngFor="let event of filteredOswsEvents(); let i = index" class="hover:bg-[#f5f5f5] transition-colors duration-200">
-              <td class="px-4 py-3 text-center text-[#14532d] font-semibold">{{ i + 1 }}</td>
-              <td class="px-4 py-3 font-semibold text-left max-w-[200px] truncate" [title]="event.title">
-                <button class="text-[#14532d] hover:underline cursor-pointer font-semibold"
-                        (click)="openParticipantsModal(event)">
-                  {{ event.title }}
-                </button>
-                <span class="ml-2 align-middle inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
-                      [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
-                  <i class="fas" [ngClass]="event.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
-                  {{ event.is_paid ? 'Paid' : 'Free' }}
-                </span>
-                <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
-                      class="ml-1 align-middle inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-amber-50 text-amber-900 border-amber-200">
-                  ₱ {{ event.registration_fee | number:'1.2-2' }}
-                </span>
+          <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+            <tr *ngFor="let event of filteredOswsEvents(); let i = index" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
+              <td class="px-4 py-4 text-center text-[#14532d] font-bold text-base">{{ i + 1 }}</td>
+              <td class="px-4 py-4 font-semibold text-left max-w-[200px]">
+                <div class="text-[#14532d] font-semibold truncate" [title]="event.title">{{ event.title }}</div>
               </td>
-              <td class="px-4 py-3 text-center">{{ event.start_date | date: 'MMM d, y' }}</td>
-              <td class="px-4 py-3 text-center">{{ event.end_date | date: 'MMM d, y' }}</td>
-              <td class="px-4 py-3 text-center">{{ formatTime(event.start_time) }}</td>
-              <td class="px-4 py-3 text-center">{{ formatTime(event.end_time) }}</td>
-              <td class="px-4 py-3 text-left max-w-[160px] truncate" [title]="event.location">{{ event.location }}</td>
+              <td class="px-4 py-4 text-center">
+                <div class="flex flex-col gap-1.5">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 justify-center"
+                        [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-emerald-50 text-emerald-800 border-emerald-300'">
+                    <i class="fas text-xs" [ngClass]="event.is_paid ? 'fa-peso-sign' : 'fa-ticket-alt'"></i>
+                    {{ event.is_paid ? 'Paid' : 'Free' }}
+                  </span>
+                  <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 bg-amber-50 text-amber-900 border-amber-300 justify-center">
+                    <i class="fas fa-peso-sign text-xs"></i>
+                    {{ event.registration_fee | number:'1.2-2' }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center text-sm">
+                <div class="flex flex-col gap-1">
+                  <span class="font-medium">{{ event.start_date | date: 'MMM d, y' }}</span>
+                  <span *ngIf="event.end_date" class="text-gray-500 text-xs">to {{ event.end_date | date: 'MMM d, y' }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center text-sm">
+                <div class="flex flex-col gap-1">
+                  <span class="font-medium">{{ formatTime(event.start_time) }}</span>
+                  <span *ngIf="event.end_time" class="text-gray-500 text-xs">to {{ formatTime(event.end_time) }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-left max-w-[160px]">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
+                  <span class="truncate text-sm" [title]="event.location">{{ event.location }}</span>
+                </div>
+              </td>
               
-              <td class="px-4 py-3 text-center">
-                <div class="inline-flex items-center gap-2">
+              <td class="px-4 py-4 text-center">
+                 <div class="inline-flex items-center gap-2">
                   <select
-                    class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
+                    class="px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2 transition-all text-sm font-semibold cursor-pointer"
                     [ngClass]="{
-                      'bg-yellow-100 text-yellow-800 border-yellow-300': event.status === 'not yet started',
-                      'bg-blue-100 text-blue-800 border-blue-300': event.status === 'ongoing',
-                      'bg-green-100 text-green-800 border-green-300': event.status === 'concluded',
-                      'bg-red-100 text-red-800 border-red-300': event.status === 'cancelled'
+                      'bg-yellow-50 text-yellow-800 border-yellow-300 focus:ring-yellow-200': event.status === 'not yet started',
+                      'bg-blue-50 text-blue-800 border-blue-300 focus:ring-blue-200': event.status === 'ongoing',
+                      'bg-green-50 text-green-800 border-green-300 focus:ring-green-200': event.status === 'concluded',
+                      'bg-red-50 text-red-800 border-red-300 focus:ring-red-200': event.status === 'cancelled'
                     }"
                     [ngModel]="event.status"
                     (ngModelChange)="event.status = $event"
@@ -99,27 +112,52 @@
                     <option value="concluded" [disabled]="!isStatusOptionEnabled(event, 'concluded')" [title]="statusOptionTooltip(event, 'concluded')">Concluded</option>
                     <option value="cancelled" [disabled]="!isStatusOptionEnabled(event, 'cancelled')" [title]="statusOptionTooltip(event, 'cancelled')">Cancelled</option>
                   </select>
-                  <span *ngIf="event.auto_mismatch" class="text-xs text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full" title="Stored status differs from automatic status">
+                  <span *ngIf="event.auto_mismatch" 
+                        class="text-xs text-amber-700 bg-amber-100 border-2 border-amber-300 px-2 py-1 rounded-lg font-semibold" 
+                        title="Stored status differs from automatic status">
                     Auto: {{ event.auto_status || 'n/a' }}
                   </span>
                 </div>
               </td>
-              <td class="px-4 py-3 text-center">
+              <td class="px-4 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
-                  <!-- Update/Edit Icon -->
-                  <button (click)="editEvent(event)" class="text-blue-600 hover:text-blue-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Edit Event">
+                  <!-- View Participants Button -->
+                  <button (click)="openParticipantsModal(event)" 
+                          class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-white bg-[#14532d] hover:bg-[#166534] transition-all duration-200 hover:shadow-lg transform hover:scale-110" 
+                          title="View Participants">
+                    <i class="fas fa-users"></i>
+                  </button>
+                  <!-- View Evaluations Button -->
+                  <button (click)="openEvaluationsModal(event)" 
+                          class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-white bg-purple-600 hover:bg-purple-700 transition-all duration-200 hover:shadow-lg transform hover:scale-110" 
+                          title="View Evaluations">
+                    <i class="fas fa-star"></i>
+                  </button>
+                  <!-- Edit Button -->
+                  <button (click)="editEvent(event)" 
+                          [disabled]="isEventConcluded(event)"
+                          [class]="isEventConcluded(event) 
+                            ? 'inline-flex items-center justify-center w-9 h-9 rounded-lg text-gray-400 bg-gray-200 cursor-not-allowed' 
+                            : 'inline-flex items-center justify-center w-9 h-9 rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-all duration-200 hover:shadow-lg transform hover:scale-110'"
+                          [title]="isEventConcluded(event) ? 'Cannot edit concluded event' : 'Edit Event'">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <!-- Delete Icon only, remove label -->
-                  <button (click)="confirmDeleteEvent(event)" class="text-red-600 hover:text-red-800 px-2 py-1 rounded transition-colors duration-150 flex items-center" title="Delete Event">
+                  <!-- Delete Button -->
+                  <button (click)="confirmDeleteEvent(event)" 
+                          class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-all duration-200 hover:shadow-lg transform hover:scale-110" 
+                          title="Delete Event">
                     <i class="fas fa-trash-alt"></i>
                   </button>
                 </div>
-                <!-- Removed extra status select for OSWS events table actions column -->
               </td>
             </tr>
             <tr *ngIf="filteredOswsEvents().length === 0">
-              <td colspan="9" class="text-center py-6 text-gray-500 bg-[#f3fafd] font-semibold">No OSWS events found.</td>
+              <td colspan="8" class="text-center py-12 text-gray-500 bg-gray-50">
+                <div class="flex flex-col items-center gap-3">
+                  <i class="fas fa-calendar-times text-4xl text-gray-300"></i>
+                  <p class="font-semibold text-lg">No OSWS events found</p>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -127,108 +165,221 @@
     </div>
 
     <!-- Table 2: Events made by Student Organizations -->
-    <div class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-md bg-white">
-      <!-- Change bg and border to green -->
-      <h2 class="text-xl font-bold text-[#14532d] p-4 bg-[#e6f7ef] border-b-2 border-[#14532d]">
-        Events Created by Student Organizations
-      </h2>
+    <div class="mx-2 lg:mx-6 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
+      <!-- Enhanced Header with Gradient -->
+      <div class="px-6 py-4 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-users-cog text-white text-lg"></i>
+          </div>
+          <h2 class="text-xl lg:text-2xl font-bold text-white">
+            Events Created by Student Organizations
+          </h2>
+        </div>
+      </div>
       
-      <!-- Search bar: change border and button to green -->
-      <div class="px-4 py-3 bg-[#e6f7ef] flex flex-col sm:flex-row gap-2 sm:items-center border-b border-[#e6f7ef]">
-        <div class="flex flex-grow flex-col sm:flex-row gap-2">
-          <input
-            type="text"
-            [(ngModel)]="orgEventsSearchTerm"
-            placeholder="Search organization events (title, location, date)..."
-            class="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-transparent"
-            (ngModelChange)="searchOrgEvents()"
-          />
+      <!-- Enhanced Search Bar -->
+      <div class="px-6 py-4 bg-[#e6f7ef]/50 border-b-2 border-gray-200">
+        <!-- Search Row -->
+        <div class="flex flex-col sm:flex-row gap-3 sm:items-end mb-3">
+          <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">
+              <i class="fas fa-search mr-1"></i>Search Events
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                [(ngModel)]="orgEventsSearchTerm"
+                placeholder="Search by title, location, department, date, or status..."
+                class="w-full px-4 py-2.5 pr-10 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all"
+                (ngModelChange)="searchOrgEvents()"
+              />
+              <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+          </div>
           <button
-            class="bg-[#14532d] hover:bg-[#218c4a] text-white font-semibold px-6 py-2 rounded-md transition-all duration-300 shadow-sm flex items-center justify-center gap-2 w-full sm:w-auto"
+            class="bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d] text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 w-full sm:w-auto transform hover:scale-105"
             (click)="searchOrgEvents()"
             type="button"
           >
-            Search
+            <span>Search</span>
           </button>
           <button
-            *ngIf="orgEventsSearchTerm"
-            class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 py-2 rounded-md transition-all duration-300 shadow-sm border border-gray-300 flex items-center justify-center w-full sm:w-auto"
+            *ngIf="orgEventsSearchTerm || orgEventDepartmentFilter || orgEventStatusFilter !== 'active'"
+            class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-5 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg border-2 border-gray-300 flex items-center justify-center gap-2 w-full sm:w-auto"
             (click)="clearOrgEventsSearch()"
             type="button"
           >
-            Clear
+            <i class="fas fa-times"></i>
+            <span>Clear All</span>
           </button>
+        </div>
+        
+        <!-- Filters Row -->
+        <div class="flex flex-col lg:flex-row gap-3">
+          <!-- Department Filter -->
+          <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">
+              <i class="fas fa-building mr-1"></i>Filter by Department
+            </label>
+            <select
+              [(ngModel)]="orgEventDepartmentFilter"
+              (ngModelChange)="onOrgEventDepartmentChange()"
+              class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
+              <option value="">All Departments</option>
+              <option *ngFor="let dept of uniqueDepartments" [value]="dept">{{ dept }}</option>
+            </select>
+          </div>
+          
+          <!-- Status Filter -->
+          <div class="flex-1">
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">
+              <i class="fas fa-filter mr-1"></i>Filter by Status
+            </label>
+            <select
+              [(ngModel)]="orgEventStatusFilter"
+              (ngModelChange)="onOrgEventStatusChange()"
+              class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
+              <option value="active">Active Events (Not Yet Started + Ongoing)</option>
+              <option value="concluded">Concluded Events</option>
+              <option value="all">All Events</option>
+            </select>
+          </div>
+          
+          <!-- Items Per Page -->
+          <div class="w-full lg:w-48">
+            <label class="block text-xs font-semibold text-gray-700 mb-1.5">
+              <i class="fas fa-list-ol mr-1"></i>Items Per Page
+            </label>
+            <select
+              [(ngModel)]="orgEventPageSize"
+              (ngModelChange)="changeOrgEventPageSize(orgEventPageSize)"
+              class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
+              <option [value]="5">5 per page</option>
+              <option [value]="10">10 per page</option>
+              <option [value]="20">20 per page</option>
+              <option [value]="50">50 per page</option>
+              <option [value]="100">100 per page</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="overflow-x-auto">
-        <!-- Table header: change to green -->
+        <!-- Enhanced Table Header -->
         <table class="w-full text-sm lg:text-base">
-          <thead class="bg-[#14532d]">
-            <tr class="uppercase tracking-wider text-white">
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center w-12">#</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Title</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Date</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-center">Time</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Location</th>
-              <th class="px-4 py-3 border-b border-[#e6f7ef] text-left">Department</th>
+          <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+            <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
+              <th class="px-4 py-4 text-center w-12 font-bold">#</th>
+              <th class="px-4 py-4 text-left font-bold">Title</th>
+              <th class="px-4 py-4 text-center font-bold">Type</th>
+              <th class="px-4 py-4 text-center font-bold">Date</th>
+              <th class="px-4 py-4 text-center font-bold">Time</th>
+              <th class="px-4 py-4 text-left font-bold">Location</th>
+              <th class="px-4 py-4 text-left font-bold">Department</th>
+              <th class="px-4 py-4 text-center font-bold">Status</th>
             </tr>
           </thead>
-          <tbody class="bg-white text-gray-800 divide-y divide-[#e6f7ef]">
+          <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
             <tr *ngFor="let event of pagedOrgEvents; let i = index"
-                class="hover:bg-[#f5f5f5] transition-colors duration-200"
-                [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-[#f5f5f5]' : ''">
-              <td class="px-4 py-3 text-center text-[#14532d] font-semibold">{{ (orgEventPage - 1) * orgEventPageSize + i + 1 }}</td>
-              <td class="px-4 py-3 font-semibold text-left">{{ event.title }}</td>
-              <td class="px-4 py-3 text-left">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border"
-                      [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
-                  <i class="fas" [ngClass]="event.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
-                  {{ event.is_paid ? 'Paid' : 'Free' }}
+                class="hover:bg-[#e6f7ef]/30 transition-all duration-200"
+                [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-[#e6f7ef]/50' : ''">
+              <td class="px-4 py-4 text-center text-[#14532d] font-bold text-base">{{ (orgEventPage - 1) * orgEventPageSize + i + 1 }}</td>
+              <td class="px-4 py-4 font-semibold text-left text-[#14532d]">
+                {{ event.title }}
+              </td>
+              <td class="px-4 py-4 text-center">
+                <div class="flex flex-col gap-1.5">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 justify-center"
+                        [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-emerald-50 text-emerald-800 border-emerald-300'">
+                    <i class="fas text-xs" [ngClass]="event.is_paid ? 'fa-peso-sign' : 'fa-ticket-alt'"></i>
+                    {{ event.is_paid ? 'Paid' : 'Free' }}
+                  </span>
+                  <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 bg-amber-50 text-amber-900 border-amber-300 justify-center">
+                    <i class="fas fa-peso-sign text-xs"></i>
+                    {{ event.registration_fee | number:'1.2-2' }}
+                  </span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center text-sm">
+                <div class="flex flex-col gap-1">
+                  <span class="font-medium">{{ event.start_date | date: 'MMM d, y' }}</span>
+                  <span *ngIf="event.end_date" class="text-gray-500 text-xs">to {{ event.end_date | date: 'MMM d, y' }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center text-sm">
+                <div class="flex flex-col gap-1">
+                  <span class="font-medium">{{ formatTime(event.start_time) }}</span>
+                  <span *ngIf="event.end_time" class="text-gray-500 text-xs">to {{ formatTime(event.end_time) }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-left">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
+                  <span class="text-sm">{{ event.location }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-left">
+                <div class="flex items-center gap-2">
+                  <i class="fas fa-building text-gray-400 text-xs"></i>
+                  <span class="text-sm font-medium">{{ event.department }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 text-center">
+                <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2"
+                      [ngClass]="{
+                        'bg-yellow-50 text-yellow-800 border-yellow-300': event.status === 'not yet started',
+                        'bg-blue-50 text-blue-800 border-blue-300': event.status === 'ongoing',
+                        'bg-green-50 text-green-800 border-green-300': event.status === 'concluded',
+                        'bg-red-50 text-red-800 border-red-300': event.status === 'cancelled'
+                      }">
+                  <i class="fas" 
+                     [ngClass]="{
+                       'fa-clock': event.status === 'not yet started',
+                       'fa-play-circle': event.status === 'ongoing',
+                       'fa-check-circle': event.status === 'concluded',
+                       'fa-times-circle': event.status === 'cancelled'
+                     }"></i>
+                  {{ (event.status || 'Not Yet Started') | titlecase }}
                 </span>
-                <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
-                      class="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-amber-50 text-amber-900 border-amber-200">
-                  ₱ {{ event.registration_fee | number:'1.2-2' }}
-                </span>
               </td>
-              <td class="px-4 py-3 text-center">
-                {{ event.start_date | date: 'MMMM d, y' }}<br>
-                <span *ngIf="event.end_date">to {{ event.end_date | date: 'MMMM d, y' }}</span>
-              </td>
-              <td class="px-4 py-3 text-center">
-                {{ formatTime(event.start_time) }}<br>
-                <span *ngIf="event.end_time">to {{ formatTime(event.end_time) }}</span>
-              </td>
-              <td class="px-4 py-3 text-left">{{ event.location }}</td>
-              <td class="px-4 py-3 text-left">{{ event.department }}</td>
             </tr>
             <tr *ngIf="filteredOrgEvents().length === 0">
-              <td colspan="6" class="text-center py-6 text-gray-500 bg-[#f3fafd] font-semibold">No organization events found.</td>
+              <td colspan="8" class="text-center py-12 text-gray-500 bg-gray-50">
+                <div class="flex flex-col items-center gap-3">
+                  <i class="fas fa-search text-4xl text-gray-300"></i>
+                  <p class="font-semibold text-lg">No organization events found</p>
+                  <p class="text-sm text-gray-400">Try adjusting your search criteria</p>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <!-- Pagination moved outside horizontal scroll (Home paginator style) -->
-      <div *ngIf="filteredOrgEvents().length > orgEventPageSize" class="bg-white py-2 px-2">
+      <!-- Enhanced Pagination -->
+      <div *ngIf="filteredOrgEvents().length > orgEventPageSize" class="bg-white py-4 px-4 border-t-2 border-gray-200">
         <div class="flex justify-center items-center">
-          <nav class="inline-flex space-x-1" aria-label="Pagination">
+          <nav class="inline-flex space-x-2" aria-label="Pagination">
             <button
-              class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+              class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 transition-all duration-200 disabled:cursor-not-allowed font-semibold"
               [disabled]="orgEventPage === 1"
               (click)="prevOrgEventPage()">
               <i class="fas fa-chevron-left"></i>
             </button>
             <ng-container *ngFor="let _ of [].constructor(orgEventTotalPages); let i = index">
               <button
-                class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
-                [ngClass]="orgEventPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+                class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 font-bold"
+                [ngClass]="orgEventPage === (i + 1) 
+                  ? 'bg-gradient-to-r from-[#14532d] to-[#166534] text-white shadow-md' 
+                  : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
                 [attr.aria-current]="orgEventPage === (i + 1) ? 'page' : null"
                 (click)="goToOrgEventPage(i + 1)">
                 {{ i + 1 }}
               </button>
             </ng-container>
             <button
-              class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+              class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 transition-all duration-200 disabled:cursor-not-allowed font-semibold"
               [disabled]="orgEventPage === orgEventTotalPages"
               (click)="nextOrgEventPage()">
               <i class="fas fa-chevron-right"></i>
@@ -515,16 +666,25 @@
           </div>
           <div class="fixed md:absolute left-4 bottom-2 md:top-auto md:bottom-0 md:left-0 z-20 w-24 h-auto md:w-full md:h-auto m-0 p-1 md:p-2 rounded-xl md:rounded-b-xl md:rounded-t-none shadow-lg border border-gray-200 bg-white/90 flex flex-col md:flex-row items-center md:items-start md:justify-between gap-1 overflow-hidden" style="min-height:unset;">
             <ng-container *ngIf="!isInlineEditing">
-              <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto md:self-start md:ml-0 md:mr-auto" title="View Participants">
-                <i class="fas fa-users mr-0 md:mr-2"></i>
-                <span class="hidden md:inline">Participants</span>
-              </button>
+              <div class="flex flex-col md:flex-row gap-1 w-full md:w-auto">
+                <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto" title="View Participants">
+                  <i class="fas fa-users mr-0 md:mr-2"></i>
+                  <span class="hidden md:inline">Participants</span>
+                </button>
+                <button (click)="openEvaluationsModal(selectedEvent)" class="bg-purple-600 hover:bg-purple-800 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto" title="View Evaluations">
+                  <i class="fas fa-star mr-0 md:mr-2"></i>
+                  <span class="hidden md:inline">Evaluations</span>
+                </button>
+              </div>
               <div class="flex flex-col md:flex-row gap-1 md:ml-auto">
                 <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-gray-400 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto" title="Delete Event">
                   <i class="fas fa-trash-alt mr-0 md:mr-2"></i>
                   <span class="hidden md:inline">Archive</span>
                 </button>
-                <button (click)="editEvent(selectedEvent)" class="bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto" title="Edit Event">
+                <button (click)="editEvent(selectedEvent)" 
+                        [disabled]="isEventConcluded(selectedEvent)"
+                        [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed px-4 py-2 rounded-lg flex items-center justify-center shadow w-full md:w-auto' : 'bg-green-600 hover:bg-green-800 text-white px-4 py-2 rounded-lg transition-all duration-150 flex items-center justify-center shadow w-full md:w-auto'"
+                        [title]="isEventConcluded(selectedEvent) ? 'Cannot edit concluded event' : 'Edit Event'">
                   <i class="fas fa-edit mr-0 md:mr-2"></i>
                   <span class="hidden md:inline">Edit</span>
                 </button>
@@ -549,7 +709,7 @@
     </div>
 
   <!-- Mobile: modal for event details (styled like attendance records modal) -->
-  <div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in md:hidden" style="z-index: 3000;">
+  <div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in md:hidden" style="z-index: 3000;">
     <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0 animate-scale-in"
       [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
       style="max-height: 92vh; overflow-y: auto;">
@@ -689,15 +849,23 @@
       </div>
       <div class="flex justify-between items-center pt-4">
         <ng-container *ngIf="!isInlineEditing">
-          <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white p-3 rounded-full transition-all duration-150 flex items-center justify-center shadow w-12 h-12" title="View Participants">
-            <i class="fas fa-users text-lg"></i>
-          </button>
+          <div class="flex gap-2">
+            <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white p-3 rounded-full transition-all duration-150 flex items-center justify-center shadow w-12 h-12" title="View Participants">
+              <i class="fas fa-users text-lg"></i>
+            </button>
+            <button (click)="openEvaluationsModal(selectedEvent)" class="bg-purple-600 hover:bg-purple-800 text-white p-3 rounded-full transition-all duration-150 flex items-center justify-center shadow w-12 h-12" title="View Evaluations">
+              <i class="fas fa-star text-lg"></i>
+            </button>
+          </div>
         </ng-container>
         <div class="flex gap-2" *ngIf="!isInlineEditing">
           <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-gray-400 hover:bg-gray-600 text-white p-3 rounded-full transition-all duration-150 flex items-center justify-center shadow w-12 h-12" title="Delete Event">
             <i class="fas fa-trash-alt text-lg"></i>
           </button>
-          <button (click)="editEvent(selectedEvent)" class="bg-green-600 hover:bg-green-800 text-white p-3 rounded-full transition-all duration-150 flex items-center justify-center shadow w-12 h-12" title="Edit Event">
+          <button (click)="editEvent(selectedEvent)" 
+                  [disabled]="isEventConcluded(selectedEvent)"
+                  [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed p-3 rounded-full flex items-center justify-center shadow w-12 h-12' : 'bg-green-600 hover:bg-green-800 text-white p-3 rounded-full transition-all duration-150 flex items-center justify-center shadow w-12 h-12'"
+                  [title]="isEventConcluded(selectedEvent) ? 'Cannot edit concluded event' : 'Edit Event'">
             <i class="fas fa-edit text-lg"></i>
           </button>
         </div>
@@ -717,317 +885,1073 @@
     </ng-template>
 
 <!-- Participants Modal (responsive update, larger size) -->
-<div *ngIf="showParticipantsModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
-  <div
-  class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0 animate-scale-in"
-    [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
-  style="max-height: 92vh; overflow-y: auto;"
-  >
-    <button
-      (click)="closeParticipantsModal()"
-      class="absolute top-2 right-2 text-gray-500 hover:text-red-600"
-      aria-label="Close"
-    >
-      <i class="fas fa-times"></i>
-    </button>
-    <h2
-      class="text-xl sm:text-2xl font-bold mb-2 break-words"
-      [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"
-    >
-      Registered Participants for "{{ selectedEventTitle }}"
-    </h2>
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3" *ngIf="!participantsLoading && participants.length > 0">
-    <!-- Bulk actions toolbar -->
-    <div class="flex flex-wrap items-center gap-2">
-      <ng-container *ngIf="hasSelection; else noSelectionHint">
-        <span class="inline-flex items-center gap-1 px-2 py-1 rounded border text-xs text-gray-700 bg-gray-50">
-          <i class="fas fa-check-square text-[#679436]"></i>
-          {{ selectedCount }} selected
-        </span>
-        <button type="button"
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-white text-xs sm:text-sm shadow-sm bg-emerald-600 hover:bg-emerald-700"
-                (click)="bulkApproveSelected()">
-          <i class="fas fa-check"></i>
-          Approve Selected
-        </button>
-        <button type="button"
-                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-white text-xs sm:text-sm shadow-sm bg-red-600 hover:bg-red-700"
-                (click)="bulkRejectSelected()">
-          <i class="fas fa-times"></i>
-          Reject Selected
-        </button>
-      </ng-container>
-      <ng-template #noSelectionHint>
-        <span class="text-xs text-gray-500">Select pending registrations to approve or reject in bulk.</span>
-      </ng-template>
+<!-- Participants Modal -->
+<div *ngIf="showParticipantsModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
+       style="max-height: 95vh;">
+    
+    <!-- Modal Header -->
+    <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
+         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]'">
+      <div class="flex items-center gap-3 flex-1 min-w-0 pr-4">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-users text-white text-lg"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-white truncate">
+          {{ selectedEventTitle }}
+        </h2>
+      </div>
+      <button (click)="closeParticipantsModal()" 
+              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0"
+              aria-label="Close">
+        <i class="fas fa-times text-lg"></i>
+      </button>
     </div>
 
-    <!-- Download Excel button -->
-    <div class="flex justify-end">
+    <!-- Modal Body -->
+    <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+      
+      <!-- Loading State -->
+      <div *ngIf="participantsLoading" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2" 
+             [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
+        <p class="mt-4 text-gray-600">Loading participants...</p>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!participantsLoading">
+        
+        <!-- Stats & Actions Bar -->
+        <div *ngIf="participants.length > 0" class="space-y-4 mb-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <!-- Participant Count -->
+            <div class="flex items-center gap-2">
+              <h3 class="text-lg font-semibold" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+                <i class="fas fa-user-friends mr-2"></i>Registered Participants
+              </h3>
+              <span class="px-3 py-1 rounded-full text-sm font-semibold"
+                    [ngClass]="isOsws ? 'bg-[#e6f7ef] text-[#14532d]' : 'bg-green-50 text-[#679436]'">
+                {{ participants.length }} Total
+              </span>
+            </div>
+            
+            <!-- Download Excel -->
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all duration-300 hover:shadow-lg transform hover:scale-105"
+              [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'"
+              (click)="downloadParticipantsExcel()"
+              title="Download participants as Excel">
+              <i class="fas fa-file-excel"></i>
+              <span>Download Excel</span>
+            </button>
+          </div>
+
+          <!-- Bulk Actions Toolbar -->
+          <div *ngIf="hasSelection" 
+               class="p-4 rounded-xl border-2 transition-all animate-fade-in"
+               [ngClass]="isOsws ? 'bg-[#e6f7ef]/30 border-[#14532d]/20' : 'bg-green-50/30 border-[#679436]/20'">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-check-square text-xl" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                <span class="font-semibold text-gray-700">
+                  <span [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ selectedCount }}</span> participant{{ selectedCount !== 1 ? 's' : '' }} selected
+                </span>
+              </div>
+              <div class="flex gap-2">
+                <button type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all hover:shadow-lg"
+                        [ngClass]="'bg-emerald-600 hover:bg-emerald-700'"
+                        (click)="bulkApproveSelected()">
+                  <i class="fas fa-check"></i>
+                  Approve Selected
+                </button>
+                <button type="button"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all hover:shadow-lg bg-red-600 hover:bg-red-700"
+                        (click)="bulkRejectSelected()">
+                  <i class="fas fa-times"></i>
+                  Reject Selected
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Participants List -->
+        <div *ngIf="participants.length > 0" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+                [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+              <i class="fas fa-list"></i>
+              <span>Participant Details</span>
+              <span class="text-sm font-normal text-gray-500">({{ filteredParticipants.length }} {{ filteredParticipants.length !== participants.length ? 'of ' + participants.length : '' }})</span>
+            </h3>
+          </div>
+
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+            <!-- Search -->
+            <div class="relative flex-1">
+              <input 
+                type="text" 
+                [(ngModel)]="participantsSearchTerm"
+                (ngModelChange)="onParticipantsSearchChange()"
+                placeholder="Search by name, student ID, department, or program..."
+                class="w-full px-4 py-2.5 pr-10 border-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all"
+                [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
+              />
+              <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+            
+            <!-- Page Size Selector -->
+            <select 
+              [(ngModel)]="participantsPageSize"
+              (ngModelChange)="changeParticipantsPageSize(participantsPageSize)"
+              class="px-4 py-2.5 border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 transition-all"
+              [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'">
+              <option [value]="10">10 per page</option>
+              <option [value]="20">20 per page</option>
+              <option [value]="50">50 per page</option>
+              <option [value]="100">100 per page</option>
+            </select>
+          </div>
+
+          <!-- Select All Checkbox -->
+          <div *ngIf="hasPendingOnPage()" class="flex items-center gap-2 p-3 rounded-lg"
+               [ngClass]="isOsws ? 'bg-[#e6f7ef]/20' : 'bg-gray-50'">
+            <input type="checkbox"
+                   (change)="toggleSelectAllPage($event)"
+                   [checked]="isAllPendingSelectedOnPage()"
+                   class="form-checkbox h-5 w-5 rounded"
+                   [ngClass]="isOsws ? 'text-[#14532d] focus:ring-[#14532d]' : 'text-[#679436] focus:ring-[#679436]'" />
+            <label class="text-sm font-medium text-gray-700 cursor-pointer select-none">
+              Select all pending registrations on this page
+            </label>
+          </div>
+
+          <!-- Participant Cards -->
+          <div class="space-y-3" *ngIf="filteredParticipants.length > 0; else noResultsFound">
+            <div *ngFor="let p of pagedParticipants; let i = index" 
+                 class="bg-white border-2 rounded-xl overflow-hidden transition-all duration-200"
+                 [ngClass]="isParticipantExpanded(((participantsPage - 1) * participantsPageSize) + i) ? 
+                   (isOsws ? 'border-[#14532d] shadow-lg' : 'border-[#679436] shadow-lg') : 
+                   (isSelected(p) ? 
+                     (isOsws ? 'border-[#14532d] shadow-md' : 'border-[#679436] shadow-md') : 
+                     'border-gray-200 hover:border-gray-300 hover:shadow-sm')">
+              
+              <!-- Collapsible Header -->
+              <div class="p-4 cursor-pointer select-none"
+                   (click)="toggleParticipantExpanded(((participantsPage - 1) * participantsPageSize) + i)">
+                <div class="flex items-start gap-4">
+                  <!-- Checkbox (Only for Pending) - Click stops propagation -->
+                  <div class="flex-shrink-0 pt-1" *ngIf="isPending(p)" (click)="$event.stopPropagation()">
+                    <input type="checkbox"
+                           [checked]="isSelected(p)"
+                           (change)="toggleSelection(p)"
+                           class="form-checkbox h-5 w-5 rounded"
+                           [ngClass]="isOsws ? 'text-[#14532d] focus:ring-[#14532d]' : 'text-[#679436] focus:ring-[#679436]'" />
+                  </div>
+
+                  <!-- Avatar -->
+                  <div class="flex-shrink-0">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm"
+                         [ngClass]="isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534]' : 'bg-gradient-to-br from-[#679436] to-[#56732e]'">
+                      {{ p.first_name?.charAt(0) }}{{ p.last_name?.charAt(0) }}
+                    </div>
+                  </div>
+
+                  <!-- Header Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
+                      <!-- Name, ID, and Department-Program Summary -->
+                      <div class="flex-1 min-w-0">
+                        <h4 class="font-semibold text-base" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-gray-900'">
+                          {{ p.first_name }} {{ p.last_name }} {{ p.suffix }}
+                        </h4>
+                        <p class="text-sm text-gray-600 flex items-center gap-1 mt-0.5">
+                          <i class="fas fa-id-card text-xs"></i>
+                          {{ p.student_id }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1 truncate">
+                          {{ p.department || 'N/A' }} • {{ p.program || 'N/A' }}
+                        </p>
+                      </div>
+
+                      <!-- Status Badge & Chevron -->
+                      <div class="flex items-center gap-3 flex-shrink-0">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border-2"
+                              [ngClass]="{
+                                'bg-yellow-50 text-yellow-800 border-yellow-300': isPending(p),
+                                'bg-emerald-50 text-emerald-800 border-emerald-300': isApproved(p),
+                                'bg-red-50 text-red-800 border-red-300': isRejected(p)
+                              }">
+                          <i class="fas" 
+                             [ngClass]="{
+                               'fa-clock': isPending(p),
+                               'fa-check-circle': isApproved(p),
+                               'fa-times-circle': isRejected(p)
+                             }"></i>
+                          {{ (p.status || 'approved') | titlecase }}
+                        </span>
+                        
+                        <!-- Chevron Icon -->
+                        <i class="fas text-gray-400 transition-transform duration-200"
+                           [ngClass]="isParticipantExpanded(((participantsPage - 1) * participantsPageSize) + i) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Expanded Content -->
+              <div *ngIf="isParticipantExpanded(((participantsPage - 1) * participantsPageSize) + i)" 
+                   class="px-4 pb-4 animate-fade-in"
+                   (click)="$event.stopPropagation()">
+                <div class="pt-3 border-t" [ngClass]="isOsws ? 'border-[#e6f7ef]' : 'border-gray-200'">
+                  
+                  <!-- Full Details Grid -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                    <div class="flex items-center gap-2 text-sm">
+                      <i class="fas fa-building text-gray-400 w-4"></i>
+                      <span class="text-gray-600">Department:</span>
+                      <span class="font-medium text-gray-900">{{ p.department || 'N/A' }}</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm">
+                      <i class="fas fa-graduation-cap text-gray-400 w-4"></i>
+                      <span class="text-gray-600">Program:</span>
+                      <span class="font-medium text-gray-900">{{ p.program || 'N/A' }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Proof of Payment Section -->
+                  <div class="mb-4 p-4 rounded-lg" [ngClass]="isOsws ? 'bg-[#e6f7ef]/30' : 'bg-gray-50'">
+                    <div class="flex items-center gap-2 mb-2">
+                      <i class="fas fa-file-invoice" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                      <span class="text-sm font-semibold" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-gray-900'">
+                        Proof of Payment
+                      </span>
+                    </div>
+                    <ng-container *ngIf="p.proof_of_payment; else noProof">
+                      <div class="flex items-center gap-3">
+                        <button
+                          type="button"
+                          class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all hover:shadow-lg"
+                          [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
+                          (click)="downloadProof(p)"
+                          title="Download proof of payment">
+                          <i class="fas fa-download"></i>
+                          <span>Download Proof</span>
+                        </button>
+                        <span class="text-xs text-gray-500">File uploaded</span>
+                      </div>
+                    </ng-container>
+                    <ng-template #noProof>
+                      <p class="text-sm text-gray-500 italic">No proof of payment uploaded</p>
+                    </ng-template>
+                  </div>
+
+                  <!-- Action Buttons (Only for Pending) -->
+                  <div class="flex gap-2 justify-end" *ngIf="isPending(p)">
+                    <button type="button"
+                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all hover:shadow-lg bg-emerald-600 hover:bg-emerald-700"
+                            (click)="approveParticipant(p)">
+                      <i class="fas fa-check"></i>
+                      Approve
+                    </button>
+                    <button type="button"
+                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all hover:shadow-lg bg-red-600 hover:bg-red-700"
+                            (click)="rejectParticipant(p)">
+                      <i class="fas fa-times"></i>
+                      Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Results Found (When Search Returns Nothing) -->
+          <ng-template #noResultsFound>
+            <div class="text-center py-12 px-4">
+              <div class="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                   [ngClass]="isOsws ? 'bg-[#e6f7ef]' : 'bg-gray-100'">
+                <i class="fas fa-search text-4xl text-gray-300"></i>
+              </div>
+              <p class="text-gray-600 text-lg font-semibold">No participants found</p>
+              <p class="text-gray-500 text-sm mt-2">Try adjusting your search criteria</p>
+              <button 
+                type="button"
+                class="mt-4 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+                [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534] text-white' : 'bg-[#679436] hover:bg-[#56732e] text-white'"
+                (click)="participantsSearchTerm = ''; onParticipantsSearchChange()">
+                <i class="fas fa-times-circle mr-2"></i>Clear Search
+              </button>
+            </div>
+          </ng-template>
+
+          <!-- Pagination -->
+          <div *ngIf="participantsTotalPages > 1" 
+               class="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3 pt-4 border-t-2"
+               [ngClass]="isOsws ? 'border-[#e6f7ef]' : 'border-gray-200'">
+            <p class="text-sm text-gray-600 font-medium">
+              Showing {{ ((participantsPage - 1) * participantsPageSize) + 1 }} - {{ Math.min(participantsPage * participantsPageSize, filteredParticipants.length) }} of {{ filteredParticipants.length }}
+            </p>
+            <nav class="inline-flex space-x-1" aria-label="Pagination">
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded-lg transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                [ngClass]="isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'"
+                [disabled]="participantsPage === 1"
+                (click)="prevParticipantsPage()">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <ng-container *ngFor="let _ of [].constructor(participantsTotalPages); let i = index">
+                <button
+                  class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 text-sm font-semibold"
+                  [ngClass]="participantsPage === (i + 1) ? 
+                    (isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534] text-white shadow-md' : 'bg-gradient-to-br from-[#679436] to-[#56732e] text-white shadow-md') : 
+                    (isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700')"
+                  [attr.aria-current]="participantsPage === (i + 1) ? 'page' : null"
+                  (click)="goToParticipantsPage(i + 1)">
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded-lg transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                [ngClass]="isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'"
+                [disabled]="participantsPage === participantsTotalPages"
+                (click)="nextParticipantsPage()">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        <!-- No Participants State -->
+        <div *ngIf="participants.length === 0" class="text-center py-12">
+          <div class="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+               [ngClass]="isOsws ? 'bg-[#e6f7ef]' : 'bg-gray-100'">
+            <i class="fas fa-user-slash text-4xl text-gray-300"></i>
+          </div>
+          <p class="text-gray-600 text-lg font-semibold">No participants registered yet</p>
+          <p class="text-gray-500 text-sm mt-2">Registrations will appear here once participants sign up for this event.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div *ngIf="!participantsLoading && participants.length > 0" 
+         class="sticky bottom-0 px-6 py-4 bg-gray-50 border-t-2 border-gray-200 flex justify-between items-center">
+      <p class="text-xs text-gray-500 flex items-center gap-1">
+        <i class="fas fa-info-circle"></i>
+        <span>{{ participants.length }} participant{{ participants.length !== 1 ? 's' : '' }} registered</span>
+      </p>
       <button
         type="button"
-        class="inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md text-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
-        [ngClass]="'bg-[#05668D] hover:bg-blue-800 focus:ring-[#05668D]'"
-        (click)="downloadParticipantsExcel()"
-        aria-label="Download participants as Excel"
-        title="Download participants as Excel"
-      >
-        <i class="fas fa-file-excel text-sm sm:text-base"></i>
-        <span>Download Excel</span>
+        class="px-6 py-2.5 rounded-lg text-white font-semibold transition-all shadow-md hover:shadow-lg"
+        [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'"
+        (click)="closeParticipantsModal()">
+        Close
       </button>
     </div>
   </div>
-    <div *ngIf="participantsLoading" class="text-center py-8">Loading...</div>
-    <div *ngIf="!participantsLoading && participants.length === 0" class="text-center py-8 text-gray-500">
-      No participants registered for this event.
+</div>
+</div>
+
+<!-- Create Event Modal -->
+<div *ngIf="showCreateModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
+       style="max-height: 95vh;">
+    
+    <!-- Modal Header -->
+    <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
+         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]'">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+          <i class="fas text-white text-lg" [ngClass]="isEditing ? 'fa-edit' : 'fa-plus-circle'"></i>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-bold text-white">
+          {{ isEditing ? 'Edit Event' : 'Create New Event' }}
+        </h2>
+      </div>
+      <button (click)="closeCreateModal()" 
+              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90"
+              aria-label="Close">
+        <i class="fas fa-times text-lg"></i>
+      </button>
     </div>
-    <div *ngIf="!participantsLoading && participants.length > 0" class="overflow-x-auto">
-      <table class="w-full text-sm sm:text-base whitespace-nowrap">
-        <thead [ngClass]="isOsws ? 'bg-[#14532d] text-white' : 'bg-[#679436] text-white'">
-          <tr>
-            <th class="px-3 py-3 text-left w-8">
-              <input type="checkbox"
-                     title="Select all on page"
-                     (change)="toggleSelectAllPage($event)"
-                     [disabled]="!hasPendingOnPage()"
-                     [checked]="isAllPendingSelectedOnPage()"
-                     class="form-checkbox h-4 w-4 text-[#679436] align-middle" />
-            </th>
-            <th class="px-4 py-3 text-left">Student ID</th>
-            <th class="px-4 py-3 text-left">First Name</th>
-            <th class="px-4 py-3 text-left">Last Name</th>
-            <th class="px-4 py-3 text-left">Suffix</th>
-            <th class="px-4 py-3 text-left">Department</th>
-            <th class="px-4 py-3 text-left">Program</th>
-            <th class="px-4 py-3 text-left">Proof of Payment</th>
-            <th class="px-4 py-3 text-left">Status</th>
-            <th class="px-4 py-3 text-left">Action</th>
-          </tr>
-        </thead>
-  <tbody class="text-xs sm:text-sm">
-          <tr *ngFor="let p of pagedParticipants">
-            <td class="px-3 py-3">
-              <ng-container *ngIf="isPending(p); else noSelect">
-                <input type="checkbox"
-                       [checked]="isSelected(p)"
-                       (change)="toggleSelection(p)"
-                       class="form-checkbox h-4 w-4 text-[#679436] align-middle" />
-              </ng-container>
-              <ng-template #noSelect>
-                <!-- empty cell to keep alignment -->
-              </ng-template>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap">{{ p.student_id }}</td>
-            <td class="px-4 py-3 whitespace-nowrap">{{ p.first_name }}</td>
-            <td class="px-4 py-3 whitespace-nowrap">{{ p.last_name }}</td>
-            <td class="px-4 py-3 whitespace-nowrap">{{ p.suffix }}</td>
-            <td class="px-4 py-3 whitespace-nowrap">{{ p.department }}</td>
-            <td class="px-4 py-3 whitespace-nowrap">{{ p.program }}</td>
-            <td class="px-4 py-3 break-all">
-              <ng-container *ngIf="p.proof_of_payment; else noProof">
-                <button
-                  type="button"
-                  class="inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
-                  [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#218c4a] focus:ring-[#14532d]' : 'bg-[#679436] hover:bg-[#56732e] focus:ring-[#679436]'"
-                  (click)="downloadProof(p)"
-                  title="Download proof of payment"
-                  aria-label="Download proof of payment"
-                >
-                  <i class="fas fa-download text-sm sm:text-base" aria-hidden="true"></i>
-                  <span>Download</span>
-                </button>
-              </ng-container>
-              <ng-template #noProof>
-                <span class="text-gray-400">No file</span>
-              </ng-template>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
-                    [ngClass]="{
-                      'bg-yellow-50 text-yellow-800 border-yellow-200': isPending(p),
-                      'bg-emerald-50 text-emerald-800 border-emerald-200': isApproved(p),
-                      'bg-red-50 text-red-800 border-red-200': isRejected(p)
-                    }">
-                {{ (p.status || 'approved') | titlecase }}
-              </span>
-            </td>
-            <td class="px-4 py-3 whitespace-nowrap">
-              <div class="flex gap-2" *ngIf="isPending(p)">
-                <button type="button"
-                        class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-white text-xs shadow-sm bg-emerald-600 hover:bg-emerald-700"
-                        (click)="approveParticipant(p)">
-                  <i class="fas fa-check"></i>
-                  Approve
-                </button>
-                <button type="button"
-                        class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-white text-xs shadow-sm bg-red-600 hover:bg-red-700"
-                        (click)="rejectParticipant(p)">
-                  <i class="fas fa-times"></i>
-                  Reject
-                </button>
+
+    <!-- Modal Body -->
+    <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+      <form class="space-y-6">
+        
+        <!-- Basic Information Section -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+              [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+            <i class="fas fa-info-circle"></i>
+            <span>Basic Information</span>
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Title (Full Width on Mobile, Half on Desktop) -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold mb-2 text-gray-700 flex items-center gap-1">
+                <i class="fas fa-heading text-xs" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                Event Title <span class="text-red-500">*</span>
+              </label>
+              <input type="text" 
+                     [(ngModel)]="newEvent.title"
+                     name="title"
+                     class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                     [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
+                     placeholder="Enter event title..." />
+            </div>
+
+            <!-- Location -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold mb-2 text-gray-700 flex items-center gap-1">
+                <i class="fas fa-map-marker-alt text-xs" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                Location <span class="text-red-500">*</span>
+              </label>
+              <input type="text" 
+                     [(ngModel)]="newEvent.location"
+                     name="location"
+                     class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                     [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
+                     placeholder="Enter event location..." />
+            </div>
+
+            <!-- Description -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold mb-2 text-gray-700 flex items-center gap-1">
+                <i class="fas fa-align-left text-xs" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                Description <span class="text-red-500">*</span>
+              </label>
+              <textarea [(ngModel)]="newEvent.description"
+                        name="description"
+                        rows="4"
+                        class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all resize-y"
+                        [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
+                        placeholder="Describe your event..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Section -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+              [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+            <i class="fas fa-ticket-alt"></i>
+            <span>Registration Details</span>
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Registration Type -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold mb-3 text-gray-700">Registration Type</label>
+              <div class="grid grid-cols-2 gap-3">
+                <label class="relative flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md"
+                       [ngClass]="!newEvent.is_paid ? (isOsws ? 'border-[#14532d] bg-[#e6f7ef]' : 'border-[#679436] bg-green-50') : 'border-gray-300 bg-white'">
+                  <input type="radio" 
+                         name="is_paid_modal" 
+                         [value]="false" 
+                         [(ngModel)]="newEvent.is_paid" 
+                         class="form-radio h-5 w-5"
+                         [ngClass]="isOsws ? 'text-[#14532d] focus:ring-[#14532d]' : 'text-[#679436] focus:ring-[#679436]'">
+                  <div class="flex-1">
+                    <div class="font-semibold text-gray-800 flex items-center gap-2">
+                      <i class="fas fa-gift" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                      Free Event
+                    </div>
+                    <p class="text-xs text-gray-500 mt-0.5">No registration fee required</p>
+                  </div>
+                </label>
+                
+                <label class="relative flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md"
+                       [ngClass]="newEvent.is_paid ? (isOsws ? 'border-[#14532d] bg-[#e6f7ef]' : 'border-[#679436] bg-green-50') : 'border-gray-300 bg-white'">
+                  <input type="radio" 
+                         name="is_paid_modal" 
+                         [value]="true" 
+                         [(ngModel)]="newEvent.is_paid" 
+                         class="form-radio h-5 w-5"
+                         [ngClass]="isOsws ? 'text-[#14532d] focus:ring-[#14532d]' : 'text-[#679436] focus:ring-[#679436]'">
+                  <div class="flex-1">
+                    <div class="font-semibold text-gray-800 flex items-center gap-2">
+                      <i class="fas fa-peso-sign" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                      Paid Event
+                    </div>
+                    <p class="text-xs text-gray-500 mt-0.5">Requires registration fee</p>
+                  </div>
+                </label>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- Pagination controls (Home paginator style) -->
-      <div *ngIf="participants.length > participantsPageSize" class="flex justify-center items-center mt-4">
-        <nav class="inline-flex space-x-1" aria-label="Pagination">
-          <button
-            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            [disabled]="participantsPage === 1"
-            (click)="prevParticipantsPage()">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <ng-container *ngFor="let _ of [].constructor(participantsTotalPages); let i = index">
-            <button
-              class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
-              [ngClass]="participantsPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
-              [attr.aria-current]="participantsPage === (i + 1) ? 'page' : null"
-              (click)="goToParticipantsPage(i + 1)">
-              {{ i + 1 }}
-            </button>
-          </ng-container>
-          <button
-            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            [disabled]="participantsPage === participantsTotalPages"
-            (click)="nextParticipantsPage()">
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </nav>
+            </div>
+
+            <!-- Registration Fee (Conditional) -->
+            <div *ngIf="newEvent.is_paid" class="md:col-span-2 animate-fade-in">
+              <label class="block text-sm font-semibold mb-2 text-gray-700 flex items-center gap-1">
+                <i class="fas fa-money-bill-wave text-xs" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                Registration Fee <span class="text-red-500">*</span>
+              </label>
+              <div class="relative max-w-xs">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 font-semibold text-lg select-none">₱</span>
+                <input type="number"
+                       step="0.01"
+                       min="0"
+                       [(ngModel)]="newEvent.registration_fee"
+                       name="registration_fee"
+                       class="w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                       [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
+                       placeholder="0.00" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date & Time Section -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+              [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Schedule</span>
+          </h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Start Date & Time -->
+            <div class="space-y-3 p-4 rounded-lg border-2" [ngClass]="isOsws ? 'bg-[#e6f7ef]/30 border-[#e6f7ef]' : 'bg-green-50/30 border-green-100'">
+              <h4 class="font-semibold text-sm flex items-center gap-2" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+                <i class="fas fa-play-circle"></i>
+                Start Date & Time
+              </h4>
+              <div>
+                <label class="block text-xs font-medium mb-1 text-gray-600">Date</label>
+                <input type="date" 
+                       [(ngModel)]="newEvent.start_date"
+                       name="start_date"
+                       class="w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                       [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1 text-gray-600">Time</label>
+                <input type="time" 
+                       [(ngModel)]="newEvent.start_time"
+                       name="start_time"
+                       class="w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                       [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'" />
+              </div>
+            </div>
+
+            <!-- End Date & Time -->
+            <div class="space-y-3 p-4 rounded-lg border-2" [ngClass]="isOsws ? 'bg-[#e6f7ef]/30 border-[#e6f7ef]' : 'bg-green-50/30 border-green-100'">
+              <h4 class="font-semibold text-sm flex items-center gap-2" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+                <i class="fas fa-stop-circle"></i>
+                End Date & Time
+              </h4>
+              <div>
+                <label class="block text-xs font-medium mb-1 text-gray-600">Date</label>
+                <input type="date" 
+                       [(ngModel)]="newEvent.end_date"
+                       name="end_date"
+                       class="w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                       [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium mb-1 text-gray-600">Time</label>
+                <input type="time" 
+                       [(ngModel)]="newEvent.end_time"
+                       name="end_time"
+                       class="w-full px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                       [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Poster Section -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+              [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+            <i class="fas fa-image"></i>
+            <span>Event Poster</span>
+          </h3>
+          
+          <!-- Dropzone -->
+          <label for="dropzone-file" 
+                 class="flex flex-col items-center justify-center w-full h-56 border-2 border-dashed rounded-xl cursor-pointer transition-all hover:shadow-md"
+                 [ngClass]="posterPreviewUrl ? 'border-transparent' : (isOsws ? 'border-[#14532d]/30 bg-[#e6f7ef]/20 hover:bg-[#e6f7ef]/40' : 'border-[#679436]/30 bg-green-50/20 hover:bg-green-50/40')">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6" *ngIf="!posterPreviewUrl">
+              <div class="w-16 h-16 rounded-full flex items-center justify-center mb-3"
+                   [ngClass]="isOsws ? 'bg-[#14532d]/10' : 'bg-[#679436]/10'">
+                <i class="fas fa-cloud-upload-alt text-3xl" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+              </div>
+              <p class="mb-2 text-sm font-medium text-gray-700">
+                <span [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">Click to upload</span> or drag and drop
+              </p>
+              <p class="text-xs text-gray-500">PNG, JPG, WEBP (MAX. 5MB)</p>
+            </div>
+            
+            <!-- Preview -->
+            <div *ngIf="posterPreviewUrl" class="relative w-full h-full p-3">
+              <img [src]="posterPreviewUrl" class="w-full h-full object-contain rounded-lg" alt="Poster preview" />
+              <button type="button" 
+                      (click)="removeImage(); $event.preventDefault();" 
+                      class="absolute top-5 right-5 w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                      aria-label="Remove image">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+            
+            <input id="dropzone-file" type="file" class="hidden" accept="image/*" (change)="previewImage($event)" />
+          </label>
+        </div>
+
+      </form>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="sticky bottom-0 px-6 py-4 bg-gray-50 border-t-2 border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <p class="text-xs text-gray-500 flex items-center gap-1">
+        <i class="fas fa-info-circle"></i>
+        <span>Fields marked with <span class="text-red-500">*</span> are required</span>
+      </p>
+      <div class="flex gap-3 w-full sm:w-auto">
+        <button type="button"
+                (click)="closeCreateModal()" 
+                class="flex-1 sm:flex-none px-6 py-2.5 rounded-lg border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all hover:shadow-md">
+          Cancel
+        </button>
+        <button type="button"
+                (click)="createEventFromModal()"
+                class="flex-1 sm:flex-none px-8 py-2.5 rounded-lg text-white font-bold transition-all shadow-md hover:shadow-lg transform hover:scale-105"
+                [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'">
+          {{ isEditing ? 'Update Event' : 'Create Event' }}
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Create Event Modal -->
-<div *ngIf="showCreateModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
-  <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0 animate-scale-in"
-       [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
-  style="max-height: 92vh; overflow-y: auto;">
-    <button (click)="closeCreateModal()" class="absolute top-2 right-2 text-gray-500 hover:text-red-600" aria-label="Close">
-      <i class="fas fa-times"></i>
-    </button>
-  <h2 class="text-xl sm:text-2xl font-bold mb-4" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ isEditing ? 'Edit Event' : 'Create Event' }}</h2>
-
-    <div class="space-y-3">
-      <div>
-        <label class="block text-sm font-medium mb-1">Title</label>
-        <input type="text" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.title" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">Description</label>
-        <textarea class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.description" rows="3"></textarea>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">Location</label>
-        <input type="text" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.location" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">Registration Type</label>
-        <div class="flex items-center gap-6">
-          <label class="inline-flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="is_paid_modal" [value]="false" [(ngModel)]="newEvent.is_paid" class="form-radio text-[#679436]">
-            <span>Free event</span>
-          </label>
-          <label class="inline-flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="is_paid_modal" [value]="true" [(ngModel)]="newEvent.is_paid" class="form-radio text-[#14532d]">
-            <span>Paid event</span>
-          </label>
+<!-- Evaluations Modal -->
+<div *ngIf="showEvaluationsModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 9999 !important;">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
+       style="max-height: 95vh;">
+    
+    <!-- Modal Header -->
+    <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
+         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]'">
+      <div class="flex items-center gap-3 flex-1 min-w-0 pr-4">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-star text-white text-lg"></i>
         </div>
-        <!-- Registration fee when Paid -->
-  <div *ngIf="newEvent.is_paid" class="mt-2 max-w-xs">
-          <label class="block text-sm font-medium mb-1">Registration Fee</label>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 select-none">₱</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              [(ngModel)]="newEvent.registration_fee"
-              class="w-full pl-8 pr-3 py-2 border rounded-md"
-              placeholder="0.00"
-            />
+        <h2 class="text-xl sm:text-2xl font-bold text-white truncate">
+          {{ selectedEventForEvaluation?.title }}
+        </h2>
+      </div>
+      <button (click)="closeEvaluationsModal()" 
+              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0"
+              aria-label="Close">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+      
+      <!-- Loading State -->
+      <div *ngIf="evaluationsLoading" class="text-center py-12">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2" [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
+        <p class="mt-4 text-gray-600">Loading evaluations...</p>
+      </div>
+
+      <!-- Content -->
+      <div *ngIf="!evaluationsLoading">
+        <!-- Stats Summary Section -->
+        <div *ngIf="evaluationStats" class="space-y-4 mb-6">
+          <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+              [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+            <i class="fas fa-chart-bar"></i>
+            <span>Overview Statistics</span>
+          </h3>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="rounded-xl p-5 shadow-md border-2 transition-all hover:shadow-lg" 
+                 [ngClass]="isOsws ? 'bg-[#e6f7ef]/50 border-[#14532d]/20' : 'bg-green-50/50 border-[#679436]/20'">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">Total Evaluations</p>
+                  <p class="text-3xl font-bold mt-1" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+                    {{ evaluationStats.total_evaluations }}
+                  </p>
+                </div>
+                <div class="w-14 h-14 rounded-full flex items-center justify-center"
+                     [ngClass]="isOsws ? 'bg-[#14532d]/10' : 'bg-[#679436]/10'">
+                  <i class="fas fa-clipboard-check text-2xl" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="rounded-xl p-5 shadow-md border-2 transition-all hover:shadow-lg"
+                 [ngClass]="isOsws ? 'bg-[#e6f7ef]/50 border-[#14532d]/20' : 'bg-green-50/50 border-[#679436]/20'">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">Unique Participants</p>
+                  <p class="text-3xl font-bold mt-1" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+                    {{ evaluationStats.unique_participants }}
+                  </p>
+                </div>
+                <div class="w-14 h-14 rounded-full flex items-center justify-center"
+                     [ngClass]="isOsws ? 'bg-[#14532d]/10' : 'bg-[#679436]/10'">
+                  <i class="fas fa-users text-2xl" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="rounded-xl p-5 shadow-md border-2 transition-all hover:shadow-lg"
+                 [ngClass]="isOsws ? 'bg-[#e6f7ef]/50 border-[#14532d]/20' : 'bg-green-50/50 border-[#679436]/20'">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-600">Avg. Overall Rating</p>
+                  <div class="flex items-baseline gap-2 mt-1">
+                    <p class="text-3xl font-bold" [ngClass]="getRatingColorClass(getAverageRating('question9'))">
+                      {{ getAverageRating('question9').toFixed(2) }}
+                    </p>
+                    <span class="text-gray-400 text-lg font-medium">/5</span>
+                  </div>
+                  <p class="text-xs font-medium mt-1" [ngClass]="getRatingColorClass(getAverageRating('question9'))">
+                    {{ getRatingLabel(getAverageRating('question9')) }}
+                  </p>
+                </div>
+                <div class="w-14 h-14 rounded-full bg-yellow-400/10 flex items-center justify-center">
+                  <i class="fas fa-star text-2xl text-yellow-400"></i>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Mobile: stack in desired order (Start Date -> End Date -> Start Time -> End Time) -->
-      <div class="grid grid-cols-1 gap-3 sm:hidden">
-        <div>
-          <label class="block text-sm font-medium mb-1">Start Date</label>
-          <input type="date" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.start_date" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">End Date</label>
-          <input type="date" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.end_date" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Start Time</label>
-          <input type="time" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.start_time" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">End Time</label>
-          <input type="time" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.end_time" />
-        </div>
-      </div>
-
-      <!-- sm+: keep two-column layout (Start Date | Start Time) on first row, (End Date | End Time) on second row -->
-      <div class="hidden sm:grid sm:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-sm font-medium mb-1">Start Date</label>
-          <input type="date" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.start_date" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Start Time</label>
-          <input type="time" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.start_time" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">End Date</label>
-          <input type="date" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.end_date" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">End Time</label>
-          <input type="time" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.end_time" />
-        </div>
-      </div>
-
-      <!-- Poster uploader (modern preview) -->
-      <div>
-        <label class="block text-sm font-medium mb-1">Event Poster</label>
-        <!-- Dropzone -->
-        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-          <div class="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg aria-hidden="true" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-            <p class="mb-1 text-sm text-gray-600"><span class="font-medium">Click to upload</span> or drag and drop</p>
-            <p class="text-xs text-gray-400">PNG, JPG, WEBP</p>
-          </div>
-          <input id="dropzone-file" type="file" class="hidden" accept="image/*" (change)="previewImage($event)" />
-        </label>
-        <!-- Preview Card -->
-        <div id="image-preview" class="mt-3" [class.hidden]="!posterPreviewUrl">
-          <div class="relative rounded-lg border border-gray-200 shadow-sm bg-white p-2">
-            <img id="preview-img" [src]="posterPreviewUrl || ''" class="w-full max-h-64 object-contain rounded-md" alt="Poster preview" />
-            <button type="button" (click)="removeImage()" class="absolute top-2 right-2 bg-white text-gray-600 hover:text-red-600 border border-gray-200 rounded-full w-8 h-8 flex items-center justify-center shadow-sm" aria-label="Remove image">
-              <i class="fas fa-times text-sm"></i>
+        <!-- Average Ratings Section -->
+        <div *ngIf="evaluations.length > 0" class="space-y-4 mb-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+                [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+              <i class="fas fa-star-half-alt"></i>
+              <span>Average Ratings by Question</span>
+            </h3>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all duration-300 hover:shadow-lg transform hover:scale-105"
+              [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'"
+              (click)="downloadEvaluationsExcel()"
+              title="Download evaluations as Excel">
+              <i class="fas fa-file-excel"></i>
+              <span>Download Excel</span>
             </button>
           </div>
+          
+          <div class="rounded-xl border-2 overflow-hidden"
+               [ngClass]="isOsws ? 'border-[#14532d]/20' : 'border-[#679436]/20'">
+            
+            <!-- Collapsible Header -->
+            <div class="flex items-center justify-between p-4 cursor-pointer transition-colors"
+                 [ngClass]="isOsws ? 'bg-[#e6f7ef]/30 hover:bg-[#e6f7ef]/50' : 'bg-green-50/30 hover:bg-green-50/50'"
+                 (click)="showAverageRatings = !showAverageRatings">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-gray-700">13 Evaluation Questions</span>
+              </div>
+              <i class="fas transition-transform duration-200 text-gray-400"
+                 [ngClass]="showAverageRatings ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </div>
+            
+            <!-- Expandable Content -->
+            <div *ngIf="showAverageRatings" class="p-4 bg-white animate-fade-in">
+              <div class="space-y-2">
+                <div *ngFor="let q of ['question1', 'question2', 'question3', 'question4', 'question5', 'question6', 'question7', 'question8', 'question9', 'question10', 'question11', 'question12', 'question13']" 
+                     class="rounded-lg p-3 border-2 transition-all hover:shadow-sm"
+                     [ngClass]="isOsws ? 'border-[#e6f7ef] hover:border-[#14532d]/30' : 'border-gray-200 hover:border-[#679436]/30'">
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <!-- Question Number & Label -->
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium leading-tight text-gray-700">
+                        <span class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold mr-2"
+                              [ngClass]="isOsws ? 'bg-[#14532d] text-white' : 'bg-[#679436] text-white'">
+                          {{ q.replace('question', '') }}
+                        </span>
+                        {{ getQuestionLabel(q) }}
+                      </p>
+                    </div>
+                    
+                    <!-- Rating Display -->
+                    <div class="flex items-center gap-3 sm:ml-auto flex-shrink-0">
+                      <!-- Stars -->
+                      <div class="flex gap-0.5">
+                        <i *ngFor="let star of [1,2,3,4,5]" 
+                           class="fas fa-star text-base"
+                           [ngClass]="star <= getAverageRating(q) ? 'text-yellow-400' : 'text-gray-300'"></i>
+                      </div>
+                      
+                      <!-- Numeric Score -->
+                      <div class="flex items-center gap-1 px-3 py-1.5 rounded-full"
+                           [ngClass]="isOsws ? 'bg-[#e6f7ef]' : 'bg-green-50'">
+                        <span class="text-lg font-bold" [ngClass]="getRatingColorClass(getAverageRating(q))">
+                          {{ getAverageRating(q).toFixed(2) }}
+                        </span>
+                        <span class="text-gray-400 text-sm font-medium">/5</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Individual Evaluations Section -->
+        <div *ngIf="evaluations.length > 0" class="space-y-4">
+          <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
+              [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
+            <i class="fas fa-users"></i>
+            <span>Individual Evaluations</span>
+            <span class="text-sm font-normal text-gray-500">({{ filteredEvaluations.length }} total)</span>
+          </h3>
+          
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+            <!-- Search -->
+            <div class="relative flex-1">
+              <input 
+                type="text" 
+                [(ngModel)]="evaluationSearchTerm"
+                (ngModelChange)="onEvaluationSearchChange()"
+                placeholder="Search by name or student ID..."
+                class="w-full px-4 py-2.5 pr-10 border-2 rounded-lg text-sm focus:outline-none focus:ring-2 transition-all"
+                [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
+              />
+              <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+            
+            <!-- Page Size Selector -->
+            <select 
+              [(ngModel)]="evaluationsPageSize"
+              (ngModelChange)="changeEvaluationsPageSize(evaluationsPageSize)"
+              class="px-4 py-2.5 border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 transition-all"
+              [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'">
+              <option [value]="5">5 per page</option>
+              <option [value]="10">10 per page</option>
+              <option [value]="20">20 per page</option>
+              <option [value]="50">50 per page</option>
+            </select>
+          </div>
+          
+          <!-- Collapsible Evaluation Cards -->
+          <div class="space-y-3">
+            <div *ngFor="let evaluation of pagedEvaluations; let i = index" 
+                 class="bg-white border-2 rounded-xl overflow-hidden transition-all duration-200 hover:shadow-md"
+                 [ngClass]="isOsws ? 'border-[#e6f7ef] hover:border-[#14532d]/30' : 'border-gray-200 hover:border-[#679436]/30'">
+              
+              <!-- Compact Header (Always Visible) -->
+              <div class="flex items-center justify-between p-4 cursor-pointer transition-colors"
+                   [ngClass]="isOsws ? 'hover:bg-[#e6f7ef]/20' : 'hover:bg-gray-50'"
+                   (click)="toggleEvaluationExpanded(((evaluationsPage - 1) * evaluationsPageSize) + i)">
+                <div class="flex-1 flex items-center gap-3">
+                  <div class="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-white text-sm"
+                       [ngClass]="isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534]' : 'bg-gradient-to-br from-[#679436] to-[#56732e]'">
+                    {{ evaluation.first_name?.charAt(0) }}{{ evaluation.last_name?.charAt(0) }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-semibold text-sm sm:text-base truncate" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-gray-900'">
+                      {{ evaluation.first_name }} {{ evaluation.middle_initial ? evaluation.middle_initial + '.' : '' }} {{ evaluation.last_name }} {{ evaluation.suffix }}
+                    </h4>
+                    <div class="flex flex-wrap gap-2 text-xs text-gray-600 mt-1">
+                      <span class="flex items-center gap-1 font-medium">
+                        <i class="fas fa-id-card"></i>
+                        {{ evaluation.student_id }}
+                      </span>
+                      <span>•</span>
+                      <span class="flex items-center gap-1">
+                        <i class="fas fa-graduation-cap"></i>
+                        {{ evaluation.department }} - {{ evaluation.program }}
+                      </span>
+                      <span class="hidden sm:inline">•</span>
+                      <span class="hidden sm:inline">{{ evaluation.submitted_at | date: 'MMM d, y h:mm a' }}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Overall Rating & Expand Icon -->
+                <div class="flex items-center gap-3 ml-2">
+                  <div class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full" 
+                       [ngClass]="isOsws ? 'bg-[#e6f7ef]' : 'bg-green-50'">
+                    <i class="fas fa-star text-yellow-500 text-sm"></i>
+                    <span class="text-sm font-bold" [ngClass]="getRatingColorClass(getIndividualAverageRating(evaluation))">
+                      {{ getIndividualAverageRating(evaluation).toFixed(2) }}
+                    </span>
+                  </div>
+                  <i class="fas transition-transform duration-200 text-gray-400"
+                     [ngClass]="isEvaluationExpanded(((evaluationsPage - 1) * evaluationsPageSize) + i) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                </div>
+              </div>
+
+              <!-- Expanded Content -->
+              <div *ngIf="isEvaluationExpanded(((evaluationsPage - 1) * evaluationsPageSize) + i)" 
+                   class="border-t-2 px-4 py-4 animate-fade-in" 
+                   [ngClass]="isOsws ? 'border-[#e6f7ef] bg-[#f8faf9]' : 'border-gray-100 bg-gray-50'">
+                
+                <!-- Student Details (Mobile) -->
+                <div class="sm:hidden mb-4 p-3 bg-white rounded-lg border-2" 
+                     [ngClass]="isOsws ? 'border-[#14532d]/20' : 'border-gray-200'">
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span class="text-gray-500">Department:</span>
+                      <p class="font-medium">{{ evaluation.department }}</p>
+                    </div>
+                    <div>
+                      <span class="text-gray-500">Program:</span>
+                      <p class="font-medium">{{ evaluation.program }}</p>
+                    </div>
+                    <div class="col-span-2">
+                      <span class="text-gray-500">Submitted:</span>
+                      <p class="font-medium">{{ evaluation.submitted_at | date: 'MMM d, y h:mm a' }}</p>
+                    </div>
+                    <div class="col-span-2 pt-2 border-t">
+                      <span class="text-gray-500">Average Rating:</span>
+                      <div class="flex items-center gap-2 mt-1">
+                        <i class="fas fa-star text-yellow-500"></i>
+                        <span class="font-bold" [ngClass]="getRatingColorClass(getIndividualAverageRating(evaluation))">
+                          {{ getIndividualAverageRating(evaluation).toFixed(2) }}/5
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Ratings Grid -->
+                <div class="mb-4">
+                  <p class="text-sm font-semibold mb-3 flex items-center gap-2" 
+                     [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+                    <i class="fas fa-star-half-alt"></i>
+                    <span>Ratings</span>
+                  </p>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                    <div *ngFor="let q of ['question1', 'question2', 'question3', 'question4', 'question5', 'question6', 'question7', 'question8', 'question9', 'question10', 'question11', 'question12', 'question13']"
+                         class="bg-white rounded-lg px-3 py-2.5 border-2 transition-all hover:shadow-sm"
+                         [ngClass]="isOsws ? 'border-[#14532d]/20 hover:border-[#14532d]/40' : 'border-gray-200 hover:border-[#679436]/40'"
+                         [title]="getQuestionLabel(q)">
+                      <div class="flex flex-col gap-1">
+                        <span class="text-xs text-gray-500 font-medium truncate">Q{{ q.replace('question', '') }}</span>
+                        <div class="flex items-center gap-1.5">
+                          <i class="fas fa-star text-yellow-400 text-xs"></i>
+                          <span class="font-bold text-sm" 
+                                [ngClass]="evaluation.responses?.ratings?.[q] === 'NA' ? 'text-gray-400' : (isOsws ? 'text-[#14532d]' : 'text-[#679436]')">
+                            {{ evaluation.responses?.ratings?.[q] || 'N/A' }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Comments Section -->
+                <div *ngIf="evaluation.responses?.comments" class="space-y-3">
+                  <p class="text-sm font-semibold flex items-center gap-2" 
+                     [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
+                    <i class="fas fa-comments"></i>
+                    <span>Feedback Comments</span>
+                  </p>
+                  
+                  <div *ngIf="evaluation.responses.comments.question14" 
+                       class="bg-white border-l-4 p-3 rounded-r-lg shadow-sm" 
+                       [ngClass]="isOsws ? 'border-[#14532d]' : 'border-green-500'">
+                    <p class="text-xs font-semibold mb-1.5 flex items-center gap-1" 
+                       [ngClass]="isOsws ? 'text-[#14532d]' : 'text-green-700'">
+                      <i class="fas fa-thumbs-up"></i>
+                      <span>Most Helpful Aspects</span>
+                    </p>
+                    <p class="text-sm text-gray-700 leading-relaxed">{{ evaluation.responses.comments.question14 }}</p>
+                  </div>
+                  
+                  <div *ngIf="evaluation.responses.comments.question15" 
+                       class="bg-white border-l-4 border-yellow-500 p-3 rounded-r-lg shadow-sm">
+                    <p class="text-xs font-semibold mb-1.5 text-yellow-700 flex items-center gap-1">
+                      <i class="fas fa-lightbulb"></i>
+                      <span>Suggestions for Improvement</span>
+                    </p>
+                    <p class="text-sm text-gray-700 leading-relaxed">{{ evaluation.responses.comments.question15 }}</p>
+                  </div>
+                  
+                  <div *ngIf="evaluation.responses.comments.question16" 
+                       class="bg-white border-l-4 border-blue-500 p-3 rounded-r-lg shadow-sm">
+                    <p class="text-xs font-semibold mb-1.5 text-blue-700 flex items-center gap-1">
+                      <i class="fas fa-comment"></i>
+                      <span>Additional Comments</span>
+                    </p>
+                    <p class="text-sm text-gray-700 leading-relaxed">{{ evaluation.responses.comments.question16 }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div *ngIf="evaluationsTotalPages > 1" class="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3 pt-4 border-t-2"
+               [ngClass]="isOsws ? 'border-[#e6f7ef]' : 'border-gray-200'">
+            <p class="text-sm text-gray-600 font-medium">
+              Showing {{ ((evaluationsPage - 1) * evaluationsPageSize) + 1 }} - {{ Math.min(evaluationsPage * evaluationsPageSize, filteredEvaluations.length) }} of {{ filteredEvaluations.length }}
+            </p>
+            <nav class="inline-flex space-x-1" aria-label="Pagination">
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded-lg transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                [ngClass]="isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'"
+                [disabled]="evaluationsPage === 1"
+                (click)="prevEvaluationsPage()">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <ng-container *ngFor="let _ of [].constructor(evaluationsTotalPages); let i = index">
+                <button
+                  class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 text-sm font-semibold"
+                  [ngClass]="evaluationsPage === (i + 1) ? 
+                    (isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534] text-white shadow-md' : 'bg-gradient-to-br from-[#679436] to-[#56732e] text-white shadow-md') : 
+                    (isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700')"
+                  [attr.aria-current]="evaluationsPage === (i + 1) ? 'page' : null"
+                  (click)="goToEvaluationsPage(i + 1)">
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded-lg transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                [ngClass]="isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'"
+                [disabled]="evaluationsPage === evaluationsTotalPages"
+                (click)="nextEvaluationsPage()">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        <!-- No Evaluations State -->
+        <div *ngIf="evaluations.length === 0" class="text-center py-12">
+          <div class="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+               [ngClass]="isOsws ? 'bg-[#e6f7ef]' : 'bg-gray-100'">
+            <i class="fas fa-inbox text-4xl text-gray-300"></i>
+          </div>
+          <p class="text-gray-600 text-lg font-semibold">No evaluations submitted yet</p>
+          <p class="text-gray-500 text-sm mt-2">Participants will be able to submit evaluations after attending the event.</p>
         </div>
       </div>
+    </div>
 
-      <div class="flex justify-end gap-2 pt-2">
-        <button class="px-4 py-2 rounded-md border" (click)="closeCreateModal()">Cancel</button>
-        <button
-          [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#218c4a]' : 'bg-[#679436] hover:bg-[#56732e]'"
-          class="text-white font-semibold px-6 py-2 rounded-md"
-          (click)="createEventFromModal()"
-        >
-          {{ isEditing ? 'Update Event' : 'Create Event' }}
-        </button>
-      </div>
+    <!-- Modal Footer (Optional - only shows when there are evaluations) -->
+    <div *ngIf="!evaluationsLoading && evaluations.length > 0" 
+         class="sticky bottom-0 px-6 py-4 bg-gray-50 border-t-2 border-gray-200 flex justify-between items-center">
+      <p class="text-xs text-gray-500 flex items-center gap-1">
+        <i class="fas fa-info-circle"></i>
+        <span>Total of {{ evaluations.length }} evaluation{{ evaluations.length !== 1 ? 's' : '' }} received</span>
+      </p>
+      <button
+        type="button"
+        class="px-6 py-2.5 rounded-lg text-white font-semibold transition-all shadow-md hover:shadow-lg"
+        [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'"
+        (click)="closeEvaluationsModal()">
+        Close
+      </button>
     </div>
   </div>
 </div>
