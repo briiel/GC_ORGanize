@@ -201,15 +201,41 @@ export class AttendanceRecordsComponent implements OnInit {
     this.filterAttendees();
   }
 
+  // Format timestamp into a readable local string
+  formatDateTime(value: string | Date | null | undefined): string {
+    if (!value) return '-';
+    try {
+      const d = typeof value === 'string' ? new Date(value) : value;
+      if (!d || isNaN((d as Date).getTime())) return '-';
+      return new Intl.DateTimeFormat(undefined, {
+        year: 'numeric', month: 'short', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      }).format(d as Date);
+    } catch {
+      return '-';
+    }
+  }
+
+  // Combine first name, last name, and suffix into a single display string
+  formatName(record: any): string {
+    const first = (record?.first_name || '').trim();
+    const last = (record?.last_name || '').trim();
+    const suffix = (record?.suffix || '').trim();
+    const core = [first, last].filter(Boolean).join(' ').trim();
+    const withSuffix = suffix ? `${core} ${suffix}`.trim() : core;
+    return withSuffix || '-';
+  }
+
   downloadExcel() {
     const worksheetData = this.filteredRecords.map((record, i) => ({
       '#': i + 1,
       'Student ID': record.student_id || '-',
-      'First Name': record.first_name || '-',
-      'Last Name': record.last_name || '-',
-      'Suffix': record.suffix || '-',
+  'Name': this.formatName(record),
       'Department': record.department || '-',
-      'Program': record.program || '-'
+      'Program': record.program || '-',
+      'Time In': this.formatDateTime(record.time_in || record.attended_at),
+      'Time Out': this.formatDateTime(record.time_out),
+      'Scanned By': record.scanned_by || '-'
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);

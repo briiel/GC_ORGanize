@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common'; // <-- Add this import
 import { EventService } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
@@ -122,6 +123,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   participants: any[] = [];
   participantsLoading = false;
   selectedEventTitle = '';
+  // Track selections for bulk actions
+  selectedRegistrations = new Set<number>();
   // Participants pagination (10 per page)
   participantsPage: number = 1;
   participantsPageSize: number = 10;
@@ -157,7 +160,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     start_date: '',
     start_time: '',
     end_date: '',
-    end_time: ''
+  end_time: '',
+  is_paid: false,
+  registration_fee: 0
   };
 
   // For vertical event list selection
@@ -258,6 +263,29 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
   updateOswsEventStatus(event: any) {
     this.updateEventStatus(event);
+  }
+
+  // Determine if a given desired status option should be enabled for manual change (OSWS table)
+  isStatusOptionEnabled(event: any, desired: string): boolean {
+    const desiredLower = String(desired || '').toLowerCase();
+    const current = String(event?.status || '').toLowerCase();
+    if (desiredLower === current) return false; // don't enable selecting the same value
+    if (desiredLower === 'cancelled') return true; // always allow manual cancel
+    const auto = String(event?.auto_status || '').toLowerCase();
+    const mismatch = !!event?.auto_mismatch;
+    // Allow only when auto computed exists, current != auto, and desired equals auto (sync fix)
+    return !!auto && mismatch && desiredLower === auto;
+  }
+
+  statusOptionTooltip(event: any, desired: string): string {
+    const desiredLower = String(desired || '').toLowerCase();
+    const current = String(event?.status || '').toLowerCase();
+    if (desiredLower === current) return 'Already set';
+    if (desiredLower === 'cancelled') return 'Cancel this event';
+    const auto = String(event?.auto_status || '').toLowerCase();
+    const mismatch = !!event?.auto_mismatch;
+    if (!!auto && mismatch && desiredLower === auto) return 'Sync to automatic status';
+    return 'Manual change not allowed unless syncing to automatic status';
   }
 
   formatTime(timeString: string | null | undefined): string {
@@ -362,7 +390,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       text: `Move event "${event.title}" to archive?`,
       icon: 'warning',
       showCancelButton: true,
-  confirmButtonText: 'Delete',
+  confirmButtonText: 'Archive',
   cancelButtonText: 'Cancel',
   confirmButtonColor: '#d33',
   reverseButtons: true
@@ -401,6 +429,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       next: (res) => {
         this.participants = res.data || res;
         this.participantsLoading = false;
+  this.selectedRegistrations.clear();
     // Ensure current page is within bounds after load
     const total = this.participantsTotalPages;
     if (this.participantsPage > total) this.participantsPage = total;
@@ -417,7 +446,135 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.participants = [];
     this.selectedEventTitle = '';
   this.participantsPage = 1;
+    this.selectedRegistrations.clear();
   this.toggleBodyModalClass();
+  }
+
+  private refreshParticipantsList(): void {
+    if (!this.selectedEvent) return;
+    const id = this.selectedEvent.event_id;
+    if (!id) return;
+    this.participantsLoading = true;
+    this.eventService.getEventParticipants(id).subscribe({
+      next: (res) => {
+        this.participants = res.data || res;
+        this.participantsLoading = false;
+        this.selectedRegistrations.clear();
+        const total = this.participantsTotalPages;
+        if (this.participantsPage > total) this.participantsPage = total;
+      },
+      error: () => {
+        this.participantsLoading = false;
+      }
+    });
+  }
+
+  approveParticipant(p: any) {
+    if (!p?.registration_id) return;
+    this.eventService.approveRegistration(p.registration_id).subscribe({
+      next: () => {
+        Swal.fire('Approved', 'Registration approved.', 'success');
+        this.refreshParticipantsList();
+      },
+      error: (err) => {
+        console.error('Approve failed', err);
+        Swal.fire('Error', 'Failed to approve registration.', 'error');
+      }
+    });
+  }
+
+  rejectParticipant(p: any) {
+    if (!p?.registration_id) return;
+    this.eventService.rejectRegistration(p.registration_id).subscribe({
+      next: () => {
+        Swal.fire('Rejected', 'Registration rejected.', 'success');
+        this.refreshParticipantsList();
+      },
+      error: (err) => {
+        console.error('Reject failed', err);
+        Swal.fire('Error', 'Failed to reject registration.', 'error');
+      }
+    });
+  }
+
+  // Selection helpers
+  isSelected(p: any): boolean {
+    if (!p?.registration_id) return false;
+    const status = String(p?.status || '').toLowerCase();
+    if (status !== 'pending') return false;
+    return this.selectedRegistrations.has(Number(p.registration_id));
+  }
+  toggleSelection(p: any): void {
+    if (!p?.registration_id) return;
+    const status = String(p?.status || '').toLowerCase();
+    if (status !== 'pending') return;
+    const id = Number(p.registration_id);
+    if (this.selectedRegistrations.has(id)) this.selectedRegistrations.delete(id);
+    else this.selectedRegistrations.add(id);
+  }
+  toggleSelectAllPage(ev: Event): void {
+    const input = ev.target as HTMLInputElement;
+    const pageItems = this.pagedParticipants;
+    const pendingItems = pageItems.filter(p => String(p?.status || '').toLowerCase() === 'pending');
+    if (input.checked) {
+      pendingItems.forEach(p => { if (p?.registration_id) this.selectedRegistrations.add(Number(p.registration_id)); });
+    } else {
+      pendingItems.forEach(p => { if (p?.registration_id) this.selectedRegistrations.delete(Number(p.registration_id)); });
+    }
+  }
+  get hasSelection(): boolean { return this.selectedRegistrations.size > 0; }
+  get selectedCount(): number { return this.selectedRegistrations.size; }
+
+  // Page-level helpers for template
+  hasPendingOnPage(): boolean {
+    return this.pagedParticipants.some(p => String(p?.status || '').toLowerCase() === 'pending');
+  }
+  isAllPendingSelectedOnPage(): boolean {
+    const pendings = this.pagedParticipants.filter(p => String(p?.status || '').toLowerCase() === 'pending');
+    return pendings.length > 0 && pendings.every(p => this.isSelected(p));
+  }
+
+  // Status helpers for template
+  isPending(p: any): boolean {
+    return String(p?.status || '').toLowerCase() === 'pending';
+  }
+  isApproved(p: any): boolean {
+    return String(p?.status || '').toLowerCase() === 'approved';
+  }
+  isRejected(p: any): boolean {
+    return String(p?.status || '').toLowerCase() === 'rejected';
+  }
+
+  bulkApproveSelected(): void {
+    if (!this.hasSelection) return;
+    const calls = Array.from(this.selectedRegistrations).map(id => this.eventService.approveRegistration(id));
+    forkJoin(calls).subscribe({
+      next: () => {
+        Swal.fire('Approved', 'Selected registrations approved.', 'success');
+        this.refreshParticipantsList();
+      },
+      error: (err) => {
+        console.error('Bulk approve failed', err);
+        Swal.fire('Error', 'Some approvals failed. Please try again.', 'error');
+        this.refreshParticipantsList();
+      }
+    });
+  }
+
+  bulkRejectSelected(): void {
+    if (!this.hasSelection) return;
+    const calls = Array.from(this.selectedRegistrations).map(id => this.eventService.rejectRegistration(id));
+    forkJoin(calls).subscribe({
+      next: () => {
+        Swal.fire('Rejected', 'Selected registrations rejected.', 'success');
+        this.refreshParticipantsList();
+      },
+      error: (err) => {
+        console.error('Bulk reject failed', err);
+        Swal.fire('Error', 'Some rejections failed. Please try again.', 'error');
+        this.refreshParticipantsList();
+      }
+    });
   }
 
   // Helper to format date as yyyy-MM-dd
@@ -438,10 +595,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (this.selectedEvent && event && this.selectedEvent.event_id === event.event_id) {
       this.isInlineEditing = true;
       // Deep copy to avoid mutating selectedEvent until save
-      this.inlineEditEvent = { ...this.selectedEvent };
+  this.inlineEditEvent = { ...this.selectedEvent };
       // Ensure date fields are in yyyy-MM-dd format for input type="date"
       this.inlineEditEvent.start_date = this.toDateInputValue(this.inlineEditEvent.start_date);
       this.inlineEditEvent.end_date = this.toDateInputValue(this.inlineEditEvent.end_date);
+  // Coerce is_paid to boolean for radio binding
+  this.inlineEditEvent.is_paid = !!this.inlineEditEvent.is_paid;
       return;
     }
     // Otherwise, open modal (old logic)
@@ -479,7 +638,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       payload.append('start_time', this.inlineEditEvent.start_time);
       payload.append('end_date', endDateStr);
       payload.append('end_time', this.inlineEditEvent.end_time);
-      payload.append('status', this.inlineEditEvent.status || '');
+  payload.append('is_paid', this.inlineEditEvent.is_paid ? '1' : '0');
+  payload.append('registration_fee', this.inlineEditEvent.is_paid ? String(Number(this.inlineEditEvent.registration_fee || 0).toFixed(2)) : '0');
       payload.append('event_poster', this.inlineEditPosterFile);
       isFormData = true;
     } else {
@@ -491,7 +651,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         start_time: this.inlineEditEvent.start_time,
         end_date: endDateStr,
         end_time: this.inlineEditEvent.end_time,
-        status: this.inlineEditEvent.status || '',
+  is_paid: this.inlineEditEvent.is_paid ? 1 : 0,
+  registration_fee: this.inlineEditEvent.is_paid ? Number(this.inlineEditEvent.registration_fee || 0).toFixed(2) : 0,
         event_poster: this.inlineEditEvent.event_poster || ''
       };
     }
@@ -533,7 +694,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   // Open Create Event modal
   openCreateModal() {
     // reset form
-    this.newEvent = { title: '', description: '', location: '', start_date: '', start_time: '', end_date: '', end_time: '' };
+  this.newEvent = { title: '', description: '', location: '', start_date: '', start_time: '', end_date: '', end_time: '', is_paid: false, registration_fee: 0 };
     this.isImageUploaded = false;
     this.eventPosterFile = null;
     this.posterPreviewUrl = null;
@@ -575,7 +736,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           start_date: this.toDateInputValue(event.start_date),
           start_time: event.start_time ? String(event.start_time).substring(0, 5) : '',
           end_date: this.toDateInputValue(event.end_date),
-          end_time: event.end_time ? String(event.end_time).substring(0, 5) : ''
+          end_time: event.end_time ? String(event.end_time).substring(0, 5) : '',
+          is_paid: !!event.is_paid,
+          registration_fee: Number(event.registration_fee ?? 0)
         };
         // If backend returns poster URL, show it
         const poster = event.event_poster || event.poster || event.poster_url || event.image_url;
@@ -653,7 +816,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       }
     }
 
-    const formData = new FormData();
+  const formData = new FormData();
     formData.append('title', this.newEvent.title);
     formData.append('description', this.newEvent.description);
     formData.append('location', this.newEvent.location);
@@ -661,6 +824,18 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     formData.append('start_time', this.newEvent.start_time);
     formData.append('end_date', this.newEvent.end_date);
     formData.append('end_time', this.newEvent.end_time);
+  formData.append('is_paid', this.newEvent.is_paid ? '1' : '0');
+    // If paid, validate fee
+    if (this.newEvent.is_paid) {
+      const fee = Number(this.newEvent.registration_fee);
+      if (isNaN(fee) || fee < 0) {
+        Swal.fire({ icon: 'error', title: 'Invalid Fee', text: 'Please enter a valid registration fee (0 or higher).', confirmButtonColor: '#d33' });
+        return;
+      }
+      formData.append('registration_fee', String(fee.toFixed(2)));
+    } else {
+      formData.append('registration_fee', '0');
+    }
     if (this.eventPosterFile) {
       formData.append('event_poster', this.eventPosterFile);
     }

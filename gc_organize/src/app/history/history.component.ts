@@ -19,7 +19,8 @@ export class HistoryComponent implements OnInit {
 
   // UI state
   searchTerm = '';
-  sortBy: 'attended_desc' | 'attended_asc' | 'start_desc' | 'start_asc' = 'attended_desc';
+  // Default: latest event date/time first
+  sortBy: 'attended_desc' | 'attended_asc' | 'start_desc' | 'start_asc' = 'start_desc';
   // Pagination
   page = 1;
   readonly pageSize = 9;

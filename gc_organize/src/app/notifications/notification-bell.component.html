@@ -1,0 +1,33 @@
+<div class="relative">
+  <button (click)="toggle()" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600" aria-label="Notifications">
+    <i class="fas fa-bell text-lg"></i>
+    <span *ngIf="unreadCount() > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+      {{ unreadCount() }}
+    </span>
+  </button>
+
+  <div *ngIf="open" class="absolute right-0 mt-2 w-80 max-w-[86vw] bg-white border border-gray-200 rounded-lg shadow-lg z-30">
+    <div class="px-3 py-2 border-b flex items-center justify-between">
+      <span class="font-semibold text-gray-700">Notifications</span>
+      <button class="text-xs text-blue-600 hover:underline" (click)="refresh()">Refresh</button>
+    </div>
+    <div class="max-h-80 overflow-y-auto">
+      <div *ngIf="loading" class="p-3 text-sm text-gray-500">Loading...</div>
+      <ng-container *ngIf="!loading">
+        <div *ngIf="items.length === 0" class="p-3 text-sm text-gray-500">No notifications</div>
+        <ul *ngIf="items.length > 0" class="divide-y">
+          <li *ngFor="let n of items; let i = index" class="p-3 hover:bg-gray-50 cursor-pointer" (click)="markRead(n, i)">
+            <div class="flex items-start">
+              <div class="flex-1">
+                <p class="text-sm" [class.font-semibold]="!n.is_read">{{ n.message }}</p>
+                <p class="text-xs text-gray-500 mt-0.5" *ngIf="n.event_title">Related: {{ n.event_title }}</p>
+                <p class="text-[11px] text-gray-400 mt-0.5">{{ n.created_at | date:'medium' }}</p>
+              </div>
+              <span *ngIf="!n.is_read" class="w-2 h-2 bg-blue-500 rounded-full ml-2 mt-1"></span>
+            </div>
+          </li>
+        </ul>
+      </ng-container>
+    </div>
+  </div>
+</div>

@@ -28,6 +28,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
   // Event selection for disambiguating which event to record attendance for
   events: any[] = [];
   selectedEventId: number | null = null;
+  // Mode selection for better UX: 'time_in' | 'time_out'
+  mode: 'time_in' | 'time_out' = 'time_in';
 
   constructor(
     private http: HttpClient,
@@ -217,14 +219,13 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     event_id = this.selectedEventId ?? event_id;
 
     this.http.post(
-      'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/attendance',
-      // 'http://localhost:5000/api/event/events/attendance',
-      { registration_id, event_id, student_id },
+      { registration_id, event_id, student_id, mode: this.mode },
       { headers: { Authorization: `Bearer ${token}` }, observe: 'response' }
     ).subscribe({
       next: (res: any) => {
         this.message = res.body?.message || 'Attendance recorded!';
-        Swal.fire('Success', 'Attendance recorded successfully.', 'success').then(() => {
+        const text = this.message;
+        Swal.fire('Success', this.message, 'success').then(() => {
           this.scanning = true; // Resume scanning after alert
         });
       },

@@ -3,7 +3,13 @@
     style="outline: 2px solid #679436;" role="dialog" aria-modal="true" aria-labelledby="registermodal-title" (click)="$event.stopPropagation()">
     <form class="modal-flex-form" (ngSubmit)="submitRegistration()">
       <div class="modal-content-scroll flex-1">
-  <h2 id="registermodal-title" class="text-2xl font-bold mb-4 text-[#679436]">Event Registration</h2>
+  <h2 id="registermodal-title" class="text-2xl font-bold mb-4 text-[#679436]">Event Registration
+    <span class="ml-3 align-middle inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs font-semibold border"
+          [ngClass]="isPaid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
+      <i class="fas" [ngClass]="isPaid ? 'fa-coins' : 'fa-ticket-alt'"></i>
+      {{ isPaid ? 'Paid' : 'Free' }}
+    </span>
+  </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <div>
             <label for="firstName" class="block text-sm font-medium text-gray-700">First Name:</label>
@@ -66,14 +72,15 @@
         <!-- Updated Proof of Payment Section (mirrors Manage Event poster dropzone) -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            Proof of Payment
+            Proof of Payment <span *ngIf="isPaid" class="text-red-600">(Required)</span>
           </label>
-          <p class="text-xs text-gray-500 mb-3">Please upload your proof of payment (JPEG, PNG, WebP format, max 2MB)</p>
+          <p class="text-xs text-gray-500 mb-3" *ngIf="isPaid">Please upload your proof of payment (JPEG, PNG, WebP format, max 2MB)</p>
+          <p class="text-xs text-gray-400 mb-3" *ngIf="!isPaid">This event is free; you don't need to upload a proof of payment.</p>
 
           <div class="flex items-center justify-center w-full">
             <div class="flex flex-col items-center justify-center w-full">
               <!-- Dropzone -->
-              <label for="pop-dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors" *ngIf="!proofPreviewUrl">
+              <label for="pop-dropzone-file" class="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-200 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors" *ngIf="!proofPreviewUrl" [class.opacity-50]="!isPaid" [class.pointer-events-none]="!isPaid">
                 <div class="flex flex-col items-center justify-center pt-5 pb-6">
                   <svg aria-hidden="true" class="w-8 h-8 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
                   <p class="mb-1 text-sm text-gray-600"><span class="font-medium">Click to upload</span> or drag and drop</p>

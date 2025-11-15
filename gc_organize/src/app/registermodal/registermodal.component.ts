@@ -13,6 +13,7 @@ import Swal from 'sweetalert2';
 export class RegistermodalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Input() eventId: number | null = null;
+  isPaid: boolean = false;
   
   // Proof of payment upload state (mirror Manage Event poster behavior)
   proofPreviewUrl: string | null = null; // Data URL for preview
@@ -41,6 +42,21 @@ export class RegistermodalComponent implements OnInit {
   ngOnInit() {
     if (this.eventId !== null) {
       this.registrationData.event_id = this.eventId;
+    }
+    // Fetch event to determine if paid
+    if (this.eventId !== null) {
+      const token = localStorage.getItem('authToken') || '';
+
+        headers: token ? { Authorization: `Bearer ${token}` } as any : undefined
+      }).subscribe({
+        next: (res) => {
+          const ev = res?.data ? res.data : res;
+          this.isPaid = !!ev?.is_paid;
+        },
+        error: () => {
+          this.isPaid = false; // default to free if lookup fails
+        }
+      });
     }
     // Auto-fill student info for display, but only send id to backend
     const studentInfoStr = localStorage.getItem('studentInfo');
@@ -141,6 +157,12 @@ export class RegistermodalComponent implements OnInit {
       return;
     }
 
+    // If paid event, require proof
+    if (this.isPaid && !this.selectedFile) {
+      Swal.fire({ icon: 'warning', title: 'Proof Required', text: 'Please upload a proof of payment for this paid event.' });
+      return;
+    }
+
     // Create FormData for file upload
     const formData = new FormData();
     formData.append('event_id', this.registrationData.event_id.toString());
@@ -174,12 +196,13 @@ export class RegistermodalComponent implements OnInit {
       }
     ).subscribe({
       next: (res: any) => {
+        const message = this.isPaid
+          ? 'Your registration was submitted and is pending approval by the organizer.'
+          : 'You have been successfully registered. Your QR code is available in your registrations.';
         Swal.fire({
           icon: 'success',
-          title: 'Registration Successful!',
-          html: `
-            <p>You have been successfully registered for the event.</p>
-          `,
+          title: 'Registration Submitted',
+          html: `<p>${message}</p>`,
           confirmButtonColor: '#679436',
           confirmButtonText: 'Got it!'
         }).then(() => {

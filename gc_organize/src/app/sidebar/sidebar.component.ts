@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { RouterOutlet } from '@angular/router';
 import { trigger, transition, style, animate, query } from '@angular/animations';
+import { NotificationBellComponent } from '../notifications/notification-bell.component';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, NotificationBellComponent],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
   animations: [

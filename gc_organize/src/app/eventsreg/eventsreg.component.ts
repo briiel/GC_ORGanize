@@ -32,6 +32,22 @@ export class EventsregComponent implements OnInit {
     this.eventService.getRegisteredEvents(this.studentId).subscribe({
       next: (events) => {
         this.registeredEvents = events.data || events;
+        // Sort latest first: assume "latest" means most recent event by start_date then start_time
+        this.registeredEvents.sort((a, b) => {
+          const aDateStr: string | undefined = a?.start_date;
+          const bDateStr: string | undefined = b?.start_date;
+          const aTimeStr: string | undefined = a?.start_time;
+          const bTimeStr: string | undefined = b?.start_time;
+
+          // Build comparable timestamps; if only date exists, default to 00:00
+          const aTs = aDateStr
+            ? Date.parse(`${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00')}`)
+            : 0;
+          const bTs = bDateStr
+            ? Date.parse(`${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00')}`)
+            : 0;
+          return bTs - aTs; // descending (latest first)
+        });
       },
       error: (err) => {
         console.error('Error fetching registered events:', err);

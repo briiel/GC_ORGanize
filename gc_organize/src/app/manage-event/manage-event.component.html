@@ -64,29 +64,45 @@
                         (click)="openParticipantsModal(event)">
                   {{ event.title }}
                 </button>
+                <span class="ml-2 align-middle inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
+                      [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
+                  <i class="fas" [ngClass]="event.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
+                  {{ event.is_paid ? 'Paid' : 'Free' }}
+                </span>
+                <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
+                      class="ml-1 align-middle inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-amber-50 text-amber-900 border-amber-200">
+                  ₱ {{ event.registration_fee | number:'1.2-2' }}
+                </span>
               </td>
               <td class="px-4 py-3 text-center">{{ event.start_date | date: 'MMM d, y' }}</td>
               <td class="px-4 py-3 text-center">{{ event.end_date | date: 'MMM d, y' }}</td>
               <td class="px-4 py-3 text-center">{{ formatTime(event.start_time) }}</td>
               <td class="px-4 py-3 text-center">{{ formatTime(event.end_time) }}</td>
               <td class="px-4 py-3 text-left max-w-[160px] truncate" [title]="event.location">{{ event.location }}</td>
+              
               <td class="px-4 py-3 text-center">
-                <select
-                  class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
-                  [ngClass]="{
-                    'bg-yellow-100 text-yellow-800 border-yellow-300': event.status === 'not yet started',
-                    'bg-blue-100 text-blue-800 border-blue-300': event.status === 'ongoing',
-                    'bg-green-100 text-green-800 border-green-300': event.status === 'concluded',
-                    'bg-red-100 text-red-800 border-red-300': event.status === 'cancelled'
-                  }"
-                  [(ngModel)]="event.status"
-                  (change)="updateOswsEventStatus(event)"
-                >
-                  <option value="not yet started">Not Yet Started</option>
-                  <option value="ongoing">Ongoing</option>
-                  <option value="concluded">Concluded</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
+                <div class="inline-flex items-center gap-2">
+                  <select
+                    class="px-2 py-1 rounded-full border border-gray-300 focus:outline-none transition-colors"
+                    [ngClass]="{
+                      'bg-yellow-100 text-yellow-800 border-yellow-300': event.status === 'not yet started',
+                      'bg-blue-100 text-blue-800 border-blue-300': event.status === 'ongoing',
+                      'bg-green-100 text-green-800 border-green-300': event.status === 'concluded',
+                      'bg-red-100 text-red-800 border-red-300': event.status === 'cancelled'
+                    }"
+                    [ngModel]="event.status"
+                    (ngModelChange)="event.status = $event"
+                    (change)="updateOswsEventStatus(event)"
+                  >
+                    <option value="not yet started" [disabled]="!isStatusOptionEnabled(event, 'not yet started')" [title]="statusOptionTooltip(event, 'not yet started')">Not Yet Started</option>
+                    <option value="ongoing" [disabled]="!isStatusOptionEnabled(event, 'ongoing')" [title]="statusOptionTooltip(event, 'ongoing')">Ongoing</option>
+                    <option value="concluded" [disabled]="!isStatusOptionEnabled(event, 'concluded')" [title]="statusOptionTooltip(event, 'concluded')">Concluded</option>
+                    <option value="cancelled" [disabled]="!isStatusOptionEnabled(event, 'cancelled')" [title]="statusOptionTooltip(event, 'cancelled')">Cancelled</option>
+                  </select>
+                  <span *ngIf="event.auto_mismatch" class="text-xs text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full" title="Stored status differs from automatic status">
+                    Auto: {{ event.auto_status || 'n/a' }}
+                  </span>
+                </div>
               </td>
               <td class="px-4 py-3 text-center">
                 <div class="flex items-center justify-center gap-2">
@@ -164,6 +180,17 @@
                 [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-[#f5f5f5]' : ''">
               <td class="px-4 py-3 text-center text-[#14532d] font-semibold">{{ (orgEventPage - 1) * orgEventPageSize + i + 1 }}</td>
               <td class="px-4 py-3 font-semibold text-left">{{ event.title }}</td>
+              <td class="px-4 py-3 text-left">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold border"
+                      [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
+                  <i class="fas" [ngClass]="event.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
+                  {{ event.is_paid ? 'Paid' : 'Free' }}
+                </span>
+                <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
+                      class="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-amber-50 text-amber-900 border-amber-200">
+                  ₱ {{ event.registration_fee | number:'1.2-2' }}
+                </span>
+              </td>
               <td class="px-4 py-3 text-center">
                 {{ event.start_date | date: 'MMMM d, y' }}<br>
                 <span *ngIf="event.end_date">to {{ event.end_date | date: 'MMMM d, y' }}</span>
@@ -341,6 +368,15 @@
             <div class="mb-4">
               <h2 class="text-3xl font-extrabold text-[#679436] break-words">
                 {{ selectedEvent.title }}
+                <span class="ml-3 inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold border align-middle"
+                      [ngClass]="selectedEvent.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
+                  <i class="fas" [ngClass]="selectedEvent.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
+                  {{ selectedEvent.is_paid ? 'Paid' : 'Free' }}
+                </span>
+                <span *ngIf="selectedEvent.is_paid && (selectedEvent.registration_fee ?? 0) > 0"
+                      class="ml-2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold border align-middle bg-amber-50 text-amber-900 border-amber-200">
+                  ₱ {{ selectedEvent.registration_fee | number:'1.2-2' }}
+                </span>
               </h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -402,23 +438,45 @@
                   </div>
                   <div class="col-span-2">
                     <label class="block text-sm font-medium mb-1 text-gray-700">Status</label>
-                    <ng-container *ngIf="!isInlineEditing; else editStatusField">
-                      <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [value]="selectedEvent.status || ''" disabled>
-                        
-                        <option value="not yet started">Not Yet Started</option>
-                        <option value="ongoing">Ongoing</option>
-                        <option value="concluded">Concluded</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
+                    <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [value]="(isInlineEditing ? inlineEditEvent?.status : selectedEvent?.status) || ''" disabled>
+                      <option value="not yet started">Not Yet Started</option>
+                      <option value="ongoing">Ongoing</option>
+                      <option value="concluded">Concluded</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
+                  <div class="col-span-2">
+                    <label class="block text-sm font-medium mb-1 text-gray-700">Registration Type</label>
+                    <ng-container *ngIf="!isInlineEditing; else editIsPaidField">
+                      <div class="flex items-center gap-6">
+                        <label class="inline-flex items-center gap-2">
+                          <input type="radio" [checked]="!selectedEvent.is_paid" disabled class="form-radio text-[#679436]" />
+                          <span>Free event</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2">
+                          <input type="radio" [checked]="selectedEvent.is_paid" disabled class="form-radio text-[#14532d]" />
+                          <span>Paid event</span>
+                        </label>
+                      </div>
                     </ng-container>
-                    <ng-template #editStatusField>
-                      <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [(ngModel)]="inlineEditEvent.status">
-                        
-                        <option value="not yet started">Not Yet Started</option>
-                        <option value="ongoing">Ongoing</option>
-                        <option value="concluded">Concluded</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
+                    <ng-template #editIsPaidField>
+                      <div class="flex items-center gap-6">
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="inline_is_paid" [value]="false" [(ngModel)]="inlineEditEvent.is_paid" class="form-radio text-[#679436]">
+                          <span>Free event</span>
+                        </label>
+                        <label class="inline-flex items-center gap-2 cursor-pointer">
+                          <input type="radio" name="inline_is_paid" [value]="true" [(ngModel)]="inlineEditEvent.is_paid" class="form-radio text-[#14532d]">
+                          <span>Paid event</span>
+                        </label>
+                      </div>
+                      <div *ngIf="inlineEditEvent.is_paid" class="mt-2 max-w-xs">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Registration Fee</label>
+                        <div class="relative">
+                          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 select-none">₱</span>
+                          <input type="number" step="0.01" min="0" [(ngModel)]="inlineEditEvent.registration_fee" class="w-full pl-8 pr-3 py-2 rounded-md border border-gray-300 focus:outline-none" placeholder="0.00" />
+                        </div>
+                      </div>
                     </ng-template>
                   </div>
                 </div>
@@ -558,23 +616,45 @@
           </div>
           <div class="col-span-2">
             <label class="block text-sm font-medium mb-1 text-gray-700">Status</label>
-            <ng-container *ngIf="!isInlineEditing; else editStatusFieldMobile">
-              <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [value]="selectedEvent.status || ''" disabled>
-                
-                <option value="not yet started">Not Yet Started</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="concluded">Concluded</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+            <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [value]="(isInlineEditing ? inlineEditEvent?.status : selectedEvent?.status) || ''" disabled>
+              <option value="not yet started">Not Yet Started</option>
+              <option value="ongoing">Ongoing</option>
+              <option value="concluded">Concluded</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+          <div class="col-span-2">
+            <label class="block text-sm font-medium mb-1 text-gray-700">Registration Type</label>
+            <ng-container *ngIf="!isInlineEditing; else editIsPaidFieldMobile">
+              <div class="flex items-center gap-6">
+                <label class="inline-flex items-center gap-2">
+                  <input type="radio" [checked]="!selectedEvent.is_paid" disabled class="form-radio text-[#679436]" />
+                  <span>Free event</span>
+                </label>
+                <label class="inline-flex items-center gap-2">
+                  <input type="radio" [checked]="selectedEvent.is_paid" disabled class="form-radio text-[#14532d]" />
+                  <span>Paid event</span>
+                </label>
+              </div>
             </ng-container>
-            <ng-template #editStatusFieldMobile>
-              <select class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-gray-700" [(ngModel)]="inlineEditEvent.status">
-                
-                <option value="not yet started">Not Yet Started</option>
-                <option value="ongoing">Ongoing</option>
-                <option value="concluded">Concluded</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+            <ng-template #editIsPaidFieldMobile>
+              <div class="flex items-center gap-6">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="inline_is_paid_mobile" [value]="false" [(ngModel)]="inlineEditEvent.is_paid" class="form-radio text-[#679436]">
+                  <span>Free event</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="radio" name="inline_is_paid_mobile" [value]="true" [(ngModel)]="inlineEditEvent.is_paid" class="form-radio text-[#14532d]">
+                  <span>Paid event</span>
+                </label>
+              </div>
+              <div *ngIf="inlineEditEvent.is_paid" class="mt-2 max-w-xs">
+                <label class="block text-xs font-medium text-gray-700 mb-1">Registration Fee</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 select-none">₱</span>
+                  <input type="number" step="0.01" min="0" [(ngModel)]="inlineEditEvent.registration_fee" class="w-full pl-8 pr-3 py-2 rounded-md border border-gray-300 focus:outline-none" placeholder="0.00" />
+                </div>
+              </div>
             </ng-template>
           </div>
         </div>
@@ -656,19 +736,47 @@
     >
       Registered Participants for "{{ selectedEventTitle }}"
     </h2>
-  <div class="flex justify-end mb-3" *ngIf="!participantsLoading && participants.length > 0">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3" *ngIf="!participantsLoading && participants.length > 0">
+    <!-- Bulk actions toolbar -->
+    <div class="flex flex-wrap items-center gap-2">
+      <ng-container *ngIf="hasSelection; else noSelectionHint">
+        <span class="inline-flex items-center gap-1 px-2 py-1 rounded border text-xs text-gray-700 bg-gray-50">
+          <i class="fas fa-check-square text-[#679436]"></i>
+          {{ selectedCount }} selected
+        </span>
+        <button type="button"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-white text-xs sm:text-sm shadow-sm bg-emerald-600 hover:bg-emerald-700"
+                (click)="bulkApproveSelected()">
+          <i class="fas fa-check"></i>
+          Approve Selected
+        </button>
+        <button type="button"
+                class="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-white text-xs sm:text-sm shadow-sm bg-red-600 hover:bg-red-700"
+                (click)="bulkRejectSelected()">
+          <i class="fas fa-times"></i>
+          Reject Selected
+        </button>
+      </ng-container>
+      <ng-template #noSelectionHint>
+        <span class="text-xs text-gray-500">Select pending registrations to approve or reject in bulk.</span>
+      </ng-template>
+    </div>
+
+    <!-- Download Excel button -->
+    <div class="flex justify-end">
       <button
         type="button"
-  class="inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md text-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
-  [ngClass]="'bg-[#05668D] hover:bg-blue-800 focus:ring-[#05668D]'"
+        class="inline-flex items-center gap-1 sm:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md text-white text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
+        [ngClass]="'bg-[#05668D] hover:bg-blue-800 focus:ring-[#05668D]'"
         (click)="downloadParticipantsExcel()"
         aria-label="Download participants as Excel"
         title="Download participants as Excel"
       >
-    <i class="fas fa-file-excel text-sm sm:text-base"></i>
-    <span>Download Excel</span>
+        <i class="fas fa-file-excel text-sm sm:text-base"></i>
+        <span>Download Excel</span>
       </button>
     </div>
+  </div>
     <div *ngIf="participantsLoading" class="text-center py-8">Loading...</div>
     <div *ngIf="!participantsLoading && participants.length === 0" class="text-center py-8 text-gray-500">
       No participants registered for this event.
@@ -677,6 +785,14 @@
       <table class="w-full text-sm sm:text-base whitespace-nowrap">
         <thead [ngClass]="isOsws ? 'bg-[#14532d] text-white' : 'bg-[#679436] text-white'">
           <tr>
+            <th class="px-3 py-3 text-left w-8">
+              <input type="checkbox"
+                     title="Select all on page"
+                     (change)="toggleSelectAllPage($event)"
+                     [disabled]="!hasPendingOnPage()"
+                     [checked]="isAllPendingSelectedOnPage()"
+                     class="form-checkbox h-4 w-4 text-[#679436] align-middle" />
+            </th>
             <th class="px-4 py-3 text-left">Student ID</th>
             <th class="px-4 py-3 text-left">First Name</th>
             <th class="px-4 py-3 text-left">Last Name</th>
@@ -684,10 +800,23 @@
             <th class="px-4 py-3 text-left">Department</th>
             <th class="px-4 py-3 text-left">Program</th>
             <th class="px-4 py-3 text-left">Proof of Payment</th>
+            <th class="px-4 py-3 text-left">Status</th>
+            <th class="px-4 py-3 text-left">Action</th>
           </tr>
         </thead>
   <tbody class="text-xs sm:text-sm">
           <tr *ngFor="let p of pagedParticipants">
+            <td class="px-3 py-3">
+              <ng-container *ngIf="isPending(p); else noSelect">
+                <input type="checkbox"
+                       [checked]="isSelected(p)"
+                       (change)="toggleSelection(p)"
+                       class="form-checkbox h-4 w-4 text-[#679436] align-middle" />
+              </ng-container>
+              <ng-template #noSelect>
+                <!-- empty cell to keep alignment -->
+              </ng-template>
+            </td>
             <td class="px-4 py-3 whitespace-nowrap">{{ p.student_id }}</td>
             <td class="px-4 py-3 whitespace-nowrap">{{ p.first_name }}</td>
             <td class="px-4 py-3 whitespace-nowrap">{{ p.last_name }}</td>
@@ -711,6 +840,32 @@
               <ng-template #noProof>
                 <span class="text-gray-400">No file</span>
               </ng-template>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border"
+                    [ngClass]="{
+                      'bg-yellow-50 text-yellow-800 border-yellow-200': isPending(p),
+                      'bg-emerald-50 text-emerald-800 border-emerald-200': isApproved(p),
+                      'bg-red-50 text-red-800 border-red-200': isRejected(p)
+                    }">
+                {{ (p.status || 'approved') | titlecase }}
+              </span>
+            </td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              <div class="flex gap-2" *ngIf="isPending(p)">
+                <button type="button"
+                        class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-white text-xs shadow-sm bg-emerald-600 hover:bg-emerald-700"
+                        (click)="approveParticipant(p)">
+                  <i class="fas fa-check"></i>
+                  Approve
+                </button>
+                <button type="button"
+                        class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-white text-xs shadow-sm bg-red-600 hover:bg-red-700"
+                        (click)="rejectParticipant(p)">
+                  <i class="fas fa-times"></i>
+                  Reject
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -769,6 +924,35 @@
       <div>
         <label class="block text-sm font-medium mb-1">Location</label>
         <input type="text" class="w-full px-3 py-2 border rounded-md" [(ngModel)]="newEvent.location" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Registration Type</label>
+        <div class="flex items-center gap-6">
+          <label class="inline-flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="is_paid_modal" [value]="false" [(ngModel)]="newEvent.is_paid" class="form-radio text-[#679436]">
+            <span>Free event</span>
+          </label>
+          <label class="inline-flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="is_paid_modal" [value]="true" [(ngModel)]="newEvent.is_paid" class="form-radio text-[#14532d]">
+            <span>Paid event</span>
+          </label>
+        </div>
+        <!-- Registration fee when Paid -->
+  <div *ngIf="newEvent.is_paid" class="mt-2 max-w-xs">
+          <label class="block text-sm font-medium mb-1">Registration Fee</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500 select-none">₱</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              [(ngModel)]="newEvent.registration_fee"
+              class="w-full pl-8 pr-3 py-2 border rounded-md"
+              placeholder="0.00"
+            />
+          </div>
+        </div>
       </div>
 
       <!-- Mobile: stack in desired order (Start Date -> End Date -> Start Time -> End Time) -->

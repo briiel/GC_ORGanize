@@ -107,6 +107,17 @@
             <li class="text-sm sm:text-base truncate white" title="{{event.description}}">
               {{event.description}}
             </li>
+            <li class="text-sm sm:text-base flex items-center gap-2 flex-wrap">
+              <span class="inline-flex items-center gap-2 px-2 py-0.5 rounded-full text-xs font-semibold border"
+                    [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
+                <i class="fas" [ngClass]="event.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
+                {{ event.is_paid ? 'Paid' : 'Free' }}
+              </span>
+              <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-amber-50 text-amber-900 border-amber-200">
+                ₱ {{ event.registration_fee | number:'1.2-2' }}
+              </span>
+            </li>
             <li
               [attr.aria-label]="'Location: ' + (event.location || '')"
               class="text-sm sm:text-base"

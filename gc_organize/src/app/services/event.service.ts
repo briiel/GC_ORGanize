@@ -1,3 +1,4 @@
+// ...existing code...
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
@@ -7,6 +8,11 @@ import { tap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class EventService {
+  // Trash (soft-delete) multiple events
+  trashMultipleEvents(eventIds: number[]): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/events/trash-multiple`, { eventIds }, { headers });
+  }
   // Dev: 'http://localhost:5000/api/event'
   private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event';
 
@@ -144,6 +150,16 @@ export class EventService {
 
   getEventParticipants(eventId: number) {
     return this.http.get<any>(`${this.apiUrl}/${eventId}/participants`);
+  }
+
+  approveRegistration(registrationId: number) {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/registrations/${registrationId}/approve`, {}, { headers });
+  }
+
+  rejectRegistration(registrationId: number) {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/registrations/${registrationId}/reject`, {}, { headers });
   }
 
   getEventById(eventId: number) {
