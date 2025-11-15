@@ -15,6 +15,10 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
   loading = true;
   error: string | null = null;
 
+  // Search terms
+  adminSearchTerm: string = '';
+  orgSearchTerm: string = '';
+
   // Modal state and form fields
   isAddAdminModalOpen = false;
   newEmail: string = '';
@@ -22,6 +26,31 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
   newName: string = '';
 
   constructor(private adminService: AdminService) {}
+
+  // Filtered admins based on search term
+  get filteredAdmins() {
+    if (!this.adminSearchTerm.trim()) {
+      return this.admins;
+    }
+    const searchLower = this.adminSearchTerm.toLowerCase();
+    return this.admins.filter(admin =>
+      admin.name.toLowerCase().includes(searchLower) ||
+      admin.email.toLowerCase().includes(searchLower)
+    );
+  }
+
+  // Filtered organizations based on search term
+  get filteredOrganizations() {
+    if (!this.orgSearchTerm.trim()) {
+      return this.organizations;
+    }
+    const searchLower = this.orgSearchTerm.toLowerCase();
+    return this.organizations.filter(org =>
+      org.name.toLowerCase().includes(searchLower) ||
+      org.email.toLowerCase().includes(searchLower) ||
+      org.department.toLowerCase().includes(searchLower)
+    );
+  }
 
   ngOnInit(): void {
     this.loadUsers();

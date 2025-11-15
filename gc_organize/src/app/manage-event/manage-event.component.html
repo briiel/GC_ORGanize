@@ -45,11 +45,11 @@
           <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
             <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
               <th class="px-4 py-4 text-center w-12 font-bold">#</th>
-              <th class="px-4 py-4 text-left min-w-[180px] font-bold">Title</th>
+              <th class="px-4 py-4 text-center min-w-[180px] font-bold">Title</th>
               <th class="px-4 py-4 text-center font-bold">Type</th>
               <th class="px-4 py-4 text-center font-bold">Date</th>
               <th class="px-4 py-4 text-center font-bold">Time</th>
-              <th class="px-4 py-4 text-left min-w-[120px] font-bold">Location</th>
+              <th class="px-4 py-4 text-center min-w-[120px] font-bold">Location</th>
               <th class="px-4 py-4 text-center font-bold">Status</th>
               <th class="px-4 py-4 text-center font-bold">Actions</th>
             </tr>
@@ -57,7 +57,7 @@
           <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
             <tr *ngFor="let event of filteredOswsEvents(); let i = index" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
               <td class="px-4 py-4 text-center text-[#14532d] font-bold text-base">{{ i + 1 }}</td>
-              <td class="px-4 py-4 font-semibold text-left max-w-[200px]">
+              <td class="px-4 py-4 font-semibold text-center max-w-[200px]">
                 <div class="text-[#14532d] font-semibold truncate" [title]="event.title">{{ event.title }}</div>
               </td>
               <td class="px-4 py-4 text-center">
@@ -86,8 +86,8 @@
                   <span *ngIf="event.end_time" class="text-gray-500 text-xs">to {{ formatTime(event.end_time) }}</span>
                 </div>
               </td>
-              <td class="px-4 py-4 text-left max-w-[160px]">
-                <div class="flex items-center gap-2">
+              <td class="px-4 py-4 text-center max-w-[160px]">
+                <div class="flex items-center gap-2 justify-center">
                   <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
                   <span class="truncate text-sm" [title]="event.location">{{ event.location }}</span>
                 </div>
@@ -271,12 +271,12 @@
           <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
             <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
               <th class="px-4 py-4 text-center w-12 font-bold">#</th>
-              <th class="px-4 py-4 text-left font-bold">Title</th>
+              <th class="px-4 py-4 text-center font-bold">Title</th>
               <th class="px-4 py-4 text-center font-bold">Type</th>
               <th class="px-4 py-4 text-center font-bold">Date</th>
               <th class="px-4 py-4 text-center font-bold">Time</th>
-              <th class="px-4 py-4 text-left font-bold">Location</th>
-              <th class="px-4 py-4 text-left font-bold">Department</th>
+              <th class="px-4 py-4 text-center font-bold">Location</th>
+              <th class="px-4 py-4 text-center font-bold">Department</th>
               <th class="px-4 py-4 text-center font-bold">Status</th>
             </tr>
           </thead>
@@ -285,7 +285,7 @@
                 class="hover:bg-[#e6f7ef]/30 transition-all duration-200"
                 [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-[#e6f7ef]/50' : ''">
               <td class="px-4 py-4 text-center text-[#14532d] font-bold text-base">{{ (orgEventPage - 1) * orgEventPageSize + i + 1 }}</td>
-              <td class="px-4 py-4 font-semibold text-left text-[#14532d]">
+              <td class="px-4 py-4 font-semibold text-center text-[#14532d]">
                 {{ event.title }}
               </td>
               <td class="px-4 py-4 text-center">
@@ -314,14 +314,14 @@
                   <span *ngIf="event.end_time" class="text-gray-500 text-xs">to {{ formatTime(event.end_time) }}</span>
                 </div>
               </td>
-              <td class="px-4 py-4 text-left">
-                <div class="flex items-center gap-2">
+              <td class="px-4 py-4 text-center">
+                <div class="flex items-center gap-2 justify-center">
                   <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
                   <span class="text-sm">{{ event.location }}</span>
                 </div>
               </td>
-              <td class="px-4 py-4 text-left">
-                <div class="flex items-center gap-2">
+              <td class="px-4 py-4 text-center">
+                <div class="flex items-center gap-2 justify-center">
                   <i class="fas fa-building text-gray-400 text-xs"></i>
                   <span class="text-sm font-medium">{{ event.department }}</span>
                 </div>
