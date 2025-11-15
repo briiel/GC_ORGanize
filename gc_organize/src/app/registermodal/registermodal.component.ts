@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-registermodal',
+  standalone: true, 
   templateUrl: './registermodal.component.html',
   styleUrls: ['./registermodal.component.css'],
   imports: [CommonModule, FormsModule]
@@ -15,11 +16,11 @@ export class RegistermodalComponent implements OnInit {
   @Input() eventId: number | null = null;
   isPaid: boolean = false;
   
-  // Proof of payment upload state (mirror Manage Event poster behavior)
-  proofPreviewUrl: string | null = null; // Data URL for preview
-  selectedFile: File | null = null; // Store single file for upload
+  // Proof of payment upload state
+  proofPreviewUrl: string | null = null;
+  selectedFile: File | null = null;
 
-  // For display only (not sent to backend)
+  // For display only
   studentInfo: any = {
     id: '',
     first_name: '',
@@ -39,26 +40,28 @@ export class RegistermodalComponent implements OnInit {
 
   constructor(private http: HttpClient) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (this.eventId !== null) {
       this.registrationData.event_id = this.eventId;
     }
+    
     // Fetch event to determine if paid
     if (this.eventId !== null) {
       const token = localStorage.getItem('authToken') || '';
-
-        headers: token ? { Authorization: `Bearer ${token}` } as any : undefined
+      this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/event/events/${this.eventId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
       }).subscribe({
         next: (res) => {
           const ev = res?.data ? res.data : res;
           this.isPaid = !!ev?.is_paid;
         },
         error: () => {
-          this.isPaid = false; // default to free if lookup fails
+          this.isPaid = false;
         }
       });
     }
-    // Auto-fill student info for display, but only send id to backend
+    
+    // Auto-fill student info
     const studentInfoStr = localStorage.getItem('studentInfo');
     if (studentInfoStr) {
       const student = JSON.parse(studentInfoStr);
@@ -76,35 +79,35 @@ export class RegistermodalComponent implements OnInit {
     }
   }
 
-  previewImages(event: Event) {
+  previewImages(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+    
     if (!file) {
       this.selectedFile = null;
       this.proofPreviewUrl = null;
       return;
     }
 
-  // Validate file size (2MB)
-  const maxSize = 2 * 1024 * 1024;
+    // Validate file size (2MB)
+    const maxSize = 2 * 1024 * 1024;
     if (file.size > maxSize) {
       Swal.fire({
         icon: 'error',
         title: 'File Too Large',
-    text: 'Please select an image smaller than 2MB.',
+        text: 'Please select an image smaller than 2MB.',
       });
-      // Reset input
       input.value = '';
       return;
     }
 
     // Validate file type
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       Swal.fire({
         icon: 'error',
         title: 'Invalid File Type',
-    text: 'Only PNG, JPG, JPEG, or WEBP images are allowed.',
+        text: 'Only PNG, JPG, JPEG, or WEBP images are allowed.',
       });
       input.value = '';
       return;
@@ -120,23 +123,25 @@ export class RegistermodalComponent implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  triggerFileInput() {
+  triggerFileInput(): void {
     const fileInput = document.getElementById('pop-dropzone-file') as HTMLInputElement;
     fileInput?.click();
   }
 
-  removeImage() {
+  removeImage(): void {
     this.selectedFile = null;
     this.proofPreviewUrl = null;
     const dropzoneInput = document.getElementById('pop-dropzone-file') as HTMLInputElement | null;
-    if (dropzoneInput) dropzoneInput.value = '';
+    if (dropzoneInput) {
+      dropzoneInput.value = '';
+    }
   }
 
-  removeAllImages() {
+  removeAllImages(): void {
     this.removeImage();
   }
 
-  submitRegistration() {
+  submitRegistration(): void {
     const token = localStorage.getItem('authToken');
     if (!token) {
       Swal.fire({
@@ -159,20 +164,24 @@ export class RegistermodalComponent implements OnInit {
 
     // If paid event, require proof
     if (this.isPaid && !this.selectedFile) {
-      Swal.fire({ icon: 'warning', title: 'Proof Required', text: 'Please upload a proof of payment for this paid event.' });
+      Swal.fire({
+        icon: 'warning',
+        title: 'Proof Required',
+        text: 'Please upload a proof of payment for this paid event.'
+      });
       return;
     }
 
-    // Create FormData for file upload
+    // Create FormData
     const formData = new FormData();
     formData.append('event_id', this.registrationData.event_id.toString());
     formData.append('student_id', this.registrationData.student_id.toString());
-    // Append proof of payment only if provided
+    
     if (this.selectedFile) {
       formData.append('proof_of_payment', this.selectedFile);
     }
 
-    // Show loading indicator
+    // Show loading
     Swal.fire({
       title: 'Processing Registration...',
       text: 'Please wait while we process your registration.',
@@ -185,13 +194,11 @@ export class RegistermodalComponent implements OnInit {
     });
 
     this.http.post(
-  // Dev: 'http://localhost:5000/api/event/events/register',
-  'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/register',
+      'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/register',
       formData,
       {
         headers: {
           Authorization: `Bearer ${token}`
-          // Don't set Content-Type - let browser handle it for FormData
         }
       }
     ).subscribe({
@@ -237,9 +244,8 @@ export class RegistermodalComponent implements OnInit {
     this.close.emit();
   }
 
-  // Close on ESC key for consistency with view modal
   @HostListener('document:keydown.escape', ['$event'])
-  onEsc(event: KeyboardEvent) {
+  onEsc(event: KeyboardEvent): void {
     event.preventDefault();
     this.closeModal();
   }
