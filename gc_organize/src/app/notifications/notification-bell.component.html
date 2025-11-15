@@ -1,33 +1,106 @@
 <div class="relative">
-  <button (click)="toggle()" class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-200 text-gray-600" aria-label="Notifications">
-    <i class="fas fa-bell text-lg"></i>
-    <span *ngIf="unreadCount() > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-      {{ unreadCount() }}
+  <!-- Bell Button -->
+  <button 
+    (click)="toggle()" 
+    class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-600 transition-all duration-200 hover:scale-105 active:scale-95" 
+    aria-label="Notifications"
+  >
+    <i class="fas fa-bell text-lg" [class.animate-bounce]="unreadCount() > 0"></i>
+    <span 
+      *ngIf="unreadCount() > 0" 
+      class="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border-2 border-white min-w-[20px] flex items-center justify-center"
+    >
+      {{ unreadCount() > 99 ? '99+' : unreadCount() }}
     </span>
   </button>
 
-  <div *ngIf="open" class="absolute right-0 mt-2 w-80 max-w-[86vw] bg-white border border-gray-200 rounded-lg shadow-lg z-30">
-    <div class="px-3 py-2 border-b flex items-center justify-between">
-      <span class="font-semibold text-gray-700">Notifications</span>
-      <button class="text-xs text-blue-600 hover:underline" (click)="refresh()">Refresh</button>
+  <!-- Notification Dropdown Panel -->
+  <div 
+    *ngIf="open" 
+    class="absolute right-0 mt-3 w-96 max-w-[90vw] bg-white rounded-2xl shadow-2xl z-50 border-2 border-gray-200 overflow-hidden animate-slideDown"
+  >
+    <!-- Header -->
+    <div class="px-5 py-3 bg-gradient-to-r from-blue-500 to-blue-600 border-b-4 border-blue-500">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30">
+            <i class="fas fa-bell text-white text-sm"></i>
+          </div>
+          <span class="font-bold text-white text-lg">Notifications</span>
+        </div>
+        <button 
+          class="text-xs text-white/90 hover:text-white font-semibold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 border border-white/30" 
+          (click)="refresh()"
+        >
+          <i class="fas fa-sync-alt mr-1"></i>Refresh
+        </button>
+      </div>
     </div>
-    <div class="max-h-80 overflow-y-auto">
-      <div *ngIf="loading" class="p-3 text-sm text-gray-500">Loading...</div>
+
+    <!-- Notifications List -->
+    <div class="max-h-96 overflow-y-auto custom-scrollbar">
+      <!-- Loading State -->
+      <div *ngIf="loading" class="p-6 text-center">
+        <i class="fas fa-spinner fa-spin text-blue-500 text-2xl mb-2"></i>
+        <p class="text-sm text-gray-500 font-semibold">Loading notifications...</p>
+      </div>
+
+      <!-- Empty State -->
       <ng-container *ngIf="!loading">
-        <div *ngIf="items.length === 0" class="p-3 text-sm text-gray-500">No notifications</div>
-        <ul *ngIf="items.length > 0" class="divide-y">
-          <li *ngFor="let n of items; let i = index" class="p-3 hover:bg-gray-50 cursor-pointer" (click)="markRead(n, i)">
-            <div class="flex items-start">
-              <div class="flex-1">
-                <p class="text-sm" [class.font-semibold]="!n.is_read">{{ n.message }}</p>
-                <p class="text-xs text-gray-500 mt-0.5" *ngIf="n.event_title">Related: {{ n.event_title }}</p>
-                <p class="text-[11px] text-gray-400 mt-0.5">{{ n.created_at | date:'medium' }}</p>
+        <div *ngIf="items.length === 0" class="p-8 text-center">
+          <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+            <i class="fas fa-bell-slash text-gray-400 text-2xl"></i>
+          </div>
+          <p class="text-sm text-gray-500 font-semibold">No notifications yet</p>
+          <p class="text-xs text-gray-400 mt-1">You're all caught up!</p>
+        </div>
+
+        <!-- Notification Items -->
+        <ul *ngIf="items.length > 0" class="divide-y divide-gray-100">
+          <li *ngFor="let n of items; let i = index" (click)="markRead(n, i)" class="p-4 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent cursor-pointer transition-all duration-200 border-l-4" [ngClass]="{'border-l-blue-500': !n.is_read, 'border-l-transparent': n.is_read, 'bg-blue-50/30': !n.is_read}">
+            <div class="flex items-start gap-3">
+              <!-- Icon Badge -->
+              <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-md" [ngClass]="{'bg-gradient-to-br from-blue-500 to-blue-600': !n.is_read, 'bg-gray-300': n.is_read}">
+                <i class="fas fa-info-circle text-white text-sm"></i>
               </div>
-              <span *ngIf="!n.is_read" class="w-2 h-2 bg-blue-500 rounded-full ml-2 mt-1"></span>
+
+              <!-- Content -->
+              <div class="flex-1 min-w-0">
+                <p class="text-sm leading-relaxed" [ngClass]="{'font-bold text-gray-900': !n.is_read, 'font-normal text-gray-600': n.is_read}">
+                  {{ n.message }}
+                </p>
+                <p *ngIf="n.event_title" class="text-xs mt-1.5 px-2 py-1 bg-blue-100 text-blue-700 rounded-md inline-flex items-center gap-1 font-semibold">
+                  <i class="fas fa-calendar-alt text-[10px]"></i>
+                  {{ n.event_title }}
+                </p>
+                <p class="text-[11px] text-gray-400 mt-2 flex items-center gap-1">
+                  <i class="far fa-clock"></i>
+                  {{ n.created_at | date:'MMM d, y - h:mm a' }}
+                </p>
+              </div>
+
+              <!-- Unread Indicator -->
+              <div class="flex items-center gap-2 flex-shrink-0">
+                <span *ngIf="!n.is_read" class="w-2.5 h-2.5 bg-blue-500 rounded-full shadow-lg ring-2 ring-blue-200" title="Unread"></span>
+              </div>
             </div>
           </li>
         </ul>
       </ng-container>
+    </div>
+
+    <!-- Footer (if has notifications) -->
+    <div 
+      *ngIf="!loading && items.length > 0" 
+      class="px-4 py-3 bg-gray-50 border-t-2 border-gray-200 text-center"
+    >
+      <button 
+        class="text-xs text-blue-600 hover:text-blue-700 font-semibold hover:underline transition-colors duration-200"
+        (click)="toggle()"
+      >
+        <i class="fas fa-check-double mr-1"></i>
+        Close Notifications
+      </button>
     </div>
   </div>
 </div>

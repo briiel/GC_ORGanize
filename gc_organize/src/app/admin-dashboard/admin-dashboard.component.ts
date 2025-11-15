@@ -2,12 +2,13 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } fr
 import { Subscription } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
 import Chart from 'chart.js/auto';
 
 @Component({
   selector: 'app-admin-dashboard',
-  imports: [RouterModule, CommonModule],
+  imports: [RouterModule, CommonModule, FormsModule],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.css'
 })
@@ -21,11 +22,17 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     totalAttendees: 0
   };
 
+  pieChartFilter: 'weekly' | 'monthly' | 'yearly' = 'monthly';
+  barChartFilter: 'weekly' | 'monthly' | 'yearly' = 'monthly';
+  lineChartFilter: 'weekly' | 'monthly' | 'yearly' = 'monthly';
+
   // Chart elements
   @ViewChild('deptPieChart') deptPieChart!: ElementRef<HTMLCanvasElement>;
   @ViewChild('eventsBarChart') eventsBarChart!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('orgActivitiesChart') orgActivitiesChart!: ElementRef<HTMLCanvasElement>;
   private deptChart?: Chart;
   private monthlyChart?: Chart;
+  private orgActivitiesLineChart?: Chart;
   private viewReady = false;
   private refreshHandle?: ReturnType<typeof setInterval>;
   private statusChangedSub?: Subscription;
@@ -112,6 +119,24 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   canModifyEventStatus(event: any): boolean {
     // Admin can modify all events, but you might want to add additional rules
     return true;
+  }
+
+  onPieChartFilterChange(): void {
+    if (this.viewReady) {
+      this.renderPieChart();
+    }
+  }
+
+  onBarChartFilterChange(): void {
+    if (this.viewReady) {
+      this.renderBarChart();
+    }
+  }
+
+  onLineChartFilterChange(): void {
+    if (this.viewReady) {
+      this.renderLineChart();
+    }
   }
 
   private loadEventsAndStats(): void {
@@ -212,12 +237,20 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private renderCharts(): void {
-    // Safeguard against missing canvas
-    if (!this.deptPieChart || !this.eventsBarChart) return;
+    this.renderPieChart();
+    this.renderBarChart();
+    this.renderLineChart();
+  }
 
-    // Pie/Donut: events by department (EXCLUDES OSWS-created)
+  private renderPieChart(): void {
+    if (!this.deptPieChart) return;
+
+    // Pie/Donut: events by department (EXCLUDES OSWS-created) - filtered by time
     const departmentCounts = new Map<string, number>();
-    const orgEventsOnly = this.events.filter((e: any) => e.created_by_org_id != null);
+    let orgEventsOnly = this.events.filter((e: any) => e.created_by_org_id != null);
+    
+    // Apply time filter
+    orgEventsOnly = this.filterEventsByTime(orgEventsOnly, this.pieChartFilter);
     for (const e of orgEventsOnly) {
       // Normalize: if department missing for an org event, mark as 'Unknown'
       const dept = (e.department || 'Unknown') as string;
@@ -261,30 +294,162 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         }
       });
     }
+  }
 
-    // Bar: events per month (OSWS-created ONLY)
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const monthlyCounts = new Array(12).fill(0);
-    const oswsOnly = this.events.filter((e: any) => e.created_by_osws_id != null);
-    for (const e of oswsOnly) {
-      const d = e.start_date ? new Date(e.start_date) : undefined;
-      if (d && !isNaN(d.getTime())) {
-        monthlyCounts[d.getMonth()]++;
+  private renderBarChart(): void {
+    if (!this.orgActivitiesChart) return;
+
+    // Horizontal Bar Chart: Activities count per Organization - filtered by time
+    let orgEventsOnly = this.events.filter((e: any) => e.created_by_org_id != null);
+    
+    // Apply time filter
+    orgEventsOnly = this.filterEventsByTime(orgEventsOnly, this.barChartFilter);
+
+    const orgActivityCounts = new Map<string, number>();
+    for (const e of orgEventsOnly) {
+      const orgName = e.organization_name || e.org_name || `Org ${e.created_by_org_id || 'Unknown'}`;
+      orgActivityCounts.set(orgName, (orgActivityCounts.get(orgName) || 0) + 1);
+    }
+    
+    const sortedOrgs = Array.from(orgActivityCounts.entries())
+      .sort((a, b) => b[1] - a[1]);
+    
+    const orgLabels = sortedOrgs.map(([name]) => name);
+    const orgCounts = sortedOrgs.map(([, count]) => count);
+    
+    const orgColors = [
+      '#679436', '#3b82f6', '#ec4899', '#f59e0b', '#10b981',
+      '#8b5cf6', '#ef4444', '#06b6d4', '#eab308', '#a855f7',
+      '#14b8a6', '#f97316', '#84cc16', '#6366f1', '#d946ef'
+    ];
+
+    if (this.orgActivitiesLineChart) this.orgActivitiesLineChart.destroy();
+    this.orgActivitiesLineChart = new Chart(this.orgActivitiesChart.nativeElement.getContext('2d')!, {
+      type: 'bar',
+      data: {
+        labels: orgLabels,
+        datasets: [
+          {
+            label: 'Number of Activities',
+            data: orgCounts,
+            backgroundColor: orgLabels.map((_, i) => orgColors[i % orgColors.length]),
+            borderColor: orgLabels.map((_, i) => orgColors[i % orgColors.length]),
+            borderWidth: 1
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            beginAtZero: true,
+            ticks: { 
+              precision: 0,
+              font: { size: 11 }
+            },
+            title: {
+              display: true,
+              text: 'Number of Activities',
+              font: { weight: 'bold', size: 12 }
+            }
+          },
+          y: {
+            ticks: {
+              font: { size: 11 }
+            }
+          }
+        },
+        plugins: {
+          legend: { 
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                return `Activities: ${context.parsed.x}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  private renderLineChart(): void {
+    if (!this.eventsBarChart) return;
+
+    // Line Chart: events per time period (OSWS-created ONLY)
+    const oswsOnly = this.filterEventsByTime(
+      this.events.filter((e: any) => e.created_by_osws_id != null),
+      this.lineChartFilter
+    );
+    
+    let labels: string[] = [];
+    let timeData: number[] = [];
+    
+    if (this.lineChartFilter === 'weekly') {
+      // Weekly view - show last 12 weeks
+      labels = Array.from({length: 12}, (_, i) => `Week ${12 - i}`);
+      timeData = new Array(12).fill(0);
+      const now = new Date();
+      for (const e of oswsOnly) {
+        const d = e.start_date ? new Date(e.start_date) : undefined;
+        if (d && !isNaN(d.getTime())) {
+          const weeksDiff = Math.floor((now.getTime() - d.getTime()) / (7 * 24 * 60 * 60 * 1000));
+          if (weeksDiff >= 0 && weeksDiff < 12) {
+            timeData[11 - weeksDiff]++;
+          }
+        }
+      }
+    } else if (this.lineChartFilter === 'monthly') {
+      // Monthly view - show all 12 months
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      labels = months;
+      timeData = new Array(12).fill(0);
+      for (const e of oswsOnly) {
+        const d = e.start_date ? new Date(e.start_date) : undefined;
+        if (d && !isNaN(d.getTime())) {
+          timeData[d.getMonth()]++;
+        }
+      }
+    } else if (this.lineChartFilter === 'yearly') {
+      // Yearly view - show last 5 years
+      const currentYear = new Date().getFullYear();
+      labels = Array.from({length: 5}, (_, i) => `${currentYear - 4 + i}`);
+      timeData = new Array(5).fill(0);
+      for (const e of oswsOnly) {
+        const d = e.start_date ? new Date(e.start_date) : undefined;
+        if (d && !isNaN(d.getTime())) {
+          const year = d.getFullYear();
+          const yearIndex = year - (currentYear - 4);
+          if (yearIndex >= 0 && yearIndex < 5) {
+            timeData[yearIndex]++;
+          }
+        }
       }
     }
 
     if (this.monthlyChart) this.monthlyChart.destroy();
     this.monthlyChart = new Chart(this.eventsBarChart.nativeElement.getContext('2d')!, {
-      type: 'bar',
+      type: 'line',
       data: {
-        labels: months,
+        labels: labels,
         datasets: [
           {
             label: 'OSWS Events',
-            data: monthlyCounts,
-            backgroundColor: 'rgba(20, 83, 45, 0.2)', // #14532d @ 20%
+            data: timeData,
+            backgroundColor: 'rgba(20, 83, 45, 0.1)', // #14532d @ 10%
             borderColor: '#14532d',
-            borderWidth: 1
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#14532d',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
           }
         ]
       },
@@ -298,9 +463,38 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           }
         },
         plugins: {
-          legend: { display: false }
+          legend: { 
+            display: true,
+            position: 'bottom'
+          }
         }
       }
     });
+  }
+
+  private filterEventsByTime(events: any[], filter: 'weekly' | 'monthly' | 'yearly'): any[] {
+    const now = new Date();
+    
+    if (filter === 'weekly') {
+      const twelveWeeksAgo = new Date(now.getTime() - (12 * 7 * 24 * 60 * 60 * 1000));
+      return events.filter((e: any) => {
+        const d = e.start_date ? new Date(e.start_date) : undefined;
+        return d && !isNaN(d.getTime()) && d >= twelveWeeksAgo;
+      });
+    } else if (filter === 'monthly') {
+      const currentYear = now.getFullYear();
+      return events.filter((e: any) => {
+        const d = e.start_date ? new Date(e.start_date) : undefined;
+        return d && !isNaN(d.getTime()) && d.getFullYear() === currentYear;
+      });
+    } else if (filter === 'yearly') {
+      const fiveYearsAgo = new Date(now.getFullYear() - 4, 0, 1);
+      return events.filter((e: any) => {
+        const d = e.start_date ? new Date(e.start_date) : undefined;
+        return d && !isNaN(d.getTime()) && d >= fiveYearsAgo;
+      });
+    }
+    
+    return events;
   }
 }
