@@ -46,7 +46,8 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class RbacAuthService {
-  private apiUrl = 'http://localhost:5000/api/auth';
+  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/auth';
+  // private apiUrl = 'http://localhost:5000/api/auth';
   private readonly TOKEN_KEY = 'gc_organize_token';
   
   // BehaviorSubject to track authentication state
