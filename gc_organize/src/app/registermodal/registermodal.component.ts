@@ -53,6 +53,7 @@ export class RegistermodalComponent implements OnInit {
     if (this.eventId !== null) {
       const token = localStorage.getItem('gc_organize_token') || '';
       this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/event/events/${this.eventId}`, {
+      // this.http.get<any>(`http://localhost:5000/api/event/events/${this.eventId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       }).subscribe({
         next: (res) => {
@@ -91,6 +92,7 @@ export class RegistermodalComponent implements OnInit {
 
     // Fetch additional student details from backend
     this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/users/${decoded.studentId}`, {
+    // this.http.get<any>(`http://localhost:5000/api/users/${decoded.studentId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: (res) => {
@@ -231,6 +233,7 @@ export class RegistermodalComponent implements OnInit {
 
     this.http.post(
       'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/register',
+      // 'http://localhost:5000/api/event/events/register',
       formData,
       {
         headers: {

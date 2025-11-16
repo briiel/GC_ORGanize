@@ -126,10 +126,32 @@
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
-                <button [routerLink]="'manage-users'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
-                    <i class="fas fa-users-cog mr-2 text-lg sm:text-xl"></i> Manage Users
-                </button>
+                
+                <!-- User Management Dropdown -->
+                <div class="w-full">
+                    <button (click)="toggleUserManagement()"
+                        class="flex items-center justify-between px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                        <span class="flex items-center">
+                            <i class="fas fa-users-cog mr-2 text-lg sm:text-xl"></i> User Management
+                        </span>
+                        <i class="fas transition-transform duration-200" 
+                           [ngClass]="isUserManagementOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    
+                    <!-- Dropdown Menu -->
+                    <div *ngIf="isUserManagementOpen" 
+                         class="ml-6 mt-1 space-y-1 overflow-hidden transition-all duration-200">
+                        <button [routerLink]="'manage-users'" (click)="closeIfMobile()"
+                            class="flex items-center px-3 py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                            <i class="fas fa-users mr-2"></i> Accounts
+                        </button>
+                        <button [routerLink]="'role-requests'" (click)="closeIfMobile()"
+                            class="flex items-center px-3 py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                            <i class="fas fa-user-check mr-2"></i> Role Requests
+                        </button>
+                    </div>
+                </div>
+                
                 <button [routerLink]="'manage-event'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-calendar-alt mr-2 text-lg sm:text-xl"></i> Manage Events
@@ -146,10 +168,6 @@
                 <button [routerLink]="'trash'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-trash mr-2 text-lg sm:text-xl"></i> Archive
-                </button>
-                <button [routerLink]="'role-requests'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
-                    <i class="fas fa-user-check mr-2 text-lg sm:text-xl"></i> Role Requests
                 </button>
                 <!-- <button [routerLink]="'manage-event'" [queryParams]="{ create: true }"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">

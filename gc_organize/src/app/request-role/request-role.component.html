@@ -1,111 +1,129 @@
 <!-- Request Organization Officer Role Component -->
-<div class="p-4 lg:p-6 bg-gray-100 min-h-screen">
+<div class="p-4 lg:p-6 bg-gray-100 min-h-screen relative">
   <div class="max-w-6xl mx-auto">
     
     <!-- Header Section -->
     <div class="mb-6 mx-2 lg:mx-6">
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-r from-[#679436] to-[#56732e] flex items-center justify-center flex-shrink-0 shadow-lg">
-          <i class="fas fa-user-plus text-white text-lg"></i>
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold text-[#679436]">Request Officer Role</h1>
+          <p class="text-gray-600 mt-1">Apply to become an officer in a student organization</p>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-[#679436]">Request Officer Role</h1>
+        <button 
+          (click)="openRequestModal()"
+          class="font-bold px-6 py-3 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-[#679436] hover:bg-[#56732e] border-[#679436]">
+          <i class="fas fa-plus"></i>
+          <span class="hidden sm:inline">Submit New Request</span>
+          <span class="sm:hidden">New Request</span>
+        </button>
       </div>
-      <p class="text-gray-600 ml-13">Apply to become an officer in a student organization</p>
     </div>
 
-    <!-- Request Form Card -->
-    <div class="mx-2 lg:mx-6 mb-8 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
-      <!-- Form Header with Gradient -->
-      <div class="px-6 py-4 border-b-4 bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-file-alt text-white text-sm"></i>
+    <!-- Request Modal -->
+    <div *ngIf="isModalOpen" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" style="z-index: 3000;" (click)="closeRequestModal()">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-scale-in" (click)="$event.stopPropagation()">
+        <!-- Modal Header -->
+        <div class="px-6 py-4 border-b-4 bg-[#679436] border-[#679436] flex items-center justify-between sticky top-0 z-10">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-file-alt text-white text-sm"></i>
+            </div>
+            <h2 class="text-lg lg:text-xl font-bold text-white">Submit New Request</h2>
           </div>
-          <h2 class="text-lg lg:text-xl font-bold text-white">Submit New Request</h2>
+          <button 
+            (click)="closeRequestModal()"
+            type="button"
+            class="text-white hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-      </div>
-      
-      <!-- Form Content -->
-      <div class="p-6">
-        <form (ngSubmit)="submitRequest()" class="space-y-6">
-          
-          <!-- Organization Selection -->
-          <div>
-            <label for="organization" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-              <i class="fas fa-building text-[#679436]"></i>
-              Select Organization <span class="text-red-500">*</span>
-            </label>
-            <select 
-              id="organization"
-              [(ngModel)]="selectedOrgId" 
-              name="organization"
-              required
-              [disabled]="isSubmitting"
-              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed">
-              <option [value]="null" disabled>-- Select an Organization --</option>
-              <option *ngFor="let org of organizations" [value]="org.org_id">
-                {{ org.org_name }} <span class="text-gray-500">({{ org.department }})</span>
-              </option>
-            </select>
-          </div>
+        
+        <!-- Modal Content -->
+        <div class="p-6">
+          <form (ngSubmit)="submitRequest()" class="space-y-6">
+            
+            <!-- Organization Selection -->
+            <div>
+              <label for="organization" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <i class="fas fa-building text-[#679436]"></i>
+                Select Organization <span class="text-red-500">*</span>
+              </label>
+              <select 
+                id="organization"
+                [(ngModel)]="selectedOrgId" 
+                name="organization"
+                required
+                [disabled]="isSubmitting"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed">
+                <option [value]="null" disabled>-- Select an Organization --</option>
+                <option *ngFor="let org of filteredOrganizations" [value]="org.org_id">
+                  {{ org.org_name }} <span class="text-gray-500">({{ org.department }})</span>
+                </option>
+              </select>
+            </div>
 
-          <!-- Position -->
-          <div>
-            <label for="position" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-              <i class="fas fa-user-tie text-[#679436]"></i>
-              Requested Position <span class="text-red-500">*</span>
-            </label>
-            <input 
-              type="text" 
-              id="position"
-              [(ngModel)]="requestedPosition" 
-              name="position"
-              required
-              [disabled]="isSubmitting"
-              placeholder="e.g., President, Vice President, Secretary, Treasurer"
-              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed">
-          </div>
+            <!-- Position -->
+            <div>
+              <label for="position" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <i class="fas fa-user-tie text-[#679436]"></i>
+                Requested Position <span class="text-red-500">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="position"
+                [(ngModel)]="requestedPosition" 
+                name="position"
+                required
+                [disabled]="isSubmitting"
+                placeholder="e.g., President, Vice President, Secretary, Treasurer"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed">
+            </div>
 
-          <!-- Justification (Optional) -->
-          <div>
-            <label for="justification" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-              <i class="fas fa-comment-dots text-[#679436]"></i>
-              Justification <span class="text-gray-500 font-normal">(Optional)</span>
-            </label>
-            <textarea 
-              id="justification"
-              [(ngModel)]="justification" 
-              name="justification"
-              rows="5"
-              [disabled]="isSubmitting"
-              placeholder="Explain why you should be granted this role and how you plan to contribute to the organization..."
-              class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea>
-            <p class="text-xs text-gray-500 mt-1">
-              <i class="fas fa-info-circle"></i> Providing a justification can strengthen your request
-            </p>
-          </div>
+            <!-- Justification (Optional) -->
+            <div>
+              <label for="justification" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <i class="fas fa-comment-dots text-[#679436]"></i>
+                Justification <span class="text-gray-500 font-normal">(Optional)</span>
+              </label>
+              <textarea 
+                id="justification"
+                [(ngModel)]="justification" 
+                name="justification"
+                rows="5"
+                [disabled]="isSubmitting"
+                placeholder="Explain why you should be granted this role and how you plan to contribute to the organization..."
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea>
+              <p class="text-xs text-gray-500 mt-1">
+                <i class="fas fa-info-circle"></i> Providing a justification can strengthen your request
+              </p>
+            </div>
 
-          <!-- Submit Button -->
-          <div class="flex justify-end pt-4 border-t border-gray-200">
-            <button 
-              type="submit"
-              [disabled]="isSubmitting || !selectedOrgId || !requestedPosition.trim()"
-              class="relative font-bold px-6 py-3 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-[#679436] hover:bg-[#56732e] border-[#679436] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none">
-              <span class="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 border border-white" *ngIf="!isSubmitting">
-                <i class="fas fa-paper-plane"></i>
-              </span>
-              <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
-              {{ isSubmitting ? 'Submitting Request...' : 'Submit Request' }}
-            </button>
-          </div>
-        </form>
+            <!-- Submit Button -->
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+              <button 
+                type="button"
+                (click)="closeRequestModal()"
+                [disabled]="isSubmitting"
+                class="font-bold px-6 py-3 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-gray-700 border-2 bg-white hover:bg-gray-50 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                [disabled]="isSubmitting || !selectedOrgId || !requestedPosition.trim()"
+                class="relative font-bold px-6 py-3 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-[#679436] hover:bg-[#56732e] border-[#679436] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed disabled:transform-none">
+                <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+                {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
 
     <!-- My Requests History -->
     <div class="mx-2 lg:mx-6 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
       <!-- History Header with Gradient -->
-      <div class="px-6 py-4 border-b-4 bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]">
+      <div class="px-6 py-4 border-b-4 bg-[#679436] border-[#679436]">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-history text-white text-sm"></i>
@@ -122,7 +140,7 @@
 
       <!-- No Requests -->
       <div *ngIf="!isLoading && myRequests.length === 0" class="text-center py-12 px-6">
-        <div class="w-20 h-20 rounded-full bg-gradient-to-r from-[#679436] to-[#56732e] flex items-center justify-center mx-auto mb-4 opacity-20">
+        <div class="w-20 h-20 rounded-full bg-[#679436] flex items-center justify-center mx-auto mb-4 opacity-20">
           <i class="fas fa-inbox text-4xl text-white"></i>
         </div>
         <p class="text-gray-600 font-medium text-lg">No requests yet</p>
@@ -132,7 +150,7 @@
       <!-- Requests Table -->
       <div *ngIf="!isLoading && myRequests.length > 0" class="overflow-x-auto">
         <table class="w-full text-sm lg:text-base">
-          <thead class="bg-gradient-to-r from-[#679436] to-[#56732e]">
+          <thead class="bg-[#679436]">
             <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
               <th class="px-4 lg:px-6 py-4 text-left font-bold min-w-[200px]">Organization</th>
               <th class="px-4 lg:px-6 py-4 text-left font-bold min-w-[150px]">Position</th>
@@ -147,7 +165,7 @@
               <!-- Organization -->
               <td class="px-4 lg:px-6 py-4">
                 <div class="flex items-start gap-3">
-                  <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#679436] to-[#56732e] flex items-center justify-center flex-shrink-0 shadow">
+                  <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center flex-shrink-0 shadow">
                     <i class="fas fa-building text-white text-sm"></i>
                   </div>
                   <div>

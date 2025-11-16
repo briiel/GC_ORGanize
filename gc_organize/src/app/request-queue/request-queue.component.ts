@@ -33,7 +33,8 @@ interface RoleRequest {
   styleUrls: ['./request-queue.component.css']
 })
 export class RequestQueueComponent implements OnInit {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
+  // private apiUrl = 'http://localhost:5000/api';
   
   pendingRequests: RoleRequest[] = [];
   allRequests: RoleRequest[] = [];

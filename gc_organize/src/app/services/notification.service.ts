@@ -15,7 +15,7 @@ export interface NotificationItem {
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private api = 'https://gcorg-apiv1-8bn5.onrender.com/api/notifications';
-  // private api = 'http://localhost:5000/api/notifications'; // Comment this out for production
+  // private api = 'http://localhost:5000/api/notifications';
 
   constructor(private http: HttpClient) {}
 

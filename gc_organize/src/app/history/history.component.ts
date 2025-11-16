@@ -104,19 +104,30 @@ export class HistoryComponent implements OnInit {
 
   formatTime(t?: string) {
     if (!t) return '';
-    const [h, m] = String(t).split(':');
-    const dt = new Date();
-    dt.setHours(Number(h||0), Number(m||0), 0, 0);
-    return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    try {
+      // Handle both full datetime strings and time-only strings
+      const dateObj = new Date(t);
+      if (!isNaN(dateObj.getTime())) {
+        // Valid datetime - extract time
+        return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+      // Fallback for HH:MM format
+      const [h, m] = String(t).split(':');
+      const dt = new Date();
+      dt.setHours(Number(h||0), Number(m||0), 0, 0);
+      return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return '';
+    }
   }
 
   statusColor(status?: string) {
     const s = String(status || '').toLowerCase();
-    if (s === 'ongoing') return 'bg-blue-100 text-blue-700 border-blue-200';
-    if (s === 'concluded') return 'bg-green-100 text-green-700 border-green-200';
-    if (s === 'cancelled') return 'bg-red-100 text-red-700 border-red-200';
-    if (s === 'not yet started') return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-    return 'bg-gray-100 text-gray-600 border-gray-200';
+    if (s === 'ongoing') return 'bg-blue-50 text-blue-800 border-blue-300';
+    if (s === 'concluded') return 'bg-green-50 text-green-800 border-green-300';
+    if (s === 'cancelled') return 'bg-red-50 text-red-800 border-red-300';
+    if (s === 'not yet started') return 'bg-yellow-50 text-yellow-800 border-yellow-300';
+    return 'bg-gray-50 text-gray-600 border-gray-300';
   }
 
   private safeDate(v: any) {

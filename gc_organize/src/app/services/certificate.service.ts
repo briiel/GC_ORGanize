@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class CertificateService {
-  // Dev: 'http://localhost:5000/api/event/certificates'
   private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event/certificates';
+  // private apiUrl = 'http://localhost:5000/api/event/certificates';
 
   constructor(private http: HttpClient) {}
 

@@ -34,10 +34,12 @@ interface MyRequest {
   styleUrls: ['./request-role.component.css']
 })
 export class RequestRoleComponent implements OnInit {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
+  // private apiUrl = 'http://localhost:5000/api';
   
   organizations: Organization[] = [];
   myRequests: MyRequest[] = [];
+  userDepartment: string = '';
   
   selectedOrgId: number | null = null;
   requestedPosition: string = '';
@@ -45,6 +47,7 @@ export class RequestRoleComponent implements OnInit {
   
   isSubmitting = false;
   isLoading = true;
+  isModalOpen = false;
 
   constructor(
     private http: HttpClient,
@@ -52,8 +55,43 @@ export class RequestRoleComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadUserInfo();
     this.loadOrganizations();
     this.loadMyRequests();
+  }
+
+  /**
+   * Load user information to get department
+   */
+  loadUserInfo(): void {
+    this.authService.getUserDepartment((department) => {
+      this.userDepartment = department;
+      console.log('User department loaded:', this.userDepartment);
+    });
+  }
+
+  /**
+   * Get filtered organizations based on user's department
+   */
+  get filteredOrganizations(): Organization[] {
+    if (!this.userDepartment) {
+      return this.organizations;
+    }
+    return this.organizations.filter(org => org.department === this.userDepartment);
+  }
+
+  /**
+   * Open the request modal
+   */
+  openRequestModal(): void {
+    this.isModalOpen = true;
+  }
+
+  /**
+   * Close the request modal
+   */
+  closeRequestModal(): void {
+    this.isModalOpen = false;
   }
 
   /**
@@ -123,6 +161,7 @@ export class RequestRoleComponent implements OnInit {
     this.http.post<any>(`${this.apiUrl}/roles/request`, requestData, { headers }).subscribe({
       next: (response) => {
         this.isSubmitting = false;
+        this.closeRequestModal();
         
         Swal.fire({
           icon: 'success',

@@ -2,8 +2,8 @@
 <div class="p-6 bg-gray-100 min-h-screen overflow-x-hidden">
   <!-- Header -->
   <div class="mb-6 mx-2 lg:mx-6">
-    <div class="bg-gradient-to-r shadow-2xl rounded-2xl overflow-hidden border-2"
-         [ngClass]="isOsws ? 'from-[#14532d] to-[#166534] border-[#14532d]' : 'from-[#679436] to-[#56732e] border-[#679436]'">
+    <div class="shadow-2xl rounded-2xl overflow-hidden border-2"
+         [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
       <div class="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
@@ -46,8 +46,8 @@
     <!-- Vertical event list -->
     <div class="w-full md:w-1/4 max-w-xs min-w-0">
       <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden flex flex-col" style="height: auto; min-height: 540px; max-height: none;">
-        <div class="px-6 py-3 border-b-4 bg-gradient-to-r flex-shrink-0"
-             [ngClass]="isOsws ? 'from-[#14532d] to-[#166534] border-[#14532d]' : 'from-[#679436] to-[#56732e] border-[#679436]'">
+        <div class="px-6 py-3 border-b-4 flex-shrink-0"
+             [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
               <i class="fas fa-calendar-alt text-white text-sm"></i>
@@ -141,8 +141,8 @@
       <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden">
         <ng-container *ngIf="selectedEvent; else selectEventMsg">
           <!-- Header -->
-          <div class="px-6 py-3 border-b-4 bg-gradient-to-r"
-               [ngClass]="isOsws ? 'from-[#14532d] to-[#166534] border-[#14532d]' : 'from-[#679436] to-[#56732e] border-[#679436]'">
+          <div class="px-6 py-3 border-b-4"
+               [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3 flex-1">
                 <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -182,8 +182,8 @@
                   (keyup.enter)="onSearch()"
                 />
                 <button
-                  class="text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto bg-gradient-to-r"
-                  [ngClass]="isOsws ? 'from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'"
+                  class="text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto"
+                  [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
                   (click)="onSearch()"
                   type="button"
                 >
@@ -201,7 +201,7 @@
                 </button>
                 <button
                   (click)="downloadExcel()"
-                  class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 sm:px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto min-w-[44px] text-base whitespace-nowrap"
+                  class="bg-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 sm:px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto min-w-[44px] text-base whitespace-nowrap"
                   [disabled]="filteredRecords.length === 0"
                   type="button"
                 >
@@ -214,8 +214,8 @@
             <div class="overflow-x-auto shadow-sm">
               <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMsg">
                 <table *ngIf="!error" class="w-full text-sm">
-                  <thead class="bg-gradient-to-r"
-                         [ngClass]="isOsws ? 'from-[#14532d] to-[#166534]' : 'from-[#679436] to-[#56732e]'">
+                  <thead
+                         [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
                       <tr class="uppercase tracking-wider text-white">
                         <th class="px-3 py-3 text-center w-12">#</th>
                         <th class="px-3 py-3 text-center min-w-[100px]">Student ID</th>
@@ -302,7 +302,7 @@
 
 
 <!-- Mobile: modal for records table -->
-<div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in md:hidden" style="z-index: 3000;">
+<div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in md:hidden" style="z-index: 3000;">
   <div class="mobile-attendance-modal bg-white rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative mx-2 sm:mx-0 animate-scale-in border-2"
     [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
     style="max-height: 92vh; overflow-y: auto;">
@@ -313,8 +313,8 @@
     <!-- Modal Header -->
     <div class="mb-4 pr-8">
       <div class="flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-r"
-             [ngClass]="isOsws ? 'from-[#14532d] to-[#166534]' : 'from-[#679436] to-[#56732e]'">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center"
+             [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
           <i class="fas fa-users text-white"></i>
         </div>
         <h2 class="text-xl sm:text-2xl font-bold"
@@ -346,8 +346,8 @@
             (keyup.enter)="onSearch()"
           />
           <button
-            class="text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto bg-gradient-to-r"
-            [ngClass]="isOsws ? 'from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'"
+            class="text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto"
+            [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
             (click)="onSearch()"
             type="button"
           >
@@ -365,7 +365,7 @@
           </button>
           <button
             (click)="downloadExcel()"
-            class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 sm:px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto min-w-[44px] text-base whitespace-nowrap"
+            class="bg-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 sm:px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto min-w-[44px] text-base whitespace-nowrap"
             [disabled]="filteredRecords.length === 0"
             type="button"
           >
@@ -378,8 +378,8 @@
       <div class="overflow-x-auto rounded-lg border-2 border-gray-200 shadow-sm">
         <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMobileMsg">
           <table *ngIf="!error" class="w-full text-sm">
-            <thead class="bg-gradient-to-r"
-                   [ngClass]="isOsws ? 'from-[#14532d] to-[#166534]' : 'from-[#679436] to-[#56732e]'">
+            <thead
+                   [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
               <tr class="uppercase tracking-wider text-white">
                 <th class="px-3 py-3 text-center w-12">#</th>
                 <th class="px-3 py-3 text-center min-w-[100px]">Student ID</th>

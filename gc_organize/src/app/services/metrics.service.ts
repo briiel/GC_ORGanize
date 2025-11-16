@@ -6,8 +6,8 @@ interface VisitsResponse { success: boolean; total: number; }
 
 @Injectable({ providedIn: 'root' })
 export class MetricsService {
-//   private api = 'http://localhost:5000/api';
   private api = 'https://gcorg-apiv1-8bn5.onrender.com/api';
+  // private api = 'http://localhost:5000/api';
 
   constructor(private http: HttpClient) {}
 

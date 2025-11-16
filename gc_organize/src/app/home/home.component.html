@@ -1,77 +1,85 @@
 <!-- Main content -->
-<div class="flex-1 p-4 lg:p-6 bg-gray-100 overflow-y-auto min-h-screen" id="main-content">
-  <!-- Top section with responsive layout -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-start items-center justify-center mb-4">
-    <!-- Search section -->
-    <div class="flex flex-col sm:flex-row sm:items-center w-full max-w-xl sm:max-w-2xl space-y-2 sm:space-y-0 sm:space-x-2">
-      <div class="relative flex-grow w-full sm:w-auto">
-        <input
-          type="text"
-          placeholder="Search title, department, location, description, or status..."
-          class="w-full px-4 py-2 border rounded-lg pl-10"
-          [value]="searchTerm"
-          (input)="onSearchInput($event)"
-          (keyup.enter)="onSearchClick()"
+<div class="flex-1 p-6 bg-gray-100 overflow-y-auto min-h-screen" id="main-content">
+  <!-- Header Section -->
+  <div class="mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-2 leading-tight break-words max-w-full text-[#679436]">
+      Available Events
+    </h1>
+  </div>
+
+  <!-- Search Section -->
+  <div class="mb-6">
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      <div class="relative flex-1 sm:flex-none sm:max-w-lg flex gap-2">
+        <div class="relative flex-1">
+          <input
+            type="text"
+            placeholder="Search by title, department, location, or description..."
+            class="w-full px-4 py-2.5 pl-10 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all shadow-sm"
+            [value]="searchTerm"
+            (input)="onSearchInput($event)"
+            (keyup.enter)="onSearchClick()"
+          />
+          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        </div>
+        <button
+          class="px-5 py-2.5 bg-[#679436] hover:bg-[#56732e] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] flex items-center gap-2"
+          (click)="onSearchClick()"
         >
-        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600"></i>
+          <i class="fas fa-search"></i>
+          <span class="hidden sm:inline">Search</span>
+        </button>
+        <button
+          *ngIf="searchTerm"
+          class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md border-2 border-gray-300 flex items-center gap-2"
+          (click)="clearSearch()"
+        >
+          <i class="fas fa-times"></i>
+          <span class="hidden sm:inline">Clear</span>
+        </button>
       </div>
-      <button
-        class="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-[#679436] text-white rounded-lg hover:bg-[#56732e] cursor-pointer"
-        (click)="onSearchClick()"
-      >Search</button>
-      <button
-        class="w-full sm:w-auto px-4 py-2 text-sm sm:text-base bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 cursor-pointer"
-        (click)="clearSearch()"
-        *ngIf="searchTerm"
-      >Clear</button>
     </div>
   </div>
 
-  <!-- Cards Section: 3x3 on large screens -->
+  <!-- Cards Grid -->
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-8 mt-6 mb-8 sm:mb-12 pb-4 sm:pb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
     <div
-      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-transform transform hover:-translate-y-2 duration-300 relative flex flex-col h-full"
+      class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative flex flex-col h-full border-t-4"
       *ngFor="let event of filteredEvents; let i = index"
       [ngClass]="{
-        'pointer-events-none bg-green-100 bg-opacity-80 border border-green-300': isConcluded(event),
-        'pointer-events-none opacity-60 grayscale bg-gray-200 border border-gray-300': getDisplayStatus(event) === 'cancelled'
+        'opacity-90': isConcluded(event),
+        'opacity-60 grayscale': getDisplayStatus(event) === 'cancelled',
+        'border-orange-500': event.department === 'CCS',
+        'border-yellow-400': event.department === 'CBA',
+        'border-red-500': event.department === 'CAHS',
+        'border-blue-500': event.department === 'CEAS',
+        'border-pink-400': event.department === 'CHTM',
+        'border-[#679436]': !event.department || event.department === 'OSWS'
       }"
     >
-      <!-- Colored top strip based on department -->
-      <div
-        class="h-2 w-full"
-        [ngClass]="{
-          'bg-orange-500': event.department === 'CCS',
-          'bg-yellow-400': event.department === 'CBA',
-          'bg-red-500': event.department === 'CAHS',
-          'bg-blue-500': event.department === 'CEAS',
-          'bg-pink-400': event.department === 'CHTM',
-          'bg-[#14532d]': !event.department || event.department === 'OSWS'
-        }"
-      ></div>
-      <!-- Poster image: taller on mobile -->
-      <div class="relative h-48 sm:h-56 overflow-hidden">
-        <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-' + (event.id || i)"></div>
+      <!-- Poster image -->
+      <div class="relative h-48 sm:h-56 overflow-hidden bg-gray-50">
+        <div class="absolute inset-0 bg-cover bg-center filter blur-lg opacity-30" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
-        <!-- Mobile status pill positioned like the ribbon was -->
-        <div class="absolute top-2 left-2 z-10 sm:hidden" [attr.aria-label]="'Status: ' + (getDisplayStatus(event) | titlecase)" title="{{ getDisplayStatus(event) | titlecase }}">
+        <!-- Status badge on image -->
+        <div class="absolute top-3 left-3 z-10">
           <span
-            class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap border-2 shadow-lg backdrop-blur-sm"
             [ngClass]="{
-              'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus(event) === 'not yet started',
-              'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus(event) === 'ongoing',
-              'bg-green-50 text-green-800 border-green-200': getDisplayStatus(event) === 'concluded',
-              'bg-red-50 text-red-800 border-red-200': getDisplayStatus(event) === 'cancelled'
+              'bg-yellow-50/95 text-yellow-800 border-yellow-300': getDisplayStatus(event) === 'not yet started',
+              'bg-blue-50/95 text-blue-800 border-blue-300': getDisplayStatus(event) === 'ongoing',
+              'bg-green-50/95 text-green-800 border-green-300': getDisplayStatus(event) === 'concluded',
+              'bg-red-50/95 text-red-800 border-red-300': getDisplayStatus(event) === 'cancelled'
             }"
           >
-            <span class="w-2.5 h-2.5 rounded-full"
+            <span class="w-2 h-2 rounded-full"
               [ngClass]="{
-                'bg-yellow-400': getDisplayStatus(event) === 'not yet started',
-                'bg-blue-500': getDisplayStatus(event) === 'ongoing',
-                'bg-green-500': getDisplayStatus(event) === 'concluded',
-                'bg-red-500': getDisplayStatus(event) === 'cancelled'
+                'bg-yellow-500': getDisplayStatus(event) === 'not yet started',
+                'bg-blue-600': getDisplayStatus(event) === 'ongoing',
+                'bg-green-600': getDisplayStatus(event) === 'concluded',
+                'bg-red-600': getDisplayStatus(event) === 'cancelled'
               }"
             ></span>
             <span>{{ getDisplayStatus(event) | titlecase }}</span>
@@ -79,116 +87,91 @@
         </div>
       </div>
         <div class="flex flex-col flex-1 min-h-0">
-        <!-- Title -->
-        <div class="sticky top-0 z-10 bg-white p-4 border-b border-gray-200 sm:static sm:border-0 sm:p-3">
-          <ul class="space-y-2 text-gray-700">
-            <li class="text-xl sm:text-xl font-bold flex items-center">
+        <!-- Title Section -->
+        <div class="p-4 border-b-2 border-gray-100">
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="text-lg font-bold text-[#679436] line-clamp-2 flex-1" [title]="event.title">
               {{event.title}}
-              <span
-                *ngIf="event.department || !event.department"
-                class="ml-3 px-2 py-1 rounded text-sm text-white flex items-center font-semibold"
-                [ngClass]="{
-                  'bg-orange-500': event.department === 'CCS',
-                  'bg-yellow-400': event.department === 'CBA',
-                  'bg-red-500': event.department === 'CAHS',
-                  'bg-blue-500': event.department === 'CEAS',
-                  'bg-pink-400': event.department === 'CHTM',
-                  'bg-[#14532d]': !event.department || event.department === 'OSWS'
-                }"
-              >
-                {{ event.department ? event.department : 'OSWS' }}
-              </span>
-            </li>
-          </ul>
-        </div>
-        <!-- Details -->
-        <div class="overflow-visible px-4 py-2 pb-4 sm:px-3 sm:py-2 sm:pb-3 flex-1">
-          <ul class="space-y-2 text-gray-700">
-            <li class="text-sm sm:text-base truncate white" title="{{event.description}}">
-              {{event.description}}
-            </li>
-            <li class="text-sm sm:text-base flex items-center gap-2 flex-wrap">
-              <span class="inline-flex items-center gap-2 px-2 py-0.5 rounded-full text-xs font-semibold border"
-                    [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
-                <i class="fas" [ngClass]="event.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
-                {{ event.is_paid ? 'Paid' : 'Free' }}
-              </span>
-              <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border bg-amber-50 text-amber-900 border-amber-200">
-                ₱ {{ event.registration_fee | number:'1.2-2' }}
-              </span>
-            </li>
-            <li
-              [attr.aria-label]="'Location: ' + (event.location || '')"
-              class="text-sm sm:text-base"
-            >
-              <i class="fas fa-map-marker-alt mr-2" aria-hidden="true"></i>
-              <span class="hidden sm:inline text-gray-500">Location:</span>
-              <span class="sm:ml-1">{{ event.location }}</span>
-            </li>
-            <li
-              [attr.aria-label]="'Date: ' + (event.start_date | date:'MMMM d, y') + (event.end_date && event.end_date !== event.start_date ? (' - ' + (event.end_date | date:'MMMM d, y')) : '')"
-              class="text-sm sm:text-base"
-            >
-              <i class="fas fa-calendar-alt mr-2" aria-hidden="true"></i>
-              <span class="hidden sm:inline text-gray-500">Date:</span>
-              <span class="sm:ml-1">
-                {{ event.start_date | date: 'MMMM d, y' }}
-                <span *ngIf="event.end_date && event.end_date !== event.start_date">
-                  - {{ event.end_date | date: 'MMMM d, y' }}
-                </span>
-              </span>
-            </li>
-            <li
-              [attr.aria-label]="'Time: ' + formatTime(event.start_time) + (event.end_time && event.end_time !== event.start_time ? (' - ' + formatTime(event.end_time)) : '')"
-              class="text-sm sm:text-base"
-            >
-              <i class="fas fa-clock mr-2" aria-hidden="true"></i>
-              <span class="hidden sm:inline text-gray-500">Time:</span>
-              <span class="sm:ml-1">
-                {{ formatTime(event.start_time) }}
-                <span *ngIf="event.end_time && event.end_time !== event.start_time">
-                  - {{ formatTime(event.end_time) }}
-                </span>
-              </span>
-            </li>
-          </ul>
-        </div>
-        <!-- Status and Buttons always at the bottom -->
-        <div class="mt-auto px-4 pb-4 sm:px-3 sm:pb-3 flex flex-col sm:flex-row sm:items-center w-full space-y-2 sm:space-y-0 sm:space-x-2">
-          <!-- Status badge on desktop -->
-          <div class="hidden sm:flex sm:flex-1">
+            </h3>
             <span
-              class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap border shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
+              class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold text-white flex-shrink-0 border-2"
               [ngClass]="{
-                'bg-yellow-50 text-yellow-800 border-yellow-200': getDisplayStatus(event) === 'not yet started',
-                'bg-blue-50 text-blue-800 border-blue-200': getDisplayStatus(event) === 'ongoing',
-                'bg-green-50 text-green-800 border-green-200': getDisplayStatus(event) === 'concluded',
-                'bg-red-50 text-red-800 border-red-200': getDisplayStatus(event) === 'cancelled'
+                'bg-orange-500 border-orange-600': event.department === 'CCS',
+                'bg-yellow-400 border-yellow-500': event.department === 'CBA',
+                'bg-red-500 border-red-600': event.department === 'CAHS',
+                'bg-blue-500 border-blue-600': event.department === 'CEAS',
+                'bg-pink-400 border-pink-500': event.department === 'CHTM',
+                'bg-[#679436] border-[#56732e]': !event.department || event.department === 'OSWS'
               }"
-              [attr.aria-label]="'Status: ' + (getDisplayStatus(event) | titlecase)"
             >
-              <span class="w-2.5 h-2.5 rounded-full"
-                [ngClass]="{
-                  'bg-yellow-400': getDisplayStatus(event) === 'not yet started',
-                  'bg-blue-500': getDisplayStatus(event) === 'ongoing',
-                  'bg-green-500': getDisplayStatus(event) === 'concluded',
-                  'bg-red-500': getDisplayStatus(event) === 'cancelled'
-                }"
-              ></span>
-              <span>{{ getDisplayStatus(event) | titlecase }}</span>
+              {{ event.department ? event.department : 'OSWS' }}
             </span>
           </div>
-          <!-- Buttons always on the right in sm+ screens, bottom in mobile -->
-          <div class="flex flex-col sm:flex-row items-center w-full sm:w-auto space-y-2 sm:space-y-0 sm:space-x-2 sm:justify-end">
+        </div>
+        
+        <!-- Details Section -->
+        <div class="p-4 flex-1 space-y-3">
+          <!-- Description -->
+          <p class="text-sm text-gray-600 line-clamp-2" [title]="event.description">
+            {{event.description}}
+          </p>
+          
+          <!-- Event Type & Fee -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2"
+                  [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-300' : 'bg-emerald-50 text-emerald-800 border-emerald-300'">
+              <i class="fas text-xs" [ngClass]="event.is_paid ? 'fa-peso-sign' : 'fa-ticket-alt'"></i>
+              {{ event.is_paid ? 'Paid Event' : 'Free Event' }}
+            </span>
+            <span *ngIf="event.is_paid && (event.registration_fee ?? 0) > 0"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 bg-amber-50 text-amber-900 border-amber-300">
+              <i class="fas fa-peso-sign text-xs"></i>
+              {{ event.registration_fee | number:'1.2-2' }}
+            </span>
+          </div>
+          
+          <!-- Location -->
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <i class="fas fa-map-marker-alt text-gray-400 w-4"></i>
+            <span class="truncate" [title]="event.location">{{ event.location }}</span>
+          </div>
+          
+          <!-- Date -->
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <i class="fas fa-calendar-alt text-gray-400 w-4"></i>
+            <span>
+              {{ event.start_date | date: 'MMM d, y' }}
+              <span *ngIf="event.end_date && event.end_date !== event.start_date">
+                - {{ event.end_date | date: 'MMM d, y' }}
+              </span>
+            </span>
+          </div>
+          
+          <!-- Time -->
+          <div class="flex items-center gap-2 text-sm text-gray-700">
+            <i class="fas fa-clock text-gray-400 w-4"></i>
+            <span>
+              {{ formatTime(event.start_time) }}
+              <span *ngIf="event.end_time && event.end_time !== event.start_time">
+                - {{ formatTime(event.end_time) }}
+              </span>
+            </span>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="p-4 border-t-2 border-gray-100 bg-gray-50">
+          <div class="flex gap-2">
             <button (click)="openViewModal(event)"
-              class="w-full sm:w-auto px-4 py-2 sm:px-3 sm:py-2 bg-[#05668D] text-white rounded-lg hover:bg-[#034f6b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
-              View
+              class="flex-1 px-4 py-2.5 bg-[#05668D] hover:bg-[#044f6b] text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#05668D] flex items-center justify-center gap-2">
+              <i class="fas fa-eye"></i>
+              <span>View Details</span>
             </button>
             <button (click)="openRegisterModal(event)"
-              [disabled]="isConcluded(event)"
-              class="w-full sm:w-auto px-4 py-2 sm:px-3 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#4e732b] disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer">
-              Register
+              [disabled]="isConcluded(event) || getDisplayStatus(event) === 'cancelled'"
+              class="flex-1 px-4 py-2.5 bg-[#679436] hover:bg-[#56732e] text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center justify-center gap-2">
+              <i class="fas fa-user-plus"></i>
+              <span>Register</span>
             </button>
           </div>
         </div>
@@ -196,37 +179,48 @@
     </div>
   </div>
 
-  <div *ngIf="filteredEvents.length === 0" class="flex flex-col items-center justify-center min-h-[300px] text-gray-500 mt-10">
-    <i class="fas fa-calendar-times text-5xl mb-4"></i>
-    <span>No events found.</span>
+  <!-- Empty State -->
+  <div *ngIf="filteredEvents.length === 0" class="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl shadow-md border-2 border-gray-200 p-12">
+    <i class="fas fa-calendar-times text-6xl text-gray-300 mb-4"></i>
+    <h3 class="text-xl font-bold text-gray-700 mb-2">No Events Found</h3>
+    <p class="text-gray-500 text-center">There are no events matching your search criteria.</p>
   </div>
 
-  <!-- Paginator (only when more than one page / >9 items) -->
-  <div *ngIf="totalPages > 1" class="flex justify-center items-center mt-8">
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 bg-white rounded-xl shadow-md border-2 border-gray-200 p-4">
+    <!-- Page Info -->
+    <div class="text-sm text-gray-600">
+      Page <span class="font-semibold text-[#679436]">{{ currentPage }}</span> of 
+      <span class="font-semibold text-[#679436]">{{ totalPages }}</span>
+    </div>
+
+    <!-- Pagination Controls -->
     <nav class="inline-flex space-x-1" aria-label="Pagination">
       <!-- Previous Arrow -->
       <button
-        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         [disabled]="currentPage === 1"
         (click)="changePage(currentPage - 1)">
-        <i class="fas fa-chevron-left"></i>
+        <i class="fas fa-chevron-left text-gray-600"></i>
       </button>
+      
       <!-- Page Numbers -->
-    <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+      <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
         <button
-          class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
-          [ngClass]="currentPage === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
-      [attr.aria-current]="currentPage === (i + 1) ? 'page' : null"
+          class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 border-2"
+          [ngClass]="currentPage === (i + 1) ? 'bg-[#679436] text-white font-bold border-[#679436]' : 'bg-white border-gray-300 hover:bg-gray-100 text-gray-800'"
+          [attr.aria-current]="currentPage === (i + 1) ? 'page' : null"
           (click)="changePage(i + 1)">
           {{ i + 1 }}
         </button>
       </ng-container>
+      
       <!-- Next Arrow -->
       <button
-        class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         [disabled]="currentPage === totalPages"
         (click)="changePage(currentPage + 1)">
-        <i class="fas fa-chevron-right"></i>
+        <i class="fas fa-chevron-right text-gray-600"></i>
       </button>
     </nav>
   </div>

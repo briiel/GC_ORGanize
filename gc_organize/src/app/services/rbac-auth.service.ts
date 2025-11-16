@@ -207,6 +207,32 @@ export class RbacAuthService {
   }
 
   /**
+   * Get user department (from backend API)
+   */
+  getUserDepartment(callback: (department: string) => void): void {
+    const studentId = this.getStudentId();
+    if (!studentId) {
+      callback('');
+      return;
+    }
+
+    const token = this.getToken();
+    this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/users/${studentId}`, {
+      // this.http.get<any>(`http://localhost:5000/api/users/${studentId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: (res) => {
+        const student = res?.data || res;
+        callback(student?.department || '');
+      },
+      error: (err) => {
+        console.error('Error fetching user department:', err);
+        callback('');
+      }
+    });
+  }
+
+  /**
    * Get creator/organization ID (for organization accounts)
    */
   getCreatorId(): number | null {

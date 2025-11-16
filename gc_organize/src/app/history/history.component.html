@@ -1,174 +1,222 @@
-<div class="min-h-screen bg-gray-100 p-6">
-    <!-- Header: exactly match Events Registered spacing/typography -->
-  <div class="mb-2 mx-2 lg:mx-6">
-      <h1 class="text-2xl lg:text-4xl font-bold mb-1 text-[#679436]">Events Attended</h1>
-      <p class="text-gray-600">View and manage your attended events</p>
-    </div>
-
-    <!-- Error -->
-    <div *ngIf="error" class="mb-4 mx-2 lg:mx-6 p-3 rounded border border-red-200 bg-red-50 text-red-700">
-      {{ error }}
-    </div>
-
-  <!-- Search: match Events Registered design -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <!-- Header Section -->
   <div class="mb-6 mx-2 lg:mx-6">
-      <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-        <div class="relative flex-grow sm:flex-none sm:w-[300px] lg:w-[400px] flex">
-          <input
-            type="text"
-            [(ngModel)]="searchTerm"
-            placeholder="Search events..."
-            class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent shadow-sm"
-            (ngModelChange)="onSearch()"
-            (keyup.enter)="onSearch()"
-          />
-          <button
-            class="ml-2 px-4 py-2 bg-[#679436] hover:bg-[#4e732b] text-white rounded-md text-sm flex-shrink-0"
-            (click)="onSearch()"
-          >
-            Search
-          </button>
-          <button
-            class="ml-2 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm flex-shrink-0"
-            (click)="clearSearch()"
-            *ngIf="searchTerm"
-          >
-            Clear
-          </button>
-        </div>
-        <!-- Extra controls aligned right (only sort now) -->
-  <div class="flex gap-2 sm:ml-auto">
-    <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()"
-      class="w-56 px-3 py-2 rounded border border-gray-300 text-sm focus:outline-none">
-            <option value="start_desc">Sort: Event date (latest)</option>
-            <option value="start_asc">Sort: Event date (oldest)</option>
-            <option value="attended_desc">Sort: Attended at (latest)</option>
-            <option value="attended_asc">Sort: Attended at (oldest)</option>
-          </select>
-        </div>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+      <h1 class="text-2xl sm:text-3xl font-bold mb-2 leading-tight break-words max-w-full text-[#679436]">
+        Events Attended
+      </h1>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="mb-6 mx-2 lg:mx-6">
+    <div class="p-4 rounded-lg border-2 border-red-300 bg-red-50 text-red-700 flex items-center gap-3">
+      <i class="fas fa-exclamation-circle text-xl"></i>
+      <span>{{ error }}</span>
+    </div>
+  </div>
+
+  <!-- Search and Sort Section -->
+  <div class="mb-6 mx-2 lg:mx-6">
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
+      <div class="relative flex-1 sm:flex-none sm:max-w-md flex gap-2">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          placeholder="Search by event name or location..."
+          class="flex-1 px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all shadow-sm"
+          (keyup.enter)="onSearch()"
+        />
+        <button
+          class="px-5 py-2.5 bg-[#679436] hover:bg-[#56732e] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] flex items-center gap-2"
+          (click)="onSearch()"
+        >
+          <i class="fas fa-search"></i>
+          <span class="hidden sm:inline">Search</span>
+        </button>
+        <button
+          *ngIf="searchTerm"
+          class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md border-2 border-gray-300 flex items-center gap-2"
+          (click)="clearSearch()"
+        >
+          <i class="fas fa-times"></i>
+          <span class="hidden sm:inline">Clear</span>
+        </button>
+      </div>
+      <!-- Sort Dropdown -->
+      <div class="sm:ml-auto">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()"
+          class="w-full sm:w-64 px-4 py-2.5 rounded-lg border-2 border-gray-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all shadow-sm bg-white">
+          <option value="start_desc">Sort: Event date (latest)</option>
+          <option value="start_asc">Sort: Event date (oldest)</option>
+          <option value="attended_desc">Sort: Attended at (latest)</option>
+          <option value="attended_asc">Sort: Attended at (oldest)</option>
+        </select>
       </div>
     </div>
+  </div>
 
-  <!-- Loading / Empty -->
-  <div *ngIf="loading" class="text-gray-500">Loading...</div>
-  <div *ngIf="!loading && items.length === 0" class="text-gray-500">No attended events found.</div>
+  <!-- Events Table -->
+  <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
+    <!-- Enhanced Header with Gradient -->
+    <div class="px-6 py-3 border-b-4 bg-[#679436] border-[#679436]">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-history text-white text-sm"></i>
+        </div>
+        <h2 class="text-lg lg:text-xl font-bold text-white">
+          My Attended Events
+        </h2>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm lg:text-base">
+        <thead class="bg-[#679436]">
+          <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
+            <th class="px-4 py-4 text-center w-12 font-bold">#</th>
+            <th class="px-4 py-4 text-center min-w-[180px] font-bold">Event Name</th>
+            <th class="px-4 py-4 text-center font-bold">Organized By</th>
+            <th class="px-4 py-4 text-center font-bold">Date</th>
+            <th class="px-4 py-4 text-center font-bold">Time In and Out</th>
+            <th class="px-4 py-4 text-center font-bold">Status</th>
+            <th class="px-4 py-4 text-center font-bold">Scanned By</th>
+            <th class="px-4 py-4 text-center font-bold">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+          <!-- Loading State -->
+          <tr *ngIf="loading">
+            <td colspan="8" class="px-4 py-12 text-center">
+              <div class="flex flex-col items-center gap-3">
+                <i class="fas fa-spinner fa-spin text-3xl text-[#679436]"></i>
+                <p class="text-gray-600">Loading your attended events...</p>
+              </div>
+            </td>
+          </tr>
 
-    <!-- Cards grid with reduced outer spacing -->
-    <div class="mx-2 lg:m-6" *ngIf="!loading && items.length > 0">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-        <div *ngFor="let e of pagedItems; let i = index" class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-          <!-- Colored top strip based on department (match Home cards) -->
-          <div
-            class="h-2 w-full"
-            [ngClass]="{
-              'bg-orange-500': e.department === 'CCS',
-              'bg-yellow-400': e.department === 'CBA',
-              'bg-red-500': e.department === 'CAHS',
-              'bg-blue-500': e.department === 'CEAS',
-              'bg-pink-400': e.department === 'CHTM',
-              'bg-[#14532d]': !e.department || e.department === 'OSWS'
-            }"
-          ></div>
-          <!-- Poster image: match Home with blurred background and fixed height -->
-          <div class="relative h-48 sm:h-56 overflow-hidden">
-            <div class="absolute inset-0 bg-cover bg-center filter blur-lg" [id]="'bg-image-hist-' + (e.event_id || e.id || i)"></div>
-            <ng-container *ngIf="e.event_poster; else noPoster">
-              <img
-                [src]="e.event_poster"
-                [alt]="e.event_title || e.title || 'Event poster'"
-                class="relative w-full h-full object-contain"
-                loading="lazy"
-                (load)="updateBackgroundImage($event, 'bg-image-hist-' + (e.event_id || e.id || i))"
-              />
-            </ng-container>
-            <ng-template #noPoster>
-              <div class="absolute inset-0 flex items-center justify-center bg-gray-100">
-                <i class="fas fa-image text-gray-300 text-4xl"></i>
+          <!-- Empty State -->
+          <tr *ngIf="!loading && items.length === 0">
+            <td colspan="8" class="px-4 py-12 text-center">
+              <div class="flex flex-col items-center gap-3">
+                <i class="fas fa-calendar-times text-5xl text-gray-400"></i>
+                <h3 class="text-lg font-medium text-gray-900">No attended events yet</h3>
+                <p class="text-gray-500">Attend events to see your history here!</p>
               </div>
-            </ng-template>
-          </div>
-  <div class="p-3">
-            <div class="flex items-start justify-between gap-2">
-              <h3 class="font-semibold text-gray-800 text-base line-clamp-2" [title]="e.event_title || e.title">{{ e.event_title || e.title }}</h3>
-              <span class="text-[10px] px-2 py-1 rounded-full border font-medium whitespace-nowrap"
-                    [ngClass]="statusColor(e.status)">{{ (e.status || '') | titlecase }}</span>
-            </div>
-            <div class="text-xs text-gray-500 mt-1">
-              <span *ngIf="e.org_name">{{ e.org_name }}</span>
-              <span *ngIf="!e.org_name && e.osws_name">OSWS</span>
-              <span *ngIf="e.department"> • {{ e.department }}</span>
-            </div>
-            <div class="text-sm text-gray-600 mt-2 flex items-start gap-2">
-              <i class="far fa-clock mt-0.5"></i>
-              <div class="space-y-0.5">
-                <div>
-                  <span class="font-medium">Date:</span>
-                  {{ formatDate(e.start_date) }}
-                  <span class="mx-1">–</span>
-                  {{ formatDate(e.end_date) }}
+            </td>
+          </tr>
+
+          <!-- Event Rows -->
+          <tr *ngFor="let e of pagedItems; let i = index" class="hover:bg-green-50/50 transition-all duration-200">
+            <td class="px-4 py-4 text-center text-[#679436] font-bold text-base">{{ (page - 1) * pageSize + i + 1 }}</td>
+            <td class="px-4 py-4 font-semibold text-center max-w-[200px]">
+              <div class="text-[#679436] font-semibold truncate" [title]="e.event_title || e.title">{{ e.event_title || e.title }}</div>
+            </td>
+            <td class="px-4 py-4 text-center">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold text-white border-2"
+                    [ngClass]="{
+                      'bg-orange-500 border-orange-600': e.department === 'CCS',
+                      'bg-yellow-400 border-yellow-500': e.department === 'CBA',
+                      'bg-red-500 border-red-600': e.department === 'CAHS',
+                      'bg-blue-500 border-blue-600': e.department === 'CEAS',
+                      'bg-pink-400 border-pink-500': e.department === 'CHTM',
+                      'bg-[#679436] border-[#56732e]': !e.department || e.department === 'OSWS'
+                    }">
+                {{ e.department ? e.department : 'OSWS' }}
+              </span>
+            </td>
+            <td class="px-4 py-4 text-center text-sm">
+              <div class="font-medium">{{ e.attended_at | date:'MMM d, y' }}</div>
+            </td>
+            <td class="px-4 py-4 text-center text-sm">
+              <div class="flex flex-col gap-0.5">
+                <div class="flex items-center justify-center gap-1">
+                  <i class="fas fa-sign-in-alt text-green-600 text-xs"></i>
+                  <span class="font-medium">{{ e.time_in ? formatTime(e.time_in) : '—' }}</span>
                 </div>
-                <div>
-                  <span class="font-medium">Time:</span>
-                  {{ formatTime(e.start_time) }}
-                  <span class="mx-1">–</span>
-                  {{ formatTime(e.end_time) }}
+                <div class="flex items-center justify-center gap-1 text-gray-500 text-xs">
+                  <i class="fas fa-sign-out-alt text-red-600 text-xs"></i>
+                  <span>{{ e.time_out ? formatTime(e.time_out) : '—' }}</span>
                 </div>
               </div>
-            </div>
-            <div class="text-sm text-gray-600 mt-1 flex items-center gap-2 truncate" [title]="e.location">
-              <i class="fas fa-map-marker-alt"></i>
-              <span class="truncate">{{ e.location }}</span>
-            </div>
-            <div class="text-xs text-gray-500 mt-2">
-              Attended at: <span class="font-medium">{{ e.attended_at | date:'medium' }}</span>
-            </div>
-            <div class="mt-3 flex justify-end">
-              <button
-                class="px-3 py-2 rounded text-xs transition-colors inline-flex items-center gap-2"
-                [ngClass]="(e.created_by_osws_id || sendingId===e.event_id) ? 'bg-gray-300 text-gray-600 cursor-not-allowed' : 'bg-[#679436] hover:bg-[#4e732b] text-white'"
-                [title]="e.created_by_osws_id ? 'Certificates are auto-generated for OSWS events' : (sendingId===e.event_id ? 'Sending request…' : 'Request e‑certificate via email to organizer')"
-                [disabled]="!!e.created_by_osws_id || sendingId===e.event_id"
-                (click)="requestCertificate(e.event_id)"
-              >
-                <ng-container *ngIf="sendingId===e.event_id; else reqLabel">
-                  <i class="fas fa-spinner fa-spin"></i>
-                  <span>Sending…</span>
-                </ng-container>
-                <ng-template #reqLabel>Request</ng-template>
-              </button>
-            </div>
-          </div>
+            </td>
+            <td class="px-4 py-4 text-center">
+              <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold border-2"
+                    [ngClass]="statusColor(e.status)">
+                {{ (e.status || 'Unknown') | titlecase }}
+              </span>
+            </td>
+            <td class="px-4 py-4 text-center text-sm">
+              <div class="flex items-center justify-center gap-2">
+                <i class="fas fa-user-check text-[#679436]"></i>
+                <span class="font-medium">{{ e.scanned_by_name || 'N/A' }}</span>
+              </div>
+            </td>
+            <td class="px-4 py-4 text-center">
+              <div class="flex flex-col items-center gap-2">
+                <button
+                  *ngIf="!e.created_by_osws_id"
+                  class="bg-[#679436] hover:bg-[#56732e] text-white inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed"
+                  [disabled]="sendingId === e.event_id"
+                  [title]="sendingId === e.event_id ? 'Sending request…' : 'Request e‑certificate via email to organizer'"
+                  (click)="requestCertificate(e.event_id)">
+                  <i *ngIf="sendingId === e.event_id" class="fas fa-spinner fa-spin mr-2"></i>
+                  <i *ngIf="sendingId !== e.event_id" class="fas fa-envelope mr-2"></i>
+                  <span>{{ sendingId === e.event_id ? 'Sending...' : 'Request' }}</span>
+                </button>
+                <span
+                  *ngIf="e.created_by_osws_id"
+                  class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 border-2 border-gray-300"
+                  title="Certificates are auto-generated for OSWS events">
+                  <i class="fas fa-info-circle mr-1.5"></i>
+                  Auto-generated
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="totalPages > 1" class="px-6 py-4 border-t-2 border-gray-200 bg-gray-50">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <!-- Showing Info -->
+        <div class="text-sm text-gray-600">
+          Showing <span class="font-semibold text-[#679436]">{{ showingFrom }}</span> to 
+          <span class="font-semibold text-[#679436]">{{ showingTo }}</span> of 
+          <span class="font-semibold text-[#679436]">{{ totalItems }}</span> events
         </div>
 
-      <!-- Pagination controls (match Home page design) -->
-      <div *ngIf="totalPages > 1" class="flex justify-center items-center mt-8">
+        <!-- Pagination Buttons -->
         <nav class="inline-flex space-x-1" aria-label="Pagination">
           <!-- Previous Arrow -->
           <button
-            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             [disabled]="page === 1"
-            (click)="goToPage(page - 1)">
-            <i class="fas fa-chevron-left"></i>
+            (click)="prevPage()">
+            <i class="fas fa-chevron-left text-gray-600"></i>
           </button>
+          
           <!-- Page Numbers -->
           <ng-container *ngFor="let _ of [].constructor(totalPages); let i = index">
             <button
-              class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
-              [ngClass]="page === (i + 1) ? 'bg-[#679436] text-white font-bold' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
+              class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 border-2"
+              [ngClass]="page === (i + 1) ? 'bg-[#679436] text-white font-bold border-[#679436]' : 'bg-white border-gray-300 hover:bg-gray-100 text-gray-800'"
               [attr.aria-current]="page === (i + 1) ? 'page' : null"
               (click)="goToPage(i + 1)">
               {{ i + 1 }}
             </button>
           </ng-container>
+          
           <!-- Next Arrow -->
           <button
-            class="w-9 h-9 flex items-center justify-center rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             [disabled]="page === totalPages"
-            (click)="goToPage(page + 1)">
-            <i class="fas fa-chevron-right"></i>
+            (click)="nextPage()">
+            <i class="fas fa-chevron-right text-gray-600"></i>
           </button>
         </nav>
       </div>
-      </div>
     </div>
   </div>
+</div>

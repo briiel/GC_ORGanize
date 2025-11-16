@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  // Dev: 'http://localhost:5000/api'
   private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
+  // private apiUrl = 'http://localhost:5000/api';
 
   constructor(private http: HttpClient) {}
 

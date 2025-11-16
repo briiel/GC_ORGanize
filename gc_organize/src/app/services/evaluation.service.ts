@@ -39,7 +39,8 @@ export interface EvaluationStatus {
   providedIn: 'root'
 })
 export class EvaluationService {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
+  // private apiUrl = 'http://localhost:5000/api';
 
   constructor(private http: HttpClient) {}
 

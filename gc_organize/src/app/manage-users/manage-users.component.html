@@ -1,9 +1,9 @@
 <div class="p-6 bg-gray-100 min-h-screen">
   <!-- Add Admin Modal -->
-  <div *ngIf="isAddAdminModalOpen" class="fixed inset-0 z-50 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
+  <div *ngIf="isAddAdminModalOpen" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" style="z-index: 3000;">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 relative border-2 border-[#14532d] animate-scale-in overflow-hidden" style="max-height: 95vh;">
       <!-- Modal Header -->
-      <div class="px-6 py-4 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d] sticky top-0 z-10">
+      <div class="px-6 py-4 border-b-4 bg-[#14532d] border-[#14532d] sticky top-0 z-10">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -69,7 +69,7 @@
               Cancel
             </button>
             <button type="submit" 
-                    class="px-6 py-3 rounded-lg bg-gradient-to-r from-[#14532d] to-[#166534] text-white font-semibold hover:from-[#166534] hover:to-[#14532d] transition-all duration-200 shadow-lg hover:shadow-xl">
+                    class="px-6 py-3 rounded-lg bg-[#14532d] text-white font-semibold hover:from-[#166534] hover:to-[#14532d] transition-all duration-200 shadow-lg hover:shadow-xl">
               Add Admin
             </button>
           </div>
@@ -99,7 +99,7 @@
   <!-- OSWS Admins Table Section -->
   <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
     <!-- Enhanced Header with Gradient -->
-    <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+    <div class="px-6 py-3 border-b-4 bg-[#14532d] border-[#14532d]">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -145,7 +145,7 @@
 
     <div class="overflow-x-auto">
       <table *ngIf="!loading && filteredAdmins.length" class="w-full text-sm lg:text-base">
-        <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+        <thead class="bg-[#14532d]">
           <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
             <th class="px-6 py-4 text-center w-16 font-bold">#</th>
             <th class="px-6 py-4 text-center font-bold">Name</th>
@@ -187,7 +187,7 @@
   <!-- Student Organizations Table Section -->
   <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
     <!-- Enhanced Header with Gradient -->
-    <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+    <div class="px-6 py-3 border-b-4 bg-[#14532d] border-[#14532d]">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <i class="fas fa-users text-white text-sm"></i>
@@ -226,7 +226,7 @@
 
     <div class="overflow-x-auto">
       <table *ngIf="!loading && filteredOrganizations.length" class="w-full text-sm lg:text-base">
-        <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+        <thead class="bg-[#14532d]">
           <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
             <th class="px-6 py-4 text-center w-16 font-bold">#</th>
             <th class="px-6 py-4 text-center font-bold">Organization Name</th>

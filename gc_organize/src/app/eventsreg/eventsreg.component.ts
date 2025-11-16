@@ -30,6 +30,7 @@ export class EventsregComponent implements OnInit {
 
   fetchRegisteredEvents() {
     if (!this.studentId) return;
+    this.loading = true;
     this.eventService.getRegisteredEvents(this.studentId).subscribe({
       next: (events) => {
         this.registeredEvents = events.data || events;
@@ -49,9 +50,11 @@ export class EventsregComponent implements OnInit {
             : 0;
           return bTs - aTs; // descending (latest first)
         });
+        this.loading = false;
       },
       error: (err) => {
         console.error('Error fetching registered events:', err);
+        this.loading = false;
       }
     });
   }
@@ -64,7 +67,9 @@ export class EventsregComponent implements OnInit {
     const term = this.searchTerm.toLowerCase();
     return this.registeredEvents.filter(event =>
       (event.title && event.title.toLowerCase().includes(term)) ||
-      (event.venue && event.venue.toLowerCase().includes(term))
+      (event.location && event.location.toLowerCase().includes(term)) ||
+      (event.venue && event.venue.toLowerCase().includes(term)) ||
+      (event.department && event.department.toLowerCase().includes(term))
     );
   }
 

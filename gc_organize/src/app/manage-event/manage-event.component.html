@@ -24,7 +24,7 @@
     <!-- Table 1: Events made by OSWS -->
     <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
       <!-- Enhanced Header with Gradient -->
-      <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+      <div class="px-6 py-3 border-b-4 bg-[#14532d] hover:bg-[#166534] border-[#14532d]">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-building text-white text-sm"></i>
@@ -36,7 +36,7 @@
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-sm lg:text-base">
-          <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+          <thead class="bg-[#14532d] hover:bg-[#166534]">
             <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
               <th class="px-4 py-4 text-center w-12 font-bold">#</th>
               <th class="px-4 py-4 text-center min-w-[180px] font-bold">Title</th>
@@ -161,7 +161,7 @@
     <!-- Table 2: Events made by Student Organizations -->
     <div class="mx-2 lg:mx-6 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
       <!-- Enhanced Header with Gradient -->
-      <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+      <div class="px-6 py-3 border-b-4 bg-[#14532d] border-[#14532d]">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
             <i class="fas fa-users-cog text-white text-sm"></i>
@@ -192,7 +192,7 @@
             </div>
           </div>
           <button
-            class="bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d] text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 w-full sm:w-auto transform hover:scale-105"
+            class="bg-[#14532d] hover:bg-[#166534] text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 w-full sm:w-auto transform hover:scale-105"
             (click)="searchOrgEvents()"
             type="button"
           >
@@ -262,7 +262,7 @@
       <div class="overflow-x-auto">
         <!-- Enhanced Table Header -->
         <table class="w-full text-sm lg:text-base">
-          <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+          <thead class="bg-[#14532d]">
             <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
               <th class="px-4 py-4 text-center w-12 font-bold">#</th>
               <th class="px-4 py-4 text-center font-bold">Title</th>
@@ -365,7 +365,7 @@
               <button
                 class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 font-bold"
                 [ngClass]="orgEventPage === (i + 1) 
-                  ? 'bg-gradient-to-r from-[#14532d] to-[#166534] text-white shadow-md' 
+                  ? 'bg-[#14532d] text-white shadow-md' 
                   : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
                 [attr.aria-current]="orgEventPage === (i + 1) ? 'page' : null"
                 (click)="goToOrgEventPage(i + 1)">
@@ -390,7 +390,7 @@
     <ng-container *ngIf="!isOsws">
   <!-- Header -->
   <div class="mb-6 mx-2 lg:mx-6">
-    <div class="bg-gradient-to-r from-[#679436] to-[#56732e] shadow-2xl rounded-2xl overflow-hidden border-2 border-[#679436]">
+    <div class="bg-[#679436] shadow-2xl rounded-2xl overflow-hidden border-2 border-[#679436]">
       <div class="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
@@ -449,7 +449,7 @@
     <div class="w-full md:w-1/4 max-w-xs">
       <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden flex flex-col" style="height: auto; min-height: 540px; max-height: none;">
         <!-- Enhanced gradient header -->
-        <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436] flex-shrink-0">
+        <div class="px-6 py-3 border-b-4 bg-[#679436] border-[#679436] flex-shrink-0">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
               <i class="fas fa-calendar-alt text-white text-sm"></i>
@@ -550,7 +550,7 @@
         <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden">
           <ng-container *ngIf="selectedEvent; else selectEventMsg">
             <!-- Header -->
-            <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]">
+            <div class="px-6 py-3 border-b-4 bg-[#679436] border-[#679436]">
               <div class="flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 flex-1">
                   <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
@@ -726,11 +726,11 @@
               <ng-container *ngIf="!isInlineEditing">
                 <div class="flex flex-wrap gap-2 justify-between">
                   <div class="flex gap-2">
-                    <button (click)="openParticipantsModal(selectedEvent)" class="bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Participants">
+                    <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Participants">
                       <i class="fas fa-users"></i>
                       <span>Participants</span>
                     </button>
-                    <button (click)="openEvaluationsModal(selectedEvent)" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Evaluations">
+                    <button (click)="openEvaluationsModal(selectedEvent)" class="bg-purple-600 hover:from-purple-700 hover:to-purple-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Evaluations">
                       <i class="fas fa-star"></i>
                       <span>Evaluations</span>
                     </button>
@@ -738,18 +738,18 @@
                   <div class="flex gap-2">
                     <button *ngIf="canCancelEvent(selectedEvent)" 
                             (click)="confirmCancelEvent(selectedEvent)" 
-                            class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" 
+                            class="bg-red-600 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" 
                             title="Cancel Event">
                       <i class="fas fa-ban"></i>
                       <span>Cancel Event</span>
                     </button>
-                    <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="Archive Event">
+                    <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-gray-400 hover:from-gray-500 hover:to-gray-600 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="Archive Event">
                       <i class="fas fa-trash-alt"></i>
                       <span>Archive</span>
                     </button>
                     <button (click)="editEvent(selectedEvent)" 
                             [disabled]="isEventConcluded(selectedEvent)"
-                            [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow font-semibold' : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold'"
+                            [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow font-semibold' : 'bg-green-600 hover:from-green-700 hover:to-green-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold'"
                             [title]="isEventConcluded(selectedEvent) ? 'Cannot edit concluded event' : 'Edit Event'">
                       <i class="fas fa-edit"></i>
                       <span>Edit</span>
@@ -759,11 +759,11 @@
               </ng-container>
               <ng-container *ngIf="isInlineEditing">
                 <div class="flex gap-2 justify-end">
-                  <button (click)="cancelInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed font-semibold" title="Cancel Edit">
+                  <button (click)="cancelInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-gray-400 hover:from-gray-500 hover:to-gray-600 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed font-semibold" title="Cancel Edit">
                     <i class="fas fa-times"></i>
                     <span>Cancel</span>
                   </button>
-                  <button (click)="saveInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed font-semibold" title="Save Changes">
+                  <button (click)="saveInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-green-600 hover:from-green-700 hover:to-green-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed font-semibold" title="Save Changes">
                     <i *ngIf="!isSavingInlineEdit" class="fas fa-save"></i>
                     <svg *ngIf="isSavingInlineEdit" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
                     <span>Save</span>
@@ -788,7 +788,7 @@
     </div>
 
   <!-- Mobile: modal for event details -->
-  <div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in md:hidden" style="z-index: 3000;">
+  <div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in md:hidden" style="z-index: 3000;">
     <div class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0 animate-scale-in border-[#679436]"
       style="max-height: 92vh; overflow-y: auto;">
       <button (click)="closeMobileModal()" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 border-2 border-gray-200 hover:border-red-300 z-10" aria-label="Close">
@@ -928,30 +928,30 @@
       <div class="flex justify-between items-center pt-4 border-t-2 border-gray-200">
         <ng-container *ngIf="!isInlineEditing">
           <div class="flex gap-2">
-            <button (click)="openParticipantsModal(selectedEvent)" class="bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12" title="View Participants">
+            <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12" title="View Participants">
               <i class="fas fa-users text-lg"></i>
             </button>
-            <button (click)="openEvaluationsModal(selectedEvent)" class="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12" title="View Evaluations">
+            <button (click)="openEvaluationsModal(selectedEvent)" class="bg-purple-600 hover:from-purple-700 hover:to-purple-800 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12" title="View Evaluations">
               <i class="fas fa-star text-lg"></i>
             </button>
           </div>
         </ng-container>
         <div class="flex gap-2" *ngIf="!isInlineEditing">
-          <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12" title="Archive Event">
+          <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-gray-400 hover:from-gray-500 hover:to-gray-600 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12" title="Archive Event">
             <i class="fas fa-trash-alt text-lg"></i>
           </button>
           <button (click)="editEvent(selectedEvent)" 
                   [disabled]="isEventConcluded(selectedEvent)"
-                  [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed p-3 rounded-full flex items-center justify-center shadow w-12 h-12' : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12'"
+                  [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed p-3 rounded-full flex items-center justify-center shadow w-12 h-12' : 'bg-green-600 hover:from-green-700 hover:to-green-800 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12'"
                   [title]="isEventConcluded(selectedEvent) ? 'Cannot edit concluded event' : 'Edit Event'">
             <i class="fas fa-edit text-lg"></i>
           </button>
         </div>
         <div class="flex gap-2 ml-auto" *ngIf="isInlineEditing">
-          <button (click)="cancelInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12 disabled:opacity-60 disabled:cursor-not-allowed" title="Cancel Edit">
+          <button (click)="cancelInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-gray-400 hover:from-gray-500 hover:to-gray-600 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12 disabled:opacity-60 disabled:cursor-not-allowed" title="Cancel Edit">
             <i class="fas fa-times text-lg"></i>
           </button>
-          <button (click)="saveInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12 disabled:opacity-60 disabled:cursor-not-allowed" title="Save Changes">
+          <button (click)="saveInlineEdit()" [disabled]="isSavingInlineEdit" class="bg-green-600 hover:from-green-700 hover:to-green-800 text-white p-3 rounded-full transition-all duration-200 flex items-center justify-center shadow-md hover:shadow-lg w-12 h-12 disabled:opacity-60 disabled:cursor-not-allowed" title="Save Changes">
             <i *ngIf="!isSavingInlineEdit" class="fas fa-save text-lg"></i>
             <svg *ngIf="isSavingInlineEdit" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
           </button>
@@ -964,13 +964,13 @@
 
 <!-- Participants Modal (responsive update, larger size) -->
 <!-- Participants Modal -->
-<div *ngIf="showParticipantsModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
+<div *ngIf="showParticipantsModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" style="z-index: 3000;">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
        style="max-height: 95vh;">
     
     <!-- Modal Header -->
     <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
-         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]'">
+         [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
       <div class="flex items-center gap-3 flex-1 min-w-0 pr-4">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <i class="fas fa-users text-white text-lg"></i>
@@ -1017,7 +1017,7 @@
             <button
               type="button"
               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all duration-300 hover:shadow-lg transform hover:scale-105"
-              [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'"
+              [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'"
               (click)="downloadParticipantsExcel()"
               title="Download participants as Excel">
               <i class="fas fa-file-excel"></i>
@@ -1133,7 +1133,7 @@
                   <!-- Avatar -->
                   <div class="flex-shrink-0">
                     <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white text-sm"
-                         [ngClass]="isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534]' : 'bg-gradient-to-br from-[#679436] to-[#56732e]'">
+                         [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
                       {{ p.first_name?.charAt(0) }}{{ p.last_name?.charAt(0) }}
                     </div>
                   </div>
@@ -1286,7 +1286,7 @@
                 <button
                   class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 text-sm font-semibold"
                   [ngClass]="participantsPage === (i + 1) ? 
-                    (isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534] text-white shadow-md' : 'bg-gradient-to-br from-[#679436] to-[#56732e] text-white shadow-md') : 
+                    (isOsws ? 'bg-[#14532d] text-white shadow-md' : 'bg-[#679436] text-white shadow-md') : 
                     (isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700')"
                   [attr.aria-current]="participantsPage === (i + 1) ? 'page' : null"
                   (click)="goToParticipantsPage(i + 1)">
@@ -1326,7 +1326,7 @@
       <button
         type="button"
         class="px-6 py-2.5 rounded-lg text-white font-semibold transition-all shadow-md hover:shadow-lg"
-        [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'"
+        [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
         (click)="closeParticipantsModal()">
         Close
       </button>
@@ -1336,13 +1336,13 @@
 </div>
 
 <!-- Create Event Modal -->
-<div *ngIf="showCreateModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
+<div *ngIf="showCreateModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" style="z-index: 3000;">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
        style="max-height: 95vh;">
     
     <!-- Modal Header -->
     <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
-         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]'">
+         [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
           <i class="fas text-white text-lg" [ngClass]="isEditing ? 'fa-edit' : 'fa-plus-circle'"></i>
@@ -1600,7 +1600,7 @@
         <button type="button"
                 (click)="createEventFromModal()"
                 class="flex-1 sm:flex-none px-8 py-2.5 rounded-lg text-white font-bold transition-all shadow-md hover:shadow-lg transform hover:scale-105"
-                [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'">
+                [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'">
           {{ isEditing ? 'Update Event' : 'Create Event' }}
         </button>
       </div>
@@ -1609,13 +1609,13 @@
 </div>
 
 <!-- Evaluations Modal -->
-<div *ngIf="showEvaluationsModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 9999 !important;">
+<div *ngIf="showEvaluationsModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" style="z-index: 9999;">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
        style="max-height: 95vh;">
     
     <!-- Modal Header -->
     <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
-         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]'">
+         [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
       <div class="flex items-center gap-3 flex-1 min-w-0 pr-4">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <i class="fas fa-star text-white text-lg"></i>
@@ -1717,7 +1717,7 @@
             <button
               type="button"
               class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all duration-300 hover:shadow-lg transform hover:scale-105"
-              [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'"
+              [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'"
               (click)="downloadEvaluationsExcel()"
               title="Download evaluations as Excel">
               <i class="fas fa-file-excel"></i>
@@ -1831,7 +1831,7 @@
                    (click)="toggleEvaluationExpanded(((evaluationsPage - 1) * evaluationsPageSize) + i)">
                 <div class="flex-1 flex items-center gap-3">
                   <div class="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center font-bold text-white text-sm"
-                       [ngClass]="isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534]' : 'bg-gradient-to-br from-[#679436] to-[#56732e]'">
+                       [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
                     {{ evaluation.first_name?.charAt(0) }}{{ evaluation.last_name?.charAt(0) }}
                   </div>
                   <div class="flex-1 min-w-0">
@@ -1986,7 +1986,7 @@
                 <button
                   class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 text-sm font-semibold"
                   [ngClass]="evaluationsPage === (i + 1) ? 
-                    (isOsws ? 'bg-gradient-to-br from-[#14532d] to-[#166534] text-white shadow-md' : 'bg-gradient-to-br from-[#679436] to-[#56732e] text-white shadow-md') : 
+                    (isOsws ? 'bg-[#14532d] text-white shadow-md' : 'bg-[#679436] text-white shadow-md') : 
                     (isOsws ? 'bg-[#e6f7ef] hover:bg-[#d0ede0] text-[#14532d]' : 'bg-gray-200 hover:bg-gray-300 text-gray-700')"
                   [attr.aria-current]="evaluationsPage === (i + 1) ? 'page' : null"
                   (click)="goToEvaluationsPage(i + 1)">
@@ -2026,7 +2026,7 @@
       <button
         type="button"
         class="px-6 py-2.5 rounded-lg text-white font-semibold transition-all shadow-md hover:shadow-lg"
-        [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534] hover:from-[#166534] hover:to-[#14532d]' : 'bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436]'"
+        [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
         (click)="closeEvaluationsModal()">
         Close
       </button>

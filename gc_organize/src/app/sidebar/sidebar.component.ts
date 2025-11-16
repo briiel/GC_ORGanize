@@ -39,6 +39,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   availablePanels: { role: string; label: string; route: string }[] = [];
   today = new Date();
   currentTime: string = '';
+  isUserManagementOpen = false; // For OSWS admin user management dropdown
 
   private timeInterval: any;
   private readonly desktopBreakpoint = 1024; // match Tailwind's lg breakpoint
@@ -208,5 +209,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
       this.router.navigate([panel.route]);
       this.closeIfMobile();
     }
+  }
+
+  toggleUserManagement(): void {
+    this.isUserManagementOpen = !this.isUserManagementOpen;
   }
 }

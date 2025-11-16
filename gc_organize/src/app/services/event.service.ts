@@ -13,8 +13,8 @@ export class EventService {
     const headers = this.getAuthHeaders();
     return this.http.post(`${this.apiUrl}/events/trash-multiple`, { eventIds }, { headers });
   }
-  // Dev: 'http://localhost:5000/api/event'
   private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event';
+  // private apiUrl = 'http://localhost:5000/api/event';
 
   private statusChangedSubject = new Subject<void>();
   public statusChanged$ = this.statusChangedSubject.asObservable();
