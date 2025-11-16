@@ -16,151 +16,460 @@
     </div>
   </div>
 
-  <!-- Actions and Statistics (side-by-side) -->
-  <div class="grid grid-cols-1 gap-6 lg:flex lg:gap-6 lg:items-stretch mx-2 lg:mx-6">
-    <!-- Quick Actions -->
-    <section class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden w-full lg:w-[360px] lg:shrink-0 flex flex-col">
-      <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-tools text-white text-sm"></i>
+  <!-- Main Dashboard Grid -->
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:grid-rows-2 lg:auto-rows-auto lg:gap-6 mx-2 lg:mx-6">
+    <!-- Top Row: Status Overview - 8 columns -->
+    <section class="lg:col-span-8 bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden flex flex-col" style="max-height: 280px;">
+      <div class="px-5 py-3 border-b border-gray-300 bg-gradient-to-r from-[#679436] to-[#56732e]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 border border-white/30">
+            <i class="fas fa-chart-bar text-white text-sm"></i>
           </div>
-          <h2 class="text-lg font-bold text-white">Quick Actions</h2>
+          <h2 class="text-base font-bold text-white">Status Overview</h2>
         </div>
       </div>
+      <div class="p-6 flex-1">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div class="flex flex-col items-center bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl shadow-sm border border-blue-200 hover:shadow-md hover:border-blue-300 transition-all duration-200">
+            <div class="w-12 h-12 rounded-lg bg-blue-500 flex items-center justify-center mb-2 shadow-sm">
+              <i class="fas fa-calendar-check text-white text-xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-blue-700">{{ stats.upcoming }}</p>
+            <p class="text-blue-600 text-xs font-semibold text-center mt-1">Upcoming Events</p>
+          </div>
+          <div class="flex flex-col items-center bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-xl shadow-sm border border-yellow-200 hover:shadow-md hover:border-yellow-300 transition-all duration-200">
+            <div class="w-12 h-12 rounded-lg bg-yellow-500 flex items-center justify-center mb-2 shadow-sm">
+              <i class="fas fa-play-circle text-white text-xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-yellow-700">{{ stats.ongoing }}</p>
+            <p class="text-yellow-600 text-xs font-semibold text-center mt-1">Ongoing Events</p>
+          </div>
+          <div class="flex flex-col items-center bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl shadow-sm border border-green-200 hover:shadow-md hover:border-green-300 transition-all duration-200">
+            <div class="w-12 h-12 rounded-lg bg-green-600 flex items-center justify-center mb-2 shadow-sm">
+              <i class="fas fa-check-circle text-white text-xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-green-700">{{ stats.concluded }}</p>
+            <p class="text-green-600 text-xs font-semibold text-center mt-1">Concluded Events</p>
+          </div>
+          <div class="flex flex-col items-center bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-xl shadow-sm border border-red-200 hover:shadow-md hover:border-red-300 transition-all duration-200">
+            <div class="w-12 h-12 rounded-lg bg-red-500 flex items-center justify-center mb-2 shadow-sm">
+              <i class="fas fa-times-circle text-white text-xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-red-700">{{ stats.cancelled }}</p>
+            <p class="text-red-600 text-xs font-semibold text-center mt-1">Canceled Events</p>
+          </div>
+          <div class="flex flex-col items-center bg-gradient-to-br from-teal-50 to-teal-100 p-4 rounded-xl shadow-sm border border-teal-200 hover:shadow-md hover:border-teal-300 transition-all duration-200">
+            <div class="w-12 h-12 rounded-lg bg-teal-600 flex items-center justify-center mb-2 shadow-sm">
+              <i class="fas fa-users text-white text-xl"></i>
+            </div>
+            <p class="text-3xl font-bold text-teal-700">{{ stats.totalAttendees }}</p>
+            <p class="text-teal-600 text-xs font-semibold text-center mt-1">Total Attendees</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity - Right Column spanning 2 rows -->
+    <aside class="lg:col-span-4 lg:row-span-2" style="max-height: 600px;">
+      <section class="bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden flex flex-col h-full">
+        <div class="px-5 py-3 border-b border-gray-300 bg-gradient-to-r from-purple-500 to-purple-600">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 border border-white/30">
+                <i class="fas fa-history text-white text-sm"></i>
+              </div>
+              <h2 class="text-base font-bold text-white">Recent Activity</h2>
+            </div>
+            <button 
+              *ngIf="activities.length > 5"
+              (click)="openRecentActivityModal()"
+              class="text-white/90 hover:text-white text-xs font-semibold flex items-center gap-1 transition-colors duration-150"
+              type="button">
+              <span>View All</span>
+              <i class="fas fa-external-link-alt text-xs"></i>
+            </button>
+          </div>
+        </div>
+        <div class="p-4 flex-1 flex flex-col overflow-hidden">
+          <div class="overflow-y-auto flex-1 pr-2">
+            <ul class="space-y-2.5">
+              <li *ngFor="let activity of pagedActivities" class="flex gap-3 p-3 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200">
+                <div class="flex-shrink-0">
+                  <div class="w-10 h-10 rounded-lg flex items-center justify-center shadow-sm border"
+                       [ngClass]="{
+                         'bg-gradient-to-br from-green-100 to-green-200 border-green-300': activity.type === 'create',
+                         'bg-gradient-to-br from-blue-100 to-blue-200 border-blue-300': activity.type === 'update',
+                         'bg-gradient-to-br from-red-100 to-red-200 border-red-300': activity.type === 'delete',
+                         'bg-gradient-to-br from-yellow-100 to-yellow-200 border-yellow-300': activity.type === 'approve',
+                         'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300': activity.type === 'other'
+                       }">
+                    <i class="fas"
+                       [ngClass]="{
+                         'fa-plus-circle text-green-700': activity.type === 'create',
+                         'fa-edit text-blue-700': activity.type === 'update',
+                         'fa-trash-alt text-red-700': activity.type === 'delete',
+                         'fa-check-circle text-yellow-700': activity.type === 'approve',
+                         'fa-circle text-gray-700': activity.type === 'other'
+                       }"></i>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-gray-800 leading-tight">{{ activity.action }}</p>
+                  <p class="text-xs text-gray-600 mt-1.5 flex items-center gap-1">
+                    <i class="fas fa-user text-gray-500"></i>
+                    <span>{{ activity.user }}</span>
+                  </p>
+                  <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                    <i class="fas fa-clock text-gray-400"></i>
+                    <span>{{ activity.timestamp | date: 'MMM d, y h:mm a' }}</span>
+                  </p>
+                </div>
+              </li>
+              <li *ngIf="pagedActivities.length === 0" class="text-center py-12">
+                <div class="flex flex-col items-center">
+                  <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                    <i class="fas fa-inbox text-3xl text-gray-400"></i>
+                  </div>
+                  <p class="text-gray-600 font-semibold">No recent activity.</p>
+                  <p class="text-gray-400 text-sm mt-1">Activity will appear here</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Bottom Row: Quick Actions and Upcoming Events -->
+    <!-- Quick Actions - Left Column -->
+    <section class="lg:col-span-3 bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden flex flex-col" style="max-height: 300px;">
+      <div class="px-5 py-3 border-b border-gray-300 bg-gradient-to-r from-[#679436] to-[#56732e]">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 border border-white/30">
+            <i class="fas fa-tools text-white text-sm"></i>
+          </div>
+          <h2 class="text-base font-bold text-white">Quick Actions</h2>
+          </div>
+        </div>
       <div class="p-6 flex flex-col gap-3 flex-1 justify-center">
         <button
-          class="w-full bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-6 py-3 rounded-lg font-semibold flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl"
+          class="w-full bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-5 py-3 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg border border-[#56732e] text-sm"
           [routerLink]="['/sidebar/manage-event']" [queryParams]="{ create: true }"
           type="button"
         >
-          <i class="fas fa-plus-circle mr-2"></i> Create New Event
+          <i class="fas fa-plus-circle mr-2 text-base"></i>
+          <span>Create New Event</span>
         </button>
         <button
-          class="w-full bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-6 py-3 rounded-lg font-semibold flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl"
+          class="w-full bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-5 py-3 rounded-xl font-semibold flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg border border-[#56732e] text-sm"
           [routerLink]="['/sidebar/manage-event']"
           type="button"
         >
-          <i class="fas fa-list mr-2"></i> View All Events
+          <i class="fas fa-list mr-2 text-base"></i>
+          <span>View All Events</span>
         </button>
       </div>
     </section>
 
-    <!-- Statistics -->
-    <section class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden lg:flex-1 flex flex-col">
-      <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#679436] to-[#56732e] border-[#679436]">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-chart-bar text-white text-sm"></i>
+    <!-- Upcoming Events - Middle Column -->
+    <section class="lg:col-span-5 bg-white rounded-2xl shadow-lg border border-gray-300 overflow-hidden flex flex-col" style="max-height: 300px;">
+      <div class="px-5 py-3 border-b border-gray-300 bg-gradient-to-r from-blue-500 to-blue-600">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 border border-white/30">
+              <i class="fas fa-clock text-white text-sm"></i>
+            </div>
+            <h2 class="text-base font-bold text-white">Upcoming Events</h2>
           </div>
-          <h2 class="text-lg font-bold text-white">Status Overview</h2>
+          <button 
+            *ngIf="totalUpcomingEvents > upcomingPageSize"
+            (click)="openUpcomingEventsModal()"
+            class="text-white/90 hover:text-white text-xs font-semibold flex items-center gap-1 transition-colors duration-150"
+            type="button">
+            <span>View All</span>
+            <i class="fas fa-external-link-alt text-xs"></i>
+          </button>
+          </div>
         </div>
-      </div>
-      <div class="p-6">
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md border-2 border-gray-200 hover:shadow-lg transition-all duration-200">
-            <i class="fas fa-calendar-check text-blue-500 text-3xl mb-2"></i>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.upcoming }}</p>
-            <p class="text-gray-600 text-xs font-semibold text-center mt-1">Upcoming Events</p>
-          </div>
-          <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md border-2 border-gray-200 hover:shadow-lg transition-all duration-200">
-            <i class="fas fa-play-circle text-yellow-500 text-3xl mb-2"></i>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.ongoing }}</p>
-            <p class="text-gray-600 text-xs font-semibold text-center mt-1">Ongoing Events</p>
-          </div>
-          <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md border-2 border-gray-200 hover:shadow-lg transition-all duration-200">
-            <i class="fas fa-check-circle text-green-600 text-3xl mb-2"></i>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.concluded }}</p>
-            <p class="text-gray-600 text-xs font-semibold text-center mt-1">Concluded Events</p>
-          </div>
-          <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md border-2 border-gray-200 hover:shadow-lg transition-all duration-200">
-            <i class="fas fa-times-circle text-red-500 text-3xl mb-2"></i>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.cancelled }}</p>
-            <p class="text-gray-600 text-xs font-semibold text-center mt-1">Canceled Events</p>
-          </div>
-          <div class="flex flex-col items-center bg-white p-4 rounded-lg shadow-md border-2 border-gray-200 hover:shadow-lg transition-all duration-200">
-            <i class="fas fa-users text-teal-600 text-3xl mb-2"></i>
-            <p class="text-3xl font-bold text-gray-800">{{ stats.totalAttendees }}</p>
-            <p class="text-gray-600 text-xs font-semibold text-center mt-1">Total Attendees</p>
-          </div>
+      <div class="p-4 flex-1 flex flex-col">
+        <div class="overflow-y-auto flex-1 pr-2">
+          <ul class="space-y-2.5">
+            <li *ngFor="let event of pagedUpcomingEvents" class="group bg-gradient-to-r from-white to-gray-50 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 overflow-hidden">
+              <div class="p-3 flex items-center gap-3">
+                <!-- Event Icon -->
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center flex-shrink-0 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-200 border border-blue-300 shadow-sm">
+                  <i class="fas fa-calendar-alt text-blue-700 text-sm"></i>
+                </div>
+                
+                <!-- Event Info -->
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-gray-900 font-semibold text-sm leading-tight truncate mb-1">{{ event.title }}</h3>
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-600">
+                    <span class="flex items-center gap-1.5">
+                      <i class="fas fa-calendar-day text-blue-500 text-xs"></i>
+                      <span class="font-medium">{{ event.start_date | date: 'MMM d, y' }}</span>
+                      <span *ngIf="event.end_date && event.end_date !== event.start_date" class="text-gray-500">
+                        - {{ event.end_date | date: 'MMM d' }}
+                      </span>
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                      <i class="fas fa-clock text-blue-500 text-xs"></i>
+                      <span class="font-medium">{{ formatTime(event.start_time) }}</span>
+                    </span>
+                  </div>
+                </div>
+                
+                <!-- Action Button -->
+                <button
+                  class="flex-shrink-0 bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-3 py-2 rounded-lg font-semibold flex items-center gap-1.5 transition-all duration-200 shadow-sm hover:shadow-md border border-[#56732e] text-xs"
+                  [routerLink]="['/sidebar/manage-event']"
+                  type="button"
+                >
+                  <i class="fas fa-eye text-xs"></i>
+                  <span>View</span>
+                </button>
+              </div>
+            </li>
+            <li *ngIf="pagedUpcomingEvents.length === 0" class="text-center py-10">
+              <div class="flex flex-col items-center">
+                <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-3">
+                  <i class="fas fa-calendar-times text-3xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-600 font-semibold text-sm">No upcoming events found.</p>
+                <p class="text-gray-400 text-xs mt-1">Create a new event to get started!</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- Pagination Controls -->
+        <div *ngIf="totalUpcomingPages > 1" class="flex justify-center items-center mt-4 pt-4 border-t border-gray-200">
+          <nav class="inline-flex space-x-1" aria-label="Pagination">
+            <button
+              class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold shadow-sm"
+              [disabled]="upcomingPage === 1"
+              (click)="setUpcomingPage(upcomingPage - 1)">
+              <i class="fas fa-chevron-left text-xs"></i>
+            </button>
+            <ng-container *ngFor="let _ of [].constructor(totalUpcomingPages); let i = index">
+              <button
+                class="w-9 h-9 flex items-center justify-center rounded-lg border transition-all duration-150 font-semibold shadow-sm"
+                [ngClass]="upcomingPage === (i + 1) ? 'bg-[#679436] text-white border-[#679436]' : 'bg-white text-gray-700 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436]'"
+                [attr.aria-current]="upcomingPage === (i + 1) ? 'page' : null"
+                (click)="setUpcomingPage(i + 1)">
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+            <button
+              class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold shadow-sm"
+              [disabled]="upcomingPage === totalUpcomingPages"
+              (click)="setUpcomingPage(upcomingPage + 1)">
+              <i class="fas fa-chevron-right text-xs"></i>
+            </button>
+          </nav>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- Upcoming Events -->
-  <section class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden mt-6 mx-2 lg:mx-6">
-    <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-blue-500 to-blue-600 border-blue-500">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-          <i class="fas fa-clock text-white text-sm"></i>
+  <!-- Upcoming Events Modal -->
+  <div *ngIf="showUpcomingEventsModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden" style="max-height: 95vh;">
+        <!-- Header -->
+        <div class="sticky top-0 z-10 px-6 py-4 border-b-4 border-blue-600 flex items-center justify-between bg-gradient-to-r from-blue-500 to-blue-600">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center border border-white/30">
+              <i class="fas fa-clock text-white text-lg"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">All Upcoming Events ({{ totalUpcomingEvents }})</h3>
+          </div>
+          <button (click)="closeUpcomingEventsModal()" type="button" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90" aria-label="Close">
+            <i class="fas fa-times text-lg"></i>
+          </button>
         </div>
-        <h2 class="text-lg font-bold text-white">Upcoming Events</h2>
+
+        <!-- Content -->
+        <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+          <ul class="space-y-3">
+            <li *ngFor="let event of modalPagedUpcomingEvents" class="group bg-gradient-to-r from-white to-gray-50 rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 overflow-hidden">
+              <div class="p-4 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center flex-shrink-0 group-hover:from-blue-200 group-hover:to-blue-300 transition-all duration-200 border border-blue-300 shadow-sm">
+                  <i class="fas fa-calendar-alt text-blue-700 text-lg"></i>
+                </div>
+                
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-gray-900 font-bold text-base leading-tight mb-2">{{ event.title }}</h3>
+                  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
+                    <span class="flex items-center gap-2">
+                      <i class="fas fa-calendar-day text-blue-500"></i>
+                      <span class="font-medium">{{ event.start_date | date: 'MMMM d, y' }}</span>
+                      <span *ngIf="event.end_date && event.end_date !== event.start_date" class="text-gray-500">
+                        - {{ event.end_date | date: 'MMMM d, y' }}
+                      </span>
+                    </span>
+                    <span class="flex items-center gap-2">
+                      <i class="fas fa-clock text-blue-500"></i>
+                      <span class="font-medium">{{ formatTime(event.start_time) }}</span>
+                      <span *ngIf="event.end_time && event.end_time !== event.start_time" class="text-gray-500">
+                        - {{ formatTime(event.end_time) }}
+                      </span>
+                    </span>
+                    <span *ngIf="event.location" class="flex items-center gap-2">
+                      <i class="fas fa-map-marker-alt text-blue-500"></i>
+                      <span class="font-medium">{{ event.location }}</span>
+                    </span>
+                  </div>
+                </div>
+                
+                <button
+                  class="flex-shrink-0 bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-4 py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg border border-[#56732e] text-sm"
+                  [routerLink]="['/sidebar/manage-event']"
+                  (click)="closeUpcomingEventsModal()"
+                  type="button">
+                  <i class="fas fa-eye"></i>
+                  <span>View Details</span>
+                </button>
+              </div>
+            </li>
+            <li *ngIf="modalPagedUpcomingEvents.length === 0" class="text-center py-12">
+              <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                  <i class="fas fa-calendar-times text-4xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-600 font-semibold text-lg">No upcoming events found.</p>
+                <p class="text-gray-400 text-sm mt-2">Create a new event to get started!</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Footer with Pagination -->
+        <div *ngIf="modalTotalUpcomingPages > 1" class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div class="flex justify-center items-center">
+            <nav class="inline-flex space-x-1" aria-label="Pagination">
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold shadow-sm"
+                [disabled]="modalUpcomingPage === 1"
+                (click)="setModalUpcomingPage(modalUpcomingPage - 1)"
+                type="button">
+                <i class="fas fa-chevron-left text-sm"></i>
+              </button>
+              <ng-container *ngFor="let _ of [].constructor(modalTotalUpcomingPages); let i = index">
+                <button
+                  class="w-10 h-10 flex items-center justify-center rounded-lg border transition-all duration-150 font-semibold shadow-sm"
+                  [ngClass]="modalUpcomingPage === (i + 1) ? 'bg-[#679436] text-white border-[#679436]' : 'bg-white text-gray-700 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436]'"
+                  [attr.aria-current]="modalUpcomingPage === (i + 1) ? 'page' : null"
+                  (click)="setModalUpcomingPage(i + 1)"
+                  type="button">
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold shadow-sm"
+                [disabled]="modalUpcomingPage === modalTotalUpcomingPages"
+                (click)="setModalUpcomingPage(modalUpcomingPage + 1)"
+                type="button">
+                <i class="fas fa-chevron-right text-sm"></i>
+              </button>
+            </nav>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="p-6">
-      <ul class="space-y-3">
-        <li *ngFor="let event of pagedUpcomingEvents" class="p-4 bg-gray-50 rounded-lg shadow-sm border-2 border-gray-200 hover:shadow-md transition-all duration-200 flex justify-between items-center">
-          <div>
-            <h3 class="text-gray-800 font-semibold">{{ event.title }}</h3>
-            <p class="text-gray-600 text-sm mt-1">
-              <i class="fas fa-calendar-day mr-1"></i>
-              {{ event.start_date | date: 'MMMM d, y' }}
-              <span *ngIf="event.end_date && event.end_date !== event.start_date">
-                - {{ event.end_date | date: 'MMMM d, y' }}
-              </span>
-              |
-              {{ formatTime(event.start_time) }}
-              <span *ngIf="event.end_time && event.end_time !== event.start_time">
-                - {{ formatTime(event.end_time) }}
-              </span>
-            </p>
+  </div>
+
+  <!-- Recent Activity Modal -->
+  <div *ngIf="showRecentActivityModal" class="fixed inset-0 flex items-center justify-center modal-blur bg-[#0000008a] animate-fade-in" style="z-index: 3000;">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden" style="max-height: 95vh;">
+        <!-- Header -->
+        <div class="sticky top-0 z-10 px-6 py-4 border-b-4 border-purple-600 flex items-center justify-between bg-gradient-to-r from-purple-500 to-purple-600">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center border border-white/30">
+              <i class="fas fa-history text-white text-lg"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white">All Recent Activity ({{ activities.length }})</h3>
           </div>
-          <button
-            class="bg-gradient-to-r from-[#679436] to-[#56732e] hover:from-[#56732e] hover:to-[#679436] text-white px-4 py-2 rounded-lg font-semibold flex items-center transition-all duration-200 shadow-md hover:shadow-lg"
-            [routerLink]="['/sidebar/manage-event']"
-            type="button"
-          >
-            <i class="fas fa-eye mr-2"></i>
-            <span class="hidden sm:inline">View</span>
+          <button (click)="closeRecentActivityModal()" type="button" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90" aria-label="Close">
+            <i class="fas fa-times text-lg"></i>
           </button>
-        </li>
-        <li *ngIf="pagedUpcomingEvents.length === 0" class="text-center py-8">
-          <div class="flex flex-col items-center">
-            <i class="fas fa-inbox text-4xl text-gray-300 mb-2"></i>
-            <p class="text-gray-500 font-semibold">No upcoming events found.</p>
+        </div>
+
+        <!-- Content -->
+        <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+          <ul class="space-y-3">
+            <li *ngFor="let activity of modalPagedActivities" class="flex gap-4 p-4 bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all duration-200">
+              <div class="flex-shrink-0">
+                <div class="w-12 h-12 rounded-lg flex items-center justify-center shadow-sm border"
+                     [ngClass]="{
+                       'bg-gradient-to-br from-green-100 to-green-200 border-green-300': activity.type === 'create',
+                       'bg-gradient-to-br from-blue-100 to-blue-200 border-blue-300': activity.type === 'update',
+                       'bg-gradient-to-br from-red-100 to-red-200 border-red-300': activity.type === 'delete',
+                       'bg-gradient-to-br from-yellow-100 to-yellow-200 border-yellow-300': activity.type === 'approve',
+                       'bg-gradient-to-br from-gray-100 to-gray-200 border-gray-300': activity.type === 'other'
+                     }">
+                  <i class="fas text-lg"
+                     [ngClass]="{
+                       'fa-plus-circle text-green-700': activity.type === 'create',
+                       'fa-edit text-blue-700': activity.type === 'update',
+                       'fa-trash-alt text-red-700': activity.type === 'delete',
+                       'fa-check-circle text-yellow-700': activity.type === 'approve',
+                       'fa-circle text-gray-700': activity.type === 'other'
+                     }"></i>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-base font-semibold text-gray-800 leading-tight mb-2">{{ activity.action }}</p>
+                <p class="text-sm text-gray-600 flex items-center gap-2 mb-1">
+                  <i class="fas fa-user text-gray-500"></i>
+                  <span>{{ activity.user }}</span>
+                </p>
+                <p class="text-sm text-gray-500 flex items-center gap-2">
+                  <i class="fas fa-clock text-gray-400"></i>
+                  <span>{{ activity.timestamp | date: 'MMM d, y h:mm a' }}</span>
+                </p>
+              </div>
+            </li>
+            <li *ngIf="modalPagedActivities.length === 0" class="text-center py-12">
+              <div class="flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                  <i class="fas fa-inbox text-4xl text-gray-400"></i>
+                </div>
+                <p class="text-gray-600 font-semibold text-lg">No recent activity.</p>
+                <p class="text-gray-400 text-sm mt-2">Activity will appear here</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Footer with Pagination -->
+        <div *ngIf="modalTotalActivityPages > 1" class="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div class="flex justify-center items-center">
+            <nav class="inline-flex space-x-1" aria-label="Pagination">
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-300 hover:bg-purple-500 hover:text-white hover:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold shadow-sm"
+                [disabled]="modalActivityPage === 1"
+                (click)="setModalActivityPage(modalActivityPage - 1)"
+                type="button">
+                <i class="fas fa-chevron-left text-sm"></i>
+              </button>
+              <ng-container *ngFor="let _ of [].constructor(modalTotalActivityPages); let i = index">
+                <button
+                  class="w-10 h-10 flex items-center justify-center rounded-lg border transition-all duration-150 font-semibold shadow-sm"
+                  [ngClass]="modalActivityPage === (i + 1) ? 'bg-purple-500 text-white border-purple-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-purple-500 hover:text-white hover:border-purple-500'"
+                  [attr.aria-current]="modalActivityPage === (i + 1) ? 'page' : null"
+                  (click)="setModalActivityPage(i + 1)"
+                  type="button">
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                class="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-300 hover:bg-purple-500 hover:text-white hover:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold shadow-sm"
+                [disabled]="modalActivityPage === modalTotalActivityPages"
+                (click)="setModalActivityPage(modalActivityPage + 1)"
+                type="button">
+                <i class="fas fa-chevron-right text-sm"></i>
+              </button>
+            </nav>
           </div>
-        </li>
-      </ul>
-      <!-- Pagination Controls -->
-      <div *ngIf="totalUpcomingPages > 1" class="flex justify-center items-center mt-6 pt-4 border-t-2 border-gray-200">
-        <nav class="inline-flex space-x-1" aria-label="Pagination">
-          <!-- Previous Arrow -->
-          <button
-            class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold"
-            [disabled]="upcomingPage === 1"
-            (click)="setUpcomingPage(upcomingPage - 1)">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <!-- Page Numbers -->
-          <ng-container *ngFor="let _ of [].constructor(totalUpcomingPages); let i = index">
-            <button
-              class="w-9 h-9 flex items-center justify-center rounded-lg border-2 transition-all duration-150 font-semibold"
-              [ngClass]="upcomingPage === (i + 1) ? 'bg-[#679436] text-white border-[#679436]' : 'bg-white text-gray-700 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436]'"
-              [attr.aria-current]="upcomingPage === (i + 1) ? 'page' : null"
-              (click)="setUpcomingPage(i + 1)">
-              {{ i + 1 }}
-            </button>
-          </ng-container>
-          <!-- Next Arrow -->
-          <button
-            class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150 font-semibold"
-            [disabled]="upcomingPage === totalUpcomingPages"
-            (click)="setUpcomingPage(upcomingPage + 1)">
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </nav>
-      </div>
-    </div>
-  </section>
+        </div>
+  </div>
 </div>

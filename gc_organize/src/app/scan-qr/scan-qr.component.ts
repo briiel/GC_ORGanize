@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Html5Qrcode, Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode';
 import Swal from 'sweetalert2';
-import { AuthService } from '../services/auth.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 
 @Component({
@@ -34,15 +34,22 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private auth: AuthService,
+    private auth: RbacAuthService,
     private eventService: EventService
   ) {}
 
   ngOnInit() {
     // Set initial UI text before first change detection to avoid NG0100.
     this.message = 'Click Start Scanner and allow camera access.';
-  this.role = this.auth.getUserRole();
-  this.fetchScannerEvents();
+    const primaryRole = this.auth.getPrimaryRole();
+    if (primaryRole === 'OSWSAdmin') {
+      this.role = 'osws_admin';
+    } else if (primaryRole === 'OrgOfficer') {
+      this.role = 'organization';
+    } else if (primaryRole === 'Student') {
+      this.role = 'student';
+    }
+    this.fetchScannerEvents();
   }
 
   ngAfterViewInit() {}
@@ -206,7 +213,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     if (!token) {
       this.message = 'You must be logged in as an organization or OSWS admin.';
       Swal.fire('Error', 'You must be logged in as an organization or OSWS admin.', 'error').then(() => {
@@ -248,11 +255,11 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private fetchScannerEvents() {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     if (!token) return;
     const role = this.role;
     if (role === 'osws_admin') {
-      const adminId = Number(localStorage.getItem('adminId'));
+      const adminId = this.auth.getAdminId();
       if (!adminId) return;
       this.eventService.getEventsByAdmin(adminId).subscribe({
         next: (res: any) => {
@@ -262,7 +269,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
         error: () => {}
       });
     } else if (role === 'organization') {
-      const creatorId = Number(localStorage.getItem('creatorId'));
+      const creatorId = this.auth.getCreatorId();
       if (!creatorId) return;
       this.eventService.getEventsByCreator(creatorId).subscribe({
         next: (res: any) => {

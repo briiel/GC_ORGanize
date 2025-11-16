@@ -76,7 +76,7 @@ export class EventService {
 
   // Fetch all attendance records
   getAllAttendanceRecords(): Observable<any> {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
@@ -109,7 +109,7 @@ export class EventService {
 
   // Helper method to get Authorization headers
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     return new HttpHeaders({
       Authorization: `Bearer ${token}`
     });

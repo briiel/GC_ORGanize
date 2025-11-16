@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventService } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -22,11 +22,18 @@ export class TrashComponent implements OnInit {
 	currentPage: number = 1;
 	pageSize: number = 9;
 
-	constructor(private eventService: EventService, private auth: AuthService) {}
+	constructor(private eventService: EventService, private auth: RbacAuthService) {}
 
 	ngOnInit(): void {
-	// Determine role for palette (OSWS vs Organization)
-	this.role = this.auth.getUserRole();
+		// Determine role for palette (OSWS vs Organization)
+		const primaryRole = this.auth.getPrimaryRole();
+		if (primaryRole === 'OSWSAdmin') {
+			this.role = 'osws_admin';
+		} else if (primaryRole === 'OrgOfficer') {
+			this.role = 'organization';
+		} else if (primaryRole === 'Student') {
+			this.role = 'student';
+		}
 		this.loadTrash();
 	}
 

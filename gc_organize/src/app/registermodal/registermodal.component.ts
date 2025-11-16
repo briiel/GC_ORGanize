@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
+import { RbacAuthService } from '../services/rbac-auth.service';
 
 @Component({
   selector: 'app-registermodal',
@@ -38,7 +39,10 @@ export class RegistermodalComponent implements OnInit {
     student_id: ''
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private authService: RbacAuthService
+  ) {}
 
   ngOnInit(): void {
     if (this.eventId !== null) {
@@ -47,8 +51,7 @@ export class RegistermodalComponent implements OnInit {
     
     // Fetch event to determine if paid
     if (this.eventId !== null) {
-      const token = localStorage.getItem('authToken') || '';
-      this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/event/events/${this.eventId}`, {
+      const token = localStorage.getItem('gc_organize_token') || '';
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       }).subscribe({
         next: (res) => {
@@ -61,22 +64,54 @@ export class RegistermodalComponent implements OnInit {
       });
     }
     
-    // Auto-fill student info
-    const studentInfoStr = localStorage.getItem('studentInfo');
-    if (studentInfoStr) {
-      const student = JSON.parse(studentInfoStr);
-      this.studentInfo = {
-        id: student.student_id || student.id || '',
-        first_name: student.first_name || '',
-        last_name: student.last_name || '',
-        email: student.email || '',
-        middle_initial: student.middle_initial || '',
-        suffix: student.suffix || '',
-        department: student.department || '',
-        program: student.program || ''
-      };
-      this.registrationData.student_id = this.studentInfo.id;
+    // Fetch student info from JWT token and backend
+    this.loadStudentInfo();
+  }
+
+  private loadStudentInfo(): void {
+    const token = this.authService.getToken();
+    if (!token) {
+      console.error('No authentication token found');
+      return;
     }
+
+    const decoded = this.authService.getDecodedToken();
+    if (!decoded || !decoded.studentId) {
+      console.error('Invalid token or not a student account');
+      return;
+    }
+
+    // Set basic info from token
+    this.studentInfo.id = decoded.studentId;
+    this.studentInfo.first_name = decoded.firstName || '';
+    this.studentInfo.last_name = decoded.lastName || '';
+    this.studentInfo.email = decoded.email || '';
+    this.registrationData.student_id = decoded.studentId;
+
+    // Fetch additional student details from backend
+    this.http.get<any>(`http://localhost:5000/api/users/${decoded.studentId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).subscribe({
+      next: (res) => {
+        const student = res?.data || res;
+        if (student) {
+          this.studentInfo = {
+            id: student.id || decoded.studentId,
+            first_name: student.first_name || decoded.firstName || '',
+            last_name: student.last_name || decoded.lastName || '',
+            middle_initial: student.middle_initial || '',
+            email: student.email || decoded.email || '',
+            suffix: student.suffix || '',
+            department: student.department || '',
+            program: student.program || ''
+          };
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching student details:', err);
+        // Continue with basic info from token
+      }
+    });
   }
 
   previewImages(event: Event): void {
@@ -142,7 +177,7 @@ export class RegistermodalComponent implements OnInit {
   }
 
   submitRegistration(): void {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     if (!token) {
       Swal.fire({
         icon: 'warning',
@@ -244,9 +279,8 @@ export class RegistermodalComponent implements OnInit {
     this.close.emit();
   }
 
-  @HostListener('document:keydown.escape', ['$event'])
-  onEsc(event: KeyboardEvent): void {
-    event.preventDefault();
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
     this.closeModal();
   }
 }

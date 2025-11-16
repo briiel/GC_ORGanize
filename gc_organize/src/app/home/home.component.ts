@@ -4,7 +4,7 @@ import { ModalService } from '../modal.service';
 import { RegistermodalComponent } from '../registermodal/registermodal.component';
 import { ViewmodalComponent } from '../viewmodal/viewmodal.component';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 import { forkJoin } from 'rxjs';
 
@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   pageSize: number = 9; // 3x3 layout per page
 
-  constructor(private eventService: EventService, private authService: AuthService, private router: Router) { }
+  constructor(private eventService: EventService, private authService: RbacAuthService, private router: Router) { }
 
   ngOnInit() {
     forkJoin([

@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 
 @Component({
   selector: 'app-eventsreg',
@@ -18,9 +19,9 @@ export class EventsregComponent implements OnInit {
   registeredEvents: any[] = [];
   studentId: string | null = null;
 
-  constructor(private http: HttpClient, private eventService: EventService) {
-    // Get studentId from localStorage as string
-    this.studentId = localStorage.getItem('studentId');
+  constructor(private http: HttpClient, private eventService: EventService, private auth: RbacAuthService) {
+    // Get studentId from JWT token
+    this.studentId = this.auth.getStudentId();
   }
 
   ngOnInit() {

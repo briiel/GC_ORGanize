@@ -11,11 +11,30 @@ input[type="reset"]:not(:disabled):hover {
 @import "tailwindcss";
 
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'DM Sans', sans-serif;
 }
 
 html {
     scroll-behavior: smooth;
+}
+
+/* Override Tailwind font weights for DM Sans to use extrabold for better readability */
+.font-bold {
+    font-weight: 800 !important; /* extrabold */
+}
+
+.font-semibold {
+    font-weight: 800 !important; /* extrabold */
+}
+
+.font-medium {
+    font-weight: 700 !important; /* bold for medium weight */
+}
+
+/* Prevent body scrolling when modal is open */
+body.modal-open {
+    overflow: hidden;
+    padding-right: 0px; /* Prevent layout shift from scrollbar */
 }
 
 .modal-blur {
@@ -35,6 +54,11 @@ body.modal-open .sidebar-blur-target {
 .animate-scale-in { animation: scaleIn 180ms ease-out; }
 @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
 @keyframes scaleIn { from { transform: translateY(6px) scale(0.98); opacity: 0 } to { transform: translateY(0) scale(1); opacity: 1 } }
+
+/* SweetAlert2 z-index override - ensure it appears above modals (z-3000+) */
+.swal2-container {
+    z-index: 10000 !important;
+}
 
 /* Mobile modal sizing: make panels smaller so they don't cover the full screen */
 @media (max-width: 640px) {

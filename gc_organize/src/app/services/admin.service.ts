@@ -10,21 +10,21 @@ export class AdminService {
   constructor(private http: HttpClient) {}
 
   getManageUsers(): Observable<any> {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     return this.http.get(`${this.apiUrl}/admin/manage-users`, {
       headers: { Authorization: `Bearer ${token}` }
     });
   }
 
   addAdmin(admin: { email: string; password: string; name: string }): Observable<any> {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     return this.http.post(`${this.apiUrl}/admins`, admin, {
       headers: { Authorization: `Bearer ${token}` }
     });
   }
 
   deleteAdmin(id: number): Observable<any> {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('gc_organize_token');
     return this.http.delete(`${this.apiUrl}/admins/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });

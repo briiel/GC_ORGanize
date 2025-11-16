@@ -6,11 +6,11 @@
          [ngClass]="isOsws ? 'from-[#14532d] to-[#166534] border-[#14532d]' : 'from-[#679436] to-[#56732e] border-[#679436]'">
       <div class="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
-            <i class="fas fa-clipboard-list text-white text-xl"></i>
+          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
+            <i class="fas fa-clipboard-list text-white text-lg"></i>
           </div>
           <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-white">Attendance Records</h1>
+            <h1 class="text-lg sm:text-xl font-bold text-white">Attendance Records</h1>
             <p class="text-white/80 text-sm mt-0.5">View and manage event attendance</p>
           </div>
         </div>
@@ -211,34 +211,44 @@
               </div>
             </div>
             <!-- Table -->
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto shadow-sm">
               <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMsg">
-                <table *ngIf="!error" class="w-full text-xs md:text-sm">
+                <table *ngIf="!error" class="w-full text-sm">
                   <thead class="bg-gradient-to-r"
                          [ngClass]="isOsws ? 'from-[#14532d] to-[#166534]' : 'from-[#679436] to-[#56732e]'">
-                      <tr class="uppercase tracking-wider text-white text-center">
-                        <th class="px-4 py-3 text-center w-12">#</th>
-                        <th class="px-4 py-3 text-center min-w-[120px] whitespace-nowrap">Student ID</th>
-                        <th class="px-4 py-3 text-center min-w-[200px]">Name</th>
-                        <th class="px-4 py-3 text-center min-w-[140px]">Department</th>
-                        <th class="px-4 py-3 text-center min-w-[140px]">Program</th>
-                        <th class="px-4 py-3 text-center min-w-[160px] whitespace-nowrap">Time In</th>
-                        <th class="px-4 py-3 text-center min-w-[160px] whitespace-nowrap">Time Out</th>
-                        <th class="px-4 py-3 text-center min-w-[160px]">Scanned By</th>
+                      <tr class="uppercase tracking-wider text-white">
+                        <th class="px-3 py-3 text-center w-12">#</th>
+                        <th class="px-3 py-3 text-center min-w-[100px]">Student ID</th>
+                        <th class="px-3 py-3 text-left min-w-[180px]">Name</th>
+                        <th class="px-3 py-3 text-center min-w-[100px]">Dept</th>
+                        <th class="px-3 py-3 text-left min-w-[150px]">Program</th>
+                        <th class="px-3 py-3 text-center min-w-[140px]">Time In</th>
+                        <th class="px-3 py-3 text-center min-w-[140px]">Time Out</th>
+                        <th class="px-3 py-3 text-left min-w-[160px]">Scanned By</th>
+                        <th class="px-3 py-3 text-center min-w-[120px]">Position</th>
                       </tr>
                     </thead>
                     <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
                       <tr *ngFor="let record of pagedRecords; let i = index" 
                           class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50">
-                        <td class="px-4 py-3 text-center font-semibold"
+                        <td class="px-3 py-3 text-center font-semibold"
                             [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</td>
-                        <td class="px-4 py-3 text-center whitespace-nowrap">{{ record.student_id || '-' }}</td>
-                        <td class="px-4 py-3 text-center truncate max-w-[240px]" [title]="formatName(record)">{{ formatName(record) }}</td>
-                        <td class="px-4 py-3 text-center truncate max-w-[180px]" [title]="record.department">{{ record.department || '-' }}</td>
-                        <td class="px-4 py-3 text-center truncate max-w-[180px]" [title]="record.program">{{ record.program || '-' }}</td>
-                        <td class="px-4 py-3 text-center whitespace-nowrap">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
-                        <td class="px-4 py-3 text-center whitespace-nowrap">{{ formatDateTime(record.time_out) }}</td>
-                        <td class="px-4 py-3 text-center truncate max-w-[200px]" [title]="record.scanned_by">{{ record.scanned_by || '-' }}</td>
+                        <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ record.student_id || '-' }}</td>
+                        <td class="px-3 py-3 text-left" [title]="formatName(record)">
+                          <div class="line-clamp-2">{{ formatName(record) }}</div>
+                        </td>
+                        <td class="px-3 py-3 text-center" [title]="record.department">{{ record.department || '-' }}</td>
+                        <td class="px-3 py-3 text-left" [title]="record.program">
+                          <div class="line-clamp-2">{{ record.program || '-' }}</div>
+                        </td>
+                        <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
+                        <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_out) }}</td>
+                        <td class="px-3 py-3 text-left" [title]="record.scanned_by">
+                          <div class="line-clamp-2">{{ record.scanned_by || '-' }}</div>
+                        </td>
+                        <td class="px-3 py-3 text-center" [title]="record.scanned_by_position">
+                          <div class="line-clamp-2">{{ record.scanned_by_position || '-' }}</div>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -365,34 +375,44 @@
         </div>
       </div>
       <!-- Table -->
-      <div class="overflow-x-auto rounded-lg border-2 border-gray-200">
+      <div class="overflow-x-auto rounded-lg border-2 border-gray-200 shadow-sm">
         <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMobileMsg">
           <table *ngIf="!error" class="w-full text-sm">
             <thead class="bg-gradient-to-r"
                    [ngClass]="isOsws ? 'from-[#14532d] to-[#166534]' : 'from-[#679436] to-[#56732e]'">
-              <tr class="uppercase tracking-wider text-white text-center">
-                <th class="px-4 py-3 text-center w-12">#</th>
-                <th class="px-4 py-3 text-center min-w-[120px] whitespace-nowrap">Student ID</th>
-                <th class="px-4 py-3 text-center min-w-[200px]">Name</th>
-                <th class="px-4 py-3 text-center min-w-[140px]">Department</th>
-                <th class="px-4 py-3 text-center min-w-[140px]">Program</th>
-                <th class="px-4 py-3 text-center min-w-[160px] whitespace-nowrap">Time In</th>
-                <th class="px-4 py-3 text-center min-w-[160px] whitespace-nowrap">Time Out</th>
-                <th class="px-4 py-3 text-center min-w-[160px]">Scanned By</th>
+              <tr class="uppercase tracking-wider text-white">
+                <th class="px-3 py-3 text-center w-12">#</th>
+                <th class="px-3 py-3 text-center min-w-[100px]">Student ID</th>
+                <th class="px-3 py-3 text-left min-w-[180px]">Name</th>
+                <th class="px-3 py-3 text-center min-w-[100px]">Dept</th>
+                <th class="px-3 py-3 text-left min-w-[150px]">Program</th>
+                <th class="px-3 py-3 text-center min-w-[140px]">Time In</th>
+                <th class="px-3 py-3 text-center min-w-[140px]">Time Out</th>
+                <th class="px-3 py-3 text-left min-w-[160px]">Scanned By</th>
+                <th class="px-3 py-3 text-center min-w-[120px]">Position</th>
               </tr>
             </thead>
             <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
               <tr *ngFor="let record of pagedRecords; let i = index" 
                   class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50">
-                <td class="px-4 py-3 text-center font-semibold"
+                <td class="px-3 py-3 text-center font-semibold"
                     [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</td>
-                <td class="px-4 py-3 text-center whitespace-nowrap">{{ record.student_id || '-' }}</td>
-                <td class="px-4 py-3 text-center truncate max-w-[240px]" [title]="formatName(record)">{{ formatName(record) }}</td>
-                <td class="px-4 py-3 text-center truncate max-w-[180px]" [title]="record.department">{{ record.department || '-' }}</td>
-                <td class="px-4 py-3 text-center truncate max-w-[180px]" [title]="record.program">{{ record.program || '-' }}</td>
-                <td class="px-4 py-3 text-center whitespace-nowrap">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
-                <td class="px-4 py-3 text-center whitespace-nowrap">{{ formatDateTime(record.time_out) }}</td>
-                <td class="px-4 py-3 text-center truncate max-w-[200px]" [title]="record.scanned_by">{{ record.scanned_by || '-' }}</td>
+                <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ record.student_id || '-' }}</td>
+                <td class="px-3 py-3 text-left" [title]="formatName(record)">
+                  <div class="line-clamp-2">{{ formatName(record) }}</div>
+                </td>
+                <td class="px-3 py-3 text-center" [title]="record.department">{{ record.department || '-' }}</td>
+                <td class="px-3 py-3 text-left" [title]="record.program">
+                  <div class="line-clamp-2">{{ record.program || '-' }}</div>
+                </td>
+                <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
+                <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_out) }}</td>
+                <td class="px-3 py-3 text-left" [title]="record.scanned_by">
+                  <div class="line-clamp-2">{{ record.scanned_by || '-' }}</div>
+                </td>
+                <td class="px-3 py-3 text-center" [title]="record.scanned_by_position">
+                  <div class="line-clamp-2">{{ record.scanned_by_position || '-' }}</div>
+                </td>
               </tr>
             </tbody>
           </table>

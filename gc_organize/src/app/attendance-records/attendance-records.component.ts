@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { AuthService } from '../services/auth.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 
 @Component({
@@ -83,16 +83,24 @@ export class AttendanceRecordsComponent implements OnInit {
 
   constructor(
     private eventService: EventService, 
-    private auth: AuthService, 
+    private auth: RbacAuthService, 
     private http: HttpClient
   ) {}
 
   ngOnInit() {
     this.loading = true;
-    this.role = this.auth.getUserRole();
+    const primaryRole = this.auth.getPrimaryRole();
+    if (primaryRole === 'OSWSAdmin') {
+      this.role = 'osws_admin';
+    } else if (primaryRole === 'OrgOfficer') {
+      this.role = 'organization';
+    } else if (primaryRole === 'Student') {
+      this.role = 'student';
+    }
     
     if (this.role === 'osws_admin') {
-      const adminId = Number(localStorage.getItem('adminId'));
+      const adminId = this.auth.getAdminId();
+      if (!adminId) return;
       this.eventService.getEventsByAdmin(adminId).subscribe({
         next: (res) => {
           this.events = res.data || res;
@@ -105,7 +113,8 @@ export class AttendanceRecordsComponent implements OnInit {
         }
       });
     } else if (this.role === 'organization') {
-      const creatorId = Number(localStorage.getItem('creatorId'));
+      const creatorId = this.auth.getCreatorId();
+      if (!creatorId) return;
       this.eventService.getEventsByCreator(creatorId).subscribe({
         next: (res) => {
           this.events = res.data || res;

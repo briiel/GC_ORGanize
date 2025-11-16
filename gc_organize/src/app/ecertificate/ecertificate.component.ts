@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { RbacAuthService } from '../services/rbac-auth.service';
 
 @Component({
   selector: 'app-ecertificate',
@@ -21,11 +22,12 @@ export class EcertificateComponent implements OnInit {
   constructor(
     private certificateService: CertificateService,
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private auth: RbacAuthService
   ) {}
 
   ngOnInit() {
-    const studentId = localStorage.getItem('studentId');
+    const studentId = this.auth.getStudentId();
     if (studentId) {
       this.certificateService.getCertificates(studentId).subscribe({
         next: (res) => {

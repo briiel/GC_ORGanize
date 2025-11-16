@@ -10,7 +10,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
   // Attach Bearer token if present
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('gc_organize_token');
   const authReq = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 
   return next.handle(authReq).pipe(

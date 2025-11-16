@@ -1,0 +1,11 @@
+/* Navbar Component Styles */
+
+/* Smooth transitions for dropdowns */
+.origin-top-right {
+  transform-origin: top right;
+}
+
+/* Z-index management */
+nav {
+  z-index: 1000;
+}

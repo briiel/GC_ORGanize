@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface NotificationItem {
@@ -19,11 +19,18 @@ export class NotificationService {
 
   constructor(private http: HttpClient) {}
 
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('gc_organize_token');
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+  }
+
   list(): Observable<{ success: boolean; data: NotificationItem[] } | NotificationItem[]> {
-    return this.http.get<any>(`${this.api}`);
+    return this.http.get<any>(`${this.api}`, { headers: this.getAuthHeaders() });
   }
 
   markRead(id: number): Observable<any> {
-    return this.http.patch(`${this.api}/${id}/read`, {});
+    return this.http.patch(`${this.api}/${id}/read`, {}, { headers: this.getAuthHeaders() });
   }
 }

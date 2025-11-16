@@ -1,33 +1,22 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree, Router } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class GuestGuard implements CanActivate {
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private authService: RbacAuthService, private router: Router) {}
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean | UrlTree {
-    const token = this.auth.getToken();
-    let role = this.auth.getUserRole();
-    if (role === 'admin') role = 'osws_admin';
-
-    // If authenticated, redirect to appropriate dashboard
-    if (token && role) {
-      if (role === 'student') {
-        return this.router.parseUrl('/sidebar/home');
-      }
-      if (role === 'organization') {
-        return this.router.parseUrl('/sidebar/so-dashboard');
-      }
-      if (role === 'osws_admin') {
-        return this.router.parseUrl('/sidebar/admin-dashboard');
-      }
-      return this.router.parseUrl('/sidebar/home');
+    // If authenticated, redirect to appropriate dashboard based on role
+    if (this.authService.isAuthenticated()) {
+      const defaultRoute = this.authService.getDefaultRoute();
+      return this.router.parseUrl(defaultRoute);
     }
-    // Not authenticated, allow access
+    
+    // Not authenticated, allow access to login page
     return true;
   }
 }

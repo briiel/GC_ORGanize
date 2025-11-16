@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
@@ -13,24 +13,27 @@ import Swal from 'sweetalert2';
 })
 export class LoginComponent implements OnInit {
   showPassword = false;
-  emailOrId: string = '';
+  email: string = '';
   password: string = '';
   errorMessage: string = '';
-  isLoading = false; // Add this line
+  isLoading = false;
   public installPrompt: any;
   capsLockOn = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: RbacAuthService, 
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    // If already authenticated, route to the appropriate dashboard
-    const existingToken = this.authService.getToken();
-    const storedRole = localStorage.getItem('role') || this.authService.getUserRole();
-    if (existingToken && storedRole) {
-      this.redirectByRole(storedRole);
+    // If already authenticated, redirect to appropriate dashboard
+    if (this.authService.isAuthenticated()) {
+      const defaultRoute = this.authService.getDefaultRoute();
+      this.router.navigate([defaultRoute]);
       return;
     }
 
+    // Check for logout message
     if (localStorage.getItem('justLoggedOut')) {
       Swal.fire({
         toast: true,
@@ -46,96 +49,96 @@ export class LoginComponent implements OnInit {
 
     // Check if the app can be installed (PWA)
     window.addEventListener('beforeinstallprompt', (e: any) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later
       this.installPrompt = e;
     });
   }
 
-
   onLogin(): void {
     this.errorMessage = '';
-    this.isLoading = true; // Start loading
-    // Clear all user-related keys before setting new ones
-    localStorage.removeItem('studentId');
-    localStorage.removeItem('creatorId');
-    localStorage.removeItem('orgName');
-    localStorage.removeItem('role');
-    localStorage.removeItem('adminId');
+    this.isLoading = true;
 
-  let emailOrId = this.emailOrId.trim();
+    let username = this.email.trim();
     const password = this.password.trim();
 
-    if (!emailOrId || !password) {
+    if (!username || !password) {
       this.isLoading = false;
-      this.errorMessage = 'Please enter both your Email/ID and Password.';
+      this.errorMessage = 'Please enter both your username and password.';
       return;
     }
 
-  // No auto-append of domain; users must enter full email (e.g., user@gordoncollege.edu.ph) or a numeric Student ID.
+    // If user entered full email, extract username; otherwise append domain
+    let email: string;
+    if (username.includes('@')) {
+      // User typed full email, use as is
+      email = username;
+      // Validate it's a Gordon College email
+      if (!email.includes('@gordoncollege.edu')) {
+        this.isLoading = false;
+        this.errorMessage = 'Please use your Gordon College email address.';
+        return;
+      }
+    } else {
+      // Append the domain
+      email = username + '@gordoncollege.edu.ph';
+    }
 
-    this.authService.login(emailOrId, password).subscribe(
-      (response) => {
-        this.isLoading = false; // Stop loading
+
+    this.authService.login(email, password).subscribe({
+      next: (response) => {
+        console.log('Login response:', response);
+        this.isLoading = false;
+        
         if (response.success) {
-          this.authService.saveToken(response.token);
-          const payload = JSON.parse(atob(response.token.split('.')[1]));
+          // Verify token was saved
+          const token = this.authService.getToken();
+          const decoded = this.authService.getDecodedToken();
+          console.log('Token saved:', !!token);
+          console.log('Decoded token:', decoded);
+          console.log('User roles:', this.authService.getUserRoles());
+          console.log('Primary role:', this.authService.getPrimaryRole());
+          
+          // Get default route based on user's primary role
+          const defaultRoute = this.authService.getDefaultRoute();
+          console.log('Redirecting to:', defaultRoute);
+          
+          // Show success message
           Swal.fire({
             toast: true,
             position: 'top-end',
             icon: 'success',
             title: 'Logged in successfully!',
             showConfirmButton: false,
-            timer: 2000,
+            timer: 1500,
             timerProgressBar: true
           });
 
-          if (response.userType === 'student') {
-            localStorage.setItem('studentId', payload.id);
-            localStorage.setItem('role', 'student');
-            // Store additional student information
-            if (response.student) {
-              localStorage.setItem('studentInfo', JSON.stringify({
-                student_id: response.student.id,
-                first_name: response.student.first_name,
-                last_name: response.student.last_name,
-                middle_initial: response.student.middle_initial,
-                suffix: response.student.suffix,
-                email: response.student.email,
-                department: response.student.department,
-                program: response.student.program
-              }));
-            }
-            this.router.navigate(['/sidebar/home']);
-          } else if (response.userType === 'organization') {
-            localStorage.setItem('creatorId', payload.id);
-            localStorage.setItem('role', 'organization');
-            localStorage.setItem('orgName', response.orgName || payload.org_name || 'Student Organization');
-            this.router.navigate(['/sidebar/so-dashboard']);
-          } else if (response.userType === 'admin') {
-            localStorage.setItem('role', 'osws_admin');
-            if (response.adminId) {
-              localStorage.setItem('adminId', response.adminId);
-            } else if (response.id) {
-              localStorage.setItem('adminId', response.id);
-            } else {
-              localStorage.removeItem('adminId');
-            }
-            this.router.navigate(['/sidebar/admin-dashboard']);
-          } else {
-            this.errorMessage = 'Unknown user type.';
-          }
+          // Navigate to appropriate dashboard
+          setTimeout(() => {
+            console.log('Attempting navigation to:', defaultRoute);
+            this.router.navigate([defaultRoute]).then(
+              (success) => console.log('Navigation success:', success),
+              (error) => console.error('Navigation error:', error)
+            );
+          }, 500);
         } else {
           this.errorMessage = response.message || 'Login failed.';
         }
       },
-      (error) => {
-        this.isLoading = false; // Stop loading
-        this.errorMessage = 'Invalid email/ID or password';
+      error: (error) => {
+        this.isLoading = false;
+        
+        if (error.status === 401) {
+          this.errorMessage = 'Invalid email or password. Please try again.';
+        } else if (error.status === 403) {
+          this.errorMessage = 'Your account has been deactivated. Please contact the administrator.';
+        } else {
+          this.errorMessage = error.error?.message || 'An error occurred during login. Please try again.';
+        }
+        
         console.error('Login error:', error);
       }
-    );
+    });
   }
 
   togglePasswordVisibility() {
@@ -144,33 +147,11 @@ export class LoginComponent implements OnInit {
 
   onPasswordKeyEvent(event: KeyboardEvent) {
     try {
-      // Indicate if Caps Lock is on to help users avoid password mistakes
-      // Some environments may not support getModifierState
-      // so we guard with a try/catch
-      // @ts-ignore
       if (typeof event.getModifierState === 'function') {
-        // @ts-ignore
         this.capsLockOn = event.getModifierState('CapsLock');
       }
     } catch {
       this.capsLockOn = false;
-    }
-  }
-
-  private redirectByRole(role: string) {
-    switch (role) {
-      case 'student':
-        this.router.navigate(['/sidebar/home']);
-        break;
-      case 'organization':
-        this.router.navigate(['/sidebar/so-dashboard']);
-        break;
-      case 'osws_admin':
-      case 'admin':
-        this.router.navigate(['/sidebar/admin-dashboard']);
-        break;
-      default:
-        break;
     }
   }
 
@@ -179,17 +160,14 @@ export class LoginComponent implements OnInit {
       return;
     }
     
-    // Show the install prompt
     this.installPrompt.prompt();
     
-    // Wait for the user to respond to the prompt
     this.installPrompt.userChoice.then((choiceResult: any) => {
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the install prompt');
       } else {
         console.log('User dismissed the install prompt');
       }
-      // Clear the saved prompt since it can't be used again
       this.installPrompt = null;
     });
   }

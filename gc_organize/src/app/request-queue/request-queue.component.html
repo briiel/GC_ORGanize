@@ -1,0 +1,298 @@
+<!-- Role Request Queue Component (Admin) -->
+<div class="p-6 bg-gray-100 min-h-screen">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Header Section -->
+    <div class="mb-6 mx-2 lg:mx-6">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+        <h1 class="text-2xl sm:text-3xl font-bold mb-2 leading-tight break-words max-w-full text-[#14532d]">
+          Role Request Queue
+        </h1>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-6 mx-2 lg:mx-6">
+      <div class="border-b-2 border-gray-200">
+        <nav class="-mb-0.5 flex space-x-8">
+          <button 
+            (click)="switchTab('pending')"
+            [class.border-[#14532d]]="selectedTab === 'pending'"
+            [class.text-[#14532d]]="selectedTab === 'pending'"
+            [class.border-transparent]="selectedTab !== 'pending'"
+            [class.text-gray-500]="selectedTab !== 'pending'"
+            class="whitespace-nowrap pb-4 px-1 border-b-4 font-bold text-sm hover:text-[#14532d] hover:border-gray-300 transition-all duration-200">
+            <i class="fas fa-clock mr-2"></i>
+            Pending Requests
+            <span *ngIf="pendingRequests.length > 0" class="ml-2 bg-yellow-100 text-yellow-800 py-0.5 px-2.5 rounded-full text-xs font-bold">
+              {{ pendingRequests.length }}
+            </span>
+          </button>
+          
+          <button 
+            (click)="switchTab('all')"
+            [class.border-[#14532d]]="selectedTab === 'all'"
+            [class.text-[#14532d]]="selectedTab === 'all'"
+            [class.border-transparent]="selectedTab !== 'all'"
+            [class.text-gray-500]="selectedTab !== 'all'"
+            class="whitespace-nowrap pb-4 px-1 border-b-4 font-bold text-sm hover:text-[#14532d] hover:border-gray-300 transition-all duration-200">
+            <i class="fas fa-list mr-2"></i>
+            All Requests
+          </button>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Filter (All Requests Tab) -->
+    <div *ngIf="selectedTab === 'all'" class="mb-6 mx-2 lg:mx-6 flex justify-end">
+      <div class="relative inline-block">
+        <i class="fas fa-filter absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <select 
+          [(ngModel)]="filterStatus" 
+          class="pl-10 pr-8 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all duration-200 font-medium text-sm bg-white">
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="mx-2 lg:mx-6 bg-white rounded-2xl shadow-xl p-12 text-center border-2 border-gray-200">
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#14532d] mb-4"></div>
+      <p class="text-gray-600 font-medium text-lg">Loading requests...</p>
+    </div>
+
+    <!-- Pending Requests Tab -->
+    <div *ngIf="!isLoading && selectedTab === 'pending'">
+      
+      <!-- No Pending Requests -->
+      <div *ngIf="pendingRequests.length === 0" class="mx-2 lg:mx-6 bg-white rounded-2xl shadow-xl p-12 text-center border-2 border-gray-200">
+        <div class="w-20 h-20 rounded-full bg-[#e6f7ef] flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-check-circle text-4xl text-[#14532d]"></i>
+        </div>
+        <p class="text-gray-800 text-xl font-bold mb-2">All Clear!</p>
+        <p class="text-gray-600">No pending requests at the moment.</p>
+      </div>
+
+      <!-- Pending Requests Table -->
+      <div *ngIf="pendingRequests.length > 0" class="mx-2 lg:mx-6 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
+        <!-- Enhanced Header with Gradient -->
+        <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-hourglass-half text-white text-sm"></i>
+            </div>
+            <h2 class="text-lg lg:text-xl font-bold text-white">Pending Approval</h2>
+            <span class="ml-auto bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
+              {{ pendingRequests.length }} {{ pendingRequests.length === 1 ? 'Request' : 'Requests' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm lg:text-base">
+            <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+              <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Student</th>
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Organization</th>
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Position</th>
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Requested</th>
+                <th class="px-4 lg:px-6 py-4 text-center font-bold">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+              <tr *ngFor="let request of pendingRequests" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
+                
+                <!-- Student Info -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow">
+                      <i class="fas fa-user-graduate text-white text-sm"></i>
+                    </div>
+                    <div>
+                      <div class="text-sm font-bold text-gray-900">{{ request.first_name }} {{ request.last_name }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        <i class="fas fa-id-card mr-1"></i>{{ request.student_id }}
+                      </div>
+                      <div class="text-xs text-gray-400 mt-0.5">
+                        <i class="fas fa-envelope mr-1"></i>{{ request.email }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Organization -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="flex items-start gap-2">
+                    <i class="fas fa-building text-[#14532d] mt-1"></i>
+                    <div>
+                      <div class="text-sm font-bold text-[#14532d]">{{ request.org_name }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        <i class="fas fa-graduation-cap mr-1"></i>{{ request.department }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Position -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="text-sm font-semibold text-gray-800">
+                    <i class="fas fa-user-tie text-[#14532d] mr-2"></i>{{ request.requested_position }}
+                  </div>
+                  <div *ngIf="request.justification" class="mt-2 p-2 bg-blue-50 rounded border border-blue-200 max-w-xs">
+                    <p class="text-xs text-gray-700 italic line-clamp-2" [title]="request.justification">
+                      <i class="fas fa-quote-left text-blue-400 mr-1"></i>{{ request.justification }}
+                    </p>
+                  </div>
+                </td>
+
+                <!-- Requested Date -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="text-sm text-gray-600">
+                    <i class="far fa-calendar text-gray-400 mr-2"></i>{{ formatDate(request.requested_at) }}
+                  </div>
+                </td>
+
+                <!-- Actions -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="flex gap-2 justify-center">
+                    <button 
+                      (click)="approveRequest(request)"
+                      [disabled]="processingRequestId === request.request_id"
+                      class="relative font-bold px-4 py-2 rounded-lg transition-all duration-300 shadow-md flex items-center justify-center gap-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-green-600 hover:bg-green-700 border-green-600 disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed">
+                      <i class="fas fa-check" *ngIf="processingRequestId !== request.request_id"></i>
+                      <i class="fas fa-spinner fa-spin" *ngIf="processingRequestId === request.request_id"></i>
+                      Approve
+                    </button>
+                    
+                    <button 
+                      (click)="rejectRequest(request)"
+                      [disabled]="processingRequestId === request.request_id"
+                      class="relative font-bold px-4 py-2 rounded-lg transition-all duration-300 shadow-md flex items-center justify-center gap-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-red-600 hover:bg-red-700 border-red-600 disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed">
+                      <i class="fas fa-times" *ngIf="processingRequestId !== request.request_id"></i>
+                      <i class="fas fa-spinner fa-spin" *ngIf="processingRequestId === request.request_id"></i>
+                      Reject
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- All Requests Tab -->
+    <div *ngIf="!isLoading && selectedTab === 'all'">
+      
+      <!-- No Requests -->
+      <div *ngIf="filteredRequests.length === 0" class="mx-2 lg:mx-6 bg-white rounded-2xl shadow-xl p-12 text-center border-2 border-gray-200">
+        <div class="w-20 h-20 rounded-full bg-[#e6f7ef] flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-inbox text-4xl text-gray-300"></i>
+        </div>
+        <p class="text-gray-800 text-xl font-bold mb-2">No requests found</p>
+        <p class="text-gray-600">There are no role requests matching your filter.</p>
+      </div>
+
+      <!-- All Requests Table -->
+      <div *ngIf="filteredRequests.length > 0" class="mx-2 lg:mx-6 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
+        <!-- Enhanced Header with Gradient -->
+        <div class="px-6 py-3 border-b-4 bg-gradient-to-r from-[#14532d] to-[#166534] border-[#14532d]">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-history text-white text-sm"></i>
+            </div>
+            <h2 class="text-lg lg:text-xl font-bold text-white">Request History</h2>
+            <span class="ml-auto bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+              {{ filteredRequests.length }} {{ filteredRequests.length === 1 ? 'Request' : 'Requests' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm lg:text-base">
+            <thead class="bg-gradient-to-r from-[#14532d] to-[#166534]">
+              <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Student</th>
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Organization</th>
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Position</th>
+                <th class="px-4 lg:px-6 py-4 text-center font-bold">Status</th>
+                <th class="px-4 lg:px-6 py-4 text-left font-bold">Timeline</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
+              <tr *ngFor="let request of filteredRequests" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
+                
+                <!-- Student Info -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="flex items-start gap-2">
+                    <i class="fas fa-user-graduate text-blue-500 mt-1"></i>
+                    <div>
+                      <div class="text-sm font-bold text-gray-900">{{ request.first_name }} {{ request.last_name }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        <i class="fas fa-id-card mr-1"></i>{{ request.student_id }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Organization -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="flex items-start gap-2">
+                    <i class="fas fa-building text-[#14532d] mt-1"></i>
+                    <div>
+                      <div class="text-sm font-bold text-[#14532d]">{{ request.org_name }}</div>
+                      <div class="text-xs text-gray-500 mt-0.5">
+                        <i class="fas fa-graduation-cap mr-1"></i>{{ request.department }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Position -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="text-sm font-semibold text-gray-800">
+                    <i class="fas fa-user-tie text-[#14532d] mr-2"></i>{{ request.requested_position }}
+                  </div>
+                </td>
+
+                <!-- Status -->
+                <td class="px-4 lg:px-6 py-4 text-center">
+                  <span [ngClass]="getStatusClass(request.status)" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border-2 shadow-sm">
+                    <i class="fas fa-clock" *ngIf="request.status === 'pending'"></i>
+                    <i class="fas fa-check-circle" *ngIf="request.status === 'approved'"></i>
+                    <i class="fas fa-times-circle" *ngIf="request.status === 'rejected'"></i>
+                    {{ request.status | titlecase }}
+                  </span>
+                  <div *ngIf="request.reviewer_first_name" class="text-xs text-gray-500 mt-2">
+                    <i class="fas fa-user-shield text-gray-400 mr-1"></i>{{ request.reviewer_first_name }} {{ request.reviewer_last_name }}
+                  </div>
+                  <div *ngIf="request.review_notes" class="mt-2 p-2 bg-gray-50 rounded border border-gray-200 max-w-xs mx-auto">
+                    <p class="text-xs text-gray-700 italic" [title]="request.review_notes">
+                      <i class="fas fa-comment-dots text-[#14532d] mr-1"></i>{{ request.review_notes.length > 50 ? (request.review_notes.substring(0, 50) + '...') : request.review_notes }}
+                    </p>
+                  </div>
+                </td>
+
+                <!-- Timeline -->
+                <td class="px-4 lg:px-6 py-4">
+                  <div class="space-y-2">
+                    <div class="text-sm text-gray-600">
+                      <i class="far fa-calendar text-gray-400 mr-2"></i><strong>Requested:</strong> {{ formatDate(request.requested_at) }}
+                    </div>
+                    <div *ngIf="request.reviewed_at" class="text-sm text-gray-600">
+                      <i class="far fa-calendar-check text-gray-400 mr-2"></i><strong>Reviewed:</strong> {{ formatDate(request.reviewed_at) }}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

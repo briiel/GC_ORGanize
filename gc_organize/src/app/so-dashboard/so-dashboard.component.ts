@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { EventService } from '../services/event.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -22,24 +23,42 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
     totalAttendees: 0
   };
 
+  // Activity log
+  activities: any[] = [];
+  activityPage: number = 1;
+  readonly activityPageSize: number = 10;
+
   // Pagination for upcoming events
   upcomingPage: number = 1;
-  readonly upcomingPageSize: number = 5;
+  readonly upcomingPageSize: number = 3;
+
+  // Modal states
+  showUpcomingEventsModal: boolean = false;
+  showRecentActivityModal: boolean = false;
+  modalUpcomingPage: number = 1;
+  readonly modalUpcomingPageSize: number = 10;
+  modalActivityPage: number = 1;
+  readonly modalActivityPageSize: number = 15;
 
   private refreshHandle?: ReturnType<typeof setInterval>;
   private statusChangedSub?: Subscription;
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService, private auth: RbacAuthService) {}
 
   ngOnInit() {
-    this.orgName = localStorage.getItem('orgName') || 'Student Organization';
-    const creatorId = Number(localStorage.getItem('creatorId'));
+    const org = this.auth.getUserOrganization();
+    this.orgName = org?.org_name || 'Student Organization';
+    const creatorId = this.auth.getCreatorId();
     if (!creatorId) {
       this.events = [];
       return;
     }
     this.loadOrgEvents(creatorId);
-    this.refreshHandle = setInterval(() => this.loadOrgEvents(creatorId), 60_000);
+    this.loadActivityLog();
+    this.refreshHandle = setInterval(() => {
+      this.loadOrgEvents(creatorId);
+      this.loadActivityLog();
+    }, 60_000);
 
     this.statusChangedSub = this.eventService.statusChanged$.subscribe(() => {
       this.loadOrgEvents(creatorId);
@@ -57,7 +76,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
       next: (response) => {
         console.log('Status updated successfully:', response);
         // Refresh the events list to reflect the change
-        const creatorId = Number(localStorage.getItem('creatorId'));
+        const creatorId = this.auth.getCreatorId();
         if (creatorId) {
           this.loadOrgEvents(creatorId);
         }
@@ -132,6 +151,9 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         this.stats.ongoing = ongoing;
         this.stats.concluded = concluded;
         this.stats.cancelled = cancelled;
+
+        // Load activity log after events are loaded
+        this.loadActivityLog();
 
         // Get backend stats (if needed for additional data)
         this.eventService.getOrgStats().subscribe({
@@ -212,5 +234,182 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
     const date = new Date();
     date.setHours(Number(hour), Number(minute));
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Activity log methods
+  private loadActivityLog() {
+    // Generate activity log from events
+    const userName = this.auth.getUserFullName() || 'User';
+    
+    this.activities = [];
+    
+    console.log('Loading activity log. Events count:', this.events.length);
+    
+    // Helper function to create valid date
+    const createValidDate = (dateStr: string | null | undefined, timeStr?: string | null): Date => {
+      if (!dateStr) return new Date(); // Fallback to current date
+      const dateTimeStr = timeStr ? `${dateStr} ${timeStr}` : dateStr;
+      const date = new Date(dateTimeStr);
+      return isNaN(date.getTime()) ? new Date() : date; // Return current date if invalid
+    };
+
+    // Generate activity entries based on events - showing all activities as they happen
+    this.events.forEach(event => {
+      const eventDate = event.created_at 
+        ? createValidDate(event.created_at) 
+        : createValidDate(event.start_date);
+      
+      const status = String(event.status || 'not yet started').toLowerCase();
+
+      // Always show creation activity
+      this.activities.push({
+        type: 'create',
+        action: `Created event "${event.title}"`,
+        user: userName,
+        timestamp: eventDate,
+        eventId: event.event_id
+      });
+
+      // Show update activity if event was updated (and it's different from creation)
+      if (event.updated_at && event.updated_at !== event.created_at) {
+        this.activities.push({
+          type: 'update',
+          action: `Updated event "${event.title}"`,
+          user: userName,
+          timestamp: createValidDate(event.updated_at),
+          eventId: event.event_id
+        });
+      }
+
+      // Only show cancellation if it was a manual action (status change)
+      if (status === 'cancelled' && event.updated_at) {
+        const cancelTime = createValidDate(event.updated_at);
+        this.activities.push({
+          type: 'delete',
+          action: `Event "${event.title}" was cancelled`,
+          user: userName,
+          timestamp: cancelTime,
+          eventId: event.event_id
+        });
+      }
+      // Note: We don't show automatic status changes (ongoing/concluded) since we don't have 
+      // actual status change timestamps - only scheduled start/end times
+    });
+
+    // Sort activities: prioritize user actions by timestamp (most recent first)
+    this.activities.sort((a, b) => {
+      // Define priority levels (higher = more important)
+      const getPriority = (activity: any) => {
+        if (activity.action.includes('Updated event')) return 3; // Manual updates first
+        if (activity.action.includes('Created event')) return 2; // Then creations
+        if (activity.action.includes('was cancelled')) return 2; // Cancellations same as creations
+        return 1; // Other activities
+      };
+      
+      const priorityA = getPriority(a);
+      const priorityB = getPriority(b);
+      
+      // First, sort by priority
+      if (priorityB !== priorityA) return priorityB - priorityA;
+      
+      // Within same priority, sort by timestamp (most recent first)
+      return b.timestamp.getTime() - a.timestamp.getTime();
+    });
+    
+    console.log('Activity log loaded. Activities count:', this.activities.length);
+    console.log('Sample activities:', this.activities.slice(0, 3));
+    
+    // Reset to first page
+    this.activityPage = 1;
+  }
+
+  get pagedActivities(): any[] {
+    // Always show the most recent activities (first 10) on the main dashboard
+    return this.activities.slice(0, 10);
+  }
+
+  get totalActivityPages(): number {
+    return Math.max(1, Math.ceil(this.activities.length / this.activityPageSize));
+  }
+
+  setActivityPage(page: number) {
+    if (page >= 1 && page <= this.totalActivityPages) {
+      this.activityPage = page;
+    }
+  }
+
+  // Modal methods for Upcoming Events
+  openUpcomingEventsModal() {
+    this.showUpcomingEventsModal = true;
+    this.modalUpcomingPage = 1;
+    document.body.classList.add('modal-open');
+  }
+
+  closeUpcomingEventsModal() {
+    this.showUpcomingEventsModal = false;
+    document.body.classList.remove('modal-open');
+  }
+
+  get modalPagedUpcomingEvents(): any[] {
+    const upcoming = this.events
+      .filter(e => {
+        const status = String(e.status).toLowerCase();
+        return status === 'not yet started' || status === 'upcoming';
+      })
+      .sort((a, b) => {
+        if (!a.start_date) return 1;
+        if (!b.start_date) return -1;
+        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+      });
+    const start = (this.modalUpcomingPage - 1) * this.modalUpcomingPageSize;
+    return upcoming.slice(start, start + this.modalUpcomingPageSize);
+  }
+
+  get modalTotalUpcomingPages(): number {
+    const count = this.events.filter(e => {
+      const status = String(e.status).toLowerCase();
+      return status === 'not yet started' || status === 'upcoming';
+    }).length;
+    return Math.max(1, Math.ceil(count / this.modalUpcomingPageSize));
+  }
+
+  setModalUpcomingPage(page: number) {
+    if (page >= 1 && page <= this.modalTotalUpcomingPages) {
+      this.modalUpcomingPage = page;
+    }
+  }
+
+  get totalUpcomingEvents(): number {
+    return this.events.filter(e => {
+      const status = String(e.status).toLowerCase();
+      return status === 'not yet started' || status === 'upcoming';
+    }).length;
+  }
+
+  // Modal methods for Recent Activity
+  openRecentActivityModal() {
+    this.showRecentActivityModal = true;
+    this.modalActivityPage = 1;
+    document.body.classList.add('modal-open');
+  }
+
+  closeRecentActivityModal() {
+    this.showRecentActivityModal = false;
+    document.body.classList.remove('modal-open');
+  }
+
+  get modalPagedActivities(): any[] {
+    const start = (this.modalActivityPage - 1) * this.modalActivityPageSize;
+    return this.activities.slice(start, start + this.modalActivityPageSize);
+  }
+
+  get modalTotalActivityPages(): number {
+    return Math.max(1, Math.ceil(this.activities.length / this.modalActivityPageSize));
+  }
+
+  setModalActivityPage(page: number) {
+    if (page >= 1 && page <= this.modalTotalActivityPages) {
+      this.modalActivityPage = page;
+    }
   }
 }

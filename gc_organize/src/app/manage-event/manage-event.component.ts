@@ -3,6 +3,7 @@ import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common'; // <-- Add this import
 import { EventService } from '../services/event.service';
 import { EvaluationService } from '../services/evaluation.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -297,12 +298,14 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   constructor(
     private eventService: EventService, 
     private evaluationService: EvaluationService,
-    private router: Router
+    private router: Router,
+    private auth: RbacAuthService
   ) {
-    // Get creator/org ID from localStorage or AuthService
-    this.creatorId = Number(localStorage.getItem('creatorId'));
-    this.adminId = Number(localStorage.getItem('adminId'));
-    this.isOsws = localStorage.getItem('role') === 'osws_admin';
+    // Get creator/org ID from JWT
+    this.creatorId = this.auth.getCreatorId() || 0;
+    this.adminId = this.auth.getAdminId() || 0;
+    const primaryRole = this.auth.getPrimaryRole();
+    this.isOsws = primaryRole === 'OSWSAdmin';
   }
 
   ngOnInit() {
@@ -320,10 +323,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   // Close any open modal when ESC is pressed (matches behavior used in other modals)
-  @HostListener('document:keydown.escape', ['$event'])
-  onEsc(event: KeyboardEvent) {
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
     if (this.showParticipantsModal || this.showCreateModal || this.showMobileModal || this.showEvaluationsModal) {
-      event.preventDefault();
       if (this.showParticipantsModal) this.closeParticipantsModal();
       if (this.showCreateModal) this.closeCreateModal();
       if (this.showMobileModal) this.closeMobileModal();
@@ -762,6 +764,64 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     return status === 'concluded';
   }
 
+  // Helper to check if an event can be cancelled
+  canCancelEvent(event: any): boolean {
+    if (!event) return false;
+    const status = String(event.status || '').toLowerCase();
+    // Can only cancel if status is not already 'cancelled' or 'concluded'
+    return status !== 'cancelled' && status !== 'concluded';
+  }
+
+  // Confirm before cancelling an event
+  confirmCancelEvent(event: any): void {
+    Swal.fire({
+      title: 'Cancel Event?',
+      text: 'Are you sure you want to cancel this event? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, cancel event',
+      cancelButtonText: 'No, keep event'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cancelEvent(event);
+      }
+    });
+  }
+
+  // Cancel an event by updating its status to 'cancelled'
+  cancelEvent(event: any): void {
+    this.eventService.updateEventStatus(event.event_id, 'cancelled').subscribe({
+      next: (response) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Event Cancelled',
+          text: 'The event has been cancelled successfully.',
+          confirmButtonColor: this.isOsws ? '#14532d' : '#679436'
+        });
+
+        // Update the event status in the local data
+        event.status = 'cancelled';
+        if (this.selectedEvent && this.selectedEvent.event_id === event.event_id) {
+          this.selectedEvent.status = 'cancelled';
+        }
+
+        // Reload events to reflect changes
+        this.fetchEvents();
+      },
+      error: (error) => {
+        console.error('Error cancelling event:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: error.error?.message || 'Failed to cancel event. Please try again.',
+          confirmButtonColor: '#dc2626'
+        });
+      }
+    });
+  }
+
   editEvent(event: any) {
     // Prevent editing concluded events
     if (this.isEventConcluded(event)) {
@@ -1045,13 +1105,13 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         }
       });
     } else {
-      const adminId = localStorage.getItem('adminId');
-      if (adminId && adminId !== 'undefined' && adminId !== '') {
-        formData.append('created_by_osws_id', adminId);
+      const adminId = this.auth.getAdminId();
+      if (adminId) {
+        formData.append('created_by_osws_id', String(adminId));
       }
-      const creatorId = localStorage.getItem('creatorId');
-      if (creatorId && creatorId !== 'undefined' && creatorId !== '') {
-        formData.append('created_by_org_id', creatorId);
+      const creatorId = this.auth.getCreatorId();
+      if (creatorId) {
+        formData.append('created_by_org_id', String(creatorId));
       }
 
       Swal.fire({

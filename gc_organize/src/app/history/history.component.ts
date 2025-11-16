@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -27,10 +28,10 @@ export class HistoryComponent implements OnInit {
   // per-card request state
   sendingId: number | null = null;
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService, private auth: RbacAuthService) {}
 
   ngOnInit(): void {
-    const studentId = localStorage.getItem('studentId');
+    const studentId = this.auth.getStudentId();
     if (!studentId) {
       this.error = 'No student ID found.';
       return;

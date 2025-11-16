@@ -25,29 +25,59 @@
               class="w-16 h-16 sm:w-24 sm:h-24 object-contain"
             >
             <h1 class="text-xl sm:text-2xl font-bold text-center text-white">GC-ORGANIZE</h1>
-            <!-- Role-based panel label -->
-            <span *ngIf="role === 'student'" class="text-xs text-green-100 font-semibold tracking-wide">Student Panel</span>
-            <span *ngIf="role === 'organization'" class="text-xs text-green-100 font-semibold tracking-wide">Organization Panel</span>
-            <span *ngIf="role === 'osws_admin'" class="text-xs text-blue-100 font-semibold tracking-wide">OSWS Panel</span>
+            
+            <!-- Panel Switcher with label (single role shows static label, multiple roles show dropdown) -->
+            <div class="w-full px-4 mt-2">
+                <!-- Static label for single role -->
+                <div *ngIf="!hasMultiplePanels()" class="text-center py-1">
+                    <span class="text-xs font-semibold tracking-wide"
+                          [ngClass]="{
+                            'text-green-100': role !== 'osws_admin',
+                            'text-blue-100': role === 'osws_admin'
+                          }">
+                        {{ getCurrentPanelLabel() }}
+                    </span>
+                </div>
+                
+                <!-- Dropdown for multiple roles -->
+                <select 
+                    *ngIf="hasMultiplePanels()"
+                    [(ngModel)]="role"
+                    (ngModelChange)="switchPanel($event)"
+                    class="w-full px-3 py-2 rounded-md text-xs font-semibold cursor-pointer transition-all duration-200 text-center focus:outline-none bg-white/10 hover:bg-white/20 text-white border border-white/20"
+                >
+                    <option 
+                        *ngFor="let panel of availablePanels" 
+                        [value]="panel.role" 
+                        class="bg-gray-900 text-white"
+                    >
+                        {{ panel.label }}
+                    </option>
+                </select>
+            </div>
         </div>
         <nav class="flex-1 px-2 py-4 w-full space-y-2">
             <!-- Student Buttons -->
             <ng-container *ngIf="role === 'student'">
-                <button [routerLink]="'/sidebar/home'" (click)="closeIfMobile()"
+                <button [routerLink]="'home'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-home mr-2 text-lg sm:text-xl"></i> Home
                 </button>
-                <button [routerLink]="'/sidebar/eventsreg'" (click)="closeIfMobile()"
+                <button [routerLink]="'eventsreg'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-calendar-check mr-2 text-lg sm:text-xl"></i> Events Registered
                 </button>
-                <button [routerLink]="'/sidebar/history'" (click)="closeIfMobile()"
+                <button [routerLink]="'history'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-history mr-2 text-lg sm:text-xl"></i> Events Attended
                 </button>
-                <button [routerLink]="'/sidebar/ecertificate'" (click)="closeIfMobile()"
+                <button [routerLink]="'ecertificate'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificate
+                </button>
+                <button [routerLink]="'request-role'" (click)="closeIfMobile()"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    <i class="fas fa-user-plus mr-2 text-lg sm:text-xl"></i> Request Role
                 </button>
                 <!-- Logout Button -->
                 <button (click)="onLogout(); closeIfMobile()"
@@ -58,28 +88,28 @@
 
             <!-- Organization Buttons -->
             <ng-container *ngIf="role === 'organization'">
-                <button [routerLink]="'/sidebar/so-dashboard'" (click)="closeIfMobile()"
+                <button [routerLink]="'dashboard'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
-                <button [routerLink]="'/sidebar/manage-event'" (click)="closeIfMobile()"
+                <button [routerLink]="'manage-event'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-tasks mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
-                <!-- <button [routerLink]="'/sidebar/manage-event'" [queryParams]="{ create: true }"
+                <!-- <button [routerLink]="'manage-event'" [queryParams]="{ create: true }"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
                 </button> -->
-                <button [routerLink]="'/sidebar/scan-qr'" (click)="closeIfMobile()"
+                <button [routerLink]="'scan-qr'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
                 </button>
                 <!-- Attendance Records Button -->
-                <button [routerLink]="'/sidebar/attendance-records'" (click)="closeIfMobile()"
+                <button [routerLink]="'attendance-records'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer whitespace-nowrap">
                     <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
                 </button>
-                <button [routerLink]="'/sidebar/trash'" (click)="closeIfMobile()"
+                <button [routerLink]="'trash'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
                     <i class="fas fa-trash mr-2 text-lg sm:text-xl"></i> Archive
                 </button>
@@ -92,32 +122,36 @@
 
             <!-- OSWS Admin Buttons -->
             <ng-container *ngIf="role === 'osws_admin'">
-                <button [routerLink]="'/sidebar/admin-dashboard'" (click)="closeIfMobile()"
+                <button [routerLink]="'dashboard'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
-                <button [routerLink]="'/sidebar/manage-users'" (click)="closeIfMobile()"
+                <button [routerLink]="'manage-users'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-users-cog mr-2 text-lg sm:text-xl"></i> Manage Users
                 </button>
-                <button [routerLink]="'/sidebar/manage-event'" (click)="closeIfMobile()"
+                <button [routerLink]="'manage-event'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-calendar-alt mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
-                <button [routerLink]="'/sidebar/scan-qr'" (click)="closeIfMobile()"
+                <button [routerLink]="'scan-qr'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
                 </button>
                 <!-- Attendance Records Button for OSWS Admin -->
-                <button [routerLink]="'/sidebar/attendance-records'" (click)="closeIfMobile()"
+                <button [routerLink]="'attendance-records'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer whitespace-nowrap">
                     <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
                 </button>
-                <button [routerLink]="'/sidebar/trash'" (click)="closeIfMobile()"
+                <button [routerLink]="'trash'" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-trash mr-2 text-lg sm:text-xl"></i> Archive
                 </button>
-                <!-- <button [routerLink]="'/sidebar/manage-event'" [queryParams]="{ create: true }"
+                <button [routerLink]="'role-requests'" (click)="closeIfMobile()"
+                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    <i class="fas fa-user-check mr-2 text-lg sm:text-xl"></i> Role Requests
+                </button>
+                <!-- <button [routerLink]="'manage-event'" [queryParams]="{ create: true }"
                     class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
                 </button> -->
