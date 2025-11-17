@@ -74,12 +74,40 @@ export class RegistermodalComponent implements OnInit {
     const token = this.authService.getToken();
     if (!token) {
       console.error('No authentication token found');
+      Swal.fire({
+        icon: 'error',
+        title: 'Authentication Required',
+        text: 'Please log in to register for events.',
+        confirmButtonColor: '#679436'
+      });
+      this.closeModal();
       return;
     }
 
     const decoded = this.authService.getDecodedToken();
-    if (!decoded || !decoded.studentId) {
-      console.error('Invalid token or not a student account');
+    console.log('[RegisterModal] Decoded token:', decoded);
+    
+    if (!decoded) {
+      console.error('Invalid or expired token');
+      Swal.fire({
+        icon: 'error',
+        title: 'Session Expired',
+        text: 'Your session has expired. Please log in again.',
+        confirmButtonColor: '#679436'
+      });
+      this.closeModal();
+      return;
+    }
+
+    if (!decoded.studentId) {
+      console.error('Not a student account - studentId missing from token');
+      Swal.fire({
+        icon: 'error',
+        title: 'Access Denied',
+        text: 'Only student accounts can register for events.',
+        confirmButtonColor: '#679436'
+      });
+      this.closeModal();
       return;
     }
 
@@ -89,6 +117,8 @@ export class RegistermodalComponent implements OnInit {
     this.studentInfo.last_name = decoded.lastName || '';
     this.studentInfo.email = decoded.email || '';
     this.registrationData.student_id = decoded.studentId;
+    
+    console.log('[RegisterModal] Student ID set to:', this.registrationData.student_id);
 
     // Fetch additional student details from backend
     this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/users/${decoded.studentId}`, {
@@ -108,11 +138,16 @@ export class RegistermodalComponent implements OnInit {
             department: student.department || '',
             program: student.program || ''
           };
+          // Ensure student_id is still set even after backend fetch
+          if (!this.registrationData.student_id) {
+            this.registrationData.student_id = student.id || decoded.studentId;
+          }
+          console.log('[RegisterModal] Student info loaded:', this.studentInfo);
         }
       },
       error: (err) => {
         console.error('Error fetching student details:', err);
-        // Continue with basic info from token
+        // Continue with basic info from token - student_id is already set above
       }
     });
   }
@@ -190,12 +225,28 @@ export class RegistermodalComponent implements OnInit {
       return;
     }
 
-    // Validate required fields
+    // Validate required fields with detailed logging
+    console.log('[RegisterModal] Validation - event_id:', this.registrationData.event_id);
+    console.log('[RegisterModal] Validation - student_id:', this.registrationData.student_id);
+    
     if (!this.registrationData.event_id || !this.registrationData.student_id) {
+      console.error('[RegisterModal] Validation failed - Missing required fields:', {
+        event_id: this.registrationData.event_id,
+        student_id: this.registrationData.student_id,
+        eventId_input: this.eventId,
+        studentInfo: this.studentInfo
+      });
+      
       Swal.fire({
         icon: 'error',
         title: 'Missing Information',
-        text: 'Event ID and Student ID are required.',
+        html: `<p>Registration failed due to missing information:</p>
+               <ul style="text-align: left; margin-top: 10px;">
+                 <li>Event ID: ${this.registrationData.event_id || '<span style="color:red;">Missing</span>'}</li>
+                 <li>Student ID: ${this.registrationData.student_id || '<span style="color:red;">Missing</span>'}</li>
+               </ul>
+               <p style="margin-top: 10px;">Please try logging out and logging in again.</p>`,
+        confirmButtonColor: '#679436'
       });
       return;
     }
