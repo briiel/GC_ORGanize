@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 interface VisitsResponse { success: boolean; total: number; }
 
 @Injectable({ providedIn: 'root' })
 export class MetricsService {
-  private api = 'https://gcorg-apiv1-8bn5.onrender.com/api';
-  // private api = 'http://localhost:5000/api';
+  private api = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

@@ -6,6 +6,7 @@ import { Html5Qrcode, Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'ht
 import Swal from 'sweetalert2';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-scan-qr',
@@ -226,8 +227,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     event_id = this.selectedEventId ?? event_id;
 
     this.http.post(
-      'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/attendance',
-      // 'http://localhost:5000/api/event/events/attendance',
+      `${environment.apiUrl}/event/events/attendance`,
       { registration_id, event_id, student_id, mode: this.mode },
       { headers: { Authorization: `Bearer ${token}` }, observe: 'response' }
     ).subscribe({

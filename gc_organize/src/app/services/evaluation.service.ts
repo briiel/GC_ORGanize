@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface EvaluationResponses {
   // Rating questions 1-13 (NA or 1-5)
@@ -39,8 +40,7 @@ export interface EvaluationStatus {
   providedIn: 'root'
 })
 export class EvaluationService {
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
-  // private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

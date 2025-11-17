@@ -9,6 +9,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 interface JwtPayload {
   userId: string;           // Prefixed: "S_202211223", "O_1", "A_1"
@@ -46,8 +47,7 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class RbacAuthService {
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/auth';
-  // private apiUrl = 'http://localhost:5000/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'gc_organize_token';
   
   // BehaviorSubject to track authentication state
@@ -217,8 +217,7 @@ export class RbacAuthService {
     }
 
     const token = this.getToken();
-    this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/users/${studentId}`, {
-      // this.http.get<any>(`http://localhost:5000/api/users/${studentId}`, {
+    this.http.get<any>(`${environment.apiUrl}/users/${studentId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: (res) => {

@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,7 @@ export class EventService {
     const headers = this.getAuthHeaders();
     return this.http.post(`${this.apiUrl}/events/trash-multiple`, { eventIds }, { headers });
   }
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event';
-  // private apiUrl = 'http://localhost:5000/api/event';
+  private apiUrl = `${environment.apiUrl}/event`;
 
   private statusChangedSubject = new Subject<void>();
   public statusChanged$ = this.statusChangedSubject.asObservable();

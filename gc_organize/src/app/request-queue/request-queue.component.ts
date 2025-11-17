@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
+import { environment } from '../../environments/environment';
 
 interface RoleRequest {
   request_id: number;
@@ -33,8 +34,8 @@ interface RoleRequest {
   styleUrls: ['./request-queue.component.css']
 })
 export class RequestQueueComponent implements OnInit {
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
-  // private apiUrl = 'http://localhost:5000/api';
+  // private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
+  private apiUrl = environment.apiUrl;
   
   pendingRequests: RoleRequest[] = [];
   allRequests: RoleRequest[] = [];

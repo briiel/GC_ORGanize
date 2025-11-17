@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
+import { environment } from '../../environments/environment';
 
 interface Organization {
   org_id: number;
@@ -34,8 +35,8 @@ interface MyRequest {
   styleUrls: ['./request-role.component.css']
 })
 export class RequestRoleComponent implements OnInit {
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
-  // private apiUrl = 'http://localhost:5000/api';
+  // private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
+  private apiUrl = environment.apiUrl;
   
   organizations: Organization[] = [];
   myRequests: MyRequest[] = [];

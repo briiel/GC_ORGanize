@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-registermodal',
@@ -52,8 +53,7 @@ export class RegistermodalComponent implements OnInit {
     // Fetch event to determine if paid
     if (this.eventId !== null) {
       const token = localStorage.getItem('gc_organize_token') || '';
-      this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/event/events/${this.eventId}`, {
-      // this.http.get<any>(`http://localhost:5000/api/event/events/${this.eventId}`, {
+      this.http.get<any>(`${environment.apiUrl}/event/events/${this.eventId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       }).subscribe({
         next: (res) => {
@@ -121,8 +121,7 @@ export class RegistermodalComponent implements OnInit {
     console.log('[RegisterModal] Student ID set to:', this.registrationData.student_id);
 
     // Fetch additional student details from backend
-    this.http.get<any>(`https://gcorg-apiv1-8bn5.onrender.com/api/users/${decoded.studentId}`, {
-    // this.http.get<any>(`http://localhost:5000/api/users/${decoded.studentId}`, {
+    this.http.get<any>(`${environment.apiUrl}/users/${decoded.studentId}`, {
       headers: { Authorization: `Bearer ${token}` }
     }).subscribe({
       next: (res) => {
@@ -283,8 +282,7 @@ export class RegistermodalComponent implements OnInit {
     });
 
     this.http.post(
-      'https://gcorg-apiv1-8bn5.onrender.com/api/event/events/register',
-      // 'http://localhost:5000/api/event/events/register',
+      `${environment.apiUrl}/event/events/register`,
       formData,
       {
         headers: {

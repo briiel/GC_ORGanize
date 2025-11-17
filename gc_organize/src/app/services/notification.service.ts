@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface NotificationItem {
   id: number;
@@ -14,8 +15,7 @@ export interface NotificationItem {
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
-  private api = 'https://gcorg-apiv1-8bn5.onrender.com/api/notifications';
-  // private api = 'http://localhost:5000/api/notifications';
+  private api = `${environment.apiUrl}/notifications`;
 
   constructor(private http: HttpClient) {}
 
