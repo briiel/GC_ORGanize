@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class CertificateService {
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api/event/certificates';
-  // private apiUrl = 'http://localhost:5000/api/event/certificates';
+  private apiUrl = `${environment.apiUrl}/event/certificates`;
 
   constructor(private http: HttpClient) {}
 

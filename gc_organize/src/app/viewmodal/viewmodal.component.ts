@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-viewmodal',
@@ -50,8 +51,9 @@ export class ViewmodalComponent {
   getPosterUrl(): string {
     if (!this.event?.event_poster) return '#';
     if (this.event.event_poster.startsWith('http')) return this.event.event_poster;
-  return `https://gcorg-apiv1-8bn5.onrender.com/${this.event.event_poster.replace(/^\/+/, '')}`;
-  // return `http://localhost:5000/${this.event.event_poster.replace(/^\/+/, '')}`;
+    // For relative paths, construct URL using environment base URL
+    const baseUrl = environment.apiUrl.replace('/api', '');
+    return `${baseUrl}/${this.event.event_poster.replace(/^\/*/, '')}`;
   }
 
   // Helper to get display status
