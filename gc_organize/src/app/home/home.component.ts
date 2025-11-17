@@ -194,7 +194,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   selectedEventId: number | null = null;
 
   openRegisterModal(event: any) {
-    this.selectedEventId = event.event_id; 
+    this.selectedEventId = event.event_id || event.id; 
     this.isRegisterModalOpen = true;
   this.toggleBodyModalClass();
   }
