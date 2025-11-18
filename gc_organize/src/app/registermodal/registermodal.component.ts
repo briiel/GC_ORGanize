@@ -85,7 +85,7 @@ export class RegistermodalComponent implements OnInit {
     }
 
     const decoded = this.authService.getDecodedToken();
-    console.log('[RegisterModal] Decoded token:', decoded);
+    
     
     if (!decoded) {
       console.error('Invalid or expired token');
@@ -118,7 +118,7 @@ export class RegistermodalComponent implements OnInit {
     this.studentInfo.email = decoded.email || '';
     this.registrationData.student_id = decoded.studentId;
     
-    console.log('[RegisterModal] Student ID set to:', this.registrationData.student_id);
+    
 
     // Fetch additional student details from backend
     this.http.get<any>(`${environment.apiUrl}/users/${decoded.studentId}`, {
@@ -141,7 +141,7 @@ export class RegistermodalComponent implements OnInit {
           if (!this.registrationData.student_id) {
             this.registrationData.student_id = student.id || decoded.studentId;
           }
-          console.log('[RegisterModal] Student info loaded:', this.studentInfo);
+          
         }
       },
       error: (err) => {
@@ -225,8 +225,7 @@ export class RegistermodalComponent implements OnInit {
     }
 
     // Validate required fields with detailed logging
-    console.log('[RegisterModal] Validation - event_id:', this.registrationData.event_id);
-    console.log('[RegisterModal] Validation - student_id:', this.registrationData.student_id);
+    
     
     if (!this.registrationData.event_id || !this.registrationData.student_id) {
       console.error('[RegisterModal] Validation failed - Missing required fields:', {

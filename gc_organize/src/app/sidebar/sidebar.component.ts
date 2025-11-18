@@ -70,9 +70,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     
     this.updateTime();
     this.timeInterval = setInterval(() => this.updateTime(), 1000);
-    console.log('User Roles:', this.userRoles);
-    console.log('Sidebar Role:', this.role);
-    console.log('Available Panels:', this.availablePanels);
+    
 
   // Set initial sidebar state based on viewport width
   this.syncSidebarWithViewport();

@@ -202,7 +202,7 @@ export class RbacAuthService {
   getStudentId(): string | null {
     const decoded = this.getDecodedToken();
     const studentId = decoded?.studentId || null;
-    console.log('[RbacAuthService] getStudentId():', studentId, 'from token:', decoded);
+    
     return studentId;
   }
 
@@ -244,7 +244,7 @@ export class RbacAuthService {
     } else if (decoded?.organization?.org_id) {
       creatorId = decoded.organization.org_id;
     }
-    console.log('[RbacAuthService] getCreatorId():', creatorId, 'userType:', decoded?.userType, 'from token:', decoded);
+    
     return creatorId;
   }
 
@@ -257,7 +257,7 @@ export class RbacAuthService {
     if (decoded?.userType === 'admin') {
       adminId = Number(decoded.legacyId);
     }
-    console.log('[RbacAuthService] getAdminId():', adminId, 'userType:', decoded?.userType, 'from token:', decoded);
+    
     return adminId;
   }
 

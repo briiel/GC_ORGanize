@@ -381,7 +381,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   updateEventStatus(event: any) {
     this.eventService.updateEventStatus(event.event_id, event.status).subscribe({
       next: (response) => {
-        console.log('Status updated successfully:', response);
+        
         // Optionally show success message to user
         // You can add a toast notification here
       },

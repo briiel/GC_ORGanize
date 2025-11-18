@@ -74,7 +74,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   updateEventStatus(eventId: number, newStatus: string): void {
     this.eventService.updateEventStatus(eventId, newStatus).subscribe({
       next: (response) => {
-        console.log('Status updated successfully:', response);
+        
         // Refresh the events list to reflect the change
         const creatorId = this.auth.getCreatorId();
         if (creatorId) {
@@ -243,7 +243,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
     
     this.activities = [];
     
-    console.log('Loading activity log. Events count:', this.events.length);
+    
     
     // Helper function to create valid date
     const createValidDate = (dateStr: string | null | undefined, timeStr?: string | null): Date => {
@@ -316,8 +316,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
       return b.timestamp.getTime() - a.timestamp.getTime();
     });
     
-    console.log('Activity log loaded. Activities count:', this.activities.length);
-    console.log('Sample activities:', this.activities.slice(0, 3));
+    
     
     // Reset to first page
     this.activityPage = 1;

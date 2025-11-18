@@ -86,21 +86,18 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(email, password).subscribe({
       next: (response) => {
-        console.log('Login response:', response);
+        
         this.isLoading = false;
         
         if (response.success) {
           // Verify token was saved
           const token = this.authService.getToken();
           const decoded = this.authService.getDecodedToken();
-          console.log('Token saved:', !!token);
-          console.log('Decoded token:', decoded);
-          console.log('User roles:', this.authService.getUserRoles());
-          console.log('Primary role:', this.authService.getPrimaryRole());
+          
           
           // Get default route based on user's primary role
           const defaultRoute = this.authService.getDefaultRoute();
-          console.log('Redirecting to:', defaultRoute);
+          
           
           // Show success message
           Swal.fire({
@@ -115,9 +112,8 @@ export class LoginComponent implements OnInit {
 
           // Navigate to appropriate dashboard
           setTimeout(() => {
-            console.log('Attempting navigation to:', defaultRoute);
             this.router.navigate([defaultRoute]).then(
-              (success) => console.log('Navigation success:', success),
+              (success) => {},
               (error) => console.error('Navigation error:', error)
             );
           }, 500);
@@ -164,9 +160,9 @@ export class LoginComponent implements OnInit {
     
     this.installPrompt.userChoice.then((choiceResult: any) => {
       if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
+        
       } else {
-        console.log('User dismissed the install prompt');
+        
       }
       this.installPrompt = null;
     });

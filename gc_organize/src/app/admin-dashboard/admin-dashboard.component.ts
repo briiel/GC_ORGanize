@@ -71,7 +71,6 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   updateEventStatus(eventId: number, newStatus: string): void {
     this.eventService.updateEventStatus(eventId, newStatus).subscribe({
       next: (response) => {
-        console.log('Status updated successfully:', response);
         // Refresh the events list and charts to reflect the change
         this.loadEventsAndStats();
       },

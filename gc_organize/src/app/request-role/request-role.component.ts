@@ -67,7 +67,7 @@ export class RequestRoleComponent implements OnInit {
   loadUserInfo(): void {
     this.authService.getUserDepartment((department) => {
       this.userDepartment = department;
-      console.log('User department loaded:', this.userDepartment);
+      
     });
   }
 
