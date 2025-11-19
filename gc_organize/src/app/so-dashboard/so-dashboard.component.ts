@@ -239,8 +239,6 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   // Activity log methods
   private loadActivityLog() {
     // Generate activity log from events
-    const userName = this.auth.getUserFullName() || 'User';
-    
     this.activities = [];
     
     
@@ -255,17 +253,21 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
 
     // Generate activity entries based on events - showing all activities as they happen
     this.events.forEach(event => {
-      const eventDate = event.created_at 
-        ? createValidDate(event.created_at) 
+      const eventDate = event.created_at
+        ? createValidDate(event.created_at)
         : createValidDate(event.start_date);
       
       const status = String(event.status || 'not yet started').toLowerCase();
+
+      // Determine the name of the creator for this event (org or OSWS admin)
+      // Prefer the individual creator's name (created_by_name) over the organization name
+      const creatorName = event.created_by_name || event.org_name || event.osws_name || this.auth.getUserFullName() || 'User';
 
       // Always show creation activity
       this.activities.push({
         type: 'create',
         action: `Created event "${event.title}"`,
-        user: userName,
+        user: creatorName,
         timestamp: eventDate,
         eventId: event.event_id
       });
@@ -275,7 +277,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         this.activities.push({
           type: 'update',
           action: `Updated event "${event.title}"`,
-          user: userName,
+          user: creatorName,
           timestamp: createValidDate(event.updated_at),
           eventId: event.event_id
         });
@@ -287,7 +289,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         this.activities.push({
           type: 'delete',
           action: `Event "${event.title}" was cancelled`,
-          user: userName,
+          user: creatorName,
           timestamp: cancelTime,
           eventId: event.event_id
         });
