@@ -726,31 +726,33 @@
               <ng-container *ngIf="!isInlineEditing">
                 <div class="flex flex-wrap gap-2 justify-between">
                   <div class="flex gap-2">
-                    <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Participants">
+                    <button (click)="openParticipantsModal(selectedEvent)" class="bg-[#679436] hover:bg-[#56732e] text-white px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Participants">
                       <i class="fas fa-users"></i>
                       <span>Participants</span>
                     </button>
-                    <button (click)="openEvaluationsModal(selectedEvent)" class="bg-purple-600 hover:from-purple-700 hover:to-purple-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Evaluations">
+                    <button (click)="openEvaluationsModal(selectedEvent)" class="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="View Evaluations">
                       <i class="fas fa-star"></i>
                       <span>Evaluations</span>
                     </button>
                   </div>
                   <div class="flex gap-2">
-                    <button *ngIf="canCancelEvent(selectedEvent)" 
-                            (click)="confirmCancelEvent(selectedEvent)" 
-                            class="bg-red-600 hover:from-red-700 hover:to-red-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" 
-                            title="Cancel Event">
+                        <button *ngIf="canCancelEvent(selectedEvent)" 
+                          (click)="confirmCancelEvent(selectedEvent)" 
+                          class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" 
+                          title="Cancel Event">
                       <i class="fas fa-ban"></i>
                       <span>Cancel Event</span>
                     </button>
-                    <button (click)="confirmDeleteEvent(selectedEvent)" class="bg-gray-400 hover:from-gray-500 hover:to-gray-600 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold" title="Archive Event">
-                      <i class="fas fa-trash-alt"></i>
-                      <span>Archive</span>
-                    </button>
-                    <button (click)="editEvent(selectedEvent)" 
-                            [disabled]="isEventConcluded(selectedEvent)"
-                            [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow font-semibold' : 'bg-green-600 hover:from-green-700 hover:to-green-800 text-white px-5 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold'"
-                            [title]="isEventConcluded(selectedEvent) ? 'Cannot edit concluded event' : 'Edit Event'">
+                        <button (click)="confirmDeleteEvent(selectedEvent)" 
+                          [ngClass]="isEventConcluded(selectedEvent) ? 'bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold' : 'bg-gray-400 hover:bg-gray-500 text-white px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold'"
+                          title="Archive Event">
+                          <i class="fas fa-trash-alt"></i>
+                          <span>Archive</span>
+                        </button>
+                        <button (click)="editEvent(selectedEvent)" 
+                          [disabled]="isEventConcluded(selectedEvent)"
+                          [class]="isEventConcluded(selectedEvent) ? 'bg-gray-300 text-gray-500 cursor-not-allowed px-5 py-2.5 rounded-lg flex items-center justify-center gap-2 shadow font-semibold' : 'bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-md hover:shadow-lg font-semibold'"
+                          [title]="isEventConcluded(selectedEvent) ? 'Cannot edit concluded event' : 'Edit Event'">
                       <i class="fas fa-edit"></i>
                       <span>Edit</span>
                     </button>
