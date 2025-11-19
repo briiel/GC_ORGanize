@@ -116,7 +116,23 @@ export class RbacAuthService {
    */
   private decodeToken(token: string): JwtPayload | null {
     try {
-      return jwtDecode<JwtPayload>(token);
+      const decoded = jwtDecode<any>(token) as JwtPayload | null;
+
+      // Normalize roles to the frontend's expected casing for compatibility
+      if (decoded && Array.isArray(decoded.roles)) {
+        const mapRole = (r: string) => {
+          const low = String(r).toLowerCase();
+          if (low === 'student') return 'Student';
+          if (low === 'orgofficer' || low === 'org_officer' || low === 'organization') return 'OrgOfficer';
+          if (low === 'oswsadmin' || low === 'admin') return 'OSWSAdmin';
+          // Fallback: capitalize first letter
+          return String(r).charAt(0).toUpperCase() + String(r).slice(1);
+        };
+
+        decoded.roles = decoded.roles.map(mapRole);
+      }
+
+      return decoded;
     } catch (error) {
       console.error('Error decoding token:', error);
       return null;
