@@ -1,5 +1,9 @@
 // Development environment
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api'
+  // Use the current page hostname so mobile devices can reach the dev API
+  // when opening the frontend via http://<dev-ip>:4200
+  apiUrl: `http://${window.location.hostname}:5000/api`,
+  // Default geofence radius in meters (used when an event-specific radius is not set)
+  defaultGeofenceMeters: 200
 };
