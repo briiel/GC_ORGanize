@@ -1,0 +1,69 @@
+# Enable rewrite engine
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  
+  # Set base path for rewriting
+  RewriteBase /
+  
+  # Force HTTPS (optional, uncomment if using HTTPS)
+  # RewriteCond %{HTTPS} off
+  # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+  
+  # Serve correct MIME types for JavaScript modules
+  <IfModule mod_mime.c>
+    AddType application/javascript .js
+    AddType application/javascript .mjs
+    AddType text/css .css
+    AddType application/json .json
+    AddType image/svg+xml .svg
+    AddType image/x-icon .ico
+    AddType application/manifest+json .webmanifest
+  </IfModule>
+  
+  # Don't rewrite files or directories that exist
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  
+  # For service worker
+  RewriteCond %{REQUEST_URI} ^/ngsw-worker.js$
+  RewriteRule ^ ngsw-worker.js [L]
+  
+  RewriteCond %{REQUEST_URI} ^/ngsw.json$
+  RewriteRule ^ ngsw.json [L]
+  
+  # Rewrite all other requests to index.html for Angular routing
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Enable CORS if needed (adjust origin as needed)
+<IfModule mod_headers.c>
+  # Cache control for static assets
+  <FilesMatch "\.(js|mjs|css|jpg|jpeg|png|gif|svg|ico|webp|woff|woff2|ttf|otf)$">
+    Header set Cache-Control "max-age=31536000, public"
+  </FilesMatch>
+  
+  # No cache for service worker and index
+  <FilesMatch "^(ngsw-worker\.js|ngsw\.json|index\.html)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </FilesMatch>
+  
+  # Ensure JavaScript files are served with correct charset
+  <FilesMatch "\.(js|mjs)$">
+    Header set Content-Type "application/javascript; charset=utf-8"
+  </FilesMatch>
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>

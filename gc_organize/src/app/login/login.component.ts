@@ -49,7 +49,8 @@ export class LoginComponent implements OnInit {
 
     // Check if the app can be installed (PWA)
     window.addEventListener('beforeinstallprompt', (e: any) => {
-      e.preventDefault();
+      // Only prevent default if we're actually showing an install button
+      // Otherwise, don't call preventDefault() to avoid console warnings
       this.installPrompt = e;
     });
   }

@@ -351,9 +351,6 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     const dist = this.osm.distanceMeters(userCoords, place);
     const radiusMeters = (environment as any).defaultGeofenceMeters ?? 200;
 
-    // Log coordinates and distance to aid debugging (console visible in browser devtools)
-    console.log('Location validation', { userCoords, place, accuracy, dist });
-
     if (dist > radiusMeters) {
       Swal.fire('Not at Event Location', `You appear to be outside the allowed area. Move closer to the event location (within ${radiusMeters} m) or use a mobile device with GPS, then try again.`, 'error');
       return { ok: false, coords: userCoords, accuracy };

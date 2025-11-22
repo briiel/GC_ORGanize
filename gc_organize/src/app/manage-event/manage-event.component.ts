@@ -1239,8 +1239,6 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.evaluationService.getEventEvaluations(event.event_id).subscribe({
       next: (response) => {
         this.evaluationsLoading = false;
-        // Debug: log raw response for troubleshooting
-        console.debug('[ManageEvent] Evaluations API response:', response);
 
         // Support multiple response shapes: { success, data: { evaluations, stats } } OR { evaluations, stats } OR Array
         let data: any = null;
