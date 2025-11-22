@@ -1,6 +1,6 @@
-<div class="modal-overlay modal-blur flex items-center justify-center fixed inset-0 bg-black/60 backdrop-blur-sm p-2 sm:p-4 animate-fade-in" style="z-index: 3000;" (click)="closeModal()">
+<div class="flex items-center justify-center fixed inset-0 bg-black/60 backdrop-blur-sm p-2 sm:p-4 animate-fade-in" style="z-index: 3000;" (click)="closeModal()">
   <div
-    class="modal-content relative w-full max-w-[95vw] sm:max-w-[95vw] md:max-w-4xl max-h-[85vh] md:h-[600px] rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row bg-white mx-auto animate-scale-in border-2 border-gray-200"
+    class="relative w-full max-w-[95vw] sm:max-w-[95vw] md:max-w-4xl max-h-[85vh] md:h-[600px] rounded-lg overflow-hidden shadow-2xl flex flex-col md:flex-row bg-white mx-auto animate-scale-in border border-gray-200"
     role="dialog" aria-modal="true" aria-labelledby="viewmodal-title" (click)="$event.stopPropagation()">
 
     <!-- Colored top border based on department -->
@@ -18,8 +18,8 @@
 
     <!-- Close button -->
     <button (click)="closeModal()" aria-label="Close dialog"
-      class="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-12 h-12 sm:w-11 sm:h-11 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 cursor-pointer z-30 focus:outline-none focus:ring-2 focus:ring-[#679436] transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm">
-      <i class="fas fa-times text-lg sm:text-xl"></i>
+      class="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 cursor-pointer z-30 focus:outline-none focus:ring-2 focus:ring-[#679436] transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm min-h-[44px] min-w-[44px]">
+      <i class="fas fa-times text-lg"></i>
     </button>
 
     <!-- Poster / Visual side -->
@@ -44,7 +44,7 @@
         
         <!-- Department and Status Badges -->
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-bold text-white border-2"
+          <span class="inline-flex items-center px-3 py-2 rounded-full text-sm font-semibold text-white border"
                 [ngClass]="{
                   'bg-orange-500 border-orange-600': event?.department === 'CCS',
                   'bg-yellow-400 border-yellow-500': event?.department === 'CBA',
@@ -57,7 +57,7 @@
           </span>
           
           <span *ngIf="event.status"
-                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-bold border-2"
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold border"
                 [ngClass]="{
                   'bg-yellow-50 text-yellow-800 border-yellow-300': getDisplayStatus() === 'not yet started',
                   'bg-blue-50 text-blue-800 border-blue-300': getDisplayStatus() === 'ongoing',

@@ -61,4 +61,41 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
       this.items[idx] = { ...item, is_read: true } as any;
     });
   }
+
+  getNotificationIcon(item: NotificationItem): string {
+    const msg = item.message.toLowerCase();
+    if (msg.includes('✅') || msg.includes('approved') || msg.includes('confirmed')) {
+      return 'fas fa-check-circle';
+    }
+    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('not approved')) {
+      return 'fas fa-times-circle';
+    }
+    if (msg.includes('⏳') || msg.includes('pending') || msg.includes('submitted')) {
+      return 'fas fa-hourglass-half';
+    }
+    if (msg.includes('📜') || msg.includes('certificate')) {
+      return 'fas fa-certificate';
+    }
+    if (msg.includes('registered') || msg.includes('registration')) {
+      return 'fas fa-user-check';
+    }
+    return 'fas fa-bell';
+  }
+
+  getNotificationIconClass(item: NotificationItem): string {
+    const msg = item.message.toLowerCase();
+    if (msg.includes('✅') || msg.includes('approved') || msg.includes('confirmed')) {
+      return item.is_read ? 'bg-green-300' : 'bg-green-500';
+    }
+    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('not approved')) {
+      return item.is_read ? 'bg-red-300' : 'bg-red-500';
+    }
+    if (msg.includes('⏳') || msg.includes('pending') || msg.includes('submitted')) {
+      return item.is_read ? 'bg-yellow-300' : 'bg-yellow-500';
+    }
+    if (msg.includes('📜') || msg.includes('certificate')) {
+      return item.is_read ? 'bg-blue-300' : 'bg-blue-500';
+    }
+    return item.is_read ? 'bg-gray-300' : 'bg-[#679436]';
+  }
 }

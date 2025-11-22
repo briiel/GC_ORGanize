@@ -56,26 +56,26 @@
                 </select>
             </div>
         </div>
-        <nav class="flex-1 px-2 py-4 w-full space-y-2">
+        <nav class="flex-1 px-2 py-4 w-full space-y-2" [ngClass]="{ 'org-panel-text-sm': role === 'organization', 'osws-panel': role === 'osws_admin' }">
             <!-- Student Buttons -->
             <ng-container *ngIf="role === 'student'">
-                <button [routerLink]="'home'" (click)="closeIfMobile()"
+                <button [routerLink]="'home'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-home mr-2 text-lg sm:text-xl"></i> Home
                 </button>
-                <button [routerLink]="'eventsreg'" (click)="closeIfMobile()"
+                <button [routerLink]="'eventsreg'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-calendar-check mr-2 text-lg sm:text-xl"></i> Events Registered
                 </button>
-                <button [routerLink]="'history'" (click)="closeIfMobile()"
+                <button [routerLink]="'history'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-history mr-2 text-lg sm:text-xl"></i> Events Attended
                 </button>
-                <button [routerLink]="'ecertificate'" (click)="closeIfMobile()"
+                <button [routerLink]="'ecertificate'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificate
                 </button>
-                <button [routerLink]="'request-role'" (click)="closeIfMobile()"
+                <button [routerLink]="'request-role'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-user-plus mr-2 text-lg sm:text-xl"></i> Request Role
                 </button>
@@ -88,11 +88,11 @@
 
             <!-- Organization Buttons -->
             <ng-container *ngIf="role === 'organization'">
-                <button [routerLink]="'dashboard'" (click)="closeIfMobile()"
+                <button [routerLink]="'dashboard'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
-                <button [routerLink]="'manage-event'" (click)="closeIfMobile()"
+                <button [routerLink]="'manage-event'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-tasks mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
@@ -100,16 +100,32 @@
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
                 </button> -->
-                <button [routerLink]="'scan-qr'" (click)="closeIfMobile()"
+                <button [routerLink]="'members'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
-                    <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
+                    <i class="fas fa-users mr-2 text-lg sm:text-xl"></i> Members
                 </button>
-                <!-- Attendance Records Button -->
-                <button [routerLink]="'attendance-records'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer whitespace-nowrap transition-all min-h-[48px] sm:min-h-0">
-                    <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
-                </button>
-                <button [routerLink]="'trash'" (click)="closeIfMobile()"
+                <!-- Combined Requests & Records Dropdown -->
+                <div class="w-full">
+                    <button (click)="toggleRequests()" [class.sidebar-item-active]="isRequestsOpen"
+                        class="flex items-center justify-between px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0 whitespace-nowrap">
+                        <span class="flex items-center whitespace-nowrap">
+                            <i class="fas fa-folder-open mr-2 text-lg sm:text-xl"></i> Requests & Records
+                        </span>
+                        <i class="fas transition-transform duration-200" 
+                           [ngClass]="isRequestsOpen ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    </button>
+                    <div *ngIf="isRequestsOpen" class="ml-6 mt-1 space-y-1 overflow-hidden transition-all duration-200">
+                        <button [routerLink]="'certificate-requests'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
+                            class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
+                            <i class="fas fa-certificate mr-2"></i> Certificate Requests
+                        </button>
+                        <button [routerLink]="'attendance-records'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
+                            class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
+                            <i class="fas fa-list-alt mr-2"></i> Attendance Records
+                        </button>
+                    </div>
+                </div>
+                <button [routerLink]="'trash'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-trash mr-2 text-lg sm:text-xl"></i> Archive
                 </button>
@@ -122,14 +138,14 @@
 
             <!-- OSWS Admin Buttons -->
             <ng-container *ngIf="role === 'osws_admin'">
-                <button [routerLink]="'dashboard'" (click)="closeIfMobile()"
+                <button [routerLink]="'dashboard'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
                 
                 <!-- User Management Dropdown -->
                 <div class="w-full">
-                    <button (click)="toggleUserManagement()"
+                    <button (click)="toggleUserManagement()" [class.sidebar-item-active]="isUserManagementOpen"
                         class="flex items-center justify-between px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                         <span class="flex items-center">
                             <i class="fas fa-users-cog mr-2 text-lg sm:text-xl"></i> User Management
@@ -141,31 +157,31 @@
                     <!-- Dropdown Menu -->
                     <div *ngIf="isUserManagementOpen" 
                          class="ml-6 mt-1 space-y-1 overflow-hidden transition-all duration-200">
-                        <button [routerLink]="'manage-users'" (click)="closeIfMobile()"
+                        <button [routerLink]="'manage-users'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                             class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                             <i class="fas fa-users mr-2"></i> Accounts
                         </button>
-                        <button [routerLink]="'role-requests'" (click)="closeIfMobile()"
+                        <button [routerLink]="'role-requests'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                             class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                             <i class="fas fa-user-check mr-2"></i> Role Requests
                         </button>
                     </div>
                 </div>
                 
-                <button [routerLink]="'manage-event'" (click)="closeIfMobile()"
+                <button [routerLink]="'manage-event'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-calendar-alt mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
-                <button [routerLink]="'scan-qr'" (click)="closeIfMobile()"
+                <button [routerLink]="'scan-qr'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
                 </button>
-                <!-- Attendance Records Button for OSWS Admin -->
-                <button [routerLink]="'attendance-records'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer whitespace-nowrap transition-all min-h-[48px] sm:min-h-0">
+                <!-- Attendance Records (OSWS admin only) -->
+                <button [routerLink]="'attendance-records'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
                 </button>
-                <button [routerLink]="'trash'" (click)="closeIfMobile()"
+                <button [routerLink]="'trash'" routerLinkActive="sidebar-item-active" (click)="closeIfMobile()"
                     class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-trash mr-2 text-lg sm:text-xl"></i> Archive
                 </button>

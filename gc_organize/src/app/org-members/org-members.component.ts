@@ -1,0 +1,257 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { RbacAuthService } from '../services/rbac-auth.service';
+import { environment } from '../../environments/environment';
+import Swal from 'sweetalert2';
+
+interface OrganizationMember {
+  member_id: number;
+  student_id: string;
+  position: string;
+  joined_at: string;
+  is_active: boolean;
+  first_name: string;
+  last_name: string;
+  middle_initial: string;
+  suffix: string;
+  email: string;
+  department: string;
+  program: string;
+}
+
+@Component({
+  selector: 'app-org-members',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './org-members.component.html',
+  styleUrls: ['./org-members.component.css']
+})
+export class OrgMembersComponent implements OnInit {
+  members: OrganizationMember[] = [];
+  filteredMembers: OrganizationMember[] = [];
+  loading: boolean = false;
+  error: string | null = null;
+  orgName: string = '';
+  
+  // Search and filter
+  searchTerm: string = '';
+  filterPosition: string = '';
+  
+  // Pagination
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  totalPages: number = 1;
+
+  // Make Math available in template
+  Math = Math;
+
+  constructor(
+    private http: HttpClient,
+    private authService: RbacAuthService
+  ) {}
+
+  ngOnInit(): void {
+    const org = this.authService.getUserOrganization();
+    if (org) {
+      this.orgName = org.org_name;
+      this.loadMembers(org.org_id);
+    } else {
+      this.error = 'Organization information not found';
+    }
+  }
+
+  loadMembers(orgId: number): void {
+    this.loading = true;
+    this.error = null;
+
+    const headers = this.getAuthHeaders();
+    this.http.get<any>(`${environment.apiUrl}/users/organization/${orgId}/members`, { headers }).subscribe({
+      next: (response) => {
+        this.members = response.data || [];
+        this.applyFilters();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading members:', error);
+        this.error = 'Failed to load organization members';
+        this.loading = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load organization members'
+        });
+      }
+    });
+  }
+
+  applyFilters(): void {
+    let filtered = [...this.members];
+
+    // Search filter
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(member => 
+        member.first_name.toLowerCase().includes(term) ||
+        member.last_name.toLowerCase().includes(term) ||
+        member.student_id.toLowerCase().includes(term) ||
+        member.email.toLowerCase().includes(term) ||
+        member.position.toLowerCase().includes(term)
+      );
+    }
+
+    // Position filter
+    if (this.filterPosition) {
+      filtered = filtered.filter(member => 
+        member.position.toLowerCase() === this.filterPosition.toLowerCase()
+      );
+    }
+
+    this.filteredMembers = filtered;
+    this.totalPages = Math.ceil(this.filteredMembers.length / this.itemsPerPage);
+    this.currentPage = 1;
+  }
+
+  get paginatedMembers(): OrganizationMember[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredMembers.slice(startIndex, endIndex);
+  }
+
+  get uniquePositions(): string[] {
+    return [...new Set(this.members.map(m => m.position))].sort();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.filterPosition = '';
+    this.applyFilters();
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  }
+
+  getFullName(member: OrganizationMember): string {
+    let name = `${member.first_name}`;
+    if (member.middle_initial) {
+      name += ` ${member.middle_initial}.`;
+    }
+    name += ` ${member.last_name}`;
+    if (member.suffix) {
+      name += ` ${member.suffix}`;
+    }
+    return name;
+  }
+
+  formatDate(dateString: string): string {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  getPositionBadgeClass(position: string): string {
+    const pos = position.toLowerCase();
+    if (pos.includes('president')) return 'bg-purple-100 text-purple-800';
+    if (pos.includes('vice')) return 'bg-blue-100 text-blue-800';
+    if (pos.includes('secretary')) return 'bg-green-100 text-green-800';
+    if (pos.includes('treasurer')) return 'bg-yellow-100 text-yellow-800';
+    if (pos.includes('auditor')) return 'bg-orange-100 text-orange-800';
+    if (pos.includes('member')) return 'bg-gray-100 text-gray-800';
+    return 'bg-indigo-100 text-indigo-800';
+  }
+
+  exportToCSV(): void {
+    const csvData = this.filteredMembers.map(member => ({
+      'Student ID': member.student_id,
+      'Name': this.getFullName(member),
+      'Email': member.email,
+      'Position': member.position,
+      'Department': member.department,
+      'Program': member.program,
+      'Joined Date': this.formatDate(member.joined_at)
+    }));
+
+    const headers = Object.keys(csvData[0]);
+    const csv = [
+      headers.join(','),
+      ...csvData.map(row => headers.map(header => `"${row[header as keyof typeof row]}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${this.orgName}_members_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+
+  removeMember(member: OrganizationMember): void {
+    Swal.fire({
+      title: 'Remove Member?',
+      html: `Are you sure you want to remove <strong>${this.getFullName(member)}</strong> from the organization?<br><small class="text-gray-500">This action will deactivate their membership.</small>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, remove member',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const org = this.authService.getUserOrganization();
+        if (!org) return;
+
+        const headers = this.getAuthHeaders();
+        this.http.delete(
+          `${environment.apiUrl}/users/organization/${org.org_id}/members/${member.member_id}`,
+          { headers }
+        ).subscribe({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Member Removed',
+              text: `${this.getFullName(member)} has been removed from the organization.`,
+              timer: 2000,
+              showConfirmButton: false
+            });
+            // Reload members list
+            this.loadMembers(org.org_id);
+          },
+          error: (error) => {
+            console.error('Error removing member:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to remove member. Please try again.'
+            });
+          }
+        });
+      }
+    });
+  }
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('gc_organize_token');
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
+}

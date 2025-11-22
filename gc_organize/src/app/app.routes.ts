@@ -53,6 +53,8 @@ export const routes: Routes = [
     children: [
       { path: 'dashboard', component: SoDashboardComponent, data: { animation: 'SoDashboardPage' } },
       { path: 'manage-event', component: ManageEventComponent, data: { animation: 'ManageEventPage' } },
+      { path: 'members', loadComponent: () => import('./org-members/org-members.component').then(m => m.OrgMembersComponent), data: { animation: 'OrgMembersPage' } },
+      { path: 'certificate-requests', loadComponent: () => import('./certificate-requests/certificate-requests.component').then(m => m.CertificateRequestsComponent), data: { animation: 'CertificateRequestsPage' } },
       { path: 'scan-qr', component: ScanQrComponent, data: { animation: 'ScanQrPage' } },
       { path: 'attendance-records', component: AttendanceRecordsComponent, data: { animation: 'AttendanceRecordsPage' } },
       { path: 'trash', loadComponent: () => import('./trash/trash.component').then(m => m.TrashComponent), data: { animation: 'TrashPage' } },

@@ -40,6 +40,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   today = new Date();
   currentTime: string = '';
   isUserManagementOpen = false; // For OSWS admin user management dropdown
+  isRequestsOpen = false; // For combined Certificate Requests + Attendance Records dropdown
 
   private timeInterval: any;
   private readonly desktopBreakpoint = 1024; // match Tailwind's lg breakpoint
@@ -161,6 +162,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
         this.role = 'osws_admin';
       }
     }
+    // Auto-open dropdowns if their child routes are active (Requests only for organization)
+    this.isRequestsOpen = this.role === 'organization' && (url.includes('certificate-requests') || url.includes('attendance-records'));
+    this.isUserManagementOpen = url.includes('manage-users') || url.includes('role-requests');
   }
 
   private buildAvailablePanels(): void {
@@ -211,5 +215,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleUserManagement(): void {
     this.isUserManagementOpen = !this.isUserManagementOpen;
+  }
+
+  toggleRequests(): void {
+    this.isRequestsOpen = !this.isRequestsOpen;
   }
 }
