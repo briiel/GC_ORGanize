@@ -35,3 +35,40 @@
 .blur-sm { filter: blur(4px); }
 .backdrop-blur-sm { backdrop-filter: blur(4px); }
 
+/* Smaller typography for Organization panel to improve sidebar density */
+.org-panel-text-sm button,
+.org-panel-text-sm .w-full > button {
+	font-size: 0.9rem !important; /* ~14px */
+	padding-top: 0.5rem !important;
+	padding-bottom: 0.5rem !important;
+}
+
+.org-panel-text-sm button i,
+.org-panel-text-sm button .fas,
+.org-panel-text-sm button .far {
+	font-size: 0.95rem !important; /* slightly smaller icons */
+	margin-right: 0.5rem !important;
+}
+
+/* Slightly tighter spacing for nested dropdown items */
+.org-panel-text-sm .ml-6 .flex.items-center {
+	padding-top: 0.4rem !important;
+	padding-bottom: 0.4rem !important;
+}
+
+/* Active state for sidebar items (base) */
+.sidebar-item-active {
+	font-weight: 700 !important;
+	border-radius: 0.5rem !important;
+}
+
+/* Organization-specific active bg to match hover */
+.org-panel-text-sm .sidebar-item-active {
+	background-color: #56732e !important;
+}
+
+/* OSWS admin-specific active bg to match hover */
+.osws-panel .sidebar-item-active {
+	background-color: #218c4a !important;
+}
+
