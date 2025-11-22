@@ -1,12 +1,12 @@
 <!-- Main Navigation Bar (RBAC-enabled) -->
 <nav class="bg-white shadow-lg sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16">
+  <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+    <div class="flex justify-between h-14 sm:h-16">
       
       <!-- Logo and Brand -->
-      <div class="flex items-center">
-        <img src="/GC-Logo.png" alt="GC Logo" class="h-10 w-10 mr-3">
-        <span class="text-xl font-bold text-[#679436]">GC-ORGANIZE</span>
+      <div class="flex items-center gap-2">
+        <img src="/GC-Logo.png" alt="GC Logo" class="h-8 w-8 sm:h-10 sm:w-10">
+        <span class="text-base sm:text-xl font-bold text-[#679436]">GC-ORGANIZE</span>
       </div>
 
       <!-- Desktop Navigation Links -->
@@ -110,8 +110,8 @@
       <div class="md:hidden flex items-center">
         <button 
           (click)="toggleMobileMenu()"
-          class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#679436]">
-          <i class="fas" [ngClass]="isMobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
+          class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#679436] min-h-[44px] min-w-[44px]">
+          <i class="fas text-xl" [ngClass]="isMobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
         </button>
       </div>
     </div>
@@ -119,12 +119,12 @@
 
   <!-- Mobile Menu -->
   <div *ngIf="isMobileMenuOpen" class="md:hidden border-t border-gray-200">
-    <div class="px-2 pt-2 pb-3 space-y-1">
+    <div class="px-3 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
       
       <!-- User Info (Mobile) -->
-      <div class="px-3 py-2 border-b border-gray-200 mb-2">
-        <p class="text-sm font-medium text-gray-900">{{ userName }}</p>
-        <p class="text-xs text-gray-500">{{ userEmail }}</p>
+      <div class="px-3 py-3 border-b border-gray-200 mb-2">
+        <p class="text-sm font-medium text-gray-900 break-words">{{ userName }}</p>
+        <p class="text-xs text-gray-500 break-all">{{ userEmail }}</p>
         <div class="mt-2 flex flex-wrap gap-1">
           <span *ngFor="let role of roleBadges" 
                 [ngClass]="getBadgeClass(role)"

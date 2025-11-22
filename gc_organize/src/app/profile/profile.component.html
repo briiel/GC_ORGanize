@@ -1,30 +1,30 @@
-<div class="p-4 lg:p-6 bg-gray-100 overflow-y-auto">
+<div class="p-3 sm:p-4 lg:p-6 bg-gray-100 overflow-y-auto">
   <!-- Back to Home Button -->
-  <button [routerLink]="'/sidebar/home'" class="mb-4 px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center cursor-pointer">
+  <button [routerLink]="'/sidebar/home'" class="mb-4 px-4 py-2.5 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center cursor-pointer min-h-[44px] sm:min-h-[40px]">
     <i class="fas fa-arrow-left mr-2"></i>
     Back to Home
   </button>
 
   <!-- Profile Header -->
-  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-    <div class="flex flex-col sm:flex-row items-center">
+  <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
+    <div class="flex flex-col sm:flex-row items-center gap-4">
       <!-- Profile Image -->
-      <div class="relative mb-4 sm:mb-0 sm:mr-6">
-        <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-[#679436] flex items-center justify-center">
-          <i class="fas fa-user text-gray-500 text-5xl"></i>
+      <div class="relative mb-4 sm:mb-0">
+        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-[#679436] flex items-center justify-center">
+          <i class="fas fa-user text-gray-500 text-4xl sm:text-5xl"></i>
         </div>
       </div>
 
       
       <!-- Profile Info -->
       <div class="flex-1 text-center sm:text-left">
-        <h1 class="text-2xl font-bold text-gray-800">Juan Dela Cruz</h1>
-        <p class="text-gray-600">Student</p>
-        <p class="text-[#05668D] font-medium">BSIT - 2nd Year</p>
+        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Juan Dela Cruz</h1>
+        <p class="text-sm sm:text-base text-gray-600">Student</p>
+        <p class="text-sm sm:text-base text-[#05668D] font-medium">BSIT - 2nd Year</p>
       </div>
 
       <!-- Edit Profile Button -->
-      <button class="mt-4 sm:mt-0 px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center">
+      <button class="mt-4 sm:mt-0 px-4 py-2.5 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center min-h-[44px] sm:min-h-[40px] justify-center w-full sm:w-auto">
         <i class="fas fa-edit mr-2"></i>
         Edit Profile
       </button>
@@ -32,16 +32,16 @@
   </div>
 
   <!-- Profile Details -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
     <!-- Personal Information -->
     <div class="lg:col-span-2">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+      <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
           <i class="fas fa-user-circle text-[#05668D] mr-2"></i>
           Personal Information
         </h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-600">Full Name</label>
             <p class="mt-1 text-gray-800">Juan Dela Cruz</p>
@@ -77,13 +77,13 @@
 
     <!-- Quick Stats -->
     <div class="lg:col-span-1">
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+      <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
           <i class="fas fa-chart-bar text-[#05668D] mr-2"></i>
           Event Statistics
         </h2>
         
-        <div class="space-y-4">
+        <div class="space-y-3 sm:space-y-4">
           <div class="p-4 bg-gray-50 rounded-lg">
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Events Registered</span>

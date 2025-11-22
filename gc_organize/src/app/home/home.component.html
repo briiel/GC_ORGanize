@@ -1,49 +1,51 @@
 <!-- Main content -->
-<div class="flex-1 p-6 bg-gray-100 overflow-y-auto min-h-screen" id="main-content">
+<div class="flex-1 p-2 sm:p-4 lg:p-6 bg-gray-100 overflow-y-auto min-h-screen" id="main-content">
   <!-- Header Section -->
-  <div class="mb-6">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-2 leading-tight break-words max-w-full text-[#679436]">
+  <div class="mb-4 sm:mb-6 px-1">
+    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold mb-2 leading-tight break-words max-w-full text-[#679436]">
       Available Events
     </h1>
   </div>
 
   <!-- Search Section -->
-  <div class="mb-6">
-    <div class="flex flex-col sm:flex-row gap-3 sm:items-center">
-      <div class="relative flex-1 sm:flex-none sm:max-w-lg flex gap-2">
+  <div class="mb-4 sm:mb-6 px-1">
+    <div class="flex flex-col gap-2 sm:gap-3">
+      <div class="relative flex flex-col sm:flex-row gap-2 sm:max-w-2xl">
         <div class="relative flex-1">
           <input
             type="text"
             placeholder="Search by title, department, location, or description..."
-            class="w-full px-4 py-2.5 pl-10 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all shadow-sm"
+            class="w-full px-4 py-3 sm:py-2.5 pl-10 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all shadow-sm text-base"
             [value]="searchTerm"
             (input)="onSearchInput($event)"
             (keyup.enter)="onSearchClick()"
           />
           <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
         </div>
-        <button
-          class="px-5 py-2.5 bg-[#679436] hover:bg-[#56732e] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] flex items-center gap-2"
-          (click)="onSearchClick()"
-        >
-          <i class="fas fa-search"></i>
-          <span class="hidden sm:inline">Search</span>
-        </button>
-        <button
-          *ngIf="searchTerm"
-          class="px-4 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md border-2 border-gray-300 flex items-center gap-2"
-          (click)="clearSearch()"
-        >
-          <i class="fas fa-times"></i>
-          <span class="hidden sm:inline">Clear</span>
-        </button>
+        <div class="flex gap-2">
+          <button
+            class="flex-1 sm:flex-none px-5 py-3 sm:py-2.5 bg-[#679436] hover:bg-[#56732e] text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[44px]"
+            (click)="onSearchClick()"
+          >
+            <i class="fas fa-search"></i>
+            <span>Search</span>
+          </button>
+          <button
+            *ngIf="searchTerm"
+            class="flex-1 sm:flex-none px-4 py-3 sm:py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm hover:shadow-md border-2 border-gray-300 flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[44px]"
+            (click)="clearSearch()"
+          >
+            <i class="fas fa-times"></i>
+            <span>Clear</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Cards Grid -->
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+  <div class="px-1">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
     <div
       class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 relative flex flex-col h-full border-t-4"
       *ngFor="let event of filteredEvents; let i = index"
@@ -59,7 +61,7 @@
       }"
     >
       <!-- Poster image -->
-      <div class="relative h-48 sm:h-56 overflow-hidden bg-gray-50">
+      <div class="relative h-48 sm:h-48 md:h-56 overflow-hidden bg-gray-50">
         <div class="absolute inset-0 bg-cover bg-center filter blur-lg opacity-30" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
@@ -160,16 +162,16 @@
         </div>
         
         <!-- Action Buttons -->
-        <div class="p-4 border-t-2 border-gray-100 bg-gray-50">
-          <div class="flex gap-2">
+        <div class="p-3 sm:p-4 border-t-2 border-gray-100 bg-gray-50">
+          <div class="flex flex-col sm:flex-row gap-2">
             <button (click)="openViewModal(event)"
-              class="flex-1 px-4 py-2.5 bg-[#05668D] hover:bg-[#044f6b] text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#05668D] flex items-center justify-center gap-2">
+              class="flex-1 px-4 py-3 sm:py-2.5 md:py-2 bg-[#05668D] hover:bg-[#044f6b] text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#05668D] flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[44px] md:min-h-[40px]">
               <i class="fas fa-eye"></i>
               <span>View Details</span>
             </button>
             <button (click)="openRegisterModal(event)"
               [disabled]="isConcluded(event) || getDisplayStatus(event) === 'cancelled'"
-              class="flex-1 px-4 py-2.5 bg-[#679436] hover:bg-[#56732e] text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center justify-center gap-2">
+              class="flex-1 px-4 py-3 sm:py-2.5 md:py-2 bg-[#679436] hover:bg-[#56732e] text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg border-2 border-[#679436] disabled:opacity-50 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400 flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[44px] md:min-h-[40px]">
               <i class="fas fa-user-plus"></i>
               <span>Register</span>
             </button>
@@ -178,27 +180,28 @@
       </div>
     </div>
   </div>
+  </div>
 
   <!-- Empty State -->
-  <div *ngIf="filteredEvents.length === 0" class="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl shadow-md border-2 border-gray-200 p-12">
+  <div *ngIf="filteredEvents.length === 0" class="mx-1 flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl shadow-md border-2 border-gray-200 p-8 sm:p-12">
     <i class="fas fa-calendar-times text-6xl text-gray-300 mb-4"></i>
     <h3 class="text-xl font-bold text-gray-700 mb-2">No Events Found</h3>
     <p class="text-gray-500 text-center">There are no events matching your search criteria.</p>
   </div>
 
   <!-- Pagination -->
-  <div *ngIf="totalPages > 1" class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 bg-white rounded-xl shadow-md border-2 border-gray-200 p-4">
+  <div *ngIf="totalPages > 1" class="mx-1 flex flex-col items-center gap-3 sm:gap-4 mt-6 sm:mt-8 bg-white rounded-xl shadow-md border-2 border-gray-200 p-3 sm:p-4">
     <!-- Page Info -->
-    <div class="text-sm text-gray-600">
+    <div class="text-sm text-gray-600 text-center">
       Page <span class="font-semibold text-[#679436]">{{ currentPage }}</span> of 
       <span class="font-semibold text-[#679436]">{{ totalPages }}</span>
     </div>
 
     <!-- Pagination Controls -->
-    <nav class="inline-flex space-x-1" aria-label="Pagination">
+    <nav class="inline-flex flex-wrap gap-1 justify-center" aria-label="Pagination">
       <!-- Previous Arrow -->
       <button
-        class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        class="w-11 h-11 sm:w-10 sm:h-10 md:w-9 md:h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         [disabled]="currentPage === 1"
         (click)="changePage(currentPage - 1)">
         <i class="fas fa-chevron-left text-gray-600"></i>
@@ -207,7 +210,7 @@
       <!-- Page Numbers -->
       <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
         <button
-          class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 border-2"
+          class="w-11 h-11 sm:w-10 sm:h-10 md:w-9 md:h-9 flex items-center justify-center rounded-lg transition-all duration-150 border-2"
           [ngClass]="currentPage === (i + 1) ? 'bg-[#679436] text-white font-bold border-[#679436]' : 'bg-white border-gray-300 hover:bg-gray-100 text-gray-800'"
           [attr.aria-current]="currentPage === (i + 1) ? 'page' : null"
           (click)="changePage(i + 1)">
@@ -217,7 +220,7 @@
       
       <!-- Next Arrow -->
       <button
-        class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        class="w-11 h-11 sm:w-10 sm:h-10 md:w-9 md:h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         [disabled]="currentPage === totalPages"
         (click)="changePage(currentPage + 1)">
         <i class="fas fa-chevron-right text-gray-600"></i>

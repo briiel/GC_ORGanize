@@ -191,7 +191,7 @@
         <nav class="inline-flex space-x-1" aria-label="Pagination">
           <!-- Previous Arrow -->
           <button
-            class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            class="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             [disabled]="page === 1"
             (click)="prevPage()">
             <i class="fas fa-chevron-left text-gray-600"></i>
@@ -200,7 +200,7 @@
           <!-- Page Numbers -->
           <ng-container *ngFor="let _ of [].constructor(totalPages); let i = index">
             <button
-              class="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-150 border-2"
+              class="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center rounded-lg transition-all duration-150 border-2"
               [ngClass]="page === (i + 1) ? 'bg-[#679436] text-white font-bold border-[#679436]' : 'bg-white border-gray-300 hover:bg-gray-100 text-gray-800'"
               [attr.aria-current]="page === (i + 1) ? 'page' : null"
               (click)="goToPage(i + 1)">
@@ -210,7 +210,7 @@
           
           <!-- Next Arrow -->
           <button
-            class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            class="w-11 h-11 md:w-9 md:h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             [disabled]="page === totalPages"
             (click)="nextPage()">
             <i class="fas fa-chevron-right text-gray-600"></i>

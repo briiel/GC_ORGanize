@@ -8,7 +8,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 1rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-content {
@@ -64,10 +65,28 @@
 }
 
 /* Ensure scrollbar is subtle on content area */
-.modal-content .w-full.md\:w-2\/3 { scrollbar-width: thin; }
-.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar { width: 8px; }
-.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar-thumb { background: rgba(0,0,0,.15); border-radius: 9999px; }
-.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar-track { background: transparent; }
+.modal-content .w-full.md\:w-2\/3,
+.modal-content .flex-1.overflow-y-auto {
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar,
+.modal-content .flex-1.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar-thumb,
+.modal-content .flex-1.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,.15);
+  border-radius: 9999px;
+}
+
+.modal-content .w-full.md\:w-2\/3::-webkit-scrollbar-track,
+.modal-content .flex-1.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 /* Remove click/tap visual effects from the close button */
 .no-click-effects {
@@ -81,8 +100,19 @@
 }
 
 @media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0.75rem;
+  }
+  
   .modal-content {
-    max-width: 98vw;
-    padding: 0;
+    max-width: 96vw;
+    max-height: 94vh;
+    border-radius: 1rem;
+  }
+
+  /* Improve touch scrolling on mobile */
+  .modal-content .flex-1.overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 }

@@ -6,7 +6,7 @@
         OSWS Event Management
       </h1>
       <button
-        class="relative font-bold px-5 py-2 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-[#14532d] hover:bg-[#166534] border-[#14532d]"
+        class="relative font-bold px-5 py-3 sm:py-2.5 md:py-2 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-[#14532d] hover:bg-[#166534] border-[#14532d] min-h-[48px] sm:min-h-[44px] md:min-h-0"
         type="button"
         (click)="openCreateModal()"
         aria-label="Create Event"
@@ -192,7 +192,7 @@
             </div>
           </div>
           <button
-            class="bg-[#14532d] hover:bg-[#166534] text-white font-semibold px-6 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 w-full sm:w-auto transform hover:scale-105"
+            class="bg-[#14532d] hover:bg-[#166534] text-white font-semibold px-5 sm:px-6 py-3 sm:py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 w-full sm:w-auto transform hover:scale-105 min-h-[48px] sm:min-h-0"
             (click)="searchOrgEvents()"
             type="button"
           >
@@ -200,7 +200,7 @@
           </button>
           <button
             *ngIf="orgEventsSearchTerm || orgEventDepartmentFilter || orgEventStatusFilter !== 'active'"
-            class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-5 py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg border-2 border-gray-300 flex items-center justify-center gap-2 w-full sm:w-auto"
+            class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg border-2 border-gray-300 flex items-center justify-center gap-2 w-full sm:w-auto min-h-[48px] sm:min-h-0"
             (click)="clearOrgEventsSearch()"
             type="button"
           >
@@ -219,7 +219,7 @@
             <select
               [(ngModel)]="orgEventDepartmentFilter"
               (ngModelChange)="onOrgEventDepartmentChange()"
-              class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
+              class="w-full px-4 py-3 sm:py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
               <option value="">All Departments</option>
               <option *ngFor="let dept of uniqueDepartments" [value]="dept">{{ dept }}</option>
             </select>
@@ -233,7 +233,7 @@
             <select
               [(ngModel)]="orgEventStatusFilter"
               (ngModelChange)="onOrgEventStatusChange()"
-              class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
+              class="w-full px-4 py-3 sm:py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
               <option value="active">Active Events (Not Yet Started + Ongoing)</option>
               <option value="concluded">Concluded Events</option>
               <option value="all">All Events</option>
@@ -248,7 +248,7 @@
             <select
               [(ngModel)]="orgEventPageSize"
               (ngModelChange)="changeOrgEventPageSize(orgEventPageSize)"
-              class="w-full px-4 py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
+              class="w-full px-4 py-3 sm:py-2.5 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
               <option [value]="5">5 per page</option>
               <option [value]="10">10 per page</option>
               <option [value]="20">20 per page</option>
@@ -356,14 +356,14 @@
         <div class="flex justify-center items-center">
           <nav class="inline-flex space-x-2" aria-label="Pagination">
             <button
-              class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 transition-all duration-200 disabled:cursor-not-allowed font-semibold"
+              class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 transition-all duration-200 disabled:cursor-not-allowed font-semibold"
               [disabled]="orgEventPage === 1"
               (click)="prevOrgEventPage()">
               <i class="fas fa-chevron-left"></i>
             </button>
             <ng-container *ngFor="let _ of [].constructor(orgEventTotalPages); let i = index">
               <button
-                class="w-10 h-10 flex items-center justify-center rounded-lg transition-all duration-200 font-bold"
+                class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg transition-all duration-200 font-bold"
                 [ngClass]="orgEventPage === (i + 1) 
                   ? 'bg-[#14532d] text-white shadow-md' 
                   : 'bg-gray-200 hover:bg-gray-300 text-gray-800'"
@@ -373,7 +373,7 @@
               </button>
             </ng-container>
             <button
-              class="w-10 h-10 flex items-center justify-center rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 transition-all duration-200 disabled:cursor-not-allowed font-semibold"
+              class="w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg bg-gray-200 hover:bg-gray-300 disabled:opacity-50 transition-all duration-200 disabled:cursor-not-allowed font-semibold"
               [disabled]="orgEventPage === orgEventTotalPages"
               (click)="nextOrgEventPage()">
               <i class="fas fa-chevron-right"></i>
@@ -389,21 +389,21 @@
   <ng-template #orgTable>
     <ng-container *ngIf="!isOsws">
   <!-- Header -->
-  <div class="mb-6 mx-2 lg:mx-6">
-    <div class="bg-[#679436] shadow-2xl rounded-2xl overflow-hidden border-2 border-[#679436]">
-      <div class="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+  <div class="mb-4 sm:mb-6 mx-2 lg:mx-6">
+    <div class="bg-[#679436] shadow-2xl rounded-xl sm:rounded-2xl overflow-hidden border-2 border-[#679436]">
+      <div class="px-4 sm:px-6 py-4 flex flex-col gap-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
-            <i class="fas fa-calendar-check text-white text-lg"></i>
+          <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
+            <i class="fas fa-calendar-check text-white text-lg sm:text-xl"></i>
           </div>
-          <div>
-            <h1 class="text-lg sm:text-xl font-bold text-white">Manage Events</h1>
-            <p class="text-white/80 text-sm mt-0.5">View and manage your organization events</p>
+          <div class="flex-1 min-w-0">
+            <h1 class="text-lg sm:text-xl font-bold text-white truncate">Manage Events</h1>
+            <p class="text-white/80 text-xs sm:text-sm mt-0.5 truncate">View and manage your organization events</p>
           </div>
         </div>
         <!-- Status legend -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 px-4 py-2 text-xs">
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-white">
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 px-3 sm:px-4 py-2 sm:py-2.5">
+          <div class="flex flex-wrap items-center gap-x-3 sm:gap-x-4 gap-y-2 text-white text-xs sm:text-sm">
             <span class="inline-flex items-center gap-1">
               <span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-400 border border-yellow-500"></span>
               <span>Not Yet Started</span>
@@ -430,49 +430,49 @@
   </div>
   
   <!-- Create Button -->
-  <div class="mb-6 mx-2 lg:mx-6 flex justify-end">
+  <div class="mb-4 sm:mb-6 mx-2 lg:mx-6 flex justify-stretch sm:justify-end">
     <button
-      class="relative font-bold px-5 py-2 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-[#679436] hover:bg-[#56732e] border-[#679436]"
+      class="w-full sm:w-auto font-bold px-6 py-3 sm:py-2.5 rounded-xl sm:rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center gap-2.5 text-base focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-95 text-white border-2 bg-[#679436] hover:bg-[#56732e] border-[#679436] min-h-[48px] sm:min-h-0"
       type="button"
       (click)="openCreateModal()"
       aria-label="Create Event"
     >
-      <span class="flex items-center justify-center w-6 h-6 rounded-full bg-white/20 mr-1 border border-white">
-        <i class="fas fa-plus"></i>
+      <span class="flex items-center justify-center w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-white/20 border border-white">
+        <i class="fas fa-plus text-sm sm:text-base"></i>
       </span>
-      <span class="hidden sm:inline tracking-wide">Create</span>
+      <span class="tracking-wide">Create New Event</span>
     </button>
   </div>
   
-  <div class="mx-2 lg:mx-6 flex flex-col md:flex-row gap-6 min-h-[400px]">
+  <div class="mx-2 lg:mx-6 flex flex-col md:flex-row gap-4 sm:gap-6 min-h-[400px]">
     <!-- Vertical event list layout -->
-    <div class="w-full md:w-1/4 max-w-xs">
-      <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden flex flex-col" style="height: auto; min-height: 540px; max-height: none;">
+    <div class="w-full md:w-1/4 md:max-w-xs">
+      <div class="bg-white rounded-xl sm:rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden flex flex-col" style="height: auto; min-height: 400px; max-height: none;">
         <!-- Enhanced gradient header -->
-        <div class="px-6 py-3 border-b-4 bg-[#679436] border-[#679436] flex-shrink-0">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-calendar-alt text-white text-sm"></i>
+        <div class="px-4 sm:px-6 py-3 sm:py-3.5 border-b-4 bg-[#679436] border-[#679436] flex-shrink-0">
+          <div class="flex items-center gap-2.5 sm:gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border border-white/30">
+              <i class="fas fa-calendar-alt text-white text-base sm:text-lg"></i>
             </div>
-            <h2 class="text-lg font-bold text-white">Events</h2>
+            <h2 class="text-base sm:text-lg font-bold text-white">Events</h2>
           </div>
         </div>
         <!-- Enhanced search bar -->
-        <div class="px-4 py-3 bg-white flex gap-2 items-center border-b-2 border-gray-200">
+        <div class="px-3 sm:px-4 py-2.5 sm:py-3 bg-white flex gap-2 items-center border-b-2 border-gray-200">
           <input
             type="text"
             [(ngModel)]="searchTerm"
             (keyup.enter)="searchEvents()"
             placeholder="Search events..."
-            class="flex-1 px-3 py-2 rounded-lg border-2 border-gray-300 text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all"
+            class="flex-1 px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg border-2 border-gray-300 text-black text-sm focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all"
             style="min-width:0;"
           />
         </div>
-        <ul class="divide-y divide-gray-200 flex-1 min-h-[220px]" style="max-height: none; overflow-y: visible;">
-          <li *ngFor="let event of pagedEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200 flex items-center">
-            <span class="px-3 py-3 text-gray-400 font-bold" [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-gray-50' : ''">{{ (eventPage - 1) * eventPageSize + i + 1 }}.</span>
+        <ul class="divide-y divide-gray-200 flex-1 min-h-[180px]" style="max-height: none; overflow-y: visible;">
+          <li *ngFor="let event of pagedEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200 flex items-stretch min-h-[60px]">
+            <span class="px-2 sm:px-3 py-3 text-gray-400 font-bold flex items-center text-sm" [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-gray-50' : ''">{{ (eventPage - 1) * eventPageSize + i + 1 }}.</span>
             <button
-              class="flex-1 text-left px-2 py-3 font-semibold hover:underline focus:outline-none"
+              class="flex-1 text-left px-2 sm:px-3 py-3 font-semibold hover:underline focus:outline-none flex items-center"
               [ngClass]="[
                 'text-[#679436]',
                 selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-gray-50' : '',
@@ -481,9 +481,9 @@
               (click)="selectEvent(event)"
               [title]="event.title"
             >
-              <span class="inline-flex items-center gap-2">
-                <span class="truncate max-w-[14rem] md:max-w-[10rem] lg:max-w-[12rem] xl:max-w-[16rem]" [title]="event.title">{{ event.title }}</span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold"
+              <span class="inline-flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 w-full">
+                <span class="truncate max-w-full text-sm sm:text-base" [title]="event.title">{{ event.title }}</span>
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full border text-[10px] font-semibold flex-shrink-0 self-start"
                       [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
                   <i class="fas" [ngClass]="event.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
                   {{ event.is_paid ? 'Paid' : 'Free' }}
@@ -512,17 +512,17 @@
               </span>
             </button>
           </li>
-          <li *ngIf="events.length > eventPageSize" class="px-3 py-3 bg-gray-50 border-t-2 border-gray-200 flex justify-center items-center">
-            <nav class="inline-flex space-x-1" aria-label="Pagination">
+          <li *ngIf="events.length > eventPageSize" class="px-2 sm:px-3 py-3 bg-gray-50 border-t-2 border-gray-200 flex justify-center items-center">
+            <nav class="inline-flex space-x-1 sm:space-x-1.5" aria-label="Pagination">
               <button
-                class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 transition-all duration-150 disabled:cursor-not-allowed font-semibold"
+                class="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 transition-all duration-150 disabled:cursor-not-allowed font-semibold text-sm"
                 [disabled]="eventPage === 1"
                 (click)="prevEventPage()">
                 <i class="fas fa-chevron-left"></i>
               </button>
               <ng-container *ngFor="let _ of [].constructor(eventTotalPages); let i = index">
                 <button
-                  class="w-9 h-9 flex items-center justify-center rounded-lg border-2 transition-all duration-150 font-semibold"
+                  class="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg border-2 transition-all duration-150 font-semibold text-sm"
                   [ngClass]="eventPage === (i + 1) ? 'bg-[#679436] text-white border-[#679436]' : 'bg-white text-gray-700 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436]'"
                   [attr.aria-current]="eventPage === (i + 1) ? 'page' : null"
                   (click)="goToEventPage(i + 1)">
@@ -530,7 +530,7 @@
                 </button>
               </ng-container>
               <button
-                class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 transition-all duration-150 disabled:cursor-not-allowed font-semibold"
+                class="w-10 h-10 sm:w-9 sm:h-9 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-[#679436] hover:text-white hover:border-[#679436] disabled:opacity-50 transition-all duration-150 disabled:cursor-not-allowed font-semibold text-sm"
                 [disabled]="eventPage === eventTotalPages"
                 (click)="nextEventPage()">
                 <i class="fas fa-chevron-right"></i>
@@ -791,14 +791,14 @@
 
   <!-- Mobile: modal for event details -->
   <div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in md:hidden" style="z-index: 3000;">
-    <div class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0 animate-scale-in border-[#679436]"
-      style="max-height: 92vh; overflow-y: auto;">
+    <div class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative border-t-8 mx-2 sm:mx-0 animate-scale-in border-[#679436] flex flex-col"
+      style="max-height: 85vh; overflow: hidden;">
       <button (click)="closeMobileModal()" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-600 flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 border-2 border-gray-200 hover:border-red-300 z-10" aria-label="Close">
         <i class="fas fa-times text-lg"></i>
       </button>
   <!-- Event details content -->
-  <h2 class="text-xl sm:text-2xl font-bold mb-4 text-[#679436]">Event Details</h2>
-      <div class="space-y-3">
+  <h2 class="text-xl sm:text-2xl font-bold mb-4 text-[#679436] flex-shrink-0">Event Details</h2>
+      <div class="space-y-3 flex-1 overflow-y-auto" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
         <div>
           <label class="block text-sm font-medium mb-1 text-gray-700">Title</label>
           <ng-container *ngIf="!isInlineEditing; else editTitleFieldMobile">
@@ -966,36 +966,36 @@
 
 <!-- Participants Modal (responsive update, larger size) -->
 <!-- Participants Modal -->
-<div *ngIf="showParticipantsModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" style="z-index: 3000;">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
-       style="max-height: 95vh;">
+<div *ngIf="showParticipantsModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-2 sm:p-4" style="z-index: 3000;">
+  <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-[95vw] sm:max-w-4xl md:max-w-6xl relative animate-scale-in overflow-hidden flex flex-col"
+       style="max-height: 85vh;">
     
     <!-- Modal Header -->
-    <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
+    <div class="sticky top-0 z-10 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b-4 flex items-center justify-between"
          [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
-      <div class="flex items-center gap-3 flex-1 min-w-0 pr-4">
-        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-          <i class="fas fa-users text-white text-lg"></i>
+      <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pr-2 sm:pr-4">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+          <i class="fas fa-users text-white text-sm sm:text-lg"></i>
         </div>
-        <h2 class="text-xl sm:text-2xl font-bold text-white truncate">
+        <h2 class="text-base sm:text-xl md:text-2xl font-bold text-white break-words line-clamp-2">
           {{ selectedEventTitle }}
         </h2>
       </div>
       <button (click)="closeParticipantsModal()" 
-              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0"
+              class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0 min-h-[44px] min-w-[44px]"
               aria-label="Close">
-        <i class="fas fa-times text-lg"></i>
+        <i class="fas fa-times text-base sm:text-lg"></i>
       </button>
     </div>
 
     <!-- Modal Body -->
-    <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+    <div class="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
       
       <!-- Loading State -->
-      <div *ngIf="participantsLoading" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2" 
+      <div *ngIf="participantsLoading" class="text-center py-8 sm:py-12">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2" 
              [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
-        <p class="mt-4 text-gray-600">Loading participants...</p>
+        <p class="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Loading participants...</p>
       </div>
 
       <!-- Content -->
@@ -1338,30 +1338,30 @@
 </div>
 
 <!-- Create Event Modal -->
-<div *ngIf="showCreateModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" style="z-index: 3000;">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
-       style="max-height: 95vh;">
+<div *ngIf="showCreateModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-2 sm:p-4" style="z-index: 3000;">
+  <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-[95vw] sm:max-w-3xl md:max-w-4xl relative animate-scale-in overflow-hidden flex flex-col"
+       style="max-height: 85vh;">
     
     <!-- Modal Header -->
-    <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
+    <div class="sticky top-0 z-10 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b-4 flex items-center justify-between"
          [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-          <i class="fas text-white text-lg" [ngClass]="isEditing ? 'fa-edit' : 'fa-plus-circle'"></i>
+      <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pr-2">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+          <i class="fas text-white text-sm sm:text-lg" [ngClass]="isEditing ? 'fa-edit' : 'fa-plus-circle'"></i>
         </div>
-        <h2 class="text-xl sm:text-2xl font-bold text-white">
+        <h2 class="text-base sm:text-xl md:text-2xl font-bold text-white truncate">
           {{ isEditing ? 'Edit Event' : 'Create New Event' }}
         </h2>
       </div>
       <button (click)="closeCreateModal()" 
-              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90"
+              class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0 min-h-[44px] min-w-[44px]"
               aria-label="Close">
-        <i class="fas fa-times text-lg"></i>
+        <i class="fas fa-times text-base sm:text-lg"></i>
       </button>
     </div>
 
     <!-- Modal Body -->
-    <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+    <div class="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
       <form class="space-y-6">
         
         <!-- Basic Information Section -->
@@ -1611,9 +1611,9 @@
 </div>
 
 <!-- Evaluations Modal -->
-<div *ngIf="showEvaluationsModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in" style="z-index: 9999;">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl relative mx-2 sm:mx-4 animate-scale-in overflow-hidden"
-       style="max-height: 95vh;">
+<div *ngIf="showEvaluationsModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in p-2 sm:p-4" style="z-index: 3000;">
+  <div class="bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-[95vw] sm:max-w-6xl relative animate-scale-in overflow-hidden flex flex-col"
+       style="max-height: 85vh;">
     
     <!-- Modal Header -->
     <div class="sticky top-0 z-10 px-6 py-4 border-b-4 flex items-center justify-between"
@@ -1627,25 +1627,44 @@
         </h2>
       </div>
       <button (click)="closeEvaluationsModal()" 
-              class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0"
+              class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0 min-h-[44px] min-w-[44px]"
               aria-label="Close">
-        <i class="fas fa-times text-lg"></i>
+        <i class="fas fa-times text-base sm:text-lg"></i>
       </button>
     </div>
 
     <!-- Modal Body -->
-    <div class="px-6 py-6 overflow-y-auto" style="max-height: calc(95vh - 140px);">
+    <div class="flex-1 overflow-y-auto px-6 py-6 flex flex-col" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
       
       <!-- Loading State -->
-      <div *ngIf="evaluationsLoading" class="text-center py-12">
-        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2" [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
-        <p class="mt-4 text-gray-600">Loading evaluations...</p>
+      <div *ngIf="evaluationsLoading" class="text-center py-8 sm:py-12">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2" [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
+        <p class="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Loading evaluations...</p>
       </div>
 
       <!-- Content -->
       <div *ngIf="!evaluationsLoading">
+          <!-- Empty state when there are no evaluations -->
+          <div *ngIf="evaluations.length === 0" class="flex-1 flex flex-col items-center justify-center py-8 min-h-[180px]">
+            <div class="w-20 h-20 rounded-full mb-4 flex items-center justify-center" [ngClass]="isOsws ? 'bg-[#e6f7ef]' : 'bg-gray-100'">
+              <i class="fas fa-star text-4xl text-gray-300"></i>
+            </div>
+            <p class="text-gray-600 text-lg font-semibold">No evaluations submitted yet</p>
+            <p class="text-gray-500 text-sm mt-2">This section will populate once participants submit their evaluations.</p>
+            <div class="mt-6 flex justify-center gap-6">
+              <div class="text-center">
+                <p class="text-sm text-gray-500">Total Evaluations</p>
+                <p class="text-2xl font-bold text-gray-700">{{ evaluationStats?.total_evaluations || 0 }}</p>
+              </div>
+              <div class="text-center">
+                <p class="text-sm text-gray-500">Unique Participants</p>
+                <p class="text-2xl font-bold text-gray-700">{{ evaluationStats?.unique_participants || 0 }}</p>
+              </div>
+            </div>
+          </div>
+
         <!-- Stats Summary Section -->
-        <div *ngIf="evaluationStats" class="space-y-4 mb-6">
+        <div *ngIf="evaluations.length > 0" class="space-y-4 mb-6">
           <h3 class="text-lg font-semibold flex items-center gap-2 pb-2 border-b-2"
               [ngClass]="isOsws ? 'text-[#14532d] border-[#e6f7ef]' : 'text-[#679436] border-green-100'">
             <i class="fas fa-chart-bar"></i>
@@ -2004,16 +2023,6 @@
               </button>
             </nav>
           </div>
-        </div>
-
-        <!-- No Evaluations State -->
-        <div *ngIf="evaluations.length === 0" class="text-center py-12">
-          <div class="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-               [ngClass]="isOsws ? 'bg-[#e6f7ef]' : 'bg-gray-100'">
-            <i class="fas fa-inbox text-4xl text-gray-300"></i>
-          </div>
-          <p class="text-gray-600 text-lg font-semibold">No evaluations submitted yet</p>
-          <p class="text-gray-500 text-sm mt-2">Participants will be able to submit evaluations after attending the event.</p>
         </div>
       </div>
     </div>

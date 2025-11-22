@@ -17,7 +17,10 @@ export class EcertificateComponent implements OnInit {
   certificates: any[] = [];
   loading = true;
   searchTerm: string = '';
-  downloadingCertIds: Set<number> = new Set(); 
+  downloadingCertIds: Set<number> = new Set();
+  requestingCertIds: Set<number> = new Set();
+  requestMessage: string = '';
+  requestError: string = ''; 
 
   constructor(
     private certificateService: CertificateService,
@@ -31,8 +34,9 @@ export class EcertificateComponent implements OnInit {
     if (studentId) {
       this.certificateService.getCertificates(studentId).subscribe({
         next: (res) => {
-          // Filter to only show OSWS events (where is_osws_event is true)
-          this.certificates = (res.data || []).filter((cert: any) => cert.is_osws_event === true);
+          // Show all events (both OSWS and Organization events)
+          // Students can see evaluation requirements and request certificates
+          this.certificates = res.data || [];
           this.loading = false;
         },
         error: () => {
@@ -86,6 +90,31 @@ export class EcertificateComponent implements OnInit {
     this.router.navigate(['/sidebar/evaluation', eventId], {
       queryParams: { title: eventTitle }
     });
+  }
+  
+  requestCertificate(eventId: number) {
+    this.requestingCertIds.add(eventId);
+    this.requestMessage = '';
+    this.requestError = '';
+    
+    this.certificateService.requestCertificate(eventId).subscribe({
+      next: (res) => {
+        this.requestingCertIds.delete(eventId);
+        if (res.success) {
+          this.requestMessage = res.message || 'Certificate request submitted successfully!';
+          setTimeout(() => this.requestMessage = '', 5000);
+        }
+      },
+      error: (err) => {
+        this.requestingCertIds.delete(eventId);
+        this.requestError = err.error?.message || 'Failed to request certificate. Please try again.';
+        setTimeout(() => this.requestError = '', 5000);
+      }
+    });
+  }
+  
+  isRequesting(eventId: number): boolean {
+    return this.requestingCertIds.has(eventId);
   }
 
   downloadCertificateWithHttp(certUrl: string, eventTitle: string, certId?: number) {

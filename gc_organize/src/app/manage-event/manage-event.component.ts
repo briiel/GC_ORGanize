@@ -1239,9 +1239,22 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.evaluationService.getEventEvaluations(event.event_id).subscribe({
       next: (response) => {
         this.evaluationsLoading = false;
-        const data = response.data || response;
-        this.evaluations = data.evaluations || [];
-        this.evaluationStats = data.stats || { total_evaluations: 0, unique_participants: 0 };
+        // Debug: log raw response for troubleshooting
+        console.debug('[ManageEvent] Evaluations API response:', response);
+
+        // Support multiple response shapes: { success, data: { evaluations, stats } } OR { evaluations, stats } OR Array
+        let data: any = null;
+        if (response && response.data) data = response.data;
+        else data = response;
+
+        if (Array.isArray(response)) {
+          // Backend might return an array directly
+          this.evaluations = response;
+          this.evaluationStats = { total_evaluations: response.length, unique_participants: response.length };
+        } else {
+          this.evaluations = data && data.evaluations ? data.evaluations : (data && Array.isArray(data) ? data : []);
+          this.evaluationStats = data && data.stats ? data.stats : { total_evaluations: this.evaluations.length, unique_participants: this.evaluations.length };
+        }
       },
       error: (error) => {
         console.error('Error fetching evaluations:', error);

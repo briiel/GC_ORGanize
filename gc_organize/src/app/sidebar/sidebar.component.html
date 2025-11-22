@@ -15,8 +15,8 @@
             'bg-[#14532d] text-white': role === 'osws_admin'
          }">
                     <!-- Close button (mobile only) -->
-                    <button (click)="closeIfMobile()" class="lg:hidden absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 text-white">
-                        <i class="fas fa-times text-lg"></i>
+                    <button (click)="closeIfMobile()" class="lg:hidden absolute top-3 right-3 w-12 h-12 sm:w-10 sm:h-10 rounded-full flex items-center justify-center bg-white/20 hover:bg-white/30 text-white">
+                        <i class="fas fa-times text-lg sm:text-base"></i>
                     </button>
         <div class="p-4 flex flex-col items-center space-y-2 mt-8 lg:mt-0">
             <img 
@@ -60,28 +60,28 @@
             <!-- Student Buttons -->
             <ng-container *ngIf="role === 'student'">
                 <button [routerLink]="'home'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-home mr-2 text-lg sm:text-xl"></i> Home
                 </button>
                 <button [routerLink]="'eventsreg'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-calendar-check mr-2 text-lg sm:text-xl"></i> Events Registered
                 </button>
                 <button [routerLink]="'history'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-history mr-2 text-lg sm:text-xl"></i> Events Attended
                 </button>
                 <button [routerLink]="'ecertificate'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-certificate mr-2 text-lg sm:text-xl"></i> E-Certificate
                 </button>
                 <button [routerLink]="'request-role'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-user-plus mr-2 text-lg sm:text-xl"></i> Request Role
                 </button>
                 <!-- Logout Button -->
                 <button (click)="onLogout(); closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-sign-out-alt mr-2 text-lg sm:text-xl"></i> Logout
                 </button>
             </ng-container>
@@ -89,33 +89,33 @@
             <!-- Organization Buttons -->
             <ng-container *ngIf="role === 'organization'">
                 <button [routerLink]="'dashboard'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
                 <button [routerLink]="'manage-event'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-tasks mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
                 <!-- <button [routerLink]="'manage-event'" [queryParams]="{ create: true }"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
                 </button> -->
                 <button [routerLink]="'scan-qr'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
                 </button>
                 <!-- Attendance Records Button -->
                 <button [routerLink]="'attendance-records'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer whitespace-nowrap">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer whitespace-nowrap transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
                 </button>
                 <button [routerLink]="'trash'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-trash mr-2 text-lg sm:text-xl"></i> Archive
                 </button>
                 <!-- Logout Button -->
                 <button (click)="onLogout(); closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#56732e] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-sign-out-alt mr-2 text-lg sm:text-xl"></i> Logout
                 </button>
             </ng-container>
@@ -123,14 +123,14 @@
             <!-- OSWS Admin Buttons -->
             <ng-container *ngIf="role === 'osws_admin'">
                 <button [routerLink]="'dashboard'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-tachometer-alt mr-2 text-lg sm:text-xl"></i> Dashboard
                 </button>
                 
                 <!-- User Management Dropdown -->
                 <div class="w-full">
                     <button (click)="toggleUserManagement()"
-                        class="flex items-center justify-between px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                        class="flex items-center justify-between px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                         <span class="flex items-center">
                             <i class="fas fa-users-cog mr-2 text-lg sm:text-xl"></i> User Management
                         </span>
@@ -142,40 +142,40 @@
                     <div *ngIf="isUserManagementOpen" 
                          class="ml-6 mt-1 space-y-1 overflow-hidden transition-all duration-200">
                         <button [routerLink]="'manage-users'" (click)="closeIfMobile()"
-                            class="flex items-center px-3 py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                            class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                             <i class="fas fa-users mr-2"></i> Accounts
                         </button>
                         <button [routerLink]="'role-requests'" (click)="closeIfMobile()"
-                            class="flex items-center px-3 py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                            class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-sm sm:text-base font-medium text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                             <i class="fas fa-user-check mr-2"></i> Role Requests
                         </button>
                     </div>
                 </div>
                 
                 <button [routerLink]="'manage-event'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-calendar-alt mr-2 text-lg sm:text-xl"></i> Manage Events
                 </button>
                 <button [routerLink]="'scan-qr'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-qrcode mr-2 text-lg sm:text-xl"></i> Scan QR
                 </button>
                 <!-- Attendance Records Button for OSWS Admin -->
                 <button [routerLink]="'attendance-records'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer whitespace-nowrap">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer whitespace-nowrap transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-list-alt mr-2 text-lg sm:text-xl"></i> Attendance Records
                 </button>
                 <button [routerLink]="'trash'" (click)="closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-trash mr-2 text-lg sm:text-xl"></i> Archive
                 </button>
                 <!-- <button [routerLink]="'manage-event'" [queryParams]="{ create: true }"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-plus-circle mr-2 text-lg sm:text-xl"></i> Create Event
                 </button> -->
                 <!-- Logout Button -->
                 <button (click)="onLogout(); closeIfMobile()"
-                    class="flex items-center px-3 py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer">
+                    class="flex items-center px-3 py-3 sm:py-2.5 md:py-2 text-base sm:text-lg font-semibold text-white rounded-lg hover:bg-[#218c4a] w-full cursor-pointer transition-all min-h-[48px] sm:min-h-0">
                     <i class="fas fa-sign-out-alt mr-2 text-lg sm:text-xl"></i> Logout
                 </button>
             </ng-container>

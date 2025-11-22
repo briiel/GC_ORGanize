@@ -19,9 +19,8 @@ export class ViewmodalComponent {
   }
 
   // Close on ESC key for accessibility
-  @HostListener('document:keydown.escape', ['$event'])
-  onEsc(event: KeyboardEvent) {
-    event.preventDefault();
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
     this.closeModal();
   }
 
@@ -29,8 +28,8 @@ export class ViewmodalComponent {
     this.imageUrl = url;
   }
 
-  updateBackgroundImage(event: Event, bgElementId: string): void {
-    const imgElement = event.target as HTMLImageElement;
+  updateBackgroundImage($event: Event, bgElementId: string): void {
+    const imgElement = $event.target as HTMLImageElement;
     const bgElement = document.getElementById(bgElementId);
     if (bgElement && imgElement) {
       bgElement.style.backgroundImage = `url('${imgElement.src}')`;

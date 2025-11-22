@@ -5,6 +5,7 @@ import { AdminService } from '../services/admin.service';
 
 @Component({
   selector: 'app-manage-users',
+  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './manage-users.component.html',
   styleUrls: ['./manage-users.component.css']
@@ -117,9 +118,10 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
 
   // Close modal on ESC key press for accessibility and consistency
   @HostListener('document:keydown.escape', ['$event'])
-  onEsc(event: KeyboardEvent) {
+  onEsc(event: Event) {
+    const ke = event as KeyboardEvent;
     if (this.isAddAdminModalOpen) {
-      event.preventDefault();
+      ke.preventDefault();
       this.closeAddAdminModal();
     }
   }

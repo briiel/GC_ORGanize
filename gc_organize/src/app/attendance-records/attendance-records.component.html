@@ -302,22 +302,22 @@
 
 
 <!-- Mobile: modal for records table -->
-<div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in md:hidden" style="z-index: 3000;">
-  <div class="mobile-attendance-modal bg-white rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-lg sm:max-w-3xl relative mx-2 sm:mx-0 animate-scale-in border-2"
+<div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in md:hidden p-2 sm:p-4" style="z-index: 3000;">
+  <div class="mobile-attendance-modal bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-[95vw] sm:max-w-lg md:max-w-3xl relative mx-auto animate-scale-in border-2 flex flex-col"
     [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
-    style="max-height: 92vh; overflow-y: auto;">
-    <button (click)="showMobileModal = false" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-600 transition-colors duration-200" aria-label="Close">
-      <i class="fas fa-times"></i>
+    style="max-height: 85vh;">
+    <button (click)="showMobileModal = false" class="absolute top-2 right-2 sm:top-3 sm:right-3 w-11 h-11 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-600 transition-colors duration-200 min-h-[44px] min-w-[44px]" aria-label="Close">
+      <i class="fas fa-times text-lg sm:text-base"></i>
     </button>
     
     <!-- Modal Header -->
-    <div class="mb-4 pr-8">
-      <div class="flex items-center gap-3 mb-2">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center"
+    <div class="mb-3 sm:mb-4 pr-10 sm:pr-8">
+      <div class="flex items-center gap-2 sm:gap-3 mb-2">
+        <div class="w-10 h-10 sm:w-9 sm:h-9 rounded-full flex items-center justify-center"
              [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
-          <i class="fas fa-users text-white"></i>
+          <i class="fas fa-users text-white text-base sm:text-sm"></i>
         </div>
-        <h2 class="text-xl sm:text-2xl font-bold"
+        <h2 class="text-lg sm:text-xl font-bold break-words"
             [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
           {{ selectedEvent.title }}
         </h2>
@@ -332,40 +332,41 @@
       </div>
     </div>
     <!-- Modal Content -->
-    <div class="space-y-4">
+    <div class="flex-1 overflow-y-auto px-3 sm:px-4 md:p-6" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
+      <div class="space-y-3 sm:space-y-4">
       <!-- Search and Actions -->
       <div class="flex flex-row gap-2 items-center">
         <div class="flex flex-row flex-wrap gap-2 w-full">
           <input
             type="text"
             placeholder="Search by student name or ID..."
-            class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent shadow-sm min-w-0"
+            class="flex-1 px-4 py-3 sm:py-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent shadow-sm min-w-0 text-base"
             [ngClass]="isOsws ? 'focus:ring-[#14532d]' : 'focus:ring-[#679436]'"
             [(ngModel)]="searchTerm"
             (ngModelChange)="onSearch()"
             (keyup.enter)="onSearch()"
           />
           <button
-            class="text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto"
+            class="text-white font-semibold px-5 sm:px-6 py-3 sm:py-2.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[44px] w-auto"
             [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
             (click)="onSearch()"
             type="button"
           >
             <i class="fas fa-search"></i>
-            <span>Search</span>
+            <span class="hidden sm:inline">Search</span>
           </button>
           <button
             *ngIf="searchTerm"
-            class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg border-2 border-gray-300 flex items-center justify-center gap-2 h-[44px] w-auto"
+            class="bg-white hover:bg-gray-50 text-gray-700 font-semibold px-4 sm:px-4 py-3 sm:py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg border-2 border-gray-300 flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[44px] w-auto"
             (click)="clearSearch()"
             type="button"
           >
             <i class="fas fa-times"></i>
-            <span>Clear</span>
+            <span class="hidden sm:inline">Clear</span>
           </button>
           <button
             (click)="downloadExcel()"
-            class="bg-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 sm:px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 h-[44px] w-auto min-w-[44px] text-base whitespace-nowrap"
+            class="bg-blue-600 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-4 sm:px-5 py-3 sm:py-2.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[44px] w-auto text-base whitespace-nowrap"
             [disabled]="filteredRecords.length === 0"
             type="button"
           >
