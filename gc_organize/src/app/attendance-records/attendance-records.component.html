@@ -2,39 +2,40 @@
 <div class="p-6 bg-gray-100 min-h-screen overflow-x-hidden">
   <!-- Header -->
   <div class="mb-6 mx-2 lg:mx-6">
-    <div class="shadow-2xl rounded-2xl overflow-hidden border-2"
-         [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
-      <div class="px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+    <div class="shadow-md rounded-lg overflow-hidden border-l-4"
+         [ngClass]="isOsws ? 'bg-white border-[#14532d]' : 'bg-white border-[#679436]'">
+      <div class="px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border-2 border-white/30">
-            <i class="fas fa-clipboard-list text-white text-lg"></i>
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+               [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
+            <i class="fas fa-clipboard-list text-white text-base"></i>
           </div>
           <div>
-            <h1 class="text-lg sm:text-xl font-bold text-white">Attendance Records</h1>
-            <p class="text-white/80 text-sm mt-0.5">View and manage event attendance</p>
+            <h1 class="text-lg sm:text-xl font-semibold text-gray-800">Attendance Records</h1>
+            <p class="text-gray-600 text-sm mt-0.5">View and manage event attendance</p>
           </div>
         </div>
         <!-- Status legend -->
-        <div class="bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 px-4 py-2 text-xs">
-          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-white">
+        <div class="rounded-lg border-2 border-gray-200 bg-gray-50 px-4 py-2 text-xs">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-gray-700">
             <span class="inline-flex items-center gap-1">
               <span class="relative inline-flex rounded-full h-3 w-3 bg-yellow-400 border border-yellow-500"></span>
-              <span>Not Yet Started</span>
+              <span class="font-medium">Not Yet Started</span>
             </span>
             <span class="inline-flex items-center gap-1">
               <span class="relative flex h-3 w-3">
                 <span class="absolute inline-flex h-full w-full rounded-full opacity-60 animate-ping bg-blue-400"></span>
                 <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500 border border-blue-600"></span>
               </span>
-              <span>Ongoing</span>
+              <span class="font-medium">Ongoing</span>
             </span>
             <span class="inline-flex items-center gap-1">
               <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500 border border-green-600"></span>
-              <span>Concluded</span>
+              <span class="font-medium">Concluded</span>
             </span>
             <span class="inline-flex items-center gap-1">
               <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500 border border-red-600"></span>
-              <span>Cancelled</span>
+              <span class="font-medium">Cancelled</span>
             </span>
           </div>
         </div>
@@ -45,14 +46,15 @@
   <div class="mx-2 lg:mx-6 flex flex-col md:flex-row gap-6 min-h-[400px] max-w-full overflow-x-hidden">
     <!-- Vertical event list -->
     <div class="w-full md:w-1/4 max-w-xs min-w-0">
-      <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden flex flex-col" style="height: auto; min-height: 540px; max-height: none;">
-        <div class="px-6 py-3 border-b-4 flex-shrink-0"
-             [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
+      <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden flex flex-col" style="height: auto; min-height: 540px; max-height: none;">
+        <div class="px-5 py-3 flex-shrink-0"
+             [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-calendar-alt text-white text-sm"></i>
+            <div class="w-8 h-8 rounded-lg bg-white/90 flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-calendar-alt text-sm"
+                 [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
             </div>
-            <h2 class="text-lg font-bold text-white">Events</h2>
+            <h2 class="text-lg font-semibold text-white">Events</h2>
           </div>
         </div>
         <div class="px-4 py-3 bg-white flex gap-2 items-center border-b border-gray-200">
@@ -138,19 +140,20 @@
     </div>
     <!-- Attendees table for selected event -->
     <div class="w-full md:flex-1 hidden md:block min-w-0">
-      <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden">
+      <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
         <ng-container *ngIf="selectedEvent; else selectEventMsg">
           <!-- Header -->
-          <div class="px-6 py-3 border-b-4"
-               [ngClass]="isOsws ? 'bg-[#14532d] border-[#14532d]' : 'bg-[#679436] border-[#679436]'">
+          <div class="px-5 py-3"
+               [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-center gap-3 flex-1">
-                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <i class="fas fa-users text-white text-sm"></i>
+                <div class="w-8 h-8 rounded-lg bg-white/90 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-users text-sm"
+                     [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <h2 class="text-lg font-bold text-white truncate">{{ selectedEvent.title }}</h2>
-                  <p class="text-white/80 text-xs mt-0.5">Attendance records</p>
+                  <h2 class="text-lg font-semibold text-white truncate">{{ selectedEvent.title }}</h2>
+                  <p class="text-white/90 text-xs mt-0.5">Attendance records</p>
                 </div>
                 <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border-2 text-xs font-semibold flex-shrink-0"
                       [ngClass]="selectedEvent.is_paid ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'">
@@ -213,40 +216,40 @@
             <!-- Table -->
             <div class="overflow-x-auto shadow-sm">
               <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMsg">
-                <table *ngIf="!error" class="w-full text-sm">
+                <table *ngIf="!error" class="min-w-full divide-y divide-gray-200">
                   <thead
                          [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
-                      <tr class="uppercase tracking-wider text-white">
-                        <th class="px-3 py-3 text-center w-12">#</th>
-                        <th class="px-3 py-3 text-center min-w-[100px]">Student ID</th>
-                        <th class="px-3 py-3 text-left min-w-[180px]">Name</th>
-                        <th class="px-3 py-3 text-center min-w-[100px]">Dept</th>
-                        <th class="px-3 py-3 text-left min-w-[150px]">Program</th>
-                        <th class="px-3 py-3 text-center min-w-[140px]">Time In</th>
-                        <th class="px-3 py-3 text-center min-w-[140px]">Time Out</th>
-                        <th class="px-3 py-3 text-left min-w-[160px]">Scanned By</th>
-                        <th class="px-3 py-3 text-center min-w-[120px]">Position</th>
+                      <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
+                        <th class="px-3 py-3 text-center w-12 font-semibold">#</th>
+                        <th class="px-3 py-3 text-center min-w-[100px] font-semibold">Student ID</th>
+                        <th class="px-3 py-3 text-left min-w-[180px] font-semibold">Name</th>
+                        <th class="px-3 py-3 text-center min-w-[100px] font-semibold">Dept</th>
+                        <th class="px-3 py-3 text-left min-w-[150px] font-semibold">Program</th>
+                        <th class="px-3 py-3 text-center min-w-[140px] font-semibold">Time In</th>
+                        <th class="px-3 py-3 text-center min-w-[140px] font-semibold">Time Out</th>
+                        <th class="px-3 py-3 text-left min-w-[160px] font-semibold">Scanned By</th>
+                        <th class="px-3 py-3 text-center min-w-[120px] font-semibold">Position</th>
                       </tr>
                     </thead>
                     <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
                       <tr *ngFor="let record of pagedRecords; let i = index" 
-                          class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50">
-                        <td class="px-3 py-3 text-center font-semibold"
+                          class="hover:bg-gray-50 transition-all duration-200 even:bg-gray-50/50">
+                        <td class="px-3 py-3 text-center font-semibold text-sm"
                             [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</td>
-                        <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ record.student_id || '-' }}</td>
-                        <td class="px-3 py-3 text-left" [title]="formatName(record)">
+                        <td class="px-3 py-3 text-center text-xs">{{ record.student_id || '-' }}</td>
+                        <td class="px-3 py-3 text-left text-sm" [title]="formatName(record)">
                           <div class="line-clamp-2">{{ formatName(record) }}</div>
                         </td>
-                        <td class="px-3 py-3 text-center" [title]="record.department">{{ record.department || '-' }}</td>
-                        <td class="px-3 py-3 text-left" [title]="record.program">
+                        <td class="px-3 py-3 text-center text-xs" [title]="record.department">{{ record.department || '-' }}</td>
+                        <td class="px-3 py-3 text-left text-sm" [title]="record.program">
                           <div class="line-clamp-2">{{ record.program || '-' }}</div>
                         </td>
-                        <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
-                        <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_out) }}</td>
-                        <td class="px-3 py-3 text-left" [title]="record.scanned_by">
+                        <td class="px-3 py-3 text-center text-xs">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
+                        <td class="px-3 py-3 text-center text-xs">{{ formatDateTime(record.time_out) }}</td>
+                        <td class="px-3 py-3 text-left text-sm" [title]="record.scanned_by">
                           <div class="line-clamp-2">{{ record.scanned_by || '-' }}</div>
                         </td>
-                        <td class="px-3 py-3 text-center" [title]="record.scanned_by_position">
+                        <td class="px-3 py-3 text-center text-xs" [title]="record.scanned_by_position">
                           <div class="line-clamp-2">{{ record.scanned_by_position || '-' }}</div>
                         </td>
                       </tr>
@@ -303,34 +306,26 @@
 
 <!-- Mobile: modal for records table -->
 <div *ngIf="selectedEvent && showMobileModal" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in md:hidden p-2 sm:p-4" style="z-index: 3000;">
-  <div class="mobile-attendance-modal bg-white rounded-xl sm:rounded-2xl shadow-2xl w-full max-w-[95vw] sm:max-w-lg md:max-w-3xl relative mx-auto animate-scale-in border-2 flex flex-col"
-    [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"
+  <div class="mobile-attendance-modal bg-white rounded-lg shadow-2xl w-full max-w-[95vw] sm:max-w-lg md:max-w-3xl relative mx-auto animate-scale-in flex flex-col"
     style="max-height: 85vh;">
-    <button (click)="showMobileModal = false" class="absolute top-2 right-2 sm:top-3 sm:right-3 w-11 h-11 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-100 text-gray-600 hover:text-red-600 transition-colors duration-200 min-h-[44px] min-w-[44px]" aria-label="Close">
-      <i class="fas fa-times text-lg sm:text-base"></i>
-    </button>
     
     <!-- Modal Header -->
-    <div class="mb-3 sm:mb-4 pr-10 sm:pr-8">
-      <div class="flex items-center gap-2 sm:gap-3 mb-2">
-        <div class="w-10 h-10 sm:w-9 sm:h-9 rounded-full flex items-center justify-center"
-             [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
-          <i class="fas fa-users text-white text-base sm:text-sm"></i>
+    <div class="px-4 sm:px-6 py-4 flex items-center justify-between"
+         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'">
+      <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
+        <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+          <i class="fas fa-users text-white"></i>
         </div>
-        <h2 class="text-lg sm:text-xl font-bold break-words"
-            [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">
-          {{ selectedEvent.title }}
-        </h2>
+        <div class="flex-1 min-w-0">
+          <h2 class="text-lg font-bold text-white truncate">{{ selectedEvent.title }}</h2>
+          <p class="text-sm text-white/80">Attendance Records</p>
+        </div>
       </div>
-      <div class="flex items-center gap-2 ml-13">
-        <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full border-2 text-xs font-semibold"
-              [ngClass]="selectedEvent?.is_paid ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'">
-          <i class="fas" [ngClass]="selectedEvent?.is_paid ? 'fa-coins' : 'fa-ticket-alt'"></i>
-          {{ selectedEvent?.is_paid ? 'Paid' : 'Free' }}
-        </span>
-        <span class="text-gray-500 text-sm">Attendance Records</span>
-      </div>
+      <button (click)="showMobileModal = false" class="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 min-h-[44px] min-w-[44px]" aria-label="Close">
+        <i class="fas fa-times text-lg"></i>
+      </button>
     </div>
+    
     <!-- Modal Content -->
     <div class="flex-1 overflow-y-auto px-3 sm:px-4 md:p-6" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
       <div class="space-y-3 sm:space-y-4">

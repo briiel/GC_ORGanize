@@ -1,0 +1,252 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+  <!-- Header -->
+  <div class="mb-6 mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#679436]">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
+            <i class="fas fa-users text-white"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-800">Organization Members</h1>
+            <p class="text-sm text-gray-600">Manage your organization members</p>
+          </div>
+        </div>
+        <button 
+          *ngIf="members.length > 0"
+          (click)="exportToCSV()" 
+          class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors font-semibold flex items-center gap-2 shadow-sm hover:shadow">
+          <i class="fas fa-download"></i>
+          <span>Export CSV</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#679436]"></div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error && !loading" class="mb-6 mx-2 lg:mx-6">
+    <div class="p-4 rounded-lg border-2 border-red-300 bg-red-50 text-red-700 flex items-center gap-3">
+      <i class="fas fa-exclamation-circle text-xl"></i>
+      <span>{{ error }}</span>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div *ngIf="!loading && members.length > 0" class="mb-6 mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-search mr-1"></i>Search Members
+          </label>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilters()"
+            placeholder="Search by name, student ID, email, or position..."
+            class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all text-sm"
+          />
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-filter mr-1"></i>Filter by Position
+          </label>
+          <select
+            [(ngModel)]="filterPosition"
+            (ngModelChange)="applyFilters()"
+            class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all text-sm bg-white"
+          >
+            <option value="">All Positions</option>
+            <option *ngFor="let position of uniquePositions" [value]="position">{{ position }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">
+            <i class="fas fa-sort mr-1"></i>Sort By
+          </label>
+          <select class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all text-sm bg-white">
+            <option value="name_asc">Name (A-Z)</option>
+            <option value="name_desc">Name (Z-A)</option>
+            <option value="position_asc">Position (A-Z)</option>
+            <option value="date_desc">Recently Joined</option>
+          </select>
+        </div>
+      </div>
+      <div *ngIf="searchTerm || filterPosition" class="mt-4">
+        <button
+          (click)="clearFilters()"
+          class="px-4 py-2.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-semibold border-2 border-gray-300 flex items-center gap-2"
+        >
+          <i class="fas fa-times"></i>
+          <span>Clear Filters</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Members List -->
+  <div *ngIf="!loading && filteredMembers.length > 0" class="mx-2 lg:mx-6">
+    <!-- Desktop Table View -->
+    <div class="hidden lg:block bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-[#679436]">
+            <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
+              <th class="px-4 py-3 text-left font-semibold">Student ID</th>
+              <th class="px-4 py-3 text-left font-semibold">Name</th>
+              <th class="px-4 py-3 text-left font-semibold">Position</th>
+              <th class="px-4 py-3 text-left font-semibold">Email</th>
+              <th class="px-4 py-3 text-left font-semibold">Program</th>
+              <th class="px-4 py-3 text-left font-semibold">Joined</th>
+              <th class="px-4 py-3 text-center font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr *ngFor="let member of paginatedMembers" class="hover:bg-green-50/50 transition-all duration-200">
+              <td class="px-4 py-3.5 text-sm font-semibold text-gray-900">
+                {{ member.student_id }}
+              </td>
+              <td class="px-4 py-3.5">
+                <div class="text-sm font-semibold text-gray-900">{{ getFullName(member) }}</div>
+                <div class="text-xs text-gray-500 mt-0.5">{{ member.department }}</div>
+              </td>
+              <td class="px-4 py-3.5">
+                <span [ngClass]="getPositionBadgeClass(member.position)" class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-full">
+                  {{ member.position }}
+                </span>
+              </td>
+              <td class="px-4 py-3.5 text-sm text-gray-600">
+                {{ member.email }}
+              </td>
+              <td class="px-4 py-3.5 text-sm text-gray-600">
+                {{ member.program }}
+              </td>
+              <td class="px-4 py-3.5 text-sm text-gray-600">
+                {{ formatDate(member.joined_at) }}
+              </td>
+              <td class="px-4 py-3.5 text-center">
+                <button
+                  (click)="removeMember(member)"
+                  class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-600 hover:text-white hover:bg-red-600 transition-all duration-200"
+                  title="Remove member">
+                  <i class="fas fa-trash-alt text-sm"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Mobile Card View -->
+    <div class="lg:hidden space-y-3">
+      <div *ngFor="let member of paginatedMembers" class="bg-white rounded-lg shadow-md hover:shadow-lg p-4 border border-gray-200 transition-all duration-200">
+        <div class="mb-3">
+          <h3 class="text-base font-bold text-gray-900">{{ getFullName(member) }}</h3>
+          <p class="text-sm text-gray-500 font-medium">{{ member.student_id }}</p>
+        </div>
+
+        <div class="mb-3">
+          <span [ngClass]="getPositionBadgeClass(member.position)" class="inline-flex px-3 py-1 text-xs font-bold rounded-full">
+            {{ member.position }}
+          </span>
+        </div>
+
+        <div class="space-y-2 text-sm text-gray-600">
+          <div class="flex items-center gap-2">
+            <i class="fas fa-envelope w-4 text-gray-400"></i>
+            <span>{{ member.email }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-book w-4 text-gray-400"></i>
+            <span>{{ member.program }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-building w-4 text-gray-400"></i>
+            <span>{{ member.department }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-calendar w-4 text-gray-400"></i>
+            <span>Joined {{ formatDate(member.joined_at) }}</span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-gray-200">
+          <button
+            (click)="removeMember(member)"
+            class="w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-2 font-semibold">
+            <i class="fas fa-trash-alt"></i>
+            <span>Remove Member</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="mt-6 bg-white rounded-lg shadow-md p-4">
+      <div class="flex items-center justify-between">
+        <div class="text-sm text-gray-600 font-medium">
+          Showing {{ (currentPage - 1) * itemsPerPage + 1 }} - 
+          {{ Math.min(currentPage * itemsPerPage, filteredMembers.length) }} of 
+          {{ filteredMembers.length }} members
+        </div>
+        <div class="flex gap-2">
+          <button
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+            [class.opacity-50]="currentPage === 1"
+            [class.cursor-not-allowed]="currentPage === 1"
+            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:hover:bg-white transition-colors font-medium"
+          >
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <div class="px-4 py-2 bg-[#679436] text-white rounded-lg font-semibold">
+            {{ currentPage }} / {{ totalPages }}
+          </div>
+          <button
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            [class.opacity-50]="currentPage === totalPages"
+            [class.cursor-not-allowed]="currentPage === totalPages"
+            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:hover:bg-white transition-colors font-medium"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && members.length === 0 && !error" class="mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+      <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-users text-3xl text-gray-400"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">No Members Found</h3>
+      <p class="text-sm text-gray-500">This organization doesn't have any members yet.</p>
+    </div>
+  </div>
+
+  <!-- No Results After Filter -->
+  <div *ngIf="!loading && members.length > 0 && filteredMembers.length === 0" class="mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+      <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-search text-3xl text-gray-400"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-700 mb-2">No Results Found</h3>
+      <p class="text-sm text-gray-500 mb-4">Try adjusting your search or filter criteria.</p>
+      <button
+        (click)="clearFilters()"
+        class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors font-semibold shadow-sm"
+      >
+        <i class="fas fa-redo mr-2"></i>Clear Filters
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,106 +1,127 @@
-<div class="p-3 sm:p-4 lg:p-6 bg-gray-100 overflow-y-auto">
-  <!-- Back to Home Button -->
-  <button [routerLink]="'/sidebar/home'" class="mb-4 px-4 py-2.5 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center cursor-pointer min-h-[44px] sm:min-h-[40px]">
-    <i class="fas fa-arrow-left mr-2"></i>
-    Back to Home
-  </button>
-
-  <!-- Profile Header -->
-  <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
-    <div class="flex flex-col sm:flex-row items-center gap-4">
-      <!-- Profile Image -->
-      <div class="relative mb-4 sm:mb-0">
-        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-[#679436] flex items-center justify-center">
-          <i class="fas fa-user text-gray-500 text-4xl sm:text-5xl"></i>
+<div class="p-6 bg-gray-100 min-h-screen">
+  <!-- Header -->
+  <div class="mb-6 mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#679436]">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
+          <i class="fas fa-user-circle text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-800">My Profile</h1>
+          <p class="text-sm text-gray-600">View and manage your account information</p>
         </div>
       </div>
+    </div>
+  </div>
 
-      
-      <!-- Profile Info -->
-      <div class="flex-1 text-center sm:text-left">
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Juan Dela Cruz</h1>
-        <p class="text-sm sm:text-base text-gray-600">Student</p>
-        <p class="text-sm sm:text-base text-[#05668D] font-medium">BSIT - 2nd Year</p>
+  <!-- Profile Header -->
+  <div class="mx-2 lg:mx-6 mb-6">
+    <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+      <div class="flex flex-col sm:flex-row items-center gap-6">
+        <!-- Profile Image -->
+        <div class="relative">
+          <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-[#679436] flex items-center justify-center bg-gray-50 shadow-lg">
+            <i class="fas fa-user text-gray-400 text-5xl"></i>
+          </div>
+        </div>
+        
+        <!-- Profile Info -->
+        <div class="flex-1 text-center sm:text-left">
+          <h2 class="text-2xl font-bold text-gray-800">Juan Dela Cruz</h2>
+          <p class="text-gray-600 mt-1 font-medium">Student</p>
+          <p class="text-[#679436] font-semibold mt-1">BSIT - 2nd Year</p>
+        </div>
+
+        <!-- Edit Profile Button -->
+        <button class="px-5 py-2.5 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-all duration-200 flex items-center gap-2 font-semibold shadow-md hover:shadow-lg">
+          <i class="fas fa-edit"></i>
+          <span>Edit Profile</span>
+        </button>
       </div>
-
-      <!-- Edit Profile Button -->
-      <button class="mt-4 sm:mt-0 px-4 py-2.5 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center min-h-[44px] sm:min-h-[40px] justify-center w-full sm:w-auto">
-        <i class="fas fa-edit mr-2"></i>
-        Edit Profile
-      </button>
     </div>
   </div>
 
   <!-- Profile Details -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-    <!-- Personal Information -->
-    <div class="lg:col-span-2">
-      <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-        <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
-          <i class="fas fa-user-circle text-[#05668D] mr-2"></i>
-          Personal Information
-        </h2>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Full Name</label>
-            <p class="mt-1 text-gray-800">Juan Dela Cruz</p>
+  <div class="mx-2 lg:mx-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Personal Information -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
+              <i class="fas fa-id-card text-white"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-800">Personal Information</h2>
+              <p class="text-sm text-gray-600">Your account details</p>
+            </div>
           </div>
           
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Student Number</label>
-            <p class="mt-1 text-gray-800">2021-00123</p>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Email</label>
-            <p class="mt-1 text-gray-800">juan.delacruz&#64;gordoncollege.edu.ph</p>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Contact Number</label>
-            <p class="mt-1 text-gray-800">+63 912 345 6789</p>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Department</label>
-            <p class="mt-1 text-gray-800">College of Computer Studies</p>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-600">Course</label>
-            <p class="mt-1 text-gray-800">BS Information Technology</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+              <p class="text-gray-900 font-medium">Juan Dela Cruz</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Student Number</label>
+              <p class="text-gray-900 font-medium">2021-00123</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+              <p class="text-gray-900 font-medium break-all">juan.delacruz&#64;gordoncollege.edu.ph</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Contact Number</label>
+              <p class="text-gray-900 font-medium">+63 912 345 6789</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Department</label>
+              <p class="text-gray-900 font-medium">College of Computer Studies</p>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">Course</label>
+              <p class="text-gray-900 font-medium">BS Information Technology</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Quick Stats -->
-    <div class="lg:col-span-1">
-      <div class="bg-white rounded-lg shadow-md p-4 sm:p-6">
-        <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-3 sm:mb-4 flex items-center">
-          <i class="fas fa-chart-bar text-[#05668D] mr-2"></i>
-          Event Statistics
-        </h2>
+      <!-- Quick Stats -->
+      <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
+            <i class="fas fa-chart-bar text-white"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-800">Event Statistics</h2>
+            <p class="text-sm text-gray-600">Your activity</p>
+          </div>
+        </div>
         
-        <div class="space-y-3 sm:space-y-4">
-          <div class="p-4 bg-gray-50 rounded-lg">
+        <div class="space-y-3">
+          <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div class="flex justify-between items-center">
-              <span class="text-gray-600">Events Registered</span>
+              <span class="text-gray-700 font-medium text-sm">Events Registered</span>
               <span class="text-xl font-bold text-[#679436]">12</span>
             </div>
           </div>
           
-          <div class="p-4 bg-gray-50 rounded-lg">
+          <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div class="flex justify-between items-center">
-              <span class="text-gray-600">Events Attended</span>
+              <span class="text-gray-700 font-medium text-sm">Events Attended</span>
               <span class="text-xl font-bold text-[#679436]">8</span>
             </div>
           </div>
           
-          <div class="p-4 bg-gray-50 rounded-lg">
+          <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">
             <div class="flex justify-between items-center">
-              <span class="text-gray-600">Certificates Earned</span>
+              <span class="text-gray-700 font-medium text-sm">Certificates Earned</span>
               <span class="text-xl font-bold text-[#679436]">8</span>
             </div>
           </div>
@@ -108,34 +129,36 @@
       </div>
 
       <!-- Recent Activities -->
-      <div class="bg-white rounded-lg shadow-md p-6 mt-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-          <i class="fas fa-clock text-[#05668D] mr-2"></i>
+      <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 mt-6">
+        <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center">
+          <div class="w-8 h-8 rounded-lg bg-[#679436] flex items-center justify-center mr-3">
+            <i class="fas fa-clock text-white"></i>
+          </div>
           Recent Activities
         </h2>
         
         <div class="space-y-4">
-          <div class="flex items-start space-x-3">
+          <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
             <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-[#679436] rounded-full flex items-center justify-center">
-                <i class="fas fa-calendar-check text-white"></i>
+              <div class="w-8 h-8 bg-[#679436] rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-check text-white text-sm"></i>
               </div>
             </div>
-            <div>
-              <p class="text-gray-800">Registered for JPIA HEIST</p>
-              <p class="text-sm text-gray-500">2 days ago</p>
+            <div class="flex-1 min-w-0">
+              <p class="text-gray-900 font-medium text-sm">Registered for JPIA HEIST</p>
+              <p class="text-xs text-gray-500">2 days ago</p>
             </div>
           </div>
 
-          <div class="flex items-start space-x-3">
+          <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
             <div class="flex-shrink-0">
-              <div class="w-8 h-8 bg-[#05668D] rounded-full flex items-center justify-center">
-                <i class="fas fa-certificate text-white"></i>
+              <div class="w-8 h-8 bg-[#679436] rounded-lg flex items-center justify-center">
+                <i class="fas fa-certificate text-white text-sm"></i>
               </div>
             </div>
-            <div>
-              <p class="text-gray-800">Earned Certificate - JFINEX Operation</p>
-              <p class="text-sm text-gray-500">1 week ago</p>
+            <div class="flex-1 min-w-0">
+              <p class="text-gray-900 font-medium text-sm">Earned Certificate - JFINEX Operation</p>
+              <p class="text-xs text-gray-500">1 week ago</p>
             </div>
           </div>
         </div>
