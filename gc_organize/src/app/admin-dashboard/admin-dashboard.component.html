@@ -1,6 +1,6 @@
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
   <!-- Header -->
-  <div class="mb-6 mx-2 lg:mx-6">
+  <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
     <div class="bg-white shadow-md rounded-lg overflow-hidden border-l-4 border-[#14532d]">
       <div class="px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3">
@@ -27,7 +27,6 @@
           </div>
           <div>
             <h2 class="text-lg font-bold text-white">Quick Actions</h2>
-            <p class="text-sm text-white/80">Admin tools</p>
           </div>
         </div>
       </div>
@@ -52,7 +51,6 @@
           </div>
           <div>
             <h2 class="text-lg font-bold text-white">Status Overview</h2>
-            <p class="text-sm text-white/80">Event statistics</p>
           </div>
         </div>
       </div>
@@ -99,7 +97,6 @@
             </div>
             <div>
               <h3 class="text-lg font-bold text-white">Events by Department</h3>
-              <p class="text-sm text-white/80 hidden sm:block">Distribution analysis</p>
             </div>
           </div>
           <select [(ngModel)]="pieChartFilter" 
@@ -127,7 +124,6 @@
             </div>
             <div>
               <h3 class="text-lg font-bold text-white">Activities per Organization</h3>
-              <p class="text-sm text-white/80 hidden sm:block">Creation statistics</p>
             </div>
           </div>
           <select [(ngModel)]="barChartFilter" 

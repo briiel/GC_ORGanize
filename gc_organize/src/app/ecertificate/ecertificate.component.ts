@@ -87,7 +87,7 @@ export class EcertificateComponent implements OnInit {
   }
 
   goToEvaluation(eventId: number, eventTitle: string) {
-    this.router.navigate(['/sidebar/evaluation', eventId], {
+    this.router.navigate(['/student-dashboard/evaluation', eventId], {
       queryParams: { title: eventTitle }
     });
   }

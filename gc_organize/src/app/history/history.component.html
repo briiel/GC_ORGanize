@@ -1,6 +1,6 @@
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
   <!-- Header -->
-  <div class="mb-6 mx-2 lg:mx-6">
+  <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
     <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#679436]">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
@@ -66,7 +66,8 @@
   <!-- Events Table -->
   <div class="mx-2 lg:mx-6 mb-10">
     <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
-      <div class="overflow-x-auto">
+      <!-- Desktop Table View -->
+      <div class="hidden md:block overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-[#679436]">
           <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
@@ -150,6 +151,76 @@
           </tr>
         </tbody>
       </table>
+      </div>
+
+      <!-- Mobile Card View -->
+      <div class="md:hidden space-y-4 p-4 bg-gray-50">
+        <!-- Loading State -->
+        <div *ngIf="loading" class="text-center py-8">
+          <i class="fas fa-spinner fa-spin text-3xl text-[#679436]"></i>
+          <p class="text-gray-600 mt-2">Loading your attended events...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && items.length === 0" class="text-center py-8">
+          <i class="fas fa-calendar-times text-4xl text-gray-400"></i>
+          <h3 class="text-lg font-medium text-gray-900 mt-2">No attended events yet</h3>
+          <p class="text-gray-500">Attend events to see your history here!</p>
+        </div>
+
+        <div *ngFor="let e of pagedItems; let i = index" class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+          <!-- Header -->
+          <div class="bg-[#679436] px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 text-white font-bold">
+                {{ (page - 1) * pageSize + i + 1 }}
+              </div>
+              <h3 class="text-white font-bold text-sm truncate max-w-[180px]">{{ e.event_title || e.title }}</h3>
+            </div>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-white/20 text-white border border-white/30">
+              {{ e.department ? e.department : 'OSWS' }}
+            </span>
+          </div>
+
+          <!-- Body -->
+          <div class="p-4 space-y-3">
+            <!-- Date & Status -->
+            <div class="flex justify-between items-center">
+              <div class="text-sm font-medium text-gray-900">
+                <i class="far fa-calendar text-gray-400 mr-1.5"></i>{{ e.attended_at | date:'MMM d, y' }}
+              </div>
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border-2"
+                    [ngClass]="statusColor(e.status)">
+                {{ (e.status || 'Unknown') | titlecase }}
+              </span>
+            </div>
+
+            <!-- Time In/Out -->
+            <div class="grid grid-cols-2 gap-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <div class="flex flex-col items-center">
+                <span class="text-xs text-gray-500 font-semibold uppercase mb-1">Time In</span>
+                <div class="flex items-center gap-1.5 text-green-700 font-bold">
+                  <i class="fas fa-sign-in-alt"></i>
+                  <span>{{ e.time_in ? formatTime(e.time_in) : '—' }}</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-center border-l border-gray-200">
+                <span class="text-xs text-gray-500 font-semibold uppercase mb-1">Time Out</span>
+                <div class="flex items-center gap-1.5 text-red-700 font-bold">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>{{ e.time_out ? formatTime(e.time_out) : '—' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Scanned By -->
+            <div class="pt-2 border-t border-gray-100 text-xs text-gray-500 flex justify-end items-center gap-1">
+              <span>Scanned by:</span>
+              <span class="font-medium text-gray-700">{{ e.scanned_by_name || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Pagination Controls -->

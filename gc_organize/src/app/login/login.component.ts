@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
   isLoading = false;
   public installPrompt: any;
   capsLockOn = false;
+  justLoggedOut = false;
 
   constructor(
     private authService: RbacAuthService, 
@@ -33,8 +34,9 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    // Check for logout message
+    // Check for logout message and set animation flag
     if (localStorage.getItem('justLoggedOut')) {
+      this.justLoggedOut = true;
       Swal.fire({
         toast: true,
         position: 'top-end',

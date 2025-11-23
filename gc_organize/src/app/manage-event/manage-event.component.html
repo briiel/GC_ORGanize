@@ -1,6 +1,6 @@
-<div class="p-6 bg-gray-100 min-h-screen">
+<div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
   <!-- OSWS Header and Create Button -->
-  <div *ngIf="isOsws" class="mb-6 mx-2 lg:mx-6">
+  <div *ngIf="isOsws" class="mb-6 mx-0 sm:mx-2 lg:mx-6">
     <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#14532d]">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-center gap-3">
@@ -27,9 +27,51 @@
 
   <!-- OSWS VIEW: Show two tables with OSWS palette -->
   <ng-container *ngIf="isOsws; else orgTable">
+    <!-- OSWS Search & Sort Card (styled like Events Attended card) -->
+    <div class="mb-6 mx-2 lg:mx-6">
+      <div class="bg-white rounded-lg shadow-md p-4 sm:p-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <i class="fas fa-search mr-1"></i>Search Events
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              placeholder="Search by title, location, or date..."
+              class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm"
+              (keyup.enter)="applyOswsFilters()"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              <i class="fas fa-sort mr-1"></i>Sort By
+            </label>
+            <select [(ngModel)]="oswsSortBy" (ngModelChange)="applyOswsFilters()"
+              class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm bg-white">
+              <option value="title_asc">Title (A → Z)</option>
+              <option value="title_desc">Title (Z → A)</option>
+              <option value="date_asc">Date (Oldest)</option>
+              <option value="date_desc">Date (Newest)</option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="searchTerm" class="mt-4">
+          <button
+            (click)="searchTerm=''; oswsSortBy='title_asc'; applyOswsFilters()"
+            class="px-4 py-2.5 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-semibold border-2 border-gray-300 flex items-center gap-2"
+          >
+            <i class="fas fa-times"></i>
+            <span>Clear Search</span>
+          </button>
+        </div>
+      </div>
+    </div>
     <!-- Table 1: Events made by OSWS -->
     <div class="mx-2 lg:mx-6 mb-10">
-      <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
+      <div class="hidden md:block bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
         <div class="overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-[#14532d]">
@@ -153,6 +195,104 @@
         </table>
       </div>
     </div>
+
+    <!-- Mobile Card View for OSWS Events -->
+    <div class="md:hidden space-y-4">
+      <div *ngFor="let event of filteredOswsEvents(); let i = index" class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-[#14532d] px-4 py-3 flex justify-between items-center">
+          <div class="flex items-center gap-2 overflow-hidden">
+            <span class="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded">{{ i + 1 }}</span>
+            <h3 class="text-white font-bold truncate">{{ event.title }}</h3>
+          </div>
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-white/20 text-white border border-white/30">
+             <i class="fas text-[10px]" [ngClass]="event.is_paid ? 'fa-peso-sign' : 'fa-ticket-alt'"></i>
+             {{ event.is_paid ? 'Paid' : 'Free' }}
+          </span>
+        </div>
+        
+        <!-- Body -->
+        <div class="p-4 space-y-3">
+          <!-- Date & Time -->
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <p class="text-xs text-gray-500 font-semibold uppercase">Date</p>
+              <p class="font-medium text-gray-800">{{ event.start_date | date: 'MMM d, y' }}</p>
+              <p *ngIf="event.end_date" class="text-xs text-gray-500">to {{ event.end_date | date: 'MMM d, y' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 font-semibold uppercase">Time</p>
+              <p class="font-medium text-gray-800">{{ formatTime(event.start_time) }}</p>
+              <p *ngIf="event.end_time" class="text-xs text-gray-500">to {{ formatTime(event.end_time) }}</p>
+            </div>
+          </div>
+          
+          <!-- Location -->
+          <div>
+            <p class="text-xs text-gray-500 font-semibold uppercase">Location</p>
+            <div class="flex items-center gap-1.5 mt-0.5">
+              <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
+              <span class="text-sm font-medium text-gray-800 truncate">{{ event.location }}</span>
+            </div>
+          </div>
+          
+          <!-- Status -->
+          <div>
+            <p class="text-xs text-gray-500 font-semibold uppercase mb-1">Status</p>
+            <select
+              class="w-full px-3 py-2 rounded-lg border-2 focus:outline-none focus:ring-2 transition-all text-sm font-semibold cursor-pointer"
+              [ngClass]="{
+                'bg-yellow-50 text-yellow-800 border-yellow-300 focus:ring-yellow-200': event.status === 'not yet started',
+                'bg-blue-50 text-blue-800 border-blue-300 focus:ring-blue-200': event.status === 'ongoing',
+                'bg-green-50 text-green-800 border-green-300 focus:ring-green-200': event.status === 'concluded',
+                'bg-red-50 text-red-800 border-red-300 focus:ring-red-200': event.status === 'cancelled'
+              }"
+              [ngModel]="event.status"
+              (ngModelChange)="event.status = $event"
+              (change)="updateOswsEventStatus(event)"
+            >
+              <option value="not yet started" [disabled]="!isStatusOptionEnabled(event, 'not yet started')">Not Yet Started</option>
+              <option value="ongoing" [disabled]="!isStatusOptionEnabled(event, 'ongoing')">Ongoing</option>
+              <option value="concluded" [disabled]="!isStatusOptionEnabled(event, 'concluded')">Concluded</option>
+              <option value="cancelled" [disabled]="!isStatusOptionEnabled(event, 'cancelled')">Cancelled</option>
+            </select>
+          </div>
+          
+          <!-- Actions -->
+          <div class="pt-3 border-t border-gray-100 flex justify-between gap-2">
+             <button (click)="openParticipantsModal(event)" 
+                    class="flex-1 py-2 rounded-lg text-white bg-[#14532d] hover:bg-[#166534] text-sm font-semibold shadow-sm" 
+                    title="View Participants">
+              <i class="fas fa-users mr-1"></i> Part.
+            </button>
+            <button (click)="openEvaluationsModal(event)" 
+                    class="flex-1 py-2 rounded-lg text-white bg-purple-600 hover:bg-purple-700 text-sm font-semibold shadow-sm" 
+                    title="View Evaluations">
+              <i class="fas fa-star mr-1"></i> Eval.
+            </button>
+            <button (click)="editEvent(event)" 
+                    [disabled]="isEventConcluded(event)"
+                    [class]="isEventConcluded(event) 
+                      ? 'w-10 py-2 rounded-lg text-gray-400 bg-gray-200 cursor-not-allowed flex items-center justify-center' 
+                      : 'w-10 py-2 rounded-lg text-white bg-blue-600 hover:bg-blue-700 flex items-center justify-center shadow-sm'"
+                    title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="confirmDeleteEvent(event)" 
+                    class="w-10 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 flex items-center justify-center shadow-sm" 
+                    title="Delete">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Empty State Mobile -->
+      <div *ngIf="filteredOswsEvents().length === 0" class="bg-gray-50 rounded-lg p-8 text-center border border-gray-200">
+        <i class="fas fa-calendar-times text-4xl text-gray-300 mb-3"></i>
+        <p class="font-semibold text-gray-600">No OSWS events found</p>
+      </div>
+    </div>
     </div>
 
     <!-- Table 2: Events made by Student Organizations -->
@@ -165,8 +305,7 @@
             <i class="fas fa-users text-white"></i>
           </div>
           <div>
-            <h2 class="text-lg font-bold text-white">Events Created by Student Organizations</h2>
-            <p class="text-sm text-white/80">Review and manage organization events</p>
+            <h2 class="text-lg font-bold text-white">Student Organization Events</h2>
           </div>
         </div>
       </div>
@@ -252,7 +391,7 @@
         </div>
       </div>
 
-      <div class="overflow-x-auto">
+      <div class="hidden md:block overflow-x-auto">
         <!-- Enhanced Table Header -->
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-[#14532d]">
@@ -344,6 +483,83 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Mobile Card View for Org Events -->
+      <div class="md:hidden space-y-4 p-4 bg-gray-50">
+        <div *ngFor="let event of pagedOrgEvents; let i = index" 
+             class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
+             [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'ring-2 ring-[#14532d]' : ''">
+          
+          <!-- Header -->
+          <div class="bg-[#14532d] px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2 overflow-hidden">
+              <span class="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded">{{ (orgEventPage - 1) * orgEventPageSize + i + 1 }}</span>
+              <h3 class="text-white font-bold truncate">{{ event.title }}</h3>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-white/20 text-white border border-white/30">
+               <i class="fas text-[10px]" [ngClass]="event.is_paid ? 'fa-peso-sign' : 'fa-ticket-alt'"></i>
+               {{ event.is_paid ? 'Paid' : 'Free' }}
+            </span>
+          </div>
+
+          <!-- Body -->
+          <div class="p-4 space-y-3">
+            <!-- Department Badge -->
+            <div class="flex justify-between items-start">
+               <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-gray-100 text-gray-700">
+                 <i class="fas fa-building text-xs"></i> {{ event.department }}
+               </span>
+               
+               <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-bold border"
+                      [ngClass]="{
+                        'bg-yellow-50 text-yellow-800 border-yellow-300': event.status === 'not yet started',
+                        'bg-blue-50 text-blue-800 border-blue-300': event.status === 'ongoing',
+                        'bg-green-50 text-green-800 border-green-300': event.status === 'concluded',
+                        'bg-red-50 text-red-800 border-red-300': event.status === 'cancelled'
+                      }">
+                  <i class="fas text-[10px]" 
+                     [ngClass]="{
+                       'fa-clock': event.status === 'not yet started',
+                       'fa-play-circle': event.status === 'ongoing',
+                       'fa-check-circle': event.status === 'concluded',
+                       'fa-times-circle': event.status === 'cancelled'
+                     }"></i>
+                  {{ (event.status || 'Not Yet Started') | titlecase }}
+                </span>
+            </div>
+
+            <!-- Date & Time -->
+            <div class="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <p class="text-xs text-gray-500 font-semibold uppercase">Date</p>
+                <p class="font-medium text-gray-800">{{ event.start_date | date: 'MMM d, y' }}</p>
+                <p *ngIf="event.end_date" class="text-xs text-gray-500">to {{ event.end_date | date: 'MMM d, y' }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-gray-500 font-semibold uppercase">Time</p>
+                <p class="font-medium text-gray-800">{{ formatTime(event.start_time) }}</p>
+                <p *ngIf="event.end_time" class="text-xs text-gray-500">to {{ formatTime(event.end_time) }}</p>
+              </div>
+            </div>
+            
+            <!-- Location -->
+            <div>
+              <p class="text-xs text-gray-500 font-semibold uppercase">Location</p>
+              <div class="flex items-center gap-1.5 mt-0.5">
+                <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
+                <span class="text-sm font-medium text-gray-800 truncate">{{ event.location }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Empty State Mobile -->
+        <div *ngIf="filteredOrgEvents().length === 0" class="bg-white rounded-lg p-8 text-center border border-gray-200">
+          <i class="fas fa-search text-4xl text-gray-300 mb-3"></i>
+          <p class="font-semibold text-gray-600">No organization events found</p>
+          <p class="text-sm text-gray-400">Try adjusting your search criteria</p>
+        </div>
+      </div>
       <!-- Pagination -->
       <div *ngIf="filteredOrgEvents().length > orgEventPageSize" class="bg-gray-50 py-4 px-4 border-t border-gray-200">
         <div class="flex justify-center items-center">
@@ -384,30 +600,33 @@
   <!-- Header -->
   <div class="mb-6 mx-2 lg:mx-6">
     <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#679436]">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
-          <i class="fas fa-calendar-check text-white"></i>
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
+            <i class="fas fa-calendar-check text-white"></i>
+          </div>
+          <div>
+            <h1 class="text-xl font-bold text-gray-800">Manage Events</h1>
+            <p class="text-sm text-gray-600">View and manage your organization events</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-xl font-bold text-gray-800">Manage Events</h1>
-          <p class="text-sm text-gray-600">View and manage your organization events</p>
+        <div class="ml-2">
+          <button
+            class="px-5 py-2.5 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-all duration-200 flex items-center gap-2 font-semibold shadow-md hover:shadow-lg"
+            type="button"
+            (click)="openCreateModal()"
+            aria-label="Create Event"
+          >
+            <i class="fas fa-plus"></i>
+            <span class="hidden sm:inline">Create Event</span>
+            <span class="sm:hidden">Create</span>
+          </button>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Create Button -->
-  <div class="mb-6 mx-2 lg:mx-6 flex justify-end">
-    <button
-      class="px-5 py-2.5 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-all duration-200 flex items-center gap-2 font-semibold shadow-md hover:shadow-lg"
-      type="button"
-      (click)="openCreateModal()"
-      aria-label="Create Event"
-    >
-      <i class="fas fa-plus"></i>
-      <span>Create New Event</span>
-    </button>
-  </div>
+  <!-- Create Button moved into the Manage Events card header for consistent design -->
   
   <div class="mx-2 lg:mx-6 flex flex-col md:flex-row gap-4 sm:gap-6 min-h-[400px]">
     <!-- Vertical event list layout -->

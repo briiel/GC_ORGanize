@@ -1,7 +1,7 @@
 
-<div class="p-6 bg-gray-100 min-h-screen overflow-x-hidden">
+<div class="p-3 sm:p-6 bg-gray-100 min-h-screen overflow-x-hidden">
   <!-- Header -->
-  <div class="mb-6 mx-2 lg:mx-6">
+  <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
     <div class="shadow-md rounded-lg overflow-hidden border-l-4"
          [ngClass]="isOsws ? 'bg-white border-[#14532d]' : 'bg-white border-[#679436]'">
       <div class="px-5 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -370,51 +370,49 @@
           </button>
         </div>
       </div>
-      <!-- Table -->
-      <div class="overflow-x-auto rounded-lg border-2 border-gray-200 shadow-sm">
+      <!-- Card List for Mobile -->
+      <div class="space-y-3">
         <ng-container *ngIf="filteredRecords.length > 0; else noAttendeesMobileMsg">
-          <table *ngIf="!error" class="w-full text-sm">
-            <thead
-                   [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
-              <tr class="uppercase tracking-wider text-white">
-                <th class="px-3 py-3 text-center w-12">#</th>
-                <th class="px-3 py-3 text-center min-w-[100px]">Student ID</th>
-                <th class="px-3 py-3 text-left min-w-[180px]">Name</th>
-                <th class="px-3 py-3 text-center min-w-[100px]">Dept</th>
-                <th class="px-3 py-3 text-left min-w-[150px]">Program</th>
-                <th class="px-3 py-3 text-center min-w-[140px]">Time In</th>
-                <th class="px-3 py-3 text-center min-w-[140px]">Time Out</th>
-                <th class="px-3 py-3 text-left min-w-[160px]">Scanned By</th>
-                <th class="px-3 py-3 text-center min-w-[120px]">Position</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-              <tr *ngFor="let record of pagedRecords; let i = index" 
-                  class="hover:bg-gray-50 transition-colors duration-200 even:bg-gray-50">
-                <td class="px-3 py-3 text-center font-semibold"
-                    [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</td>
-                <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ record.student_id || '-' }}</td>
-                <td class="px-3 py-3 text-left" [title]="formatName(record)">
-                  <div class="line-clamp-2">{{ formatName(record) }}</div>
-                </td>
-                <td class="px-3 py-3 text-center" [title]="record.department">{{ record.department || '-' }}</td>
-                <td class="px-3 py-3 text-left" [title]="record.program">
-                  <div class="line-clamp-2">{{ record.program || '-' }}</div>
-                </td>
-                <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
-                <td class="px-3 py-3 text-center whitespace-nowrap text-xs">{{ formatDateTime(record.time_out) }}</td>
-                <td class="px-3 py-3 text-left" [title]="record.scanned_by">
-                  <div class="line-clamp-2">{{ record.scanned_by || '-' }}</div>
-                </td>
-                <td class="px-3 py-3 text-center" [title]="record.scanned_by_position">
-                  <div class="line-clamp-2">{{ record.scanned_by_position || '-' }}</div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div *ngFor="let record of pagedRecords; let i = index" 
+               class="bg-white rounded-lg border-2 border-gray-200 shadow-sm overflow-hidden">
+            <div class="px-4 py-3 flex justify-between items-center"
+                 [ngClass]="isOsws ? 'bg-[#14532d] text-white' : 'bg-[#679436] text-white'">
+               <div class="flex items-center gap-2">
+                  <span class="bg-white/20 text-xs font-bold px-2 py-1 rounded">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</span>
+                  <span class="font-bold truncate">{{ formatName(record) }}</span>
+               </div>
+               <span class="text-xs bg-white/20 px-2 py-1 rounded">{{ record.student_id || '-' }}</span>
+            </div>
+            <div class="p-3 text-sm space-y-2">
+               <div class="grid grid-cols-2 gap-2">
+                  <div>
+                     <span class="text-xs text-gray-500 uppercase font-semibold">Dept</span>
+                     <p class="font-medium">{{ record.department || '-' }}</p>
+                  </div>
+                  <div>
+                     <span class="text-xs text-gray-500 uppercase font-semibold">Program</span>
+                     <p class="font-medium truncate">{{ record.program || '-' }}</p>
+                  </div>
+               </div>
+               <div class="grid grid-cols-2 gap-2 border-t border-gray-100 pt-2">
+                  <div>
+                     <span class="text-xs text-gray-500 uppercase font-semibold">Time In</span>
+                     <p class="font-medium">{{ formatDateTime(record.time_in || record.attended_at) }}</p>
+                  </div>
+                  <div>
+                     <span class="text-xs text-gray-500 uppercase font-semibold">Time Out</span>
+                     <p class="font-medium">{{ formatDateTime(record.time_out) }}</p>
+                  </div>
+               </div>
+               <div class="border-t border-gray-100 pt-2">
+                  <span class="text-xs text-gray-500 uppercase font-semibold">Scanned By</span>
+                  <p class="font-medium truncate">{{ record.scanned_by || '-' }} <span class="text-xs text-gray-400">({{ record.scanned_by_position || '-' }})</span></p>
+               </div>
+            </div>
+          </div>
         </ng-container>
         <ng-template #noAttendeesMobileMsg>
-          <div class="text-center py-10 text-gray-500 font-semibold bg-gray-50">No attendees found for this event.</div>
+          <div class="text-center py-10 text-gray-500 font-semibold bg-gray-50 rounded-lg border-2 border-gray-200">No attendees found for this event.</div>
         </ng-template>
       </div>
       

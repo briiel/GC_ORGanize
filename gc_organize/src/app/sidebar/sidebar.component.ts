@@ -4,32 +4,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { RouterOutlet } from '@angular/router';
-import { trigger, transition, style, animate, query } from '@angular/animations';
+import { routeAnimations } from '../route-animations';
 import { NotificationBellComponent } from '../notifications/notification-bell.component';
 import { filter } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sidebar',
   imports: [CommonModule, RouterModule, FormsModule, NotificationBellComponent],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
-  animations: [
-    trigger('routeAnimations', [
-      transition('* <=> *', [
-        query(':enter, :leave', [
-          style({
-            position: 'absolute',
-            width: '100%',
-            opacity: 0,
-            transform: 'translateY(16px)'
-          })
-        ], { optional: true }),
-        query(':enter', [
-          animate('350ms cubic-bezier(0.4,0,0.2,1)', style({ opacity: 1, transform: 'translateY(0)' }))
-        ], { optional: true })
-      ])
-    ])
-  ]
+  animations: [routeAnimations]
 })
 export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   isSidebarOpen = false;
@@ -44,12 +29,34 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private timeInterval: any;
   private readonly desktopBreakpoint = 1024; // match Tailwind's lg breakpoint
+  // Controls whether route animations should run. Disabled briefly during panel switches
+  animateRoutes = true;
+  // When true, the panel content will show a short fade-out (used when switching panels)
+  panelFading = false;
 
   constructor(private authService: RbacAuthService, private router: Router, private cdRef: ChangeDetectorRef) {}
 
-  onLogout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  async onLogout(): Promise<void> {
+    const result = await Swal.fire({
+      title: 'Confirm logout',
+      text: 'Are you sure you want to log out?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, logout',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+      // Close sidebar immediately for smoother transition
+      this.isSidebarOpen = false;
+      
+      // Small delay to allow sidebar close animation, then logout
+      setTimeout(() => {
+        this.authService.logout();
+        this.router.navigate(['/login']);
+      }, 150);
+    }
   }
   
   ngOnInit(): void {
@@ -62,10 +69,13 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     // Detect current panel based on route
     this.detectCurrentPanel();
     
-    // Subscribe to route changes to update current panel
+    // Subscribe to route changes to update current panel and re-enable animations
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
+      // Re-enable route animations and remove fading state once navigation completes
+      this.animateRoutes = true;
+      this.panelFading = false;
       this.detectCurrentPanel();
     });
     
@@ -127,6 +137,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   prepareRoute(outlet: RouterOutlet) {
+    if (!this.animateRoutes) {
+      return null;
+    }
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 
@@ -208,7 +221,14 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     const panel = this.availablePanels.find(p => p.role === targetRole);
     if (panel) {
       this.role = panel.role;
-      this.router.navigate([panel.route]);
+      // Start cross-fade: disable route animations while we fade out the panel,
+      // then navigate when fade-out completes. NavigationEnd handler will clear fading.
+      this.animateRoutes = false;
+      this.panelFading = true;
+      const FADE_MS = 320; // must match CSS transition duration
+      setTimeout(() => {
+        this.router.navigate([panel.route]);
+      }, FADE_MS);
       this.closeIfMobile();
     }
   }

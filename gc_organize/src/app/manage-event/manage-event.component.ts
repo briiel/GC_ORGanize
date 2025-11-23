@@ -99,6 +99,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   filteredOrgEventsList: any[] = [];
   orgEventPage: number = 1;
   orgEventPageSize: number = 10;
+  // OSWS sort option for the OSWS events search card
+  oswsSortBy: string = 'title_asc';
   orgEventDepartmentFilter: string = ''; // Filter by department
   orgEventStatusFilter: string = 'active'; // Default to show only active events (not yet started + ongoing)
   
@@ -541,12 +543,40 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   filteredOswsEvents(): any[] {
     if (!this.searchTerm) return this.oswsEvents;
     const term = this.searchTerm.toLowerCase();
-    return this.oswsEvents.filter(event =>
+    const filtered = this.oswsEvents.filter(event =>
       (event.title && event.title.toLowerCase().includes(term)) ||
       (event.location && event.location.toLowerCase().includes(term)) ||
       (event.start_date && event.start_date.toLowerCase().includes(term)) ||
       (event.end_date && event.end_date.toLowerCase().includes(term))
     );
+
+    // Apply sorting based on oswsSortBy
+    const sorted = filtered.slice();
+    switch (this.oswsSortBy) {
+      case 'title_asc':
+        sorted.sort((a, b) => (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase()));
+        break;
+      case 'title_desc':
+        sorted.sort((a, b) => (b.title || '').toLowerCase().localeCompare((a.title || '').toLowerCase()));
+        break;
+      case 'date_asc':
+        sorted.sort((a, b) => (new Date(a.start_date || '').getTime() || 0) - (new Date(b.start_date || '').getTime() || 0));
+        break;
+      case 'date_desc':
+        sorted.sort((a, b) => (new Date(b.start_date || '').getTime() || 0) - (new Date(a.start_date || '').getTime() || 0));
+        break;
+      default:
+        break;
+    }
+
+    return sorted;
+  }
+
+  // Called from the Search & Sort card 'Apply' button — kept lightweight for now
+  applyOswsFilters(): void {
+    // The template bindings for `searchTerm` and `oswsSortBy` update the filtered view automatically.
+    // This method exists for explicit UX (Apply button) and future expansion.
+    return;
   }
 
   confirmDeleteEvent(event: any) {

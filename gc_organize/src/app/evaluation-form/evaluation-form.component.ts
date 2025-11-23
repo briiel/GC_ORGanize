@@ -67,7 +67,7 @@ export class EvaluationFormComponent implements OnInit {
         if (response.data.has_evaluated) {
           this.errorMessage = 'You have already submitted an evaluation for this event.';
           setTimeout(() => {
-            this.router.navigate(['/sidebar/ecertificate']);
+            this.router.navigate(['/student-dashboard/ecertificate']);
           }, 2000);
         }
         if (!response.data.has_attended) {
@@ -125,7 +125,7 @@ export class EvaluationFormComponent implements OnInit {
         this.submitting = false;
         this.successMessage = 'Evaluation submitted successfully! Your certificate is now ready. Redirecting...';
         setTimeout(() => {
-          this.router.navigate(['/sidebar/ecertificate']);
+          this.router.navigate(['/student-dashboard/ecertificate']);
         }, 2500);
       },
       error: (err) => {
@@ -137,6 +137,6 @@ export class EvaluationFormComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/sidebar/ecertificate']);
+    this.router.navigate(['/student-dashboard/ecertificate']);
   }
 }

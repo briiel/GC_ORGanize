@@ -93,6 +93,7 @@ export class RbacAuthService {
    */
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.setItem('justLoggedOut', 'true');
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
