@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import * as ExcelJS from 'exceljs';
-import { saveAs } from 'file-saver';
+// Use dynamic imports for large CommonJS libraries to keep them out of the initial bundle
+// Types are relaxed to `any` after dynamic import to avoid compile-time import side-effects
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +14,10 @@ export class ExcelExportService {
    * @param columnCount - Number of columns for the data (to span header properly)
    * @returns Promise<ExcelJS.Workbook>
    */
-  async createWorkbookWithHeader(sheetName: string, columnCount: number = 9): Promise<ExcelJS.Workbook> {
-    const workbook = new ExcelJS.Workbook();
+  async createWorkbookWithHeader(sheetName: string, columnCount: number = 9): Promise<any> {
+    const ExcelJS = await import('exceljs');
+    const Workbook = (ExcelJS as any).Workbook || (ExcelJS as any).default?.Workbook || (ExcelJS as any).default || ExcelJS;
+    const workbook = new Workbook();
     const worksheet = workbook.addWorksheet(sheetName);
 
     // Load logos
@@ -152,7 +154,7 @@ export class ExcelExportService {
    * @param startRow - Starting row number (default 7, after header + blank row)
    */
   addDataToWorksheet(
-    worksheet: ExcelJS.Worksheet,
+    worksheet: any,
     headers: string[],
     data: any[][],
     startRow: number = 7
@@ -194,9 +196,9 @@ export class ExcelExportService {
     });
 
     // Auto-fit columns
-    worksheet.columns.forEach((column, index) => {
+    worksheet.columns.forEach((column: any, index: number) => {
       let maxLength = headers[index]?.length || 10;
-      data.forEach(row => {
+      data.forEach((row: any[]) => {
         const cellValue = String(row[index] || '');
         maxLength = Math.max(maxLength, cellValue.length);
       });
@@ -209,10 +211,11 @@ export class ExcelExportService {
    * @param workbook - The workbook to export
    * @param filename - Name of the file
    */
-  async exportWorkbook(workbook: ExcelJS.Workbook, filename: string): Promise<void> {
+  async exportWorkbook(workbook: any, filename: string): Promise<void> {
+    const { saveAs } = await import('file-saver');
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    saveAs(blob, filename);
+    (saveAs as any)(blob, filename);
   }
 
   /**

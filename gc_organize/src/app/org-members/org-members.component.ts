@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { environment } from '../../environments/environment';
-import Swal from 'sweetalert2';
 
 interface OrganizationMember {
   member_id: number;
@@ -62,6 +61,11 @@ export class OrgMembersComponent implements OnInit {
     }
   }
 
+  private async getSwal(): Promise<any> {
+    const mod = await import('sweetalert2');
+    return (mod as any).default || mod;
+  }
+
   loadMembers(orgId: number): void {
     this.loading = true;
     this.error = null;
@@ -77,11 +81,14 @@ export class OrgMembersComponent implements OnInit {
         console.error('Error loading members:', error);
         this.error = 'Failed to load organization members';
         this.loading = false;
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Failed to load organization members'
-        });
+        (async () => {
+          const Swal = await this.getSwal();
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load organization members'
+          });
+        })();
       }
     });
   }
@@ -204,8 +211,9 @@ export class OrgMembersComponent implements OnInit {
     window.URL.revokeObjectURL(url);
   }
 
-  removeMember(member: OrganizationMember): void {
-    Swal.fire({
+  async removeMember(member: OrganizationMember): Promise<void> {
+    const Swal = await this.getSwal();
+    const result = await Swal.fire({
       title: 'Remove Member?',
       html: `Are you sure you want to remove <strong>${this.getFullName(member)}</strong> from the organization?<br><small class="text-gray-500">This action will deactivate their membership.</small>`,
       icon: 'warning',
@@ -214,38 +222,40 @@ export class OrgMembersComponent implements OnInit {
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, remove member',
       cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        const org = this.authService.getUserOrganization();
-        if (!org) return;
-
-        const headers = this.getAuthHeaders();
-        this.http.delete(
-          `${environment.apiUrl}/users/organization/${org.org_id}/members/${member.member_id}`,
-          { headers }
-        ).subscribe({
-          next: () => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Member Removed',
-              text: `${this.getFullName(member)} has been removed from the organization.`,
-              timer: 2000,
-              showConfirmButton: false
-            });
-            // Reload members list
-            this.loadMembers(org.org_id);
-          },
-          error: (error) => {
-            console.error('Error removing member:', error);
-            Swal.fire({
-              icon: 'error',
-              title: 'Error',
-              text: 'Failed to remove member. Please try again.'
-            });
-          }
-        });
-      }
     });
+
+    if (result.isConfirmed) {
+      const org = this.authService.getUserOrganization();
+      if (!org) return;
+
+      const headers = this.getAuthHeaders();
+      this.http.delete(
+        `${environment.apiUrl}/users/organization/${org.org_id}/members/${member.member_id}`,
+        { headers }
+      ).subscribe({
+        next: async () => {
+          const Swal2 = await this.getSwal();
+          Swal2.fire({
+            icon: 'success',
+            title: 'Member Removed',
+            text: `${this.getFullName(member)} has been removed from the organization.`,
+            timer: 2000,
+            showConfirmButton: false
+          });
+          // Reload members list
+          this.loadMembers(org.org_id);
+        },
+        error: async (error) => {
+          console.error('Error removing member:', error);
+          const Swal2 = await this.getSwal();
+          Swal2.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to remove member. Please try again.'
+          });
+        }
+      });
+    }
   }
 
   private getAuthHeaders(): HttpHeaders {
