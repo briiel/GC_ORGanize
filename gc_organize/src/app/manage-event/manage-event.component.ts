@@ -7,8 +7,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import { ExcelExportService } from '../services/excel-export.service';
 
 @Component({
   selector: 'app-manage-event',
@@ -301,7 +300,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     private eventService: EventService, 
     private evaluationService: EvaluationService,
     private router: Router,
-    private auth: RbacAuthService
+    private auth: RbacAuthService,
+    private excelExportService: ExcelExportService
   ) {
     // Get creator/org ID from JWT
     this.creatorId = this.auth.getCreatorId() || 0;
@@ -1230,29 +1230,27 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
   }
 
-  downloadParticipantsExcel(): void {
+  async downloadParticipantsExcel(): Promise<void> {
     if (!this.participants || this.participants.length === 0) return;
 
-    const worksheetData = this.participants.map((p, i) => ({
-      '#': i + 1,
-  'Event': this.selectedEventTitle || '-',
-      'Student ID': p.student_id ?? '-',
-      'First Name': p.first_name ?? '-',
-      'Last Name': p.last_name ?? '-',
-      'Suffix': p.suffix ?? '-',
-      'Department': p.department ?? '-',
-      'Program': p.program ?? '-',
-      'Proof of Payment URL': p.proof_of_payment ?? '-'
-    }));
+    const headers = ['#', 'Event', 'Student ID', 'First Name', 'Last Name', 'Suffix', 'Department', 'Program', 'Proof of Payment URL'];
+    
+    const data = this.participants.map((p, i) => [
+      i + 1,
+      this.selectedEventTitle || '-',
+      p.student_id ?? '-',
+      p.first_name ?? '-',
+      p.last_name ?? '-',
+      p.suffix ?? '-',
+      p.department ?? '-',
+      p.program ?? '-',
+      p.proof_of_payment ?? '-'
+    ]);
 
-    const ws = XLSX.utils.json_to_sheet(worksheetData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Participants');
-
-    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     const slug = (this.selectedEventTitle || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
-    saveAs(blob, `${slug}_participants.xlsx`);
+    const filename = `${slug}_participants.xlsx`;
+
+    await this.excelExportService.createAndExportExcel('Participants', headers, data, filename);
   }
 
   // ============ EVALUATION METHODS ============
@@ -1368,53 +1366,53 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   // Download evaluations as Excel
-  downloadEvaluationsExcel(): void {
+  async downloadEvaluationsExcel(): Promise<void> {
     if (!this.evaluations || this.evaluations.length === 0) return;
 
-    const worksheetData = this.evaluations.map((evaluation, i) => {
+    const headers = [
+      '#', 'Event', 'Student ID', 'Student Name', 'Department', 'Program', 'Submitted At',
+      'Q1: Venue', 'Q2: Time Management', 'Q3: Facilitator Knowledge', 'Q4: Topic Relevance',
+      'Q5: Learning Materials', 'Q6: Activities', 'Q7: Engagement', 'Q8: Objectives Met',
+      'Q9: Overall Satisfaction', 'Q10: Organization', 'Q11: Support Staff', 'Q12: Registration Process',
+      'Q13: Would Recommend', 'Most Helpful Aspects', 'Suggestions for Improvement', 'Additional Comments'
+    ];
+
+    const data = this.evaluations.map((evaluation, i) => {
       const responses = evaluation.responses || {};
       const ratings = responses.ratings || {};
       const comments = responses.comments || {};
       
-      return {
-        '#': i + 1,
-        'Event': this.selectedEventForEvaluation?.title || '-',
-        'Student ID': evaluation.student_id ?? '-',
-        'Student Name': `${evaluation.first_name || ''} ${evaluation.middle_initial || ''} ${evaluation.last_name || ''} ${evaluation.suffix || ''}`.trim(),
-        'Department': evaluation.department ?? '-',
-        'Program': evaluation.program ?? '-',
-        'Submitted At': evaluation.submitted_at ? new Date(evaluation.submitted_at).toLocaleString() : '-',
-        
-        // Ratings (Questions 1-13)
-        'Q1: Venue': ratings.question1 ?? '-',
-        'Q2: Time Management': ratings.question2 ?? '-',
-        'Q3: Facilitator Knowledge': ratings.question3 ?? '-',
-        'Q4: Topic Relevance': ratings.question4 ?? '-',
-        'Q5: Learning Materials': ratings.question5 ?? '-',
-        'Q6: Activities': ratings.question6 ?? '-',
-        'Q7: Engagement': ratings.question7 ?? '-',
-        'Q8: Objectives Met': ratings.question8 ?? '-',
-        'Q9: Overall Satisfaction': ratings.question9 ?? '-',
-        'Q10: Organization': ratings.question10 ?? '-',
-        'Q11: Support Staff': ratings.question11 ?? '-',
-        'Q12: Registration Process': ratings.question12 ?? '-',
-        'Q13: Would Recommend': ratings.question13 ?? '-',
-        
-        // Comments (Questions 14-16)
-        'Most Helpful Aspects': comments.question14 ?? '-',
-        'Suggestions for Improvement': comments.question15 ?? '-',
-        'Additional Comments': comments.question16 ?? '-'
-      };
+      return [
+        i + 1,
+        this.selectedEventForEvaluation?.title || '-',
+        evaluation.student_id ?? '-',
+        `${evaluation.first_name || ''} ${evaluation.middle_initial || ''} ${evaluation.last_name || ''} ${evaluation.suffix || ''}`.trim(),
+        evaluation.department ?? '-',
+        evaluation.program ?? '-',
+        evaluation.submitted_at ? new Date(evaluation.submitted_at).toLocaleString() : '-',
+        ratings.question1 ?? '-',
+        ratings.question2 ?? '-',
+        ratings.question3 ?? '-',
+        ratings.question4 ?? '-',
+        ratings.question5 ?? '-',
+        ratings.question6 ?? '-',
+        ratings.question7 ?? '-',
+        ratings.question8 ?? '-',
+        ratings.question9 ?? '-',
+        ratings.question10 ?? '-',
+        ratings.question11 ?? '-',
+        ratings.question12 ?? '-',
+        ratings.question13 ?? '-',
+        comments.question14 ?? '-',
+        comments.question15 ?? '-',
+        comments.question16 ?? '-'
+      ];
     });
 
-    const ws = XLSX.utils.json_to_sheet(worksheetData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Evaluations');
-
-    const excelBuffer: any = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     const slug = (this.selectedEventForEvaluation?.title || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
-    saveAs(blob, `${slug}_evaluations.xlsx`);
+    const filename = `${slug}_evaluations.xlsx`;
+
+    await this.excelExportService.createAndExportExcel('Evaluations', headers, data, filename);
   }
 
   // Get question labels for display

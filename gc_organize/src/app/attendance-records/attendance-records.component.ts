@@ -2,10 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
+import { ExcelExportService } from '../services/excel-export.service';
 
 @Component({
   selector: 'app-attendance-records',
@@ -84,7 +83,8 @@ export class AttendanceRecordsComponent implements OnInit {
   constructor(
     private eventService: EventService, 
     private auth: RbacAuthService, 
-    private http: HttpClient
+    private http: HttpClient,
+    private excelExportService: ExcelExportService
   ) {}
 
   ngOnInit() {
@@ -235,25 +235,23 @@ export class AttendanceRecordsComponent implements OnInit {
     return withSuffix || '-';
   }
 
-  downloadExcel() {
-    const worksheetData = this.filteredRecords.map((record, i) => ({
-      '#': i + 1,
-      'Student ID': record.student_id || '-',
-  'Name': this.formatName(record),
-      'Department': record.department || '-',
-      'Program': record.program || '-',
-      'Time In': this.formatDateTime(record.time_in || record.attended_at),
-      'Time Out': this.formatDateTime(record.time_out),
-      'Scanned By': record.scanned_by || '-'
-    }));
+  async downloadExcel() {
+    const headers = ['#', 'Student ID', 'Name', 'Department', 'Program', 'Time In', 'Time Out', 'Scanned By'];
+    
+    const data = this.filteredRecords.map((record, i) => [
+      i + 1,
+      record.student_id || '-',
+      this.formatName(record),
+      record.department || '-',
+      record.program || '-',
+      this.formatDateTime(record.time_in || record.attended_at),
+      this.formatDateTime(record.time_out),
+      record.scanned_by || '-'
+    ]);
 
-    const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendees');
-
-    const excelBuffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     const eventTitle = this.selectedEvent?.title || 'event';
-    saveAs(blob, `attendees-${eventTitle.replace(/\s+/g, '_')}.xlsx`);
+    const filename = `attendees-${eventTitle.replace(/\s+/g, '_')}.xlsx`;
+
+    await this.excelExportService.createAndExportExcel('Attendees', headers, data, filename);
   }
 }
