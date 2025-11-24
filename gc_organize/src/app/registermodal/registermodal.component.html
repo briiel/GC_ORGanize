@@ -1,8 +1,8 @@
 <div class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-2 sm:p-4 animate-fade-in" style="z-index: 3000;" (click)="closeModal()">
-  <div class="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] sm:max-w-[95vw] md:max-w-3xl max-h-[85vh] overflow-hidden animate-scale-in relative"
+  <div class="bg-white rounded-lg shadow-2xl w-full max-w-[95vw] sm:max-w-[95vw] md:max-w-3xl max-h-[85vh] overflow-hidden animate-scale-in relative flex flex-col"
     role="dialog" aria-modal="true" aria-labelledby="registermodal-title" (click)="$event.stopPropagation()">
     
-    <form class="flex flex-col h-full" (ngSubmit)="submitRegistration()">
+    <form class="flex flex-col flex-1 min-h-0" (ngSubmit)="submitRegistration()">
       <!-- Header -->
       <div class="px-4 sm:px-6 py-4 border-b-2 border-gray-100 bg-gradient-to-r from-[#679436] to-[#56732e]">
         <div class="flex items-center justify-between gap-3">
@@ -31,9 +31,9 @@
         </div>
       </div>
 
-      <!-- Scrollable Content -->
-      <div class="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5" 
-           style="-webkit-overflow-scrolling: touch;">
+       <!-- Scrollable Content -->
+       <div class="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-5" 
+         style="-webkit-overflow-scrolling: touch;">
         <!-- Personal Information Section -->
         <div>
           <h3 class="text-base font-bold text-gray-600 uppercase tracking-wide mb-4 flex items-center gap-2">
