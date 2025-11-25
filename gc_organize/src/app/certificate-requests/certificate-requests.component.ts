@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CertificateRequestService } from '../services/certificate-request.service';
 import { FormsModule } from '@angular/forms';
+import { firstValueFrom } from 'rxjs';
 
 interface CertificateRequest {
   id: number;
@@ -38,6 +39,7 @@ export class CertificateRequestsComponent implements OnInit {
   pagedRequests: CertificateRequest[] = [];
   loading = true;
   error: string | null = null;
+  successMessage: string | null = null;
   
   updatingRequestId: number | null = null;
   
@@ -156,12 +158,12 @@ export class CertificateRequestsComponent implements OnInit {
   }
 
   getStudentName(request: CertificateRequest): string {
-    return [
-      request.first_name,
-      request.middle_initial ? `${request.middle_initial}.` : '',
-      request.last_name,
-      request.suffix || ''
-    ].filter(Boolean).join(' ').replace(/\s+/g, ' ');
+    const first = request.first_name || '';
+    const last = request.last_name || '';
+    const middle = request.middle_initial ? `${request.middle_initial}.` : '';
+    const suffix = request.suffix || '';
+    const name = [first, middle, last, suffix].filter(Boolean).join(' ');
+    return name.trim().replace(/\s+/g, ' ');
   }
 
   formatDate(dateStr: string): string {
@@ -191,17 +193,15 @@ export class CertificateRequestsComponent implements OnInit {
 
     try {
       // Update status through API
-      const response: any = await this.certificateRequestService.updateCertificateRequestStatus(
-        request.id,
-        newStatus
-      ).toPromise();
-      
+      await firstValueFrom(this.certificateRequestService.updateCertificateRequestStatus(request.id, newStatus));
       request.status = newStatus as any;
       this.applyFilters();
+      this.successMessage = `Status updated to ${newStatus.toUpperCase()}`;
+      window.setTimeout(() => (this.successMessage = null), 4000);
     } catch (error: any) {
-      this.error = error.error?.message || 'Failed to update status';
+      this.error = error?.error?.message || error?.message || 'Failed to update status';
       console.error('Error updating status:', error);
-      // Revert the status on error
+      // Refresh list to keep UI consistent
       this.loadRequests();
     } finally {
       this.updatingRequestId = null;
@@ -257,7 +257,7 @@ export class CertificateRequestsComponent implements OnInit {
 
   async bulkUpdateStatus(): Promise<void> {
     if (this.selectedRequests.size === 0) {
-      alert('Please select at least one request to update.');
+      this.error = 'Please select at least one request to update.';
       return;
     }
 
@@ -268,30 +268,24 @@ export class CertificateRequestsComponent implements OnInit {
     this.isUpdatingBulk = true;
     this.error = null;
 
-    const updatePromises = Array.from(this.selectedRequests).map(async (requestId) => {
-      const request = this.requests.find(r => r.id === requestId);
-      if (request) {
-        try {
-          await this.certificateRequestService.updateCertificateRequestStatus(
-            requestId,
-            this.bulkStatus
-          ).toPromise();
-          request.status = this.bulkStatus as any;
-        } catch (error: any) {
-          console.error(`Failed to update request ${requestId}:`, error);
-          throw error;
-        }
-      }
-    });
-
+    const updateIds = Array.from(this.selectedRequests);
     try {
-      await Promise.all(updatePromises);
+      for (const requestId of updateIds) {
+        await firstValueFrom(this.certificateRequestService.updateCertificateRequestStatus(requestId, this.bulkStatus));
+        const request = this.requests.find(r => r.id === requestId);
+        if (request) request.status = this.bulkStatus as any;
+      }
+
       this.selectedRequests.clear();
       this.selectAll = false;
       this.applyFilters();
-      alert(`Successfully updated ${updatePromises.length} request(s) to ${this.bulkStatus.toUpperCase()}.`);
+      this.successMessage = `Successfully updated ${updateIds.length} request(s) to ${this.bulkStatus.toUpperCase()}.`;
+      window.setTimeout(() => (this.successMessage = null), 4000);
     } catch (error: any) {
-      this.error = 'Some requests failed to update. Please try again.';
+      console.error('Bulk update failed:', error);
+      this.error = error?.error?.message || 'Some requests failed to update. Please try again.';
+      // reload to reconcile UI
+      this.loadRequests();
     } finally {
       this.isUpdatingBulk = false;
     }

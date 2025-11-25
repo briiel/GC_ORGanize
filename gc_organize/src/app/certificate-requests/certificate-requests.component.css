@@ -1,1 +1,37 @@
 /* Certificate Requests Component Styles */
+
+/* Toast styles */
+.toast {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.6rem 0.8rem;
+	border-radius: 0.5rem;
+	box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+.toast .toast-body {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+.toast .toast-text { font-weight: 600; }
+.toast .toast-close {
+	background: transparent;
+	border: none;
+	font-size: 1.2rem;
+	line-height: 1;
+	cursor: pointer;
+}
+.toast.success { background: #ecfdf5; border-left: 4px solid #10b981; color: #065f46; }
+.toast.error { background: #fff1f2; border-left: 4px solid #ef4444; color: #7f1d1d; }
+
+/* Loading skeleton */
+.skeleton {
+	background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+	background-size: 400% 100%;
+	animation: shimmer 1.2s ease-in-out infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0 } 100% { background-position: -200% 0 } }
+
+/* Small helper */
+.disabled-overlay { pointer-events: none; opacity: 0.6; }
