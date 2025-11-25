@@ -1,9 +1,11 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject, Subscription, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { CommonModule } from '@angular/common'; // <-- Add this import
 import { EventService } from '../services/event.service';
 import { EvaluationService } from '../services/evaluation.service';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { OsmService, LatLon } from '../services/osm.service';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
@@ -138,10 +140,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   
   changeOrgEventPageSize(size: number) {
     this.orgEventPageSize = size;
-    this.orgEventPage = 1; // Reset to first page
+    this.orgEventPage = 1;
   }
 
   showParticipantsModal = false;
+
   participants: any[] = [];
   participantsLoading = false;
   selectedEventTitle = '';
@@ -151,6 +154,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   participantsPage: number = 1;
   participantsPageSize: number = 10;
   participantsSearchTerm: string = ''; // Search term for filtering participants
+
   expandedParticipants: Set<number> = new Set(); // Track which participants are expanded
   
   get filteredParticipants(): any[] {
@@ -161,6 +165,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     return (this.participants || []).filter(participant => {
       const studentId = (participant.student_id || '').toLowerCase();
       const firstName = (participant.first_name || '').toLowerCase();
+
       const lastName = (participant.last_name || '').toLowerCase();
       const department = (participant.department || '').toLowerCase();
       const program = (participant.program || '').toLowerCase();
@@ -232,6 +237,21 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   registration_fee: 0
   };
 
+  // Geolocation / place coordinates used for geofence validation
+  userCoords: LatLon | null = null; // user's current device location when modal opened
+  newEventLat: number | null = null; // event location latitude (resolved via OSM or user's pick)
+  newEventLon: number | null = null; // event location longitude
+  // Autocomplete suggestions for location input
+  locationSuggestions: Array<{ display_name: string; lat: number; lon: number }> = [];
+  private locationSearch$ = new Subject<string>();
+  private locationSearchSub: Subscription | null = null;
+
+  // Room selection + persistence
+  rooms: string[] = [];
+  selectedRoom: string = '';
+  otherRoomInput: string = '';
+  showOtherRoomInput: boolean = false;
+
   // For vertical event list selection
   selectedEvent: any = null;
 
@@ -301,13 +321,24 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     private evaluationService: EvaluationService,
     private router: Router,
     private auth: RbacAuthService,
-    private excelExportService: ExcelExportService
+    private excelExportService: ExcelExportService,
+    private osm: OsmService
   ) {
     // Get creator/org ID from JWT
     this.creatorId = this.auth.getCreatorId() || 0;
     this.adminId = this.auth.getAdminId() || 0;
     const primaryRole = this.auth.getPrimaryRole();
     this.isOsws = primaryRole === 'OSWSAdmin';
+    // Wire up location autocomplete subject
+    this.locationSearchSub = this.locationSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(q => {
+        const s = String(q || '').trim();
+        if (!s || s.length < 3) return of([]);
+        return this.osm.getPlaceSuggestions(s).pipe(catchError(() => of([])));
+      })
+    ).subscribe(list => this.locationSuggestions = list || []);
   }
 
   ngOnInit() {
@@ -322,6 +353,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Ensure body class is cleared when component is destroyed
     document.body.classList.remove('modal-open');
+    if (this.locationSearchSub) {
+      this.locationSearchSub.unsubscribe();
+      this.locationSearchSub = null;
+    }
   }
 
   // Close any open modal when ESC is pressed (matches behavior used in other modals)
@@ -507,7 +542,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (term) {
       results = results.filter(event =>
         (event.title && event.title.toLowerCase().includes(term)) ||
-        (event.location && event.location.toLowerCase().includes(term)) ||
+        ((event.room && event.room.toLowerCase().includes(term)) || (event.location && event.location.toLowerCase().includes(term))) ||
         (event.department && event.department.toLowerCase().includes(term)) ||
         (event.start_date && new Date(event.start_date).toLocaleDateString().toLowerCase().includes(term)) ||
         (event.end_date && new Date(event.end_date).toLocaleDateString().toLowerCase().includes(term)) ||
@@ -545,7 +580,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const term = this.searchTerm.toLowerCase();
     const filtered = this.oswsEvents.filter(event =>
       (event.title && event.title.toLowerCase().includes(term)) ||
-      (event.location && event.location.toLowerCase().includes(term)) ||
+      ((event.room && event.room.toLowerCase().includes(term)) || (event.location && event.location.toLowerCase().includes(term))) ||
       (event.start_date && event.start_date.toLowerCase().includes(term)) ||
       (event.end_date && event.end_date.toLowerCase().includes(term))
     );
@@ -902,6 +937,24 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     let isFormData = false;
     const startDateStr = formatDate(this.inlineEditEvent.start_date);
     const endDateStr = formatDate(this.inlineEditEvent.end_date);
+    // Determine room to send for inline edits (use inlineEditEvent.room if present,
+    // otherwise use selectedRoom / otherRoomInput similar to create flow)
+    let roomToSend = '';
+    if (this.inlineEditEvent && this.inlineEditEvent.room) {
+      roomToSend = String(this.inlineEditEvent.room || '').trim();
+    } else if (this.showOtherRoomInput && this.otherRoomInput && this.otherRoomInput.trim()) {
+      roomToSend = this.otherRoomInput.trim();
+      this.saveCustomRoomToStorage(roomToSend);
+    } else if (this.selectedRoom) {
+      roomToSend = String(this.selectedRoom || '').trim();
+    }
+
+    // Determine coordinates from inline event or modal-scoped newEventLat/newEventLon
+    const inlineLat = this.inlineEditEvent && (this.inlineEditEvent.event_latitude != null) ? Number(this.inlineEditEvent.event_latitude) : null;
+    const inlineLon = this.inlineEditEvent && (this.inlineEditEvent.event_longitude != null) ? Number(this.inlineEditEvent.event_longitude) : null;
+    const latToSend = inlineLat != null ? inlineLat : (this.newEventLat != null ? this.newEventLat : null);
+    const lonToSend = inlineLon != null ? inlineLon : (this.newEventLon != null ? this.newEventLon : null);
+
     if (this.inlineEditPosterFile) {
       payload = new FormData();
       payload.append('title', this.inlineEditEvent.title);
@@ -911,9 +964,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       payload.append('start_time', this.inlineEditEvent.start_time);
       payload.append('end_date', endDateStr);
       payload.append('end_time', this.inlineEditEvent.end_time);
-  payload.append('is_paid', this.inlineEditEvent.is_paid ? '1' : '0');
-  payload.append('registration_fee', this.inlineEditEvent.is_paid ? String(Number(this.inlineEditEvent.registration_fee || 0).toFixed(2)) : '0');
+      payload.append('is_paid', this.inlineEditEvent.is_paid ? '1' : '0');
+      payload.append('registration_fee', this.inlineEditEvent.is_paid ? String(Number(this.inlineEditEvent.registration_fee || 0).toFixed(2)) : '0');
       payload.append('event_poster', this.inlineEditPosterFile);
+      // Append room and coords when available
+      if (roomToSend) payload.append('room', roomToSend);
+      if (latToSend != null && lonToSend != null) {
+        payload.append('event_latitude', String(latToSend));
+        payload.append('event_longitude', String(lonToSend));
+      }
       isFormData = true;
     } else {
       payload = {
@@ -924,10 +983,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         start_time: this.inlineEditEvent.start_time,
         end_date: endDateStr,
         end_time: this.inlineEditEvent.end_time,
-  is_paid: this.inlineEditEvent.is_paid ? 1 : 0,
-  registration_fee: this.inlineEditEvent.is_paid ? Number(this.inlineEditEvent.registration_fee || 0).toFixed(2) : 0,
+        is_paid: this.inlineEditEvent.is_paid ? 1 : 0,
+        registration_fee: this.inlineEditEvent.is_paid ? Number(this.inlineEditEvent.registration_fee || 0).toFixed(2) : 0,
         event_poster: this.inlineEditEvent.event_poster || ''
-      };
+      } as any;
+      if (roomToSend) (payload as any).room = roomToSend;
+      if (latToSend != null && lonToSend != null) {
+        (payload as any).event_latitude = latToSend;
+        (payload as any).event_longitude = lonToSend;
+      }
     }
     Swal.fire({
       title: 'Updating Event...',
@@ -967,12 +1031,20 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   // Open Create Event modal
   openCreateModal() {
     // reset form
-  this.newEvent = { title: '', description: '', location: '', start_date: '', start_time: '', end_date: '', end_time: '', is_paid: false, registration_fee: 0 };
+    this.newEvent = { title: '', description: '', location: '', start_date: '', start_time: '', end_date: '', end_time: '', is_paid: false, registration_fee: 0 };
     this.isImageUploaded = false;
     this.eventPosterFile = null;
     this.posterPreviewUrl = null;
     this.isEditing = false;
     this.editingEventId = null;
+    this.newEventLat = null;
+    this.newEventLon = null;
+    this.otherRoomInput = '';
+    this.showOtherRoomInput = false;
+
+    // load saved rooms (defaults + persisted)
+    this.loadSavedRooms();
+
     // clear any preview elements if present in DOM (best-effort)
     const previewContainer = document.getElementById('image-preview');
     const previewImg = document.getElementById('preview-img') as HTMLImageElement | null;
@@ -980,13 +1052,141 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (previewImg) previewImg.src = '';
     const fileInput = document.getElementById('dropzone-file') as HTMLInputElement | null;
     if (fileInput) fileInput.value = '';
+
+    // Attempt to get user's current location (permission prompt)
+    if (navigator && 'geolocation' in navigator) {
+      try {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            this.userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          },
+          (err) => {
+            // ignore silently; user may decline
+            this.userCoords = null;
+          },
+          { enableHighAccuracy: true, maximumAge: 5 * 60 * 1000, timeout: 8000 }
+        );
+      } catch (e) {
+        this.userCoords = null;
+      }
+    }
+
     this.showCreateModal = true;
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
   }
 
   closeCreateModal() {
     this.showCreateModal = false;
   this.toggleBodyModalClass();
+  }
+
+  // Load saved rooms from localStorage and merge with defaults
+  private loadSavedRooms(): void {
+    const defaults = ['Function Hall', 'PE Room'];
+    try {
+      const raw = localStorage.getItem('gc_rooms');
+      const saved = raw ? JSON.parse(raw) : [];
+      // Merge while preserving defaults first
+      const merged = Array.from(new Set([...defaults, ...(Array.isArray(saved) ? saved : [])]));
+      this.rooms = merged;
+      this.selectedRoom = this.rooms.length ? this.rooms[0] : '';
+      this.showOtherRoomInput = this.selectedRoom === 'Others';
+    } catch (e) {
+      this.rooms = defaults;
+      this.selectedRoom = this.rooms[0];
+      this.showOtherRoomInput = false;
+    }
+  }
+
+  // Called when location input changes; push into search subject for suggestions
+  onLocationChange(value: string) {
+    const raw = String(value || '');
+    // Clear any previously selected coordinates when user edits the field
+    this.newEventLat = null;
+    this.newEventLon = null;
+    this.locationSearch$.next(raw);
+  }
+
+  // Called when user selects a suggested place
+  selectLocationSuggestion(s: { display_name: string; lat: number; lon: number }) {
+    if (!s) return;
+    this.newEvent.location = s.display_name;
+    this.newEventLat = Number(s.lat);
+    this.newEventLon = Number(s.lon);
+    this.locationSuggestions = [];
+  }
+
+  // Use device's current location as event location (reverse-lookup address if available)
+  useCurrentLocation(): void {
+    if (!this.userCoords) {
+      // Try to request again
+      if (navigator && 'geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          this.userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+          this.newEventLat = this.userCoords.lat;
+          this.newEventLon = this.userCoords.lon;
+          this.osm.reverseLookup(this.userCoords.lat, this.userCoords.lon).subscribe(address => {
+            if (address) this.newEvent.location = address;
+          });
+        }, () => {}, { enableHighAccuracy: true });
+      }
+      return;
+    }
+    this.newEventLat = this.userCoords.lat;
+    this.newEventLon = this.userCoords.lon;
+    this.osm.reverseLookup(this.userCoords.lat, this.userCoords.lon).subscribe(address => {
+      if (address) this.newEvent.location = address;
+    });
+  }
+
+  onRoomSelect(room: string) {
+    this.selectedRoom = room;
+    this.showOtherRoomInput = room === 'Others';
+    if (!this.showOtherRoomInput) this.otherRoomInput = '';
+  }
+
+  private saveCustomRoomToStorage(roomName: string) {
+    if (!roomName) return;
+    try {
+      const raw = localStorage.getItem('gc_rooms');
+      const saved = raw ? JSON.parse(raw) : [];
+      const arr = Array.isArray(saved) ? saved : [];
+      if (!arr.includes(roomName)) arr.push(roomName);
+      localStorage.setItem('gc_rooms', JSON.stringify(arr));
+      // update in-memory list
+      this.rooms = Array.from(new Set([...this.rooms.filter(r => r !== 'Others'), ...arr]));
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Public handler to save a custom room entered in the modal
+  saveCustomRoom(): void {
+    const roomName = (this.otherRoomInput || '').trim();
+    if (!roomName) {
+      Swal.fire({ icon: 'error', title: 'Invalid Room', text: 'Please enter a room name or number before saving.', confirmButtonColor: '#d33' });
+      return;
+    }
+    try {
+      this.saveCustomRoomToStorage(roomName);
+      this.selectedRoom = roomName;
+      this.showOtherRoomInput = false;
+      this.otherRoomInput = '';
+    } catch (e) {
+      console.error('Failed to save custom room', e);
+      Swal.fire('Error', 'Failed to save custom room. Please try again.', 'error');
+    }
+  }
+
+  openCustomRoomInput(): void {
+    this.showOtherRoomInput = true;
+    // small delay to allow input to render, then focus
+    setTimeout(() => {
+      try {
+        const el = document.querySelector<HTMLInputElement>('#other-room-input');
+        if (el) el.focus();
+      } catch (e) {}
+    }, 50);
   }
 
   openEditModal(eventId: number) {
@@ -1013,6 +1213,27 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           is_paid: !!event.is_paid,
           registration_fee: Number(event.registration_fee ?? 0)
         };
+        // Load room if present
+        try {
+          this.loadSavedRooms();
+          if (event.room) {
+            if (this.rooms.includes(event.room)) {
+              this.selectedRoom = event.room;
+              this.showOtherRoomInput = false;
+              this.otherRoomInput = '';
+            } else {
+              this.selectedRoom = 'Others';
+              this.showOtherRoomInput = true;
+              this.otherRoomInput = event.room;
+            }
+          }
+        } catch (e) {}
+
+        // Load existing coordinates if backend provided them
+        if (event.event_latitude != null && event.event_longitude != null) {
+          this.newEventLat = Number(event.event_latitude);
+          this.newEventLon = Number(event.event_longitude);
+        }
         // If backend returns poster URL, show it
         const poster = event.event_poster || event.poster || event.poster_url || event.image_url;
         if (poster && typeof poster === 'string') {
@@ -1111,6 +1332,23 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
     if (this.eventPosterFile) {
       formData.append('event_poster', this.eventPosterFile);
+    }
+
+    // Append room info (selected or other) and persist custom rooms
+    let roomToSend = '';
+    if (this.showOtherRoomInput && this.otherRoomInput && this.otherRoomInput.trim()) {
+      roomToSend = this.otherRoomInput.trim();
+      // persist custom room for next time
+      this.saveCustomRoomToStorage(roomToSend);
+    } else if (this.selectedRoom) {
+      roomToSend = this.selectedRoom;
+    }
+    if (roomToSend) formData.append('room', roomToSend);
+
+    // Append event coordinates for geofence validation (if resolved)
+    if (this.newEventLat != null && this.newEventLon != null) {
+      formData.append('event_latitude', String(this.newEventLat));
+      formData.append('event_longitude', String(this.newEventLon));
     }
 
     if (this.isEditing && this.editingEventId) {

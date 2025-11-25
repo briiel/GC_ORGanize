@@ -141,7 +141,7 @@
             <td class="px-4 py-3.5 text-center max-w-[160px]">
               <div class="flex items-center gap-1.5 justify-center">
                 <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-                <span class="truncate text-sm" [title]="event.location">{{ event.location }}</span>
+                <span class="truncate text-sm" [title]="event.room || event.location">{{ event.room || event.location }}</span>
               </div>
             </td>
             <td class="px-4 py-4 text-center">

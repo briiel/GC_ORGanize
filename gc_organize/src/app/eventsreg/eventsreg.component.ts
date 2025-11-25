@@ -67,7 +67,7 @@ export class EventsregComponent implements OnInit {
     const term = this.searchTerm.toLowerCase();
     return this.registeredEvents.filter(event =>
       (event.title && event.title.toLowerCase().includes(term)) ||
-      (event.location && event.location.toLowerCase().includes(term)) ||
+      ((event.room && event.room.toLowerCase().includes(term)) || (event.location && event.location.toLowerCase().includes(term))) ||
       (event.venue && event.venue.toLowerCase().includes(term)) ||
       (event.department && event.department.toLowerCase().includes(term))
     );

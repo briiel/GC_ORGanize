@@ -121,7 +121,7 @@
               <td class="px-4 py-3.5 text-center max-w-[160px]">
                 <div class="flex items-center gap-1.5 justify-center">
                   <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-                  <span class="truncate text-sm" [title]="event.location">{{ event.location }}</span>
+                  <span class="truncate text-sm" [title]="event.room || event.location">{{ event.room || event.location }}</span>
                 </div>
               </td>
               
@@ -232,7 +232,7 @@
             <p class="text-xs text-gray-500 font-semibold uppercase">Location</p>
             <div class="flex items-center gap-1.5 mt-0.5">
               <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-              <span class="text-sm font-medium text-gray-800 truncate">{{ event.location }}</span>
+              <span class="text-sm font-medium text-gray-800 truncate">{{ event.room || event.location }}</span>
             </div>
           </div>
           
@@ -443,7 +443,7 @@
               <td class="px-4 py-4 text-center">
                 <div class="flex items-center gap-2 justify-center">
                   <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-                  <span class="text-sm">{{ event.location }}</span>
+                  <span class="text-sm">{{ event.room || event.location }}</span>
                 </div>
               </td>
               <td class="px-4 py-4 text-center">
@@ -547,7 +547,7 @@
               <p class="text-xs text-gray-500 font-semibold uppercase">Location</p>
               <div class="flex items-center gap-1.5 mt-0.5">
                 <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-                <span class="text-sm font-medium text-gray-800 truncate">{{ event.location }}</span>
+                <span class="text-sm font-medium text-gray-800 truncate">{{ event.room || event.location }}</span>
               </div>
             </div>
           </div>
@@ -782,7 +782,7 @@
                   <div>
                     <label class="block text-sm font-semibold mb-1.5 text-gray-700">Location</label>
                     <ng-container *ngIf="!isInlineEditing; else editLocationField">
-                      <input type="text" class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none text-gray-800" [value]="selectedEvent.location" readonly />
+                      <input type="text" class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none text-gray-800" [value]="selectedEvent.room || selectedEvent.location" readonly />
                     </ng-container>
                     <ng-template #editLocationField>
                       <input type="text" class="w-full px-3 py-2 rounded-lg bg-white border-2 border-[#679436] focus:outline-none text-gray-800" [(ngModel)]="inlineEditEvent.location" />
@@ -1007,7 +1007,7 @@
         <div>
           <label class="block text-sm font-medium mb-1 text-gray-700">Location</label>
           <ng-container *ngIf="!isInlineEditing; else editLocationFieldMobile">
-            <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.location" readonly />
+            <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.room || selectedEvent.location" readonly />
           </ng-container>
           <ng-template #editLocationFieldMobile>
             <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.location" />
@@ -1585,16 +1585,67 @@
 
             <!-- Location -->
             <div class="md:col-span-2">
-              <label class="block text-sm font-semibold mb-2 text-gray-700 flex items-center gap-1">
-                <i class="fas fa-map-marker-alt text-xs" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
-                Location <span class="text-red-500">*</span>
+              <label class="block text-sm font-semibold mb-3 text-gray-700 flex items-center justify-between">
+                <span class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-sm" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i> Location & Room <span class="text-red-500">*</span></span>
+                <small class="text-xs text-gray-400">Use suggestions or your device location</small>
               </label>
-              <input type="text" 
-                     [(ngModel)]="newEvent.location"
-                     name="location"
-                     class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                     [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
-                     placeholder="Enter event location..." />
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
+                <!-- Location input card -->
+                <div class="col-span-1">
+                  <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <div class="flex items-center gap-2">
+                      <input type="text"
+                             [(ngModel)]="newEvent.location"
+                             (ngModelChange)="onLocationChange($event)"
+                             name="location"
+                             class="flex-1 px-3 py-2 rounded-md focus:outline-none focus:ring-2 transition-all text-sm"
+                             [ngClass]="isOsws ? 'border-gray-200 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-200 focus:border-[#679436] focus:ring-[#679436]/20'"
+                             placeholder="Search place or address..." />
+                      <button type="button" (click)="useCurrentLocation()" class="px-3 py-2 rounded-md border text-sm font-medium bg-white text-gray-700" title="Use my location">
+                        <i class="fas fa-location-arrow"></i>
+                      </button>
+                      <button type="button" (click)="newEvent.location=''; newEventLat=null; newEventLon=null; locationSuggestions=[]" class="px-3 py-2 rounded-md border text-sm font-medium bg-white text-gray-600" title="Clear location">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+
+                    <div *ngIf="locationSuggestions?.length" class="mt-2">
+                      <ul class="bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-auto">
+                        <li *ngFor="let s of locationSuggestions" class="px-3 py-2 hover:bg-gray-50 cursor-pointer text-sm" (click)="selectLocationSuggestion(s)">
+                          <div class="truncate">{{ s.display_name }}</div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Room select card -->
+                <div class="col-span-1">
+                  <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                    <div class="flex items-center gap-2">
+                      <select [(ngModel)]="selectedRoom" (ngModelChange)="onRoomSelect($event)" class="flex-1 px-3 py-2 rounded-md text-sm border">
+                        <option value="" disabled [selected]="!selectedRoom">Select a room...</option>
+                        <option *ngFor="let r of rooms" [value]="r">{{ r }}</option>
+                        <option value="Others">Others (enter custom)</option>
+                      </select>
+                      <button type="button" (click)="openCustomRoomInput()" class="px-3 py-2 rounded-md border text-sm font-medium bg-white text-gray-700" title="Add custom room">
+                        <i class="fas fa-plus mr-1"></i>Custom
+                      </button>
+                    </div>
+
+                    <div *ngIf="showOtherRoomInput" class="mt-3">
+                      <label class="block text-xs text-gray-500 mb-1">Specify custom room</label>
+                      <div class="flex gap-2">
+                        <input id="other-room-input" type="text" [(ngModel)]="otherRoomInput" class="flex-1 px-3 py-2 rounded-md border text-sm" placeholder="e.g. Room 201 / Function Hall 2" />
+                        <button type="button" (click)="saveCustomRoom()" class="px-3 py-2 rounded-md bg-[#679436] text-white text-sm font-medium">Save</button>
+                        <button type="button" (click)="showOtherRoomInput=false; otherRoomInput='';" class="px-3 py-2 rounded-md border text-sm">Cancel</button>
+                      </div>
+                      <p class="text-xs text-gray-400 mt-2">Saved rooms are stored in your browser for convenience.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Description -->

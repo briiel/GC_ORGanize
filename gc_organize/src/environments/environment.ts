@@ -5,8 +5,8 @@ export const environment = {
   // when opening the frontend via http://<dev-ip>:4200
   apiUrl: `http://${window.location.hostname}:5000/api`,
   // Default geofence radius in meters (used when an event-specific radius is not set)
-  // Increased from 200 to 1000 to cover the Gordon College campus perimeter.
-  defaultGeofenceMeters: 1000
+  // Reduced to 200m per recent change request.
+  defaultGeofenceMeters: 200
   ,
   // Geofence bypass removed for all environments; always enforce geofence checks.
   attendanceGeofenceBypass: false

@@ -335,20 +335,39 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       return { ok: false };
     }
 
-    // Resolve college coordinates via OSM Nominatim
-    let place = null as any;
+    // Determine event coordinates to validate against
+    let eventCoords: { lat: number; lon: number } | null = null;
     try {
-      place = await firstValueFrom(this.osm.getOlongapoGordonCollegeCoords());
+      const ev = this.events?.find((x: any) => x && (x.event_id === this.selectedEventId || x.event_id == this.selectedEventId));
+      if (ev) {
+        // Prefer explicit stored coordinates if backend provides them
+        if (ev.event_latitude != null && ev.event_longitude != null) {
+          eventCoords = { lat: Number(ev.event_latitude), lon: Number(ev.event_longitude) };
+        } else if (ev.latitude != null && ev.longitude != null) {
+          eventCoords = { lat: Number(ev.latitude), lon: Number(ev.longitude) };
+        } else if (ev.lat != null && ev.lon != null) {
+          eventCoords = { lat: Number(ev.lat), lon: Number(ev.lon) };
+        } else if (ev.location) {
+          // Resolve textual location on-demand via OSM
+          try {
+            const resolved = await firstValueFrom(this.osm.getPlaceCoordinates(ev.location));
+            if (resolved) eventCoords = { lat: resolved.lat, lon: resolved.lon };
+          } catch (_) {
+            // ignore resolution failure and fall back later
+          }
+        }
+      }
     } catch (e) {
-      place = null;
+      eventCoords = null;
     }
 
-    if (!place) {
-      Swal.fire('Location Error', 'Could not resolve Olongapo Gordon College coordinates via OpenStreetMap. Try again later.', 'error');
+    // If event coordinates could not be determined, fail explicitly (no silent campus fallback)
+    if (!eventCoords) {
+      Swal.fire('Location Error', 'Event does not have saved coordinates. Organizer must set event location.', 'error');
       return { ok: false };
     }
 
-    const dist = this.osm.distanceMeters(userCoords, place);
+    const dist = this.osm.distanceMeters(userCoords, eventCoords as any);
     const radiusMeters = (environment as any).defaultGeofenceMeters ?? 200;
 
     if (dist > radiusMeters) {

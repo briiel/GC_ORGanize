@@ -324,9 +324,9 @@
                         - {{ formatTime(event.end_time) }}
                       </span>
                     </span>
-                    <span *ngIf="event.location" class="flex items-center gap-2">
+                    <span *ngIf="event.room || event.location" class="flex items-center gap-2">
                       <i class="fas fa-map-marker-alt text-blue-500"></i>
-                      <span class="font-medium">{{ event.location }}</span>
+                      <span class="font-medium">{{ event.room || event.location }}</span>
                     </span>
                   </div>
                 </div>

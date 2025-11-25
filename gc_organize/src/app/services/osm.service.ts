@@ -42,17 +42,19 @@ export class OsmService {
     );
   }
 
-  // Fallback coordinates (updated from Nominatim lookup)
-  // Precise coordinates resolved via OpenStreetMap Nominatim for "Olongapo Gordon College".
-  // Source: Nominatim search (lat: 14.832926, lon: 120.2821543)
-  private readonly fallbackOgC: LatLon = { lat: 14.832926, lon: 120.2821543 };
-
-  // Convenience: resolve the known place name for Olongapo Gordon College.
-  // If Nominatim fails or returns nothing, fall back to the configured value above.
-  getOlongapoGordonCollegeCoords(): Observable<LatLon | null> {
-    return this.getPlaceCoordinates('Olongapo Gordon College').pipe(
-      map(r => r || this.fallbackOgC),
-      catchError(() => of(this.fallbackOgC))
+  // Query Nominatim for multiple place suggestions (display_name + lat/lon)
+  // Returns up to `limit` suggestions (default 5). Does not cache results.
+  getPlaceSuggestions(place: string, limit: number = 5): Observable<Array<{ display_name: string; lat: number; lon: number }>> {
+    const q = String(place || '').trim();
+    if (!q) return of([]);
+    const params = new URLSearchParams({ q: q, format: 'json', limit: String(limit) });
+    const url = `${this.nominatimUrl}?${params.toString()}`;
+    return this.http.get<any[]>(url).pipe(
+      map(results => {
+        if (!results || !results.length) return [];
+        return results.map(r => ({ display_name: r.display_name || (r.name || ''), lat: parseFloat(r.lat), lon: parseFloat(r.lon) }));
+      }),
+      catchError(() => of([]))
     );
   }
 
@@ -70,5 +72,18 @@ export class OsmService {
     const aa = sinDlat * sinDlat + Math.cos(lat1) * Math.cos(lat2) * sinDlon * sinDlon;
     const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
     return R * c;
+  }
+
+  // Reverse geocode coordinates to a human-readable address using Nominatim
+  // Returns the `display_name` or null on failure.
+  reverseLookup(lat: number, lon: number): Observable<string | null> {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&addressdetails=0`;
+    return this.http.get<any>(url).pipe(
+      map(res => {
+        if (!res) return null;
+        return typeof res.display_name === 'string' ? res.display_name : null;
+      }),
+      catchError(() => of(null))
+    );
   }
 }
