@@ -42,9 +42,10 @@ export class OsmService {
     );
   }
 
-  // Fallback coordinates (verify these once and replace with an exact value if available)
-  // These are approximate coordinates for Olongapo area; replace with the official college lat/lon if you have it.
-  private readonly fallbackOgC: LatLon = { lat: 14.8400, lon: 120.2820 };
+  // Fallback coordinates (updated from Nominatim lookup)
+  // Precise coordinates resolved via OpenStreetMap Nominatim for "Olongapo Gordon College".
+  // Source: Nominatim search (lat: 14.832926, lon: 120.2821543)
+  private readonly fallbackOgC: LatLon = { lat: 14.832926, lon: 120.2821543 };
 
   // Convenience: resolve the known place name for Olongapo Gordon College.
   // If Nominatim fails or returns nothing, fall back to the configured value above.
