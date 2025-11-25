@@ -15,7 +15,16 @@ export class ExcelExportService {
    * @returns Promise<ExcelJS.Workbook>
    */
   async createWorkbookWithHeader(sheetName: string, columnCount: number = 9): Promise<any> {
-    const ExcelJS = await import('exceljs');
+    let ExcelJS: any;
+    try {
+      if (typeof (window as any).ExcelJS !== 'undefined') {
+        ExcelJS = (window as any).ExcelJS;
+      } else {
+        ExcelJS = await import('exceljs');
+      }
+    } catch (e) {
+      throw new Error('Failed to load ExcelJS library: ' + (e && (e as any).message ? (e as any).message : e));
+    }
     const Workbook = (ExcelJS as any).Workbook || (ExcelJS as any).default?.Workbook || (ExcelJS as any).default || ExcelJS;
     const workbook = new Workbook();
     const worksheet = workbook.addWorksheet(sheetName);
@@ -212,10 +221,21 @@ export class ExcelExportService {
    * @param filename - Name of the file
    */
   async exportWorkbook(workbook: any, filename: string): Promise<void> {
-    const { saveAs } = await import('file-saver');
+    let saveAsFn: any;
+    try {
+      if (typeof (window as any).saveAs !== 'undefined') {
+        saveAsFn = (window as any).saveAs;
+      } else {
+        const fs = await import('file-saver');
+        saveAsFn = (fs as any).saveAs || (fs as any).default || fs;
+      }
+    } catch (e) {
+      throw new Error('Failed to load file-saver library: ' + (e && (e as any).message ? (e as any).message : e));
+    }
+
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    (saveAs as any)(blob, filename);
+    (saveAsFn as any)(blob, filename);
   }
 
   /**
