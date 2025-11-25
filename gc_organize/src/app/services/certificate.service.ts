@@ -15,6 +15,7 @@ export class CertificateService {
   }
   
   requestCertificate(eventId: number): Observable<any> {
-    return this.http.post<any>(`${this.baseApiUrl}/request-certificate`, { event_id: eventId });
+    // Backend expects the event ID as a URL param: POST /event/events/:id/request-certificate
+    return this.http.post<any>(`${this.baseApiUrl}/events/${eventId}/request-certificate`, {});
   }
 }
