@@ -63,7 +63,7 @@
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+              <option value="rejected">Declined</option>
             </select>
           </div>
         </div>
@@ -191,8 +191,8 @@
                       [disabled]="processingRequestId === request.request_id"
                       class="font-semibold px-3.5 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 text-xs text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
                       <i class="fas fa-times text-xs" *ngIf="processingRequestId !== request.request_id"></i>
-                      <i class="fas fa-spinner fa-spin text-xs" *ngIf="processingRequestId === request.request_id"></i>
-                      Reject
+                        <i class="fas fa-spinner fa-spin text-xs" *ngIf="processingRequestId === request.request_id"></i>
+                        Decline
                     </button>
                   </div>
                 </td>
@@ -268,7 +268,7 @@
                     class="flex-1 font-semibold px-3 py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 text-sm text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
                     <i class="fas fa-times" *ngIf="processingRequestId !== request.request_id"></i>
                     <i class="fas fa-spinner fa-spin" *ngIf="processingRequestId === request.request_id"></i>
-                    Reject
+                    Decline
                   </button>
                 </div>
               </div>
@@ -360,7 +360,7 @@
                     <i class="fas fa-clock text-xs" *ngIf="request.status === 'pending'"></i>
                     <i class="fas fa-check-circle text-xs" *ngIf="request.status === 'approved'"></i>
                     <i class="fas fa-times-circle text-xs" *ngIf="request.status === 'rejected'"></i>
-                    {{ request.status | titlecase }}
+                    {{ getStatusLabel(request.status) }}
                   </span>
                   <div *ngIf="request.reviewer_first_name" class="text-xs text-gray-500 mt-1.5">
                     <i class="fas fa-user-shield text-gray-400 mr-1"></i>{{ request.reviewer_first_name }} {{ request.reviewer_last_name }}
@@ -406,7 +406,7 @@
                   <i class="fas fa-clock text-xs" *ngIf="request.status === 'pending'"></i>
                   <i class="fas fa-check-circle text-xs" *ngIf="request.status === 'approved'"></i>
                   <i class="fas fa-times-circle text-xs" *ngIf="request.status === 'rejected'"></i>
-                  {{ request.status | titlecase }}
+                  {{ getStatusLabel(request.status) }}
                 </span>
               </div>
 

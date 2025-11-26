@@ -181,23 +181,23 @@ export class RequestQueueComponent implements OnInit {
   }
 
   /**
-   * Reject a request
+   * Decline a request (UI label only)
    */
   async rejectRequest(request: RoleRequest): Promise<void> {
     const result = await Swal.fire({
-      title: 'Reject Request?',
+      title: 'Decline Request?',
       html: `
         <div class="text-left">
           <p class="mb-2"><strong>Student:</strong> ${request.first_name} ${request.last_name} (${request.student_id})</p>
           <p class="mb-2"><strong>Organization:</strong> ${request.org_name}</p>
           <p class="mb-4"><strong>Position:</strong> ${request.requested_position}</p>
-          <label for="rejection-reason" class="block text-sm font-medium text-gray-700 mb-2">Reason for Rejection (Optional)</label>
-          <textarea id="rejection-reason" class="swal2-input w-full" rows="3" placeholder="Explain why this request is being rejected..."></textarea>
+          <label for="rejection-reason" class="block text-sm font-medium text-gray-700 mb-2">Reason for Decline (Optional)</label>
+          <textarea id="rejection-reason" class="swal2-input w-full" rows="3" placeholder="Explain why this request is being declined..."></textarea>
         </div>
       `,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Reject',
+      confirmButtonText: 'Decline',
       confirmButtonColor: '#dc2626',
       cancelButtonText: 'Cancel',
       preConfirm: () => {
@@ -220,8 +220,8 @@ export class RequestQueueComponent implements OnInit {
           
           Swal.fire({
             icon: 'success',
-            title: 'Request Rejected',
-            text: 'The role request has been rejected.',
+            title: 'Request Declined',
+            text: 'The role request has been declined.',
             confirmButtonColor: '#679436'
           });
 
@@ -237,8 +237,8 @@ export class RequestQueueComponent implements OnInit {
           
           Swal.fire({
             icon: 'error',
-            title: 'Rejection Failed',
-            text: error.error?.message || 'Failed to reject request. Please try again.'
+            title: 'Decline Failed',
+            text: error.error?.message || 'Failed to decline request. Please try again.'
           });
         }
       });
@@ -253,6 +253,16 @@ export class RequestQueueComponent implements OnInit {
       return this.allRequests;
     }
     return this.allRequests.filter(req => req.status === this.filterStatus);
+  }
+
+  /**
+   * Return a user-facing label for status values.
+   * Keeps backend status values unchanged; maps 'rejected' -> 'Declined'.
+   */
+  getStatusLabel(status: string): string {
+    if (!status) return '';
+    if (String(status).toLowerCase() === 'rejected') return 'Declined';
+    return String(status).replace(/(^|\s)\S/g, t => t.toUpperCase());
   }
 
   /**

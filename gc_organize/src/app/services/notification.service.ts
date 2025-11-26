@@ -26,11 +26,23 @@ export class NotificationService {
     });
   }
 
-  list(): Observable<{ success: boolean; data: NotificationItem[] } | NotificationItem[]> {
-    return this.http.get<any>(`${this.api}`, { headers: this.getAuthHeaders() });
+  list(panel?: string, orgId?: number): Observable<{ success: boolean; data: NotificationItem[] } | NotificationItem[]> {
+    let url = `${this.api}`;
+    const params: any = {};
+    if (panel) params.panel = panel;
+    if (orgId !== undefined && orgId !== null) params.org_id = String(orgId);
+
+    return this.http.get<any>(url, { headers: this.getAuthHeaders(), params });
   }
 
   markRead(id: number): Observable<any> {
     return this.http.patch(`${this.api}/${id}/read`, {}, { headers: this.getAuthHeaders() });
+  }
+
+  markAll(panel?: string, orgId?: number): Observable<any> {
+    const params: any = {};
+    if (panel) params.panel = panel;
+    if (orgId !== undefined && orgId !== null) params.org_id = String(orgId);
+    return this.http.patch(`${this.api}/read-all`, {}, { headers: this.getAuthHeaders(), params });
   }
 }

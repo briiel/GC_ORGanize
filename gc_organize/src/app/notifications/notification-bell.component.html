@@ -17,26 +17,31 @@
   <!-- Notification Dropdown Panel -->
   <div 
     *ngIf="open" 
-    class="absolute right-0 mt-3 w-96 max-w-[90vw] bg-white rounded-xl shadow-2xl z-50 border-2 border-gray-200 overflow-hidden animate-slideDown"
+    class="absolute right-0 mt-3 w-96 max-w-[90vw] bg-white rounded-xl shadow-2xl overflow-hidden animate-slideDown"
+    [ngStyle]="{'z-index': '9999'}"
   >
     <!-- Header -->
-    <div class="px-5 py-4 bg-gradient-to-r from-[#679436] to-[#7da846] border-b-2 border-[#679436]">
+    <div class="px-5 py-4" [ngStyle]="getHeaderStyle()">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30">
+          <div class="w-10 h-10 rounded-full bg-white/06 flex items-center justify-center border border-gray-700">
             <i class="fas fa-bell text-white text-lg"></i>
           </div>
           <div>
             <span class="font-bold text-white text-lg">Notifications</span>
-            <p class="text-xs text-white/80 mt-0.5">Stay updated with latest events</p>
           </div>
         </div>
-        <button 
-          class="text-xs text-white/90 hover:text-white font-semibold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 border border-white/30" 
-          (click)="refresh()"
-        >
-          <i class="fas fa-sync-alt mr-1"></i>Refresh
-        </button>
+        <div class="flex items-center gap-2">
+          <button 
+            class="text-xs text-white/90 hover:text-white font-semibold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 border border-white/30" 
+            (click)="refresh()"
+            title="Refresh notifications"
+          >
+            <i class="fas fa-sync-alt mr-1"></i>Refresh
+          </button>
+
+          <!-- Header Mark All removed to avoid duplication with footer -->
+        </div>
       </div>
     </div>
 
@@ -100,10 +105,21 @@
       class="px-4 py-3 bg-gray-50 border-t-2 border-gray-200 text-center"
     >
       <button 
+        *ngIf="unreadCount() > 0"
         class="text-xs text-[#679436] hover:text-[#567a2c] font-semibold hover:underline transition-colors duration-200"
-        (click)="toggle()"
+        (click)="markAll()"
+        title="Mark all notifications as read"
       >
         <i class="fas fa-check-double mr-1"></i>
+        Mark all as read
+      </button>
+      <button
+        *ngIf="unreadCount() === 0"
+        class="text-xs text-gray-600 hover:text-gray-800 font-semibold hover:underline transition-colors duration-200"
+        (click)="toggle()"
+        title="Close notifications"
+      >
+        <i class="fas fa-times mr-1"></i>
         Close Notifications
       </button>
     </div>

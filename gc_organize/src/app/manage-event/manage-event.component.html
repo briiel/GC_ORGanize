@@ -785,7 +785,17 @@
                       <input type="text" class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none text-gray-800" [value]="selectedEvent.room || selectedEvent.location" readonly />
                     </ng-container>
                     <ng-template #editLocationField>
-                      <input type="text" class="w-full px-3 py-2 rounded-lg bg-white border-2 border-[#679436] focus:outline-none text-gray-800" [(ngModel)]="inlineEditEvent.location" />
+                      <div class="flex gap-2">
+                        <input id="inline-location-input" type="text" class="flex-1 px-3 py-2 rounded-lg bg-white border-2 border-[#679436] focus:outline-none text-gray-800" [(ngModel)]="inlineEditEvent.location" (ngModelChange)="onInlineLocationChange($event)" />
+                        <button type="button" (click)="useCurrentLocationForInline()" class="px-3 py-2 rounded-md bg-[#679436] text-white hover:bg-[#56732e]" title="Use my location">
+                          <i class="fas fa-location-arrow"></i>
+                        </button>
+                        <button type="button" (click)="clearInlineLocation()" class="px-3 py-2 rounded-md border bg-white text-gray-700" title="Clear location">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      <label class="block text-sm font-semibold mb-1.5 text-gray-700 mt-3">Room (optional)</label>
+                      <input type="text" class="w-full px-3 py-2 rounded-lg bg-white border-2 border-[#679436] focus:outline-none text-gray-800" [(ngModel)]="inlineEditEvent.room" placeholder="e.g. Function Hall / Room 201" />
                     </ng-template>
                   </div>
                   
@@ -886,7 +896,7 @@
                     </ng-template>
                   </div>
                   
-                  <div *ngIf="selectedEvent.event_poster || (isInlineEditing && (inlineEditPosterPreviewUrl || inlineEditEvent.event_poster))">
+                  <div *ngIf="isInlineEditing || selectedEvent.event_poster">
                     <label class="block text-sm font-semibold mb-1.5 text-gray-700">Event Poster</label>
                     <ng-container *ngIf="!isInlineEditing">
                       <div class="rounded-lg bg-white shadow-md p-2 max-w-xs border border-gray-200" *ngIf="selectedEvent.event_poster">
@@ -1010,7 +1020,13 @@
             <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [value]="selectedEvent.room || selectedEvent.location" readonly />
           </ng-container>
           <ng-template #editLocationFieldMobile>
-            <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.location" />
+            <div class="flex gap-2">
+              <input id="inline-location-input-mobile" type="text" class="flex-1 px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.location" (ngModelChange)="onInlineLocationChange($event)" />
+              <button type="button" (click)="useCurrentLocationForInline()" class="px-3 py-2 rounded-md bg-[#679436] text-white" title="Use my location"><i class="fas fa-location-arrow"></i></button>
+              <button type="button" (click)="clearInlineLocation()" class="px-3 py-2 rounded-md border bg-white text-gray-700" title="Clear location"><i class="fas fa-times"></i></button>
+            </div>
+            <label class="block text-sm font-medium mb-1 text-gray-700 mt-3">Room (optional)</label>
+            <input type="text" class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.room" placeholder="e.g. Function Hall / Room 201" />
           </ng-template>
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -1103,7 +1119,7 @@
             <textarea class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0" [(ngModel)]="inlineEditEvent.description" rows="2"></textarea>
           </ng-template>
         </div>
-        <div *ngIf="selectedEvent.event_poster || (isInlineEditing && (inlineEditPosterPreviewUrl || inlineEditEvent.event_poster))">
+        <div *ngIf="isInlineEditing || selectedEvent.event_poster">
           <label class="block text-sm font-medium mb-1 text-gray-700">Poster</label>
           <ng-container *ngIf="!isInlineEditing">
             <div class="rounded-xl bg-white shadow-lg p-2 max-w-xs">
@@ -1246,7 +1262,7 @@
                         class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all hover:shadow-lg bg-red-600 hover:bg-red-700"
                         (click)="bulkRejectSelected()">
                   <i class="fas fa-times"></i>
-                  Reject Selected
+                  Decline Selected
                 </button>
               </div>
             </div>
@@ -1438,7 +1454,7 @@
                             class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-white text-sm font-semibold shadow-md transition-all hover:shadow-lg bg-red-600 hover:bg-red-700"
                             (click)="rejectParticipant(p)">
                       <i class="fas fa-times"></i>
-                      Reject
+                      Decline
                     </button>
                   </div>
                 </div>
@@ -1624,21 +1640,22 @@
                 <div class="col-span-1">
                   <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
                     <div class="flex items-center gap-2">
-                      <select [(ngModel)]="selectedRoom" (ngModelChange)="onRoomSelect($event)" class="flex-1 px-3 py-2 rounded-md text-sm border">
+                      <select name="room_select" [(ngModel)]="selectedRoom" (ngModelChange)="onRoomSelect($event)" [disabled]="!isLocationGordon" [ngClass]="!isLocationGordon ? 'opacity-60 cursor-not-allowed bg-gray-50' : ''" class="flex-1 px-3 py-2 rounded-md text-sm border">
                         <option value="" disabled [selected]="!selectedRoom">Select a room...</option>
                         <option *ngFor="let r of rooms" [value]="r">{{ r }}</option>
                         <option value="Others">Others (enter custom)</option>
                       </select>
-                      <button type="button" (click)="openCustomRoomInput()" class="px-3 py-2 rounded-md border text-sm font-medium bg-white text-gray-700" title="Add custom room">
+                      <button type="button" (click)="openCustomRoomInput()" [disabled]="!isLocationGordon" [ngClass]="!isLocationGordon ? 'opacity-60 cursor-not-allowed' : ''" class="px-3 py-2 rounded-md border text-sm font-medium bg-white text-gray-700" title="Add custom room">
                         <i class="fas fa-plus mr-1"></i>Custom
                       </button>
                     </div>
-
+                    
+                    <div *ngIf="!isLocationGordon" class="mt-2 text-xs text-gray-500">Room selection is available only when location is Olongapo Gordon College.</div>
                     <div *ngIf="showOtherRoomInput" class="mt-3">
                       <label class="block text-xs text-gray-500 mb-1">Specify custom room</label>
                       <div class="flex gap-2">
-                        <input id="other-room-input" type="text" [(ngModel)]="otherRoomInput" class="flex-1 px-3 py-2 rounded-md border text-sm" placeholder="e.g. Room 201 / Function Hall 2" />
-                        <button type="button" (click)="saveCustomRoom()" class="px-3 py-2 rounded-md bg-[#679436] text-white text-sm font-medium">Save</button>
+                        <input id="other-room-input" name="otherRoomInput" type="text" [(ngModel)]="otherRoomInput" class="flex-1 px-3 py-2 rounded-md border text-sm" placeholder="e.g. Room 201 / Function Hall 2" />
+                        <button type="button" (click)="saveCustomRoom()" [disabled]="!isLocationGordon" class="px-3 py-2 rounded-md bg-[#679436] text-white text-sm font-medium">Save</button>
                         <button type="button" (click)="showOtherRoomInput=false; otherRoomInput='';" class="px-3 py-2 rounded-md border text-sm">Cancel</button>
                       </div>
                       <p class="text-xs text-gray-400 mt-2">Saved rooms are stored in your browser for convenience.</p>

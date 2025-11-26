@@ -79,8 +79,8 @@
         <div class="absolute inset-0 bg-cover bg-center filter blur-lg opacity-30" [id]="'bg-image-' + (event.id || i)"></div>
         <img [src]="event.event_poster || '#'" [alt]="event.title" class="relative w-full h-full object-contain"
           (load)="updateBackgroundImage($event, 'bg-image-' + (event.id || i))">
-        <!-- Status badge on image -->
-        <div class="absolute top-2 left-2 z-10">
+        <!-- Status badge on image (lower z-index to avoid overlapping floating notifications) -->
+        <div class="absolute top-2 left-2 z-0">
           <span
             class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap border-2 shadow-lg backdrop-blur-sm"
             [ngClass]="{

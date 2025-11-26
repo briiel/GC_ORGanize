@@ -34,7 +34,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   // When true, the panel content will show a short fade-out (used when switching panels)
   panelFading = false;
 
-  constructor(private authService: RbacAuthService, private router: Router, private cdRef: ChangeDetectorRef) {}
+  constructor(public authService: RbacAuthService, private router: Router, private cdRef: ChangeDetectorRef) {}
 
   async onLogout(): Promise<void> {
     const result = await Swal.fire({

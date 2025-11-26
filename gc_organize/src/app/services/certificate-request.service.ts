@@ -33,7 +33,7 @@ export class CertificateRequestService {
     );
   }
 
-  // Reject a certificate request
+  // Decline a certificate request
   rejectCertificateRequest(requestId: number, rejectionReason: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/requests/${requestId}/reject`, { rejection_reason: rejectionReason }, { headers: this.getAuthHeaders() }).pipe(
       map((resp: any) => resp),

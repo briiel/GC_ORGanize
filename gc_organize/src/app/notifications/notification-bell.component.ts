@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationItem, NotificationService } from '../services/notification.service';
 
@@ -10,6 +10,8 @@ import { NotificationItem, NotificationService } from '../services/notification.
   styleUrls: ['./notification-bell.component.css']
 })
 export class NotificationBellComponent implements OnInit, OnDestroy {
+  @Input() panel: string | null = null;
+  @Input() orgId: number | null = null;
   open = false;
   items: NotificationItem[] = [];
   loading = false;
@@ -25,6 +27,27 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) this.refresh();
     });
+  }
+
+  // Return header style based on current panel
+  getHeaderStyle(): { [key: string]: string } {
+    // Default colors (organization/student)
+    let bg = '#0f172a'; // dark slate-900 as default header background
+    let border = '#0b1220';
+
+    const p = (this.panel || '').toLowerCase();
+    if (p === 'student' || p === 'organization') {
+      bg = '#1f8a17'; // green tone similar to app theme
+      border = '#16720f';
+    } else if (p === 'osws_admin' || p === 'osws') {
+      bg = '#0f3a1a'; // darker green for OSWS admin
+      border = '#0b2b13';
+    }
+
+    return {
+      'background': bg,
+      'border-bottom': `2px solid ${border}`
+    };
   }
 
   ngOnDestroy(): void {
@@ -48,7 +71,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
 
   refresh() {
     this.loading = true;
-    this.api.list().subscribe((res: any) => {
+    this.api.list(this.panel ?? undefined, this.orgId ?? undefined).subscribe((res: any) => {
       const data: NotificationItem[] = Array.isArray(res) ? res : res.data ?? [];
       this.items = data;
       this.loading = false;
@@ -62,12 +85,19 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     });
   }
 
+  markAll() {
+    if (!this.items || this.items.length === 0) return;
+    this.api.markAll(this.panel ?? undefined, this.orgId ?? undefined).subscribe(() => {
+      this.items = this.items.map(i => ({ ...i, is_read: true } as any));
+    });
+  }
+
   getNotificationIcon(item: NotificationItem): string {
     const msg = item.message.toLowerCase();
     if (msg.includes('✅') || msg.includes('approved') || msg.includes('confirmed')) {
       return 'fas fa-check-circle';
     }
-    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('not approved')) {
+    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('declined') || msg.includes('not approved')) {
       return 'fas fa-times-circle';
     }
     if (msg.includes('⏳') || msg.includes('pending') || msg.includes('submitted')) {
@@ -87,7 +117,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     if (msg.includes('✅') || msg.includes('approved') || msg.includes('confirmed')) {
       return item.is_read ? 'bg-green-300' : 'bg-green-500';
     }
-    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('not approved')) {
+    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('declined') || msg.includes('not approved')) {
       return item.is_read ? 'bg-red-300' : 'bg-red-500';
     }
     if (msg.includes('⏳') || msg.includes('pending') || msg.includes('submitted')) {

@@ -62,16 +62,20 @@
               </label>
               <select 
                 id="organization"
+                #orgSelect
                 [(ngModel)]="selectedOrgId" 
                 name="organization"
                 required
                 [disabled]="isSubmitting"
+                [attr.aria-invalid]="!!formErrors['organization']"
+                [ngClass]="{'border-red-500': formErrors['organization']}"
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed">
                 <option [value]="null" disabled>-- Select an Organization --</option>
                 <option *ngFor="let org of filteredOrganizations" [value]="org.org_id">
                   {{ org.org_name }} <span class="text-gray-500">({{ org.department }})</span>
                 </option>
               </select>
+              <p *ngIf="formErrors['organization']" class="text-red-600 text-sm mt-1" role="alert">{{ formErrors['organization'] }}</p>
             </div>
 
             <!-- Position -->
@@ -80,15 +84,34 @@
                 <i class="fas fa-user-tie text-[#679436]"></i>
                 Requested Position <span class="text-red-500">*</span>
               </label>
-              <input 
-                type="text" 
+              <select
                 id="position"
-                [(ngModel)]="requestedPosition" 
+                [(ngModel)]="requestedPosition"
                 name="position"
                 required
                 [disabled]="isSubmitting"
-                placeholder="e.g., President, Vice President, Secretary, Treasurer"
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                [attr.aria-invalid]="!!(formErrors['position'] || formErrors['otherPosition'])"
+                [ngClass]="{'border-red-500': formErrors['position'] || formErrors['otherPosition']}"
+                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed">
+                <option [value]="''" disabled>-- Select a Position --</option>
+                <option *ngFor="let pos of positions" [value]="pos">{{ pos }}</option>
+              </select>
+              <p *ngIf="formErrors['position']" class="text-red-600 text-sm mt-1" role="alert">{{ formErrors['position'] }}</p>
+
+              <div *ngIf="requestedPosition === 'Others'" class="mt-3">
+                <input
+                  type="text"
+                  id="otherPosition"
+                  [(ngModel)]="otherPosition"
+                  name="otherPosition"
+                  required
+                  [disabled]="isSubmitting"
+                  [attr.aria-invalid]="!!formErrors['otherPosition']"
+                  [ngClass]="{'border-red-500': formErrors['otherPosition']}"
+                  placeholder="Please specify your position"
+                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed">
+                <p *ngIf="formErrors['otherPosition']" class="text-red-600 text-sm mt-1" role="alert">{{ formErrors['otherPosition'] }}</p>
+              </div>
             </div>
 
             <!-- Justification (Optional) -->
@@ -103,8 +126,15 @@
                 name="justification"
                 rows="5"
                 [disabled]="isSubmitting"
+                [attr.maxlength]="justificationMax"
                 placeholder="Explain why you should be granted this role and how you plan to contribute to the organization..."
+                [attr.aria-invalid]="!!formErrors['justification']"
+                [ngClass]="{'border-red-500': formErrors['justification']}"
                 class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea>
+              <div class="flex items-center justify-between mt-1">
+                <p *ngIf="formErrors['justification']" class="text-red-600 text-sm" role="alert">{{ formErrors['justification'] }}</p>
+                <p class="text-xs text-gray-500 ml-auto" [ngClass]="{'text-yellow-600': justificationCharsLeft<=20 && justificationCharsLeft>0, 'text-red-600': justificationCharsLeft<0}">{{ justification.length }} / {{ justificationMax }}</p>
+              </div>
               <p class="text-xs text-gray-500 mt-1">
                 <i class="fas fa-info-circle"></i> Providing a justification can strengthen your request
               </p>
@@ -121,7 +151,7 @@
               </button>
               <button 
                 type="submit"
-                [disabled]="isSubmitting || !selectedOrgId || !requestedPosition.trim()"
+                [disabled]="isSubmitting || !selectedOrgId || !isPositionValid()"
                 class="w-full sm:w-auto relative px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 text-white border-2 bg-[#679436] hover:bg-[#56732e] border-[#679436] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed min-h-[44px]">
                 <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
                 <span>{{ isSubmitting ? 'Submitting...' : 'Submit Request' }}</span>

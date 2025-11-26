@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -44,7 +44,28 @@ export class RequestRoleComponent implements OnInit {
   
   selectedOrgId: number | null = null;
   requestedPosition: string = '';
+  otherPosition: string = '';
+  positions: string[] = [
+    'President',
+    'Vice President for Internal Affairs',
+    'Vice President for External Affairs',
+    'Secretary',
+    'Assitant Secretary',
+    'Treasurer',
+    'Auditor',
+    'Business Manager',
+    'Public Information Officer (P.I.O.)',
+    '1st Year Representative',
+    '2nd Year Representative',
+    '3rd Year Representative',
+    '4th Year Representative',
+    'Others'
+  ];
   justification: string = '';
+  // UI / validation helpers
+  formErrors: { [key: string]: string } = {};
+  justificationMax = 300;
+  @ViewChild('orgSelect') orgSelect?: ElementRef<HTMLSelectElement>;
   
   isSubmitting = false;
   isLoading = true;
@@ -86,6 +107,14 @@ export class RequestRoleComponent implements OnInit {
    */
   openRequestModal(): void {
     this.isModalOpen = true;
+    // focus organization select for faster keyboard flow
+    setTimeout(() => {
+      try {
+        this.orgSelect?.nativeElement.focus();
+      } catch (e) {
+        // ignore
+      }
+    }, 50);
   }
 
   /**
@@ -141,21 +170,29 @@ export class RequestRoleComponent implements OnInit {
    * Submit role request
    */
   submitRequest(): void {
-    if (!this.selectedOrgId || !this.requestedPosition.trim()) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Missing Information',
-        text: 'Please select an organization and enter a position.'
-      });
+    // validate and show inline messages
+    if (!this.validateForm()) {
+      // focus first invalid field
+      if (this.formErrors['organization']) {
+        this.orgSelect?.nativeElement.focus();
+      } else if (this.formErrors['position'] || this.formErrors['otherPosition']) {
+        const el: HTMLElement | null = document.getElementById('position');
+        el?.focus();
+      } else if (this.formErrors['justification']) {
+        const el: HTMLElement | null = document.getElementById('justification');
+        el?.focus();
+      }
       return;
     }
+
+    const finalPosition = this.requestedPosition === 'Others' ? this.otherPosition : this.requestedPosition;
 
     this.isSubmitting = true;
     const headers = this.authService.getAuthHeaders();
     
     const requestData = {
       org_id: this.selectedOrgId,
-      requested_position: this.requestedPosition.trim(),
+      requested_position: finalPosition.trim(),
       justification: this.justification.trim() || null
     };
 
@@ -174,6 +211,7 @@ export class RequestRoleComponent implements OnInit {
         // Reset form
         this.selectedOrgId = null;
         this.requestedPosition = '';
+        this.otherPosition = '';
         this.justification = '';
 
         // Reload requests
@@ -228,5 +266,38 @@ export class RequestRoleComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  isPositionValid(): boolean {
+    if (this.requestedPosition === 'Others') {
+      return !!this.otherPosition && !!this.otherPosition.trim();
+    }
+    return !!this.requestedPosition && !!this.requestedPosition.trim();
+  }
+
+  get justificationCharsLeft(): number {
+    return this.justificationMax - (this.justification ? this.justification.length : 0);
+  }
+
+  validateForm(): boolean {
+    this.formErrors = {};
+
+    if (!this.selectedOrgId) {
+      this.formErrors['organization'] = 'Please select an organization.';
+    }
+
+    if (!this.requestedPosition || !this.requestedPosition.trim()) {
+      this.formErrors['position'] = 'Please select a position.';
+    } else if (this.requestedPosition === 'Others') {
+      if (!this.otherPosition || !this.otherPosition.trim()) {
+        this.formErrors['otherPosition'] = 'Please specify your position.';
+      }
+    }
+
+    if (this.justification && this.justification.length > this.justificationMax) {
+      this.formErrors['justification'] = `Justification must be ${this.justificationMax} characters or fewer.`;
+    }
+
+    return Object.keys(this.formErrors).length === 0;
   }
 }

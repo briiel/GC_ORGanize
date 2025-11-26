@@ -251,6 +251,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   selectedRoom: string = '';
   otherRoomInput: string = '';
   showOtherRoomInput: boolean = false;
+  // Whether the chosen location corresponds to Olongapo Gordon College
+  isLocationGordon: boolean = false;
 
   // For vertical event list selection
   selectedEvent: any = null;
@@ -719,12 +721,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (!p?.registration_id) return;
     this.eventService.rejectRegistration(p.registration_id).subscribe({
       next: () => {
-        Swal.fire('Rejected', 'Registration rejected.', 'success');
+        Swal.fire('Declined', 'Registration declined.', 'success');
         this.refreshParticipantsList();
       },
       error: (err) => {
-        console.error('Reject failed', err);
-        Swal.fire('Error', 'Failed to reject registration.', 'error');
+        console.error('Decline failed', err);
+        Swal.fire('Error', 'Failed to decline registration.', 'error');
       }
     });
   }
@@ -798,12 +800,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const calls = Array.from(this.selectedRegistrations).map(id => this.eventService.rejectRegistration(id));
     forkJoin(calls).subscribe({
       next: () => {
-        Swal.fire('Rejected', 'Selected registrations rejected.', 'success');
+        Swal.fire('Declined', 'Selected registrations declined.', 'success');
         this.refreshParticipantsList();
       },
       error: (err) => {
-        console.error('Bulk reject failed', err);
-        Swal.fire('Error', 'Some rejections failed. Please try again.', 'error');
+        console.error('Bulk decline failed', err);
+        Swal.fire('Error', 'Some declines failed. Please try again.', 'error');
         this.refreshParticipantsList();
       }
     });
@@ -968,7 +970,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       payload.append('registration_fee', this.inlineEditEvent.is_paid ? String(Number(this.inlineEditEvent.registration_fee || 0).toFixed(2)) : '0');
       payload.append('event_poster', this.inlineEditPosterFile);
       // Append room and coords when available
-      if (roomToSend) payload.append('room', roomToSend);
+      // Only include room if location is on-campus
+      if (this.isLocationGordon && roomToSend) payload.append('room', roomToSend);
       if (latToSend != null && lonToSend != null) {
         payload.append('event_latitude', String(latToSend));
         payload.append('event_longitude', String(lonToSend));
@@ -987,7 +990,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         registration_fee: this.inlineEditEvent.is_paid ? Number(this.inlineEditEvent.registration_fee || 0).toFixed(2) : 0,
         event_poster: this.inlineEditEvent.event_poster || ''
       } as any;
-      if (roomToSend) (payload as any).room = roomToSend;
+      if (this.isLocationGordon && roomToSend) (payload as any).room = roomToSend;
       if (latToSend != null && lonToSend != null) {
         (payload as any).event_latitude = latToSend;
         (payload as any).event_longitude = lonToSend;
@@ -1072,6 +1075,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
 
     this.showCreateModal = true;
+    this.isLocationGordon = false;
     this.toggleBodyModalClass();
   }
 
@@ -1098,13 +1102,97 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
   }
 
+  // If the active location is on-campus, ensure a sensible default room is selected
+  private ensureRoomForLocation(): void {
+    if (this.isLocationGordon) {
+      // If no room chosen, pick the first available room (not 'Others')
+      if (!this.selectedRoom || this.selectedRoom === '') {
+        const first = this.rooms.find(r => r && r !== 'Others');
+        if (first) this.selectedRoom = first;
+      }
+    } else {
+      // Off-campus: clear room selections
+      this.selectedRoom = '';
+      this.showOtherRoomInput = false;
+      this.otherRoomInput = '';
+    }
+  }
+
   // Called when location input changes; push into search subject for suggestions
   onLocationChange(value: string) {
     const raw = String(value || '');
     // Clear any previously selected coordinates when user edits the field
     this.newEventLat = null;
     this.newEventLon = null;
+    // Update whether location is at Gordon College (simple string check)
+    this.isLocationGordon = this.isGordonLocation(raw);
     this.locationSearch$.next(raw);
+    // Update room availability right away for typed locations
+    this.ensureRoomForLocation();
+  }
+
+  // Inline edit: when the location input changes in the details panel
+  onInlineLocationChange(value: string) {
+    try {
+      // clear any previously resolved inline coordinates when user edits the field
+      if (this.inlineEditEvent) {
+        this.inlineEditEvent.event_latitude = null;
+        this.inlineEditEvent.event_longitude = null;
+      }
+      // Update whether location is at Gordon College for room logic
+      this.isLocationGordon = this.isGordonLocation(String(value || ''));
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Use device geolocation to fill inline edit location and reverse-lookup address
+  useCurrentLocationForInline(): void {
+    if (!this.inlineEditEvent) return;
+    if (navigator && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          // reverse lookup to get a human-readable address
+          this.osm.reverseLookup(lat, lon).subscribe(address => {
+            if (address) {
+              this.inlineEditEvent.location = address;
+              this.inlineEditEvent.event_latitude = Number(lat);
+              this.inlineEditEvent.event_longitude = Number(lon);
+              this.isLocationGordon = this.isGordonLocation(address);
+            } else {
+              // fallback: write coordinates as location string
+              this.inlineEditEvent.location = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+              this.inlineEditEvent.event_latitude = Number(lat);
+              this.inlineEditEvent.event_longitude = Number(lon);
+              this.isLocationGordon = this.isGordonLocation(this.inlineEditEvent.location);
+            }
+          }, () => {
+            this.inlineEditEvent.location = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
+            this.inlineEditEvent.event_latitude = Number(lat);
+            this.inlineEditEvent.event_longitude = Number(lon);
+            this.isLocationGordon = this.isGordonLocation(this.inlineEditEvent.location);
+          });
+        },
+        (err) => {
+          console.warn('Geolocation failed:', err);
+          Swal.fire('Error', 'Unable to get current location. Please allow location access or enter address manually.', 'error');
+        },
+        { enableHighAccuracy: true, maximumAge: 5 * 60 * 1000, timeout: 8000 }
+      );
+    } else {
+      Swal.fire('Not Supported', 'Geolocation is not available in your browser.', 'info');
+    }
+  }
+
+  clearInlineLocation(): void {
+    if (!this.inlineEditEvent) return;
+    this.inlineEditEvent.location = '';
+    this.inlineEditEvent.event_latitude = null;
+    this.inlineEditEvent.event_longitude = null;
+    // reset room availability for typed locations
+    this.isLocationGordon = false;
   }
 
   // Called when user selects a suggested place
@@ -1113,7 +1201,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.newEvent.location = s.display_name;
     this.newEventLat = Number(s.lat);
     this.newEventLon = Number(s.lon);
+    // Determine if the selected suggestion refers to Gordon College
+    this.isLocationGordon = this.isGordonLocation(s.display_name);
     this.locationSuggestions = [];
+    this.ensureRoomForLocation();
   }
 
   // Use device's current location as event location (reverse-lookup address if available)
@@ -1126,7 +1217,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           this.newEventLat = this.userCoords.lat;
           this.newEventLon = this.userCoords.lon;
           this.osm.reverseLookup(this.userCoords.lat, this.userCoords.lon).subscribe(address => {
-            if (address) this.newEvent.location = address;
+            if (address) {
+              this.newEvent.location = address;
+              this.isLocationGordon = this.isGordonLocation(address);
+            }
           });
         }, () => {}, { enableHighAccuracy: true });
       }
@@ -1135,8 +1229,21 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.newEventLat = this.userCoords.lat;
     this.newEventLon = this.userCoords.lon;
     this.osm.reverseLookup(this.userCoords.lat, this.userCoords.lon).subscribe(address => {
-      if (address) this.newEvent.location = address;
+      if (address) {
+        this.newEvent.location = address;
+        this.isLocationGordon = this.isGordonLocation(address);
+        this.ensureRoomForLocation();
+        this.ensureRoomForLocation();
+      }
     });
+  }
+
+  // Simple heuristic: check if a place/address string refers to Gordon College
+  private isGordonLocation(place: string | null | undefined): boolean {
+    if (!place) return false;
+    const s = String(place).toLowerCase();
+    const keywords = ['gordon college', 'olongapo gordon', 'gordon'];
+    return keywords.some(k => s.includes(k));
   }
 
   onRoomSelect(room: string) {
@@ -1228,6 +1335,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
             }
           }
         } catch (e) {}
+
+        // Determine if loaded event location is Gordon College
+        this.isLocationGordon = this.isGordonLocation(event.location || this.newEvent.location || '');
 
         // Load existing coordinates if backend provided them
         if (event.event_latitude != null && event.event_longitude != null) {
@@ -1334,7 +1444,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       formData.append('event_poster', this.eventPosterFile);
     }
 
-    // Append room info (selected or other) and persist custom rooms
+      // Append room info (selected or other) and persist custom rooms
     let roomToSend = '';
     if (this.showOtherRoomInput && this.otherRoomInput && this.otherRoomInput.trim()) {
       roomToSend = this.otherRoomInput.trim();
@@ -1343,7 +1453,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     } else if (this.selectedRoom) {
       roomToSend = this.selectedRoom;
     }
-    if (roomToSend) formData.append('room', roomToSend);
+    // Only append room for on-campus locations
+    if (this.isLocationGordon && roomToSend) formData.append('room', roomToSend);
 
     // Append event coordinates for geofence validation (if resolved)
     if (this.newEventLat != null && this.newEventLon != null) {
