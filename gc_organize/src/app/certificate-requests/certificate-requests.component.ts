@@ -11,6 +11,9 @@ interface CertificateRequest {
   status: 'pending' | 'processing' | 'sent' | 'approved' | 'rejected';
   requested_at: string;
   processed_at?: string;
+  // Server may provide event-local formatted timestamps to avoid timezone ambiguity
+  requested_at_local?: string;
+  processed_at_local?: string;
   rejection_reason?: string;
   certificate_url?: string;
   event_title: string;
@@ -168,6 +171,19 @@ export class CertificateRequestsComponent implements OnInit {
 
   formatDate(dateStr: string): string {
     if (!dateStr) return 'N/A';
+    // If server provided an event-local datetime in 'YYYY-MM-DD HH:mm:ss', format it directly
+    const localMatch = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
+    if (localMatch) {
+      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const y = Number(localMatch[1]);
+      const mo = Number(localMatch[2]);
+      const d = Number(localMatch[3]);
+      let hh = Number(localMatch[4]);
+      const mm = String(localMatch[5]).padStart(2, '0');
+      const ampm = hh >= 12 ? 'PM' : 'AM';
+      hh = hh % 12 || 12;
+      return `${monthNames[mo - 1]} ${d}, ${y} ${hh}:${mm} ${ampm}`;
+    }
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { 
       year: 'numeric', 
