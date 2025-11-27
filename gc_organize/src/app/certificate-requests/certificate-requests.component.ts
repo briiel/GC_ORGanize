@@ -195,6 +195,10 @@ export class CertificateRequestsComponent implements OnInit {
       // Update status through API
       await firstValueFrom(this.certificateRequestService.updateCertificateRequestStatus(request.id, newStatus));
       request.status = newStatus as any;
+      // Set processed_at immediately using current UTC time so UI shows updated timestamp
+      try {
+        request.processed_at = new Date().toISOString();
+      } catch (_e) { /* ignore */ }
       this.applyFilters();
       this.successMessage = `Status updated to ${newStatus.toUpperCase()}`;
       window.setTimeout(() => (this.successMessage = null), 4000);
@@ -274,6 +278,9 @@ export class CertificateRequestsComponent implements OnInit {
         await firstValueFrom(this.certificateRequestService.updateCertificateRequestStatus(requestId, this.bulkStatus));
         const request = this.requests.find(r => r.id === requestId);
         if (request) request.status = this.bulkStatus as any;
+        if (request) {
+          try { request.processed_at = new Date().toISOString(); } catch (_e) { /* ignore */ }
+        }
       }
 
       this.selectedRequests.clear();
