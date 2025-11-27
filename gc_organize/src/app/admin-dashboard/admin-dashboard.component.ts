@@ -36,6 +36,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private viewReady = false;
   private refreshHandle?: ReturnType<typeof setInterval>;
   private statusChangedSub?: Subscription;
+  // Server-provided chart datasets (optional). If available, UI will prefer them.
+  private serverDeptData: Array<{ department: string; count: number }> | null = null;
+  private serverOrgData: Array<{ org_name: string; count: number }> | null = null;
 
   constructor(private eventService: EventService) {}
 
@@ -122,12 +125,15 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
   onPieChartFilterChange(): void {
     if (this.viewReady) {
+      // Re-fetch server datasets for new filter when available
+      this.fetchServerChartsIfPossible();
       this.renderPieChart();
     }
   }
 
   onBarChartFilterChange(): void {
     if (this.viewReady) {
+      this.fetchServerChartsIfPossible();
       this.renderBarChart();
     }
   }
@@ -174,6 +180,9 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           },
           error: () => { /* keep computeStats() fallback if backend call fails */ }
         });
+
+        // Try to load server-side chart aggregates (non-blocking)
+        this.fetchServerChartsIfPossible();
 
         // Render charts when view is ready
         if (this.viewReady) {
@@ -237,21 +246,27 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private renderPieChart(): void {
-    if (!this.deptPieChart) return;
-
-    // Pie/Donut: events by department (EXCLUDES OSWS-created) - filtered by time
-    const departmentCounts = new Map<string, number>();
-    let orgEventsOnly = this.events.filter((e: any) => e.created_by_org_id != null);
-    
-    // Apply time filter
-    orgEventsOnly = this.filterEventsByTime(orgEventsOnly, this.pieChartFilter);
-    for (const e of orgEventsOnly) {
-      // Normalize: if department missing for an org event, mark as 'Unknown'
-      const dept = (e.department || 'Unknown') as string;
-      departmentCounts.set(dept, (departmentCounts.get(dept) || 0) + 1);
+    if (!this.deptPieChart || !this.deptPieChart.nativeElement) return;
+    // If server provided aggregated department data, prefer that (avoids client-side grouping mistakes)
+    let deptLabels: string[] = [];
+    let deptData: number[] = [];
+    if (this.serverDeptData && this.serverDeptData.length) {
+      deptLabels = this.serverDeptData.map(d => d.department);
+      deptData = this.serverDeptData.map(d => d.count);
+    } else {
+      // Pie/Donut: events by department (EXCLUDES OSWS-created) - filtered by time
+      const departmentCounts = new Map<string, number>();
+      let orgEventsOnly = this.events.filter((e: any) => e.created_by_org_id != null);
+      // Apply time filter
+      orgEventsOnly = this.filterEventsByTime(orgEventsOnly, this.pieChartFilter);
+      for (const e of orgEventsOnly) {
+        // Normalize: if department missing for an org event, mark as 'Unknown'
+        const dept = (e.department || 'Unknown') as string;
+        departmentCounts.set(dept, (departmentCounts.get(dept) || 0) + 1);
+      }
+      deptLabels = Array.from(departmentCounts.keys());
+      deptData = Array.from(departmentCounts.values());
     }
-    const deptLabels = Array.from(departmentCounts.keys());
-    const deptData = Array.from(departmentCounts.values());
     // Fixed color mapping per requirement
     const deptColorMap: Record<string, string> = {
       'CCS': '#f59e0b',   // orange
@@ -265,9 +280,24 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     const fallbackPalette = ['#10b981', '#a855f7', '#06b6d4', '#f97316', '#84cc16'];
     const deptColors = deptLabels.map((label, i) => deptColorMap[label] || fallbackPalette[i % fallbackPalette.length]);
 
-    if (this.deptChart) this.deptChart.destroy();
-    if (this.deptPieChart) {
-      this.deptChart = new Chart(this.deptPieChart.nativeElement.getContext('2d')!, {
+    try {
+      if (this.deptChart) this.deptChart.destroy();
+      const ctx = this.deptPieChart.nativeElement.getContext('2d');
+      if (!ctx) return;
+      if (!deptLabels.length) {
+        // Clear canvas and show friendly message when there's no data
+        ctx.clearRect(0, 0, this.deptPieChart.nativeElement.width, this.deptPieChart.nativeElement.height);
+        ctx.save();
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#6b7280';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No department data', this.deptPieChart.nativeElement.width / 2 || 150, this.deptPieChart.nativeElement.height / 2 || 80);
+        ctx.restore();
+        this.deptChart = undefined;
+        return;
+      }
+      this.deptChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
           labels: deptLabels,
@@ -287,29 +317,35 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           }
         }
       });
+    } catch (err) {
+      console.error('renderPieChart error:', err);
     }
   }
 
   private renderBarChart(): void {
-    if (!this.orgActivitiesChart) return;
+    if (!this.orgActivitiesChart || !this.orgActivitiesChart.nativeElement) return;
+    // If server provided aggregated organization activity data, prefer that
+    let orgLabels: string[] = [];
+    let orgCounts: number[] = [];
+    if (this.serverOrgData && this.serverOrgData.length) {
+      orgLabels = this.serverOrgData.map(d => d.org_name);
+      orgCounts = this.serverOrgData.map(d => d.count);
+    } else {
+      // Horizontal Bar Chart: Activities count per Organization - filtered by time
+      let orgEventsOnly = this.events.filter((e: any) => e.created_by_org_id != null);
+      // Apply time filter
+      orgEventsOnly = this.filterEventsByTime(orgEventsOnly, this.barChartFilter);
 
-    // Horizontal Bar Chart: Activities count per Organization - filtered by time
-    let orgEventsOnly = this.events.filter((e: any) => e.created_by_org_id != null);
-    
-    // Apply time filter
-    orgEventsOnly = this.filterEventsByTime(orgEventsOnly, this.barChartFilter);
-
-    const orgActivityCounts = new Map<string, number>();
-    for (const e of orgEventsOnly) {
-      const orgName = e.organization_name || e.org_name || `Org ${e.created_by_org_id || 'Unknown'}`;
-      orgActivityCounts.set(orgName, (orgActivityCounts.get(orgName) || 0) + 1);
+      const orgActivityCounts = new Map<string, number>();
+      for (const e of orgEventsOnly) {
+        const orgName = e.organization_name || e.org_name || `Org ${e.created_by_org_id || 'Unknown'}`;
+        orgActivityCounts.set(orgName, (orgActivityCounts.get(orgName) || 0) + 1);
+      }
+      const sortedOrgs = Array.from(orgActivityCounts.entries())
+        .sort((a, b) => b[1] - a[1]);
+      orgLabels = sortedOrgs.map(([name]) => name);
+      orgCounts = sortedOrgs.map(([, count]) => count);
     }
-    
-    const sortedOrgs = Array.from(orgActivityCounts.entries())
-      .sort((a, b) => b[1] - a[1]);
-    
-    const orgLabels = sortedOrgs.map(([name]) => name);
-    const orgCounts = sortedOrgs.map(([, count]) => count);
     
     const orgColors = [
       '#679436', '#3b82f6', '#ec4899', '#f59e0b', '#10b981',
@@ -317,58 +353,76 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       '#14b8a6', '#f97316', '#84cc16', '#6366f1', '#d946ef'
     ];
 
-    if (this.orgActivitiesLineChart) this.orgActivitiesLineChart.destroy();
-    this.orgActivitiesLineChart = new Chart(this.orgActivitiesChart.nativeElement.getContext('2d')!, {
-      type: 'bar',
-      data: {
-        labels: orgLabels,
-        datasets: [
-          {
-            label: 'Number of Activities',
-            data: orgCounts,
-            backgroundColor: orgLabels.map((_, i) => orgColors[i % orgColors.length]),
-            borderColor: orgLabels.map((_, i) => orgColors[i % orgColors.length]),
-            borderWidth: 1
-          }
-        ]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            beginAtZero: true,
-            ticks: { 
-              precision: 0,
-              font: { size: 11 }
-            },
-            title: {
-              display: true,
-              text: 'Number of Activities',
-              font: { weight: 'bold', size: 12 }
+    try {
+      const ctx = this.orgActivitiesChart.nativeElement.getContext('2d');
+      if (!ctx) return;
+      if (this.orgActivitiesLineChart) this.orgActivitiesLineChart.destroy();
+      if (!orgLabels.length) {
+        ctx.clearRect(0, 0, this.orgActivitiesChart.nativeElement.width, this.orgActivitiesChart.nativeElement.height);
+        ctx.save();
+        ctx.font = '14px sans-serif';
+        ctx.fillStyle = '#6b7280';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No organization activity data', this.orgActivitiesChart.nativeElement.width / 2 || 150, this.orgActivitiesChart.nativeElement.height / 2 || 80);
+        ctx.restore();
+        this.orgActivitiesLineChart = undefined;
+        return;
+      }
+      this.orgActivitiesLineChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: orgLabels,
+          datasets: [
+            {
+              label: 'Number of Activities',
+              data: orgCounts,
+              backgroundColor: orgLabels.map((_, i) => orgColors[i % orgColors.length]),
+              borderColor: orgLabels.map((_, i) => orgColors[i % orgColors.length]),
+              borderWidth: 1
             }
-          },
-          y: {
-            ticks: {
-              font: { size: 11 }
-            }
-          }
+          ]
         },
-        plugins: {
-          legend: { 
-            display: false
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: { 
+                precision: 0,
+                font: { size: 11 }
+              },
+              title: {
+                display: true,
+                text: 'Number of Activities',
+                font: { weight: 'bold', size: 12 }
+              }
+            },
+            y: {
+              ticks: {
+                font: { size: 11 }
+              }
+            }
           },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                return `Activities: ${context.parsed.x}`;
+          plugins: {
+            legend: { 
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => {
+                  return `Activities: ${context.parsed.x}`;
+                }
               }
             }
           }
         }
-      }
-    });
+      });
+    } catch (err) {
+      console.error('renderBarChart error:', err);
+    }
   }
 
   private renderLineChart(): void {
@@ -490,5 +544,36 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     }
     
     return events;
+  }
+
+  // Try fetching server-side aggregated datasets for the charts. Non-blocking; falls
+  // back to client-side aggregation when server call fails or returns empty.
+  private fetchServerChartsIfPossible(): void {
+    try {
+      this.eventService.getOswsCharts(this.pieChartFilter).subscribe({
+        next: (res) => {
+          const data = (res as any)?.data ?? res;
+          if (data) {
+            this.serverDeptData = data.events_by_department || null;
+            this.serverOrgData = data.activities_by_organization || null;
+            // Re-render charts to use server data
+            if (this.viewReady) {
+              this.renderPieChart();
+              this.renderBarChart();
+            }
+          }
+        },
+        error: (err) => {
+          // Keep client-side fallback; log to console for diagnostics
+          console.warn('Failed to load server chart aggregates:', err?.message || err);
+          this.serverDeptData = null;
+          this.serverOrgData = null;
+        }
+      });
+    } catch (e) {
+      console.warn('fetchServerChartsIfPossible error:', e);
+      this.serverDeptData = null;
+      this.serverOrgData = null;
+    }
   }
 }

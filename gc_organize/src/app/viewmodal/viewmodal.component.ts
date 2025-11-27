@@ -57,7 +57,9 @@ export class ViewmodalComponent {
 
   // Helper to get display status
   getDisplayStatus(): string {
-    return String(this.event?.status || '').toLowerCase();
+    // Prefer server-provided auto_status (time-based) when available so the UI
+    // matches backend dashboard counts and logic.
+    return String(this.event?.auto_status || this.event?.status || '').toLowerCase();
   }
 }
 

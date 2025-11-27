@@ -133,10 +133,12 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         // Reset to first page if events change
         this.upcomingPage = 1;
 
-        // Count events by status
+        // Count events by status. Prefer server-provided `auto_status` when present
+        // (server computes time-based status and marks `auto_status`). This keeps
+        // the dashboard counts consistent with backend stats endpoints.
         let upcoming = 0, ongoing = 0, concluded = 0, cancelled = 0;
         for (const e of events) {
-          const status = String(e.status).toLowerCase();
+          const status = String(e.auto_status || e.status || '').toLowerCase();
           if (status === 'cancelled') {
             cancelled++;
           } else if (status === 'concluded') {
@@ -185,7 +187,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   get pagedUpcomingEvents(): any[] {
     const upcoming = this.events
       .filter(e => {
-        const status = String(e.status).toLowerCase();
+        const status = String(e.auto_status || e.status || '').toLowerCase();
         return status === 'not yet started' || status === 'upcoming';
       })
       .sort((a, b) => {
@@ -200,7 +202,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
 
   get totalUpcomingPages(): number {
     const count = this.events.filter(e => {
-      const status = String(e.status).toLowerCase();
+      const status = String(e.auto_status || e.status || '').toLowerCase();
       return status === 'not yet started' || status === 'upcoming';
     }).length;
     return Math.max(1, Math.ceil(count / this.upcomingPageSize));
@@ -355,7 +357,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   get modalPagedUpcomingEvents(): any[] {
     const upcoming = this.events
       .filter(e => {
-        const status = String(e.status).toLowerCase();
+        const status = String(e.auto_status || e.status || '').toLowerCase();
         return status === 'not yet started' || status === 'upcoming';
       })
       .sort((a, b) => {
@@ -369,7 +371,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
 
   get modalTotalUpcomingPages(): number {
     const count = this.events.filter(e => {
-      const status = String(e.status).toLowerCase();
+      const status = String(e.auto_status || e.status || '').toLowerCase();
       return status === 'not yet started' || status === 'upcoming';
     }).length;
     return Math.max(1, Math.ceil(count / this.modalUpcomingPageSize));

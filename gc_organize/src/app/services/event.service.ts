@@ -182,4 +182,10 @@ export class EventService {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/stats/osws`, { headers });
   }
+
+  // New: fetch aggregated chart datasets for OSWS dashboard
+  getOswsCharts(filter: 'weekly' | 'monthly' | 'yearly' = 'monthly'): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/stats/osws/charts?filter=${filter}`, { headers });
+  }
 }
