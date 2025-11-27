@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
+import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 import { RbacAuthService } from '../services/rbac-auth.service';
 
 @Component({
@@ -41,13 +42,13 @@ export class EventsregComponent implements OnInit {
           const aTimeStr: string | undefined = a?.start_time;
           const bTimeStr: string | undefined = b?.start_time;
 
-          // Build comparable timestamps; if only date exists, default to 00:00
-          const aTs = aDateStr
-            ? Date.parse(`${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00')}`)
-            : 0;
-          const bTs = bDateStr
-            ? Date.parse(`${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00')}`)
-            : 0;
+          // Build comparable timestamps; parse as UTC when possible
+          const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
+          const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
+          const aD = parseMysqlDatetimeToDate(aFull as any);
+          const bD = parseMysqlDatetimeToDate(bFull as any);
+          const aTs = aD ? aD.getTime() : 0;
+          const bTs = bD ? bD.getTime() : 0;
           return bTs - aTs; // descending (latest first)
         });
         this.loading = false;

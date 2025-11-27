@@ -4,6 +4,7 @@ import { EventService } from '../services/event.service';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
 @Component({
   selector: 'app-so-dashboard',
@@ -191,7 +192,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         // Compare by start_date (assume format YYYY-MM-DD)
         if (!a.start_date) return 1;
         if (!b.start_date) return -1;
-        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        return (parseMysqlDatetimeToDate(a.start_date)?.getTime() ?? 0) - (parseMysqlDatetimeToDate(b.start_date)?.getTime() ?? 0);
       });
     const start = (this.upcomingPage - 1) * this.upcomingPageSize;
     return upcoming.slice(start, start + this.upcomingPageSize);
@@ -247,8 +248,8 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
     const createValidDate = (dateStr: string | null | undefined, timeStr?: string | null): Date => {
       if (!dateStr) return new Date(); // Fallback to current date
       const dateTimeStr = timeStr ? `${dateStr} ${timeStr}` : dateStr;
-      const date = new Date(dateTimeStr);
-      return isNaN(date.getTime()) ? new Date() : date; // Return current date if invalid
+      const parsed = parseMysqlDatetimeToDate(dateTimeStr);
+      return parsed ?? new Date();
     };
 
     // Generate activity entries based on events - showing all activities as they happen
@@ -360,7 +361,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
       .sort((a, b) => {
         if (!a.start_date) return 1;
         if (!b.start_date) return -1;
-        return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+        return (parseMysqlDatetimeToDate(a.start_date)?.getTime() ?? 0) - (parseMysqlDatetimeToDate(b.start_date)?.getTime() ?? 0);
       });
     const start = (this.modalUpcomingPage - 1) * this.modalUpcomingPageSize;
     return upcoming.slice(start, start + this.modalUpcomingPageSize);

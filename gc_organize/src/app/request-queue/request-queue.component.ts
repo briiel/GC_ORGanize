@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
 import { environment } from '../../environments/environment';
+import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
 interface RoleRequest {
   request_id: number;
@@ -285,7 +286,9 @@ export class RequestQueueComponent implements OnInit {
    * Format date
    */
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    const d = parseMysqlDatetimeToDate(dateString);
+    if (!d) return '';
+    return d.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

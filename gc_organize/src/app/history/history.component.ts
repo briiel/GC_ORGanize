@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
+import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
 @Component({
   selector: 'app-history',
@@ -99,18 +100,17 @@ export class HistoryComponent implements OnInit {
 
   formatDate(d?: string) {
     if (!d) return '';
-    try { return new Date(d).toLocaleDateString(); } catch { return d; }
+    try {
+      const dd = parseMysqlDatetimeToDate(d as any);
+      return dd ? dd.toLocaleDateString() : '';
+    } catch { return d || ''; }
   }
 
   formatTime(t?: string) {
     if (!t) return '';
     try {
-      // Handle both full datetime strings and time-only strings
-      const dateObj = new Date(t);
-      if (!isNaN(dateObj.getTime())) {
-        // Valid datetime - extract time
-        return dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
+      const dd = parseMysqlDatetimeToDate(t as any);
+      if (dd) return dd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       // Fallback for HH:MM format
       const [h, m] = String(t).split(':');
       const dt = new Date();
@@ -131,8 +131,8 @@ export class HistoryComponent implements OnInit {
   }
 
   private safeDate(v: any) {
-    const d = new Date(v);
-    return isNaN(d.getTime()) ? 0 : d.getTime();
+    const d = parseMysqlDatetimeToDate(v as any);
+    return d ? d.getTime() : 0;
   }
 
   // Keep the same handlers as Events Registered (no-op filter trigger and clear)

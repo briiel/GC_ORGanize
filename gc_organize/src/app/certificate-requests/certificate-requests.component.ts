@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { parseMysqlDatetimeToDate, formatToLocalShort } from '../utils/date-utils';
 import { CommonModule } from '@angular/common';
 import { CertificateRequestService } from '../services/certificate-request.service';
 import { FormsModule } from '@angular/forms';
@@ -171,27 +172,10 @@ export class CertificateRequestsComponent implements OnInit {
 
   formatDate(dateStr: string): string {
     if (!dateStr) return 'N/A';
-    // If server provided an event-local datetime in 'YYYY-MM-DD HH:mm:ss', format it directly
-    const localMatch = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/);
-    if (localMatch) {
-      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-      const y = Number(localMatch[1]);
-      const mo = Number(localMatch[2]);
-      const d = Number(localMatch[3]);
-      let hh = Number(localMatch[4]);
-      const mm = String(localMatch[5]).padStart(2, '0');
-      const ampm = hh >= 12 ? 'PM' : 'AM';
-      hh = hh % 12 || 12;
-      return `${monthNames[mo - 1]} ${d}, ${y} ${hh}:${mm} ${ampm}`;
-    }
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    // Prefer the backend-provided event-local string when available, otherwise parse as UTC
+    const d = parseMysqlDatetimeToDate(dateStr as any);
+    if (!d) return 'N/A';
+    return formatToLocalShort(d);
   }
 
   async updateRequestStatus(request: CertificateRequest, newStatus: string): Promise<void> {

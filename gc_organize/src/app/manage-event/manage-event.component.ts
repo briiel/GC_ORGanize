@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { ExcelExportService } from '../services/excel-export.service';
+import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
 @Component({
   selector: 'app-manage-event',
@@ -245,6 +246,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   locationSuggestions: Array<{ display_name: string; lat: number; lon: number }> = [];
   private locationSearch$ = new Subject<string>();
   private locationSearchSub: Subscription | null = null;
+  private statusChangeSub: Subscription | null = null;
+  private refreshIntervalId: any = null;
 
   // Room selection + persistence
   rooms: string[] = [];
@@ -347,6 +350,16 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (this.isOsws) {
       this.fetchOswsEvents();
       this.fetchOrgEvents();
+      // Subscribe to status change notifications (emitted after manual status updates)
+      this.statusChangeSub = this.eventService.statusChanged$.subscribe(() => {
+        this.fetchOswsEvents();
+        this.fetchOrgEvents();
+      });
+      // Periodically refresh events so automatic status (computed server-side) is reflected in the UI
+      this.refreshIntervalId = setInterval(() => {
+        this.fetchOswsEvents();
+        this.fetchOrgEvents();
+      }, 60000); // 60s
     } else {
       this.fetchEvents();
     }
@@ -358,6 +371,14 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (this.locationSearchSub) {
       this.locationSearchSub.unsubscribe();
       this.locationSearchSub = null;
+    }
+    if (this.statusChangeSub) {
+      this.statusChangeSub.unsubscribe();
+      this.statusChangeSub = null;
+    }
+    if (this.refreshIntervalId) {
+      clearInterval(this.refreshIntervalId);
+      this.refreshIntervalId = null;
     }
   }
 
@@ -546,8 +567,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         (event.title && event.title.toLowerCase().includes(term)) ||
         ((event.room && event.room.toLowerCase().includes(term)) || (event.location && event.location.toLowerCase().includes(term))) ||
         (event.department && event.department.toLowerCase().includes(term)) ||
-        (event.start_date && new Date(event.start_date).toLocaleDateString().toLowerCase().includes(term)) ||
-        (event.end_date && new Date(event.end_date).toLocaleDateString().toLowerCase().includes(term)) ||
+        (event.start_date && parseMysqlDatetimeToDate(event.start_date)?.toLocaleDateString().toLowerCase().includes(term)) ||
+        (event.end_date && parseMysqlDatetimeToDate(event.end_date)?.toLocaleDateString().toLowerCase().includes(term)) ||
         (event.status && event.status.toLowerCase().includes(term))
       );
     }
@@ -597,10 +618,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         sorted.sort((a, b) => (b.title || '').toLowerCase().localeCompare((a.title || '').toLowerCase()));
         break;
       case 'date_asc':
-        sorted.sort((a, b) => (new Date(a.start_date || '').getTime() || 0) - (new Date(b.start_date || '').getTime() || 0));
+        sorted.sort((a, b) => (parseMysqlDatetimeToDate(a.start_date)?.getTime() ?? 0) - (parseMysqlDatetimeToDate(b.start_date)?.getTime() ?? 0));
         break;
       case 'date_desc':
-        sorted.sort((a, b) => (new Date(b.start_date || '').getTime() || 0) - (new Date(a.start_date || '').getTime() || 0));
+        sorted.sort((a, b) => (parseMysqlDatetimeToDate(b.start_date)?.getTime() ?? 0) - (parseMysqlDatetimeToDate(a.start_date)?.getTime() ?? 0));
         break;
       default:
         break;
@@ -1738,7 +1759,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         `${evaluation.first_name || ''} ${evaluation.middle_initial || ''} ${evaluation.last_name || ''} ${evaluation.suffix || ''}`.trim(),
         evaluation.department ?? '-',
         evaluation.program ?? '-',
-        evaluation.submitted_at ? new Date(evaluation.submitted_at).toLocaleString() : '-',
+        evaluation.submitted_at ? (parseMysqlDatetimeToDate(evaluation.submitted_at)?.toLocaleString() ?? '-') : '-',
         ratings.question1 ?? '-',
         ratings.question2 ?? '-',
         ratings.question3 ?? '-',

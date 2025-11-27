@@ -12,13 +12,13 @@
         'bg-red-500': event?.department === 'CAHS',
         'bg-blue-500': event?.department === 'CEAS',
         'bg-pink-400': event?.department === 'CHTM',
-        'bg-[#679436]': !event?.department || event?.department === 'OSWS'
+        'bg-[#14532d]': !event?.department || event?.department === 'OSWS'
       }"
       aria-hidden="true"></div>
 
     <!-- Close button -->
     <button (click)="closeModal()" aria-label="Close dialog"
-      class="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 cursor-pointer z-30 focus:outline-none focus:ring-2 focus:ring-[#679436] transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm min-h-[44px] min-w-[44px]">
+      class="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/90 hover:bg-white text-gray-700 hover:text-gray-900 cursor-pointer z-30 focus:outline-none focus:ring-2 focus:ring-[#14532d] transition-all duration-200 shadow-lg hover:shadow-xl backdrop-blur-sm min-h-[44px] min-w-[44px]">
       <i class="fas fa-times text-lg"></i>
     </button>
 
@@ -51,7 +51,7 @@
                   'bg-red-500 border-red-600': event?.department === 'CAHS',
                   'bg-blue-500 border-blue-600': event?.department === 'CEAS',
                   'bg-pink-400 border-pink-500': event?.department === 'CHTM',
-                  'bg-[#679436] border-[#56732e]': !event?.department || event?.department === 'OSWS'
+                  'bg-[#14532d] border-[#14532d]': !event?.department || event?.department === 'OSWS'
                 }">
             {{ event?.department ? event.department : 'OSWS' }}
           </span>

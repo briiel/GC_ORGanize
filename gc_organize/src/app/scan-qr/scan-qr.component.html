@@ -2,10 +2,10 @@
   <!-- Header -->
   <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
     <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4"
-         [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'">
+         [ngClass]="isOsws ? 'gc-border-admin' : 'gc-border-primary'">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-lg flex items-center justify-center"
-             [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
+             [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'">
           <i class="fas fa-qrcode text-white"></i>
         </div>
         <div>
@@ -77,7 +77,7 @@
             <option *ngFor="let c of cameras" [value]="c.id">{{ c.label || 'Camera ' + (cameras.indexOf(c) + 1) }}</option>
           </select>
           <button class="text-white px-4 py-2.5 rounded-lg transition-all duration-200 shadow hover:shadow-lg font-semibold text-sm flex items-center gap-2 min-h-[44px]"
-                  [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
+                    [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'"
                   (click)="switchCamera()">
             <i class="fas fa-sync-alt"></i>
             <span class="hidden sm:inline">Switch</span>
@@ -110,7 +110,7 @@
 
       <div class="flex flex-col gap-3 pt-2">
         <button class="w-full text-white px-6 py-3.5 sm:py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl font-semibold flex items-center justify-center gap-2 min-h-[52px]"
-                [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
+                  [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'"
                 (click)="retry()" 
                 *ngIf="!isRunning">
           <i class="fas fa-play"></i>

@@ -763,6 +763,47 @@ body.modal-open .sidebar-blur-target {
     background-color: var(--gc-gray-50);
 }
 
+/* Admin / OSWS Utilities */
+.gc-bg-admin {
+    background-color: var(--gc-admin) !important;
+    color: white !important;
+}
+.gc-bg-admin:hover {
+    background-color: var(--gc-admin-hover) !important;
+}
+.gc-border-admin {
+    border-color: var(--gc-admin) !important;
+}
+.gc-text-admin {
+    color: var(--gc-admin) !important;
+}
+.gc-focus-admin:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(20,83,45,0.12) !important;
+    border-color: var(--gc-admin) !important;
+}
+.gc-gradient-admin {
+    background: linear-gradient(90deg, var(--gc-admin) 0%, var(--gc-admin-hover) 100%) !important;
+    color: white !important;
+}
+
+/* Organization (primary) utilities to keep symmetry */
+.gc-bg-primary {
+    background-color: var(--gc-primary) !important;
+    color: white !important;
+}
+.gc-bg-primary:hover {
+    background-color: var(--gc-primary-hover) !important;
+}
+.gc-border-primary {
+    border-color: var(--gc-primary) !important;
+}
+.gc-focus-primary:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgba(103,148,54,0.12) !important;
+    border-color: var(--gc-primary) !important;
+}
+
 /* Border Utilities */
 .gc-border {
     border: 2px solid var(--gc-gray-200);

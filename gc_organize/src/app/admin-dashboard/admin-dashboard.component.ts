@@ -161,26 +161,18 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           .filter((id: any) => id != null);
         if (ids.length) this.fetchAttendanceStats(ids);
 
-        // Fetch backend OSWS stats to ensure Concluded includes trashed until permanent delete
+        // Fetch backend OSWS stats and use them as the source of truth so dashboard reflects server-computed statuses
         this.eventService.getOswsStats().subscribe({
           next: (s) => {
             const data = (s as any)?.data ?? s;
             if (data) {
-              // Only override if backend has different totals (e.g., includes archived)
-              const totalBackendEvents = (data.upcoming || 0) + (data.ongoing || 0) + 
-                                       (data.concluded || 0) + (data.cancelled || 0);
-              const totalLocalEvents = this.stats.upcoming + this.stats.ongoing + 
-                                     this.stats.concluded + this.stats.cancelled;
-              
-              if (totalBackendEvents !== totalLocalEvents) {
-                this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
-                this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
-                this.stats.concluded = data.concluded ?? this.stats.concluded;
-                this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
-              }
+              this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
+              this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
+              this.stats.concluded = data.concluded ?? this.stats.concluded;
+              this.stats.cancelled = data.cancelled ?? this.stats.cancelled;
             }
           },
-          error: () => { /* keep computeStats() fallback */ }
+          error: () => { /* keep computeStats() fallback if backend call fails */ }
         });
 
         // Render charts when view is ready
@@ -200,7 +192,10 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     // Improved: Only count each event in one category with flexible status handling
     let upcoming = 0, ongoing = 0, concluded = 0, cancelled = 0;
     for (const e of oswsEvents) {
-      const status = String(e.status).toLowerCase();
+      // Prefer server-computed `auto_status` when available so UI reflects automatic transitions
+      const auto = (e && (e.auto_status !== undefined)) ? (e.auto_status) : null;
+      const raw = auto !== null && auto !== undefined && auto !== '' ? String(auto).toLowerCase() : String(e.status || '').toLowerCase();
+      const status = raw;
       if (status === 'cancelled') {
         cancelled++;
       } else if (status === 'concluded') {

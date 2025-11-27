@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 import { ExcelExportService } from '../services/excel-export.service';
+import { parseMysqlDatetimeToDate, formatToLocalShort } from '../utils/date-utils';
 
 @Component({
   selector: 'app-attendance-records',
@@ -214,12 +215,9 @@ export class AttendanceRecordsComponent implements OnInit {
   formatDateTime(value: string | Date | null | undefined): string {
     if (!value) return '-';
     try {
-      const d = typeof value === 'string' ? new Date(value) : value;
-      if (!d || isNaN((d as Date).getTime())) return '-';
-      return new Intl.DateTimeFormat(undefined, {
-        year: 'numeric', month: 'short', day: '2-digit',
-        hour: '2-digit', minute: '2-digit'
-      }).format(d as Date);
+      const d = parseMysqlDatetimeToDate(value as any);
+      if (!d) return '-';
+      return formatToLocalShort(d);
     } catch {
       return '-';
     }

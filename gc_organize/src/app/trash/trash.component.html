@@ -1,12 +1,12 @@
 <div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
 	<!-- Header -->
 	<div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
-		<div class="bg-white rounded-lg shadow-md p-4 sm:p-5"
-			 [ngClass]="isOsws ? 'border-l-4 border-[#14532d]' : 'border-l-4 border-[#679436]'">
+			<div class="bg-white rounded-lg shadow-md p-4 sm:p-5"
+				 [ngClass]="isOsws ? 'border-l-4 gc-border-admin' : 'border-l-4 gc-border-primary'">
 			<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
 				<div class="flex items-center gap-3">
 					<div class="w-10 h-10 rounded-lg flex items-center justify-center"
-						 [ngClass]="isOsws ? 'bg-[#14532d]' : 'bg-[#679436]'">
+						 [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'">
 						<i class="fas fa-archive text-white"></i>
 					</div>
 					<div>
@@ -23,7 +23,7 @@
 						<input
 							type="text"
 							class="w-full px-4 py-2.5 border-2 border-gray-300 bg-white text-gray-800 placeholder-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all"
-							[ngClass]="isOsws ? 'focus:ring-[#14532d]' : 'focus:ring-[#679436]'"
+							 [ngClass]="isOsws ? 'gc-focus-admin' : 'gc-focus-primary'"
 							placeholder="Search archived events..."
 							aria-label="Search archive"
 							[ngModel]="search"
@@ -38,7 +38,7 @@
 					</button>
 					<button type="button"
 							class="px-4 py-2 rounded-lg transition-colors font-semibold shadow-sm hover:shadow flex items-center gap-2"
-							[ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534] text-white' : 'bg-[#679436] hover:bg-[#56732e] text-white'"
+							[ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'"
 							(click)="loadTrash()">
 						<i class="fas fa-rotate"></i>
 						<span class="hidden sm:inline">Refresh</span>
@@ -141,7 +141,7 @@
 				<button type="button" 
 						aria-label="Restore event"
 						class="px-3 py-2.5 rounded-lg text-white font-semibold transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center"
-						[ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'"
+						[ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'"
 						(click)="restore(ev.event_id)">
 					<i class="fas fa-undo"></i>
 				</button>
@@ -165,7 +165,7 @@
 			<ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
 				<button class="w-9 h-9 flex items-center justify-center rounded transition-colors duration-150"
 						[ngClass]="currentPage === (i + 1) ? 
-							(isOsws ? 'bg-[#14532d] text-white font-bold' : 'bg-[#679436] text-white font-bold') : 
+							(isOsws ? 'gc-bg-admin text-white font-bold' : 'gc-bg-primary text-white font-bold') : 
 							'bg-gray-200 hover:bg-gray-300 text-gray-800'"
 						[attr.aria-current]="currentPage === (i + 1) ? 'page' : null"
 						(click)="changePage(i + 1)">

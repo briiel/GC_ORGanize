@@ -1183,8 +1183,8 @@
        style="max-height: 85vh;">
     
     <!-- Modal Header -->
-    <div class="sticky top-0 z-10 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between"
-         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'">
+        <div class="sticky top-0 z-10 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between"
+          [ngClass]="isOsws ? 'gc-gradient-admin' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'">
       <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pr-2 sm:pr-4">
         <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <i class="fas fa-users text-white text-sm sm:text-lg"></i>
@@ -1556,7 +1556,7 @@
     
     <!-- Modal Header -->
     <div class="sticky top-0 z-10 px-3 sm:px-4 md:px-6 py-3 sm:py-4 flex items-center justify-between"
-         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'">
+     [ngClass]="isOsws ? 'gc-gradient-admin' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'">
       <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 pr-2">
         <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <i class="fas text-white text-sm sm:text-lg" [ngClass]="isEditing ? 'fa-edit' : 'fa-plus-circle'"></i>
@@ -1866,7 +1866,7 @@
         <button type="button"
                 (click)="createEventFromModal()"
                 class="flex-1 sm:flex-none px-8 py-2.5 rounded-lg text-white font-bold transition-all shadow-md hover:shadow-lg transform hover:scale-105"
-                [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'">
+                [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'">
           {{ isEditing ? 'Update Event' : 'Create Event' }}
         </button>
       </div>
@@ -1880,8 +1880,8 @@
        style="max-height: 85vh;">
     
     <!-- Modal Header -->
-    <div class="sticky top-0 z-10 px-6 py-4 flex items-center justify-between"
-         [ngClass]="isOsws ? 'bg-gradient-to-r from-[#14532d] to-[#166534]' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'">
+        <div class="sticky top-0 z-10 px-6 py-4 flex items-center justify-between"
+          [ngClass]="isOsws ? 'gc-gradient-admin' : 'bg-gradient-to-r from-[#679436] to-[#56732e]'">
       <div class="flex items-center gap-3 flex-1 min-w-0 pr-4">
         <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
           <i class="fas fa-star text-white text-lg"></i>
@@ -1895,12 +1895,6 @@
               aria-label="Close">
         <i class="fas fa-times text-base sm:text-lg"></i>
       </button>
-    </div>
-
-    <!-- Modal Body -->
-    <div class="flex-1 overflow-y-auto px-6 py-6 flex flex-col" style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
-      
-      <!-- Loading State -->
       <div *ngIf="evaluationsLoading" class="text-center py-8 sm:py-12">
         <div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2" [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
         <p class="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Loading evaluations...</p>
