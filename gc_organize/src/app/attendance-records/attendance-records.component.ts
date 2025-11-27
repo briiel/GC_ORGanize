@@ -213,7 +213,8 @@ export class AttendanceRecordsComponent implements OnInit {
 
   // Format timestamp into a readable local string
   formatDateTime(value: string | Date | null | undefined): string {
-    if (!value) return '-';
+    if (value === null || value === undefined) return '-';
+    if (typeof value === 'string' && value.trim() === '') return '-';
     try {
       const d = parseMysqlDatetimeToDate(value as any);
       if (!d) return '-';
