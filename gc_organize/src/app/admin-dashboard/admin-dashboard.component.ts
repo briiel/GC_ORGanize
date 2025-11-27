@@ -10,7 +10,7 @@ import Chart from 'chart.js/auto';
   selector: 'app-admin-dashboard',
   imports: [RouterModule, CommonModule, FormsModule],
   templateUrl: './admin-dashboard.component.html',
-  styleUrl: './admin-dashboard.component.css'
+  styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   events: any[] = [];
@@ -196,12 +196,12 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private computeStats(): void {
-    const oswsEvents = this.events.filter((e: any) => e.created_by_osws_id != null);
+    // Admin dashboard should reflect OSWS-created events only.
+    const oswsEvents = (this.events || []).filter((e: any) => e.created_by_osws_id != null);
 
-    // Improved: Only count each event in one category with flexible status handling
     let upcoming = 0, ongoing = 0, concluded = 0, cancelled = 0;
     for (const e of oswsEvents) {
-      // Prefer server-computed `auto_status` when available so UI reflects automatic transitions
+      // Prefer server-computed `auto_status` when available to reflect automatic transitions
       const auto = (e && (e.auto_status !== undefined)) ? (e.auto_status) : null;
       const raw = auto !== null && auto !== undefined && auto !== '' ? String(auto).toLowerCase() : String(e.status || '').toLowerCase();
       const status = raw;
@@ -215,6 +215,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         upcoming++;
       }
     }
+
     this.stats.upcoming = upcoming;
     this.stats.ongoing = ongoing;
     this.stats.concluded = concluded;
