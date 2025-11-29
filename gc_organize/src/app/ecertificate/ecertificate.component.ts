@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-ecertificate',
@@ -37,7 +38,7 @@ export class EcertificateComponent implements OnInit {
         next: (res) => {
           // Show all events (both OSWS and Organization events)
           // Students can see evaluation requirements and request certificates
-          this.certificates = res.data || [];
+          this.certificates = Array.isArray(res) ? res : (res?.data || []);
           this.loading = false;
         },
         error: () => {
@@ -102,13 +103,38 @@ export class EcertificateComponent implements OnInit {
       next: (res) => {
         this.requestingCertIds.delete(eventId);
         if (res.success) {
-          this.requestMessage = res.message || 'Certificate request submitted successfully!';
+          const msg = res.message || 'Certificate request submitted successfully!';
+          this.requestMessage = msg;
+          // show SweetAlert toast for better UX
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: msg,
+            showConfirmButton: false,
+            timer: 3500,
+            timerProgressBar: true
+          });
+          // Update the local certificate entry so UI immediately reflects the new request state
+          const cert = this.certificates.find(c => c.event_id === eventId || c.id === eventId);
+          if (cert) {
+            cert.request_status = res.request_status || (res.data && res.data.request_status) || 'pending';
+            // if server returned any certificate url or related fields, merge them
+            if (res.certificate_url) cert.certificate_url = res.certificate_url;
+            if (res.request_certificate_url) cert.request_certificate_url = res.request_certificate_url;
+          }
           setTimeout(() => this.requestMessage = '', 5000);
         }
       },
       error: (err) => {
         this.requestingCertIds.delete(eventId);
-        this.requestError = err.error?.message || 'Failed to request certificate. Please try again.';
+        const msg = err.error?.message || 'Failed to request certificate. Please try again.';
+        this.requestError = msg;
+        Swal.fire({
+          icon: 'error',
+          title: 'Request failed',
+          text: msg
+        });
         setTimeout(() => this.requestError = '', 5000);
       }
     });

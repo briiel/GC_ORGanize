@@ -111,11 +111,11 @@
         <div class="bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-[#14532d]">
-              <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold whitespace-nowrap">Student</th>
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold">Organization</th>
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold">Position</th>
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold whitespace-nowrap">Requested</th>
+              <tr class="uppercase tracking-wider text-white text-[10px] sm:text-xs lg:text-sm">
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Student</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Organization</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Position</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Requested</th>
                 <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Actions</th>
               </tr>
             </thead>
@@ -214,9 +214,9 @@
       </div>
 
       <!-- All Requests Table -->
-      <div *ngIf="filteredRequests.length > 0" class="mx-2 lg:mx-6 overflow-hidden rounded-2xl shadow-xl bg-white border-2 border-gray-200">
+      <div *ngIf="filteredRequests.length > 0" class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
         <!-- Enhanced Header with Gradient -->
-        <div class="px-6 py-3 border-b-4 bg-[#14532d] border-[#14532d]">
+        <div class="px-6 py-3 bg-[#14532d]">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
               <i class="fas fa-history text-white text-sm"></i>
@@ -231,12 +231,12 @@
         <div class="bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-[#14532d]">
-              <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold whitespace-nowrap">Student</th>
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold">Organization</th>
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold">Position</th>
+              <tr class="uppercase tracking-wider text-white text-[10px] sm:text-xs lg:text-sm">
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Student</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Organization</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Position</th>
                 <th class="px-3 sm:px-4 py-3 text-center font-semibold">Status</th>
-                <th class="px-3 sm:px-4 py-3 text-left font-semibold">Timeline</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Timeline</th>
               </tr>
             </thead>
             <tbody class="bg-white text-gray-800 divide-y divide-gray-200">

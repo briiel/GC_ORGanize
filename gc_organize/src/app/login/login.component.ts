@@ -92,7 +92,18 @@ export class LoginComponent implements OnInit {
         
         this.isLoading = false;
         
-        if (response.success) {
+        // Support both envelope-shaped and unwrapped responses.
+        const loginSucceeded = !!(
+          response && (
+            response.success === true ||
+            response.token ||
+            (response as any).user ||
+            (response as any).data?.token ||
+            (response as any).data?.user
+          )
+        );
+
+        if (loginSucceeded) {
           // Verify token was saved
           const token = this.authService.getToken();
           const decoded = this.authService.getDecodedToken();

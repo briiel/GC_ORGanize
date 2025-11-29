@@ -66,12 +66,27 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.adminService.getManageUsers().subscribe({
       next: (res) => {
-        this.admins = res.data?.admins || [];
-        this.organizations = res.data?.organizations || [];
+        // Support multiple possible response shapes for resilience:
+        // - { success: true, data: { admins, organizations } }
+        // - { admins, organizations }
+        // - { data: { admins, organizations } }
+        const payload = res?.data ?? res ?? {};
+        // If API returns top-level success=false, surface message
+        if (res && res.success === false) {
+          console.error('ManageUsers API returned failure:', res);
+          this.error = res.message || 'Failed to load users';
+          this.loading = false;
+          return;
+        }
+
+        this.admins = payload.admins || payload.admin || [];
+        this.organizations = payload.organizations || payload.orgs || [];
         this.loading = false;
       },
       error: (err) => {
-        this.error = 'Failed to load users';
+        console.error('ManageUsers load error:', err);
+        // Try to show a helpful message if provided by backend
+        this.error = err?.error?.message || 'Failed to load users';
         this.loading = false;
       }
     });

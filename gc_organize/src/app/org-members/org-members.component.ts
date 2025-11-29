@@ -77,7 +77,27 @@ export class OrgMembersComponent implements OnInit {
     const headers = this.getAuthHeaders();
     this.http.get<any>(`${environment.apiUrl}/users/organization/${orgId}/members`, { headers }).subscribe({
       next: (response) => {
-        this.members = response.data || [];
+        // Normalize response: interceptor may unwrap envelopes to data,
+        // or backend may return { success: true, data: [...] }.
+        let members: OrganizationMember[] = [];
+        try {
+          if (Array.isArray(response)) {
+            members = response as OrganizationMember[];
+          } else if (Array.isArray((response as any).data)) {
+            members = (response as any).data;
+          } else if ((response as any).members && Array.isArray((response as any).members)) {
+            members = (response as any).members;
+          } else if (response && typeof response === 'object') {
+            // If response is an object map, convert to array
+            members = Object.values(response) as OrganizationMember[];
+          }
+        } catch (e) {
+          console.warn('Error normalizing members response', e, response);
+        }
+
+        if (!Array.isArray(members)) members = [];
+
+        this.members = members;
         this.applyFilters();
         this.loading = false;
       },

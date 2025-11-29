@@ -97,10 +97,11 @@ export class RequestRoleComponent implements OnInit {
    * Get filtered organizations based on user's department
    */
   get filteredOrganizations(): Organization[] {
+    const orgs = Array.isArray(this.organizations) ? this.organizations : [];
     if (!this.userDepartment) {
-      return this.organizations;
+      return orgs;
     }
-    return this.organizations.filter(org => org.department === this.userDepartment);
+    return orgs.filter(org => org.department === this.userDepartment);
   }
 
   /**
@@ -129,9 +130,36 @@ export class RequestRoleComponent implements OnInit {
    * Load list of organizations
    */
   loadOrganizations(): void {
-    this.http.get<any>(`${this.apiUrl}/organizations`).subscribe({
+    const headers = this.authService.getAuthHeaders();
+    this.http.get<any>(`${this.apiUrl}/organizations`, { headers }).subscribe({
       next: (response) => {
-        this.organizations = response.organizations || response || [];
+        // Normalize response to an array of organizations.
+        // Some APIs return { organizations: [...] }, others may return the array directly,
+        // or in rare cases an object map. Handle those gracefully and log unexpected shapes.
+        let orgs: Organization[] = [];
+        try {
+          if (response) {
+            if (Array.isArray(response.organizations)) {
+              orgs = response.organizations;
+            } else if (Array.isArray(response)) {
+              orgs = response;
+            } else if (response.organizations && typeof response.organizations === 'object') {
+              orgs = Object.values(response.organizations) as Organization[];
+            } else if (typeof response === 'object') {
+              // If the API returned a plain object (e.g. id->org map), convert to array
+              orgs = Object.values(response) as Organization[];
+            }
+          }
+        } catch (e) {
+          console.warn('Error normalizing organizations response', e, response);
+        }
+
+        if (!Array.isArray(orgs)) {
+          console.warn('Unexpected organizations response shape, defaulting to empty array:', response);
+          orgs = [];
+        }
+
+        this.organizations = orgs;
       },
       error: (error) => {
         console.error('Error loading organizations:', error);
@@ -205,7 +233,7 @@ export class RequestRoleComponent implements OnInit {
         Swal.fire({
           icon: 'success',
           title: 'Request Submitted!',
-          text: response.message || 'Your role request has been submitted successfully. Please wait for admin approval.',
+          text: (response?.message ?? response?.data?.message) || 'Your role request has been submitted successfully. Please wait for admin approval.',
           confirmButtonColor: '#679436'
         });
 

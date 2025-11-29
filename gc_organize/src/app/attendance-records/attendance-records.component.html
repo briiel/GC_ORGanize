@@ -223,12 +223,12 @@
                       <tr class="uppercase tracking-wider text-white text-[10px] sm:text-xs lg:text-sm">
                         <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center w-8 sm:w-10 md:w-12 font-semibold">#</th>
                         <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[100px] font-semibold">Student ID</th>
-                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-left min-w-[180px] font-semibold">Name</th>
+                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[180px] font-semibold">Name</th>
                         <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[100px] font-semibold">Dept</th>
-                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-left min-w-[150px] font-semibold">Program</th>
+                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[150px] font-semibold">Program</th>
                         <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[140px] font-semibold">Time In</th>
                         <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[140px] font-semibold">Time Out</th>
-                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-left min-w-[160px] font-semibold">Scanned By</th>
+                        <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[160px] font-semibold">Scanned By</th>
                         <th class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center min-w-[120px] font-semibold">Position</th>
                       </tr>
                     </thead>
@@ -238,16 +238,16 @@
                         <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center font-semibold text-xs sm:text-sm"
                             [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'">{{ (recordPage - 1) * recordsPerPage + i + 1 }}</td>
                         <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-[10px] sm:text-xs">{{ record.student_id || '-' }}</td>
-                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-left text-xs sm:text-sm" [title]="formatName(record)">
+                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm" [title]="formatName(record)">
                           <div class="line-clamp-2">{{ formatName(record) }}</div>
                         </td>
-                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-[10px] sm:text-xs" [title]="record.department">{{ record.department || '-' }}</td>
-                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-left text-xs sm:text-sm" [title]="record.program">
+                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-xs" [title]="record.department">{{ record.department || '-' }}</td>
+                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm" [title]="record.program">
                           <div class="line-clamp-2">{{ record.program || '-' }}</div>
                         </td>
                         <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-[10px] sm:text-xs">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
                         <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-[10px] sm:text-xs">{{ formatDateTime(record.time_out) }}</td>
-                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-left text-xs sm:text-sm" [title]="record.scanned_by">
+                        <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-xs sm:text-sm" [title]="record.scanned_by">
                           <div class="line-clamp-2">{{ record.scanned_by || '-' }}</div>
                         </td>
                         <td class="px-2 sm:px-3 py-2 sm:py-2.5 md:py-3 text-center text-[10px] sm:text-xs" [title]="record.scanned_by_position">
@@ -395,16 +395,16 @@
                   {{ (recordPage - 1) * recordsPerPage + i + 1 }}
                 </td>
                 <td class="px-2 py-2 text-center text-[10px] whitespace-nowrap">{{ record.student_id || '-' }}</td>
-                <td class="px-2 py-2 text-left text-[11px]">
+                <td class="px-2 py-2 text-center text-[11px]">
                   <div class="max-w-[120px] truncate" [title]="formatName(record)">{{ formatName(record) }}</div>
                 </td>
                 <td class="px-2 py-2 text-center text-[10px]">{{ record.department || '-' }}</td>
-                <td class="px-2 py-2 text-left text-[10px]">
+                <td class="px-2 py-2 text-center text-[10px]">
                   <div class="max-w-[100px] truncate" [title]="record.program">{{ record.program || '-' }}</div>
                 </td>
                 <td class="px-2 py-2 text-center text-[9px] whitespace-nowrap">{{ formatDateTime(record.time_in || record.attended_at) }}</td>
                 <td class="px-2 py-2 text-center text-[9px] whitespace-nowrap">{{ formatDateTime(record.time_out) }}</td>
-                <td class="px-2 py-2 text-left text-[10px]">
+                <td class="px-2 py-2 text-center text-[10px]">
                   <div class="max-w-[100px] truncate" [title]="record.scanned_by">{{ record.scanned_by || '-' }}</div>
                 </td>
                 <td class="px-2 py-2 text-center text-[10px]">

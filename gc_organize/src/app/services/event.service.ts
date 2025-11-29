@@ -149,7 +149,8 @@ export class EventService {
   }
 
   getEventParticipants(eventId: number) {
-    return this.http.get<any>(`${this.apiUrl}/${eventId}/participants`);
+    const headers = this.getAuthHeaders();
+    return this.http.get<any>(`${this.apiUrl}/${eventId}/participants`, { headers });
   }
 
   approveRegistration(registrationId: number) {

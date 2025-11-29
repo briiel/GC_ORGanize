@@ -202,8 +202,8 @@
                   (change)="toggleSelectAll()"
                   class="w-5 h-5 rounded border-2 border-white/50 bg-white/20 text-[#679436] focus:ring-2 focus:ring-white cursor-pointer">
               </th>
-              <th class="px-6 py-3 text-left font-semibold">Student</th>
-              <th class="px-6 py-3 text-left font-semibold">Event</th>
+              <th class="px-6 py-3 text-center font-semibold">Student</th>
+              <th class="px-6 py-3 text-center font-semibold">Event</th>
               <th class="px-6 py-3 text-center font-semibold">Requested</th>
               <th class="px-6 py-3 text-center font-semibold">Status / Actions</th>
             </tr>
@@ -259,7 +259,7 @@
               <!-- Requested Date -->
               <td class="px-6 py-4 text-center">
                 <div class="flex flex-col items-center">
-                  <span class="text-sm font-medium text-gray-900">{{ formatDate(request.requested_at || request.requested_at_local || '') }}</span>
+                  <span class="text-sm font-medium text-gray-900">{{ formatDate(request._display_requested_at || request.requested_at || '') }}</span>
                 </div>
               </td>
 
@@ -287,7 +287,7 @@
                     </div>
                   </div>
                   <div *ngIf="request.processed_at" class="w-full text-center">
-                    <p class="text-xs text-gray-500">Updated: {{ formatDate(request.processed_at || request.processed_at_local || '') }}</p>
+                    <p class="text-xs text-gray-500">Updated: {{ formatDate(request._display_processed_at || request.processed_at || '') }}</p>
                   </div>
                 </div>
               </td>
@@ -330,7 +330,7 @@
              <!-- Requested Date -->
            <div>
              <p class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase">Requested</p>
-             <p class="font-medium text-gray-900 text-sm sm:text-base">{{ formatDate(request.requested_at || request.requested_at_local || '') }}</p>
+             <p class="font-medium text-gray-900 text-sm sm:text-base">{{ formatDate(request._display_requested_at || request.requested_at || '') }}</p>
            </div>
 
              <!-- Status Action -->
@@ -356,7 +356,7 @@
                     </div>
                   </div>
                 <div *ngIf="request.processed_at" class="mt-1.5">
-                  <p class="text-[10px] sm:text-xs text-gray-500">Updated: {{ formatDate(request.processed_at || request.processed_at_local || '') }}</p>
+                  <p class="text-[10px] sm:text-xs text-gray-500">Updated: {{ formatDate(request._display_processed_at || request.processed_at || '') }}</p>
                 </div>
              </div>
           </div>

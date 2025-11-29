@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { parseMysqlDatetimeToDate, formatToLocalShort } from '../utils/date-utils';
 import { CommonModule } from '@angular/common';
 import { CertificateRequestService } from '../services/certificate-request.service';
+import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
 
@@ -15,6 +16,9 @@ interface CertificateRequest {
   // Server may provide event-local formatted timestamps to avoid timezone ambiguity
   requested_at_local?: string;
   processed_at_local?: string;
+  // Normalized display fields (populated by the component)
+  _display_requested_at?: string;
+  _display_processed_at?: string;
   rejection_reason?: string;
   certificate_url?: string;
   event_title: string;
@@ -74,7 +78,64 @@ export class CertificateRequestsComponent implements OnInit {
     
     this.certificateRequestService.getCertificateRequests().subscribe({
       next: (response: any) => {
-        this.requests = Array.isArray(response) ? response : response.data || [];
+        const raw = Array.isArray(response) ? response : response.data || [];
+        // Normalize each request to include a displayable timestamp.
+        // Prefer an ISO/UTC timestamp from `requested_at` when available so
+        // the browser will convert it to the viewer's local time. If the
+        // server did not provide an ISO/UTC value, fall back to server-local
+        // ISO (`requested_at_local_iso`) or plain local string (`requested_at_local`).
+        const hasIsoTz = (s: any) => typeof s === 'string' && /[zZ]|[+-]\d{2}:?\d{2}$/.test(s);
+        this.requests = raw.map((r: any) => {
+          // Choose viewerDisplay so the browser will show the instant in the
+          // viewer's local clock. Preference order:
+          // 1) `requested_at` (UTC/ISO) -> browser converts to viewer local
+          // 2) `requested_at_local_iso` (server local with offset)
+          // 3) `requested_at_local` (plain server-local DATETIME)
+          // Keep a separate serverDisplay (explicit server-local time) when available.
+          let sourceLabel: string | undefined = undefined;
+          let viewerDisplay: string | undefined = undefined;
+          if (hasIsoTz(r?.requested_at)) {
+            viewerDisplay = r.requested_at; // UTC ISO
+            sourceLabel = 'Viewer local (converted from UTC)';
+          } else if (hasIsoTz(r?.requested_at_local_iso)) {
+            viewerDisplay = r.requested_at_local_iso; // server local ISO with offset
+            const tzMatch = String(r.requested_at_local_iso).match(/([+-]\d{2}:?\d{2})$/);
+            sourceLabel = tzMatch ? `Server local (${tzMatch[1]})` : 'Server local';
+          } else if (r?.requested_at_local) {
+            viewerDisplay = r.requested_at_local; // plain server-local
+            sourceLabel = 'Server local';
+          } else {
+            viewerDisplay = r?.requested_at;
+            sourceLabel = 'Unknown';
+          }
+
+          let serverDisplay: string | undefined = undefined;
+          if (hasIsoTz(r?.requested_at_local_iso)) serverDisplay = r.requested_at_local_iso;
+          else if (r?.requested_at_local) serverDisplay = r.requested_at_local;
+
+          // processed_at selection (keep previous behavior)
+          let procDisplay: string | undefined = undefined;
+          let procSourceLabel: string | undefined = undefined;
+          if (hasIsoTz(r?.processed_at)) {
+            procDisplay = r.processed_at;
+            procSourceLabel = 'Viewer local (converted from UTC)';
+          } else if (hasIsoTz(r?.processed_at_local_iso)) {
+            procDisplay = r.processed_at_local_iso;
+            const m = String(r.processed_at_local_iso).match(/([+-]\d{2}:?\d{2})$/);
+            procSourceLabel = m ? `Server local (${m[1]})` : 'Server local';
+          } else if (r?.processed_at_local) {
+            procDisplay = r.processed_at_local;
+            procSourceLabel = 'Server local';
+          } else {
+            procDisplay = r?.processed_at;
+            procSourceLabel = hasIsoTz(r?.processed_at) ? 'UTC' : 'Unknown';
+          }
+
+          return Object.assign({}, r, {
+            _display_requested_at: viewerDisplay,
+            _display_processed_at: procDisplay
+          });
+        });
         this.applyFilters();
         this.loading = false;
       },
@@ -172,7 +233,11 @@ export class CertificateRequestsComponent implements OnInit {
 
   formatDate(dateStr: string): string {
     if (!dateStr) return 'N/A';
-    // Prefer the backend-provided event-local string when available, otherwise parse as UTC
+    // `dateStr` may be one of:
+    // - an ISO string with timezone (e.g. 2025-11-30T08:04:31+08:00)
+    // - a server-local plain DATETIME (e.g. 2025-11-30 08:04:31)
+    // - a UTC ISO with Z (e.g. 2025-11-30T00:04:31.000Z)
+    // parseMysqlDatetimeToDate will honor ISO+Z and plain DATETIME correctly
     const d = parseMysqlDatetimeToDate(dateStr as any);
     if (!d) return 'N/A';
     return formatToLocalShort(d);
@@ -265,7 +330,17 @@ export class CertificateRequestsComponent implements OnInit {
       return;
     }
 
-    if (!confirm(`Update ${this.selectedRequests.size} selected request(s) to "${this.bulkStatus.toUpperCase()}" status?`)) {
+    const result = await Swal.fire({
+      title: 'Confirm Bulk Update',
+      text: `Update ${this.selectedRequests.size} selected request(s) to "${this.bulkStatus.toUpperCase()}" status?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, update',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (!result.isConfirmed) {
       return;
     }
 
@@ -286,11 +361,27 @@ export class CertificateRequestsComponent implements OnInit {
       this.selectedRequests.clear();
       this.selectAll = false;
       this.applyFilters();
-      this.successMessage = `Successfully updated ${updateIds.length} request(s) to ${this.bulkStatus.toUpperCase()}.`;
+      const successMsg = `Successfully updated ${updateIds.length} request(s) to ${this.bulkStatus.toUpperCase()}.`;
+      this.successMessage = successMsg;
+      Swal.fire({
+        icon: 'success',
+        title: 'Updated',
+        text: successMsg,
+        timer: 3000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
       window.setTimeout(() => (this.successMessage = null), 4000);
     } catch (error: any) {
       console.error('Bulk update failed:', error);
-      this.error = error?.error?.message || 'Some requests failed to update. Please try again.';
+      const errMsg = error?.error?.message || 'Some requests failed to update. Please try again.';
+      this.error = errMsg;
+      Swal.fire({
+        icon: 'error',
+        title: 'Bulk update failed',
+        text: errMsg
+      });
       // reload to reconcile UI
       this.loadRequests();
     } finally {

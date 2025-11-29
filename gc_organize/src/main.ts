@@ -5,6 +5,7 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { AuthInterceptor } from './app/services/auth-interceptor.service';
+import { UnwrapResponseInterceptor } from './app/services/unwrap-response.interceptor';
 import { routes } from './app/app.routes';
 import { IMAGE_CONFIG } from '@angular/common';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -15,6 +16,11 @@ bootstrapApplication(AppComponent, {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: UnwrapResponseInterceptor,
       multi: true
     },
     provideRouter(routes),

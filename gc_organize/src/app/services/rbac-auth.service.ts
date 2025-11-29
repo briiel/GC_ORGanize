@@ -33,6 +33,20 @@ interface LoginResponse {
   success: boolean;
   message: string;
   token: string;
+  // Some server responses wrap payloads under a `data` envelope: { success: true, data: { token, user } }
+  // Accept that shape here so callers can safely access `response.data.token` when present.
+  data?: {
+    token?: string;
+    user?: {
+      userId: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      roles: string[];
+      organization: any;
+    };
+    message?: string;
+  };
   user: {
     userId: string;
     email: string;
@@ -72,12 +86,15 @@ export class RbacAuthService {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(response => {
-          if (response.success && response.token) {
-            this.saveToken(response.token);
-            const decoded = this.getDecodedToken();
-            this.currentUserSubject.next(decoded);
-          }
-        })
+            // Support both envelope-shaped responses ({ success, data: { token } })
+            // and unwrapped responses ( { token, user } ) depending on interceptor state.
+            const token = response?.token ?? response?.data?.token;
+            if (token) {
+              this.saveToken(token);
+              const decoded = this.getDecodedToken();
+              this.currentUserSubject.next(decoded);
+            }
+          })
       );
   }
 

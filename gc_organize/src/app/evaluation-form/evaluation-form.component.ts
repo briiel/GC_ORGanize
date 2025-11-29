@@ -64,13 +64,14 @@ export class EvaluationFormComponent implements OnInit {
     this.evaluationService.getEvaluationStatus(this.eventId).subscribe({
       next: (response) => {
         this.loading = false;
-        if (response.data.has_evaluated) {
+        const body = response?.data ?? response;
+        if (body?.has_evaluated) {
           this.errorMessage = 'You have already submitted an evaluation for this event.';
           setTimeout(() => {
             this.router.navigate(['/student-dashboard/ecertificate']);
           }, 2000);
         }
-        if (!response.data.has_attended) {
+        if (!body?.has_attended) {
           this.errorMessage = 'You must attend the event before submitting an evaluation.';
         }
       },
