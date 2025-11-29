@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-manage-users',
@@ -25,6 +26,10 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
   newEmail: string = '';
   newPassword: string = '';
   newName: string = '';
+
+  // Loading states for actions
+  isAddingAdmin = false;
+  deletingAdminId: number | null = null;
 
   constructor(private adminService: AdminService) {}
 
@@ -84,6 +89,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
   }
 
   addAdmin() {
+    this.isAddingAdmin = true;
     const newAdmin = {
       email: this.newEmail,
       password: this.newPassword,
@@ -91,21 +97,64 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
     };
     this.adminService.addAdmin(newAdmin).subscribe({
       next: () => {
+        this.isAddingAdmin = false;
         this.closeAddAdminModal();
         this.loadUsers();
       },
       error: () => {
+        this.isAddingAdmin = false;
         // Optionally show error message
       }
     });
   }
 
-  deleteAdmin(id: number) {
-    if (confirm('Are you sure you want to delete this admin?')) {
+  async deleteAdmin(id: number, adminName: string) {
+    const result = await Swal.fire({
+      title: 'Archive Admin Account?',
+      html: `Are you sure you want to archive <strong>${adminName}</strong>?<br><small class="text-gray-500">This account will be moved to the archive and can be restored within 30 days.</small>`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#14532d',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, archive it',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    });
+
+    if (result.isConfirmed) {
+      this.deletingAdminId = id;
+      
+      Swal.fire({
+        title: 'Archiving...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
       this.adminService.deleteAdmin(id).subscribe({
-        next: () => this.loadUsers(),
-        error: () => {
-          // Optionally show error message
+        next: () => {
+          this.deletingAdminId = null;
+          Swal.fire({
+            icon: 'success',
+            title: 'Archived!',
+            text: 'Admin account has been moved to the archive.',
+            timer: 2000,
+            showConfirmButton: false
+          });
+          this.loadUsers();
+        },
+        error: (err) => {
+          this.deletingAdminId = null;
+          Swal.fire({
+            icon: 'error',
+            title: 'Archive Failed',
+            text: err?.error?.message || 'Failed to archive admin account',
+            confirmButtonColor: '#14532d'
+          });
         }
       });
     }

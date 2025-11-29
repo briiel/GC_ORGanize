@@ -1,5 +1,6 @@
 import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ModalService } from '../modal.service';
 import { RegistermodalComponent } from '../registermodal/registermodal.component';
 import { ViewmodalComponent } from '../viewmodal/viewmodal.component';
@@ -13,7 +14,7 @@ import { forkJoin } from 'rxjs';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   standalone: true,
-  imports: [CommonModule, RegistermodalComponent, ViewmodalComponent, RouterModule]
+  imports: [CommonModule, RegistermodalComponent, ViewmodalComponent, RouterModule, FormsModule]
 })
 export class HomeComponent implements OnInit, OnDestroy {
   dropdownVisible = false;
@@ -21,6 +22,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   events: any[] = [];
   searchTerm: string = '';
+  sortBy: string = 'date_desc';
 
   notifications: any[] = [];
   unreadCount: number = 0;
@@ -142,6 +144,25 @@ export class HomeComponent implements OnInit, OnDestroy {
         );
       });
     }
+
+    // Apply sorting
+    filtered = [...filtered].sort((a, b) => {
+      switch (this.sortBy) {
+        case 'date_desc':
+          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
+        case 'date_asc':
+          return new Date(a.start_date || 0).getTime() - new Date(b.start_date || 0).getTime();
+        case 'title_asc':
+          return (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase());
+        case 'title_desc':
+          return (b.title || '').toLowerCase().localeCompare((a.title || '').toLowerCase());
+        case 'department':
+          return (a.department || '').toLowerCase().localeCompare((b.department || '').toLowerCase());
+        default:
+          return 0;
+      }
+    });
+
     // Pagination logic
     const start = (this.currentPage - 1) * this.pageSize;
     return filtered.slice(start, start + this.pageSize);
@@ -179,6 +200,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onSearchInput(event: any) {
     this.searchTerm = event.target.value;
+    this.currentPage = 1;
+  }
+
+  onSortChange() {
     this.currentPage = 1;
   }
 

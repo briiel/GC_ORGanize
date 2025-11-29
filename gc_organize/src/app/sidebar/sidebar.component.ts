@@ -29,6 +29,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private timeInterval: any;
   private readonly desktopBreakpoint = 1024; // match Tailwind's lg breakpoint
+  private readonly tabletBreakpoint = 640; // match Tailwind's sm breakpoint
   // Controls whether route animations should run. Disabled briefly during panel switches
   animateRoutes = true;
   // When true, the panel content will show a short fade-out (used when switching panels)
@@ -130,10 +131,11 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private syncSidebarWithViewport() {
     const isDesktop = window.innerWidth >= this.desktopBreakpoint;
-  this.isMobile = !isDesktop;
-    // Open by default on desktop, closed by default on mobile
+    const isTablet = window.innerWidth >= this.tabletBreakpoint && window.innerWidth < this.desktopBreakpoint;
+    this.isMobile = !isDesktop;
+    // Open by default on desktop, closed by default on mobile and tablet
     this.isSidebarOpen = isDesktop;
-  this.toggleBodyScrollLock();
+    this.toggleBodyScrollLock();
   }
 
   prepareRoute(outlet: RouterOutlet) {

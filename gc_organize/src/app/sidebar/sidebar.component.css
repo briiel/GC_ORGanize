@@ -31,27 +31,57 @@
 }
 
 /* Ensure the sidebar doesn't take full width on very small devices */
-.max-w-\[85vw\] {
-	max-width: 85vw;
+.max-w-\[90vw\] {
+	max-width: 90vw;
 }
 
 /* Fallbacks for blur and opacity utilities */
-.bg-black\/50 { background-color: rgba(0,0,0,0.5); }
+.bg-black\/60 { background-color: rgba(0,0,0,0.6); }
 .blur-sm { filter: blur(4px); }
 .backdrop-blur-sm { backdrop-filter: blur(4px); }
+
+/* Improved overlay transition */
+.opacity-0 {
+	opacity: 0;
+}
+
+.opacity-100 {
+	opacity: 1;
+}
+
+.pointer-events-none {
+	pointer-events: none;
+}
 
 /* Active state for sidebar items - Clean Professional Design */
 .sidebar-item-active {
 	font-weight: 600 !important;
-	border-radius: 0.375rem !important;
-	background-color: rgba(0, 0, 0, 0.25) !important;
+	border-radius: 0.5rem !important;
+	background-color: rgba(0, 0, 0, 0.3) !important;
 	color: #ffffff !important;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Dropdown nested items active state */
+nav .ml-6 .sidebar-item-active,
 nav .ml-7 .sidebar-item-active {
-	background-color: rgba(0, 0, 0, 0.2) !important;
+	background-color: rgba(0, 0, 0, 0.25) !important;
 	font-weight: 500 !important;
+}
+
+/* Responsive sidebar width adjustments */
+@media (min-width: 640px) and (max-width: 1023px) {
+	/* Tablet: slightly wider sidebar */
+	.w-72 {
+		width: 20rem; /* 320px */
+	}
+}
+
+@media (max-width: 639px) {
+	/* Mobile: optimal width for touch */
+	.w-72 {
+		width: 18rem; /* 288px */
+	}
 }
 
 /* Panel content container used as animation anchor
@@ -81,9 +111,24 @@ nav .ml-7 .sidebar-item-active {
 	}
 
 	.panel-content.content-shift {
-		margin-left: 16rem; /* match Tailwind's ml-64 (16rem = 256px) */
+		margin-left: 16rem; /* match Tailwind's w-64 (16rem = 256px) */
 		width: calc(100% - 16rem);
 		max-width: calc(100vw - 16rem);
+	}
+}
+
+/* Enhanced touch targets for mobile */
+@media (max-width: 1023px) {
+	nav button,
+	nav a {
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+		touch-action: manipulation;
+	}
+	
+	/* Improved scrolling on mobile */
+	nav {
+		overscroll-behavior: contain;
+		-webkit-overflow-scrolling: touch;
 	}
 }
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { RbacAuthService } from '../services/rbac-auth.service';
@@ -10,7 +10,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   
   // Role flags
   isStudent = false;
@@ -26,6 +26,11 @@ export class NavbarComponent implements OnInit {
   isMobileMenuOpen = false;
   isUserMenuOpen = false;
 
+  // Time and date
+  currentTime: string = '';
+  today: Date = new Date();
+  private timeInterval: any;
+
   constructor(
     private authService: RbacAuthService,
     private router: Router
@@ -33,6 +38,20 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUserInfo();
+    this.updateTime();
+    this.timeInterval = setInterval(() => this.updateTime(), 1000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
+  }
+
+  updateTime(): void {
+    const now = new Date();
+    this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    this.today = now;
   }
 
   /**

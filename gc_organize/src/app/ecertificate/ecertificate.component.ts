@@ -17,6 +17,7 @@ export class EcertificateComponent implements OnInit {
   certificates: any[] = [];
   loading = true;
   searchTerm: string = '';
+  sortBy: string = 'date_desc';
   downloadingCertIds: Set<number> = new Set();
   requestingCertIds: Set<number> = new Set();
   requestMessage: string = '';
@@ -155,12 +156,29 @@ export class EcertificateComponent implements OnInit {
   }
 
   get filteredCertificates() {
-    if (!this.searchTerm) {
-      return this.certificates;
+    let filtered = this.certificates;
+    
+    if (this.searchTerm) {
+      filtered = filtered.filter(cert =>
+        cert.event_title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
     }
-    return this.certificates.filter(cert =>
-      cert.event_title.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+
+    // Apply sorting
+    return [...filtered].sort((a, b) => {
+      switch (this.sortBy) {
+        case 'date_desc':
+          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
+        case 'date_asc':
+          return new Date(a.start_date || 0).getTime() - new Date(b.start_date || 0).getTime();
+        case 'title_asc':
+          return (a.event_title || '').toLowerCase().localeCompare((b.event_title || '').toLowerCase());
+        case 'title_desc':
+          return (b.event_title || '').toLowerCase().localeCompare((a.event_title || '').toLowerCase());
+        default:
+          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
+      }
+    });
   }
 
   onSearch() {
@@ -169,6 +187,10 @@ export class EcertificateComponent implements OnInit {
 
   clearSearch() {
     this.searchTerm = '';
+  }
+
+  onSortChange() {
+    // Trigger re-computation of filteredCertificates
   }
 
   // Format event date range using start_date/end_date from API

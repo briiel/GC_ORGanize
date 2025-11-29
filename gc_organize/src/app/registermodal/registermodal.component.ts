@@ -22,6 +22,9 @@ export class RegistermodalComponent implements OnInit {
   proofPreviewUrl: string | null = null;
   selectedFile: File | null = null;
 
+  // Loading state for form submission
+  isSubmitting = false;
+
   // For display only
   studentInfo: any = {
     id: '',
@@ -214,6 +217,8 @@ export class RegistermodalComponent implements OnInit {
   }
 
   submitRegistration(): void {
+    if (this.isSubmitting) return;
+    
     const token = localStorage.getItem('gc_organize_token');
     if (!token) {
       Swal.fire({
@@ -269,6 +274,7 @@ export class RegistermodalComponent implements OnInit {
     }
 
     // Show loading
+    this.isSubmitting = true;
     Swal.fire({
       title: 'Processing Registration...',
       text: 'Please wait while we process your registration.',
@@ -290,6 +296,7 @@ export class RegistermodalComponent implements OnInit {
       }
     ).subscribe({
       next: (res: any) => {
+        this.isSubmitting = false;
         const message = this.isPaid
           ? 'Your registration was submitted and is pending approval by the organizer.'
           : 'You have been successfully registered. Your QR code is available in your registrations.';
@@ -304,6 +311,7 @@ export class RegistermodalComponent implements OnInit {
         });
       },
       error: (err) => {
+        this.isSubmitting = false;
         console.error('Registration error:', err);
         let errorMessage = 'An error occurred during registration.';
         

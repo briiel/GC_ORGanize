@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { ExcelExportService } from '../services/excel-export.service';
 import { environment } from '../../environments/environment';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
@@ -38,6 +39,7 @@ export class OrgMembersComponent implements OnInit {
   // Search and filter
   searchTerm: string = '';
   filterPosition: string = '';
+  sortBy: string = 'name_asc';
   
   // Pagination
   currentPage: number = 1;
@@ -49,7 +51,8 @@ export class OrgMembersComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private authService: RbacAuthService
+    private authService: RbacAuthService,
+    private excelExportService: ExcelExportService
   ) {}
 
   ngOnInit(): void {
@@ -115,6 +118,26 @@ export class OrgMembersComponent implements OnInit {
         member.position.toLowerCase() === this.filterPosition.toLowerCase()
       );
     }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (this.sortBy) {
+        case 'name_asc':
+          const fullNameA = `${a.first_name} ${a.last_name}`.toLowerCase();
+          const fullNameB = `${b.first_name} ${b.last_name}`.toLowerCase();
+          return fullNameA.localeCompare(fullNameB);
+        case 'name_desc':
+          const fullNameA2 = `${a.first_name} ${a.last_name}`.toLowerCase();
+          const fullNameB2 = `${b.first_name} ${b.last_name}`.toLowerCase();
+          return fullNameB2.localeCompare(fullNameA2);
+        case 'position_asc':
+          return a.position.toLowerCase().localeCompare(b.position.toLowerCase());
+        case 'date_desc':
+          return new Date(b.joined_at || 0).getTime() - new Date(a.joined_at || 0).getTime();
+        default:
+          return 0;
+      }
+    });
 
     this.filteredMembers = filtered;
     this.totalPages = Math.ceil(this.filteredMembers.length / this.itemsPerPage);
@@ -188,30 +211,26 @@ export class OrgMembersComponent implements OnInit {
     return 'bg-indigo-100 text-indigo-800';
   }
 
-  exportToCSV(): void {
-    const csvData = this.filteredMembers.map(member => ({
-      'Student ID': member.student_id,
-      'Name': this.getFullName(member),
-      'Email': member.email,
-      'Position': member.position,
-      'Department': member.department,
-      'Program': member.program,
-      'Joined Date': this.formatDate(member.joined_at)
-    }));
+  async downloadExcel(): Promise<void> {
+    if (!this.filteredMembers || this.filteredMembers.length === 0) return;
 
-    const headers = Object.keys(csvData[0]);
-    const csv = [
-      headers.join(','),
-      ...csvData.map(row => headers.map(header => `"${row[header as keyof typeof row]}"`).join(','))
-    ].join('\n');
+    const headers = ['#', 'Student ID', 'Name', 'Email', 'Position', 'Department', 'Program', 'Joined Date'];
+    
+    const data = this.filteredMembers.map((member, i) => [
+      i + 1,
+      member.student_id ?? '-',
+      this.getFullName(member),
+      member.email ?? '-',
+      member.position ?? '-',
+      member.department ?? '-',
+      member.program ?? '-',
+      this.formatDate(member.joined_at) || '-'
+    ]);
 
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${this.orgName}_members_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    window.URL.revokeObjectURL(url);
+    const slug = this.orgName.trim().replace(/\s+/g, '_').toLowerCase();
+    const filename = `${slug}_members.xlsx`;
+
+    await this.excelExportService.createAndExportExcel('Organization Members', headers, data, filename);
   }
 
   async removeMember(member: OrganizationMember): Promise<void> {

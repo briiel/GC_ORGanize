@@ -16,6 +16,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
 export class EventsregComponent implements OnInit {
   // Search related properties
   searchTerm: string = '';
+  sortBy: string = 'date_desc';
   loading: boolean = false;
   registeredEvents: any[] = [];
   studentId: string | null = null;
@@ -62,16 +63,45 @@ export class EventsregComponent implements OnInit {
 
   // Filtered events based on search
   get filteredEvents() {
-    if (!this.searchTerm) {
-      return this.registeredEvents;
+    let filtered = this.registeredEvents;
+    
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(event =>
+        (event.title && event.title.toLowerCase().includes(term)) ||
+        ((event.room && event.room.toLowerCase().includes(term)) || (event.location && event.location.toLowerCase().includes(term))) ||
+        (event.venue && event.venue.toLowerCase().includes(term)) ||
+        (event.department && event.department.toLowerCase().includes(term))
+      );
     }
-    const term = this.searchTerm.toLowerCase();
-    return this.registeredEvents.filter(event =>
-      (event.title && event.title.toLowerCase().includes(term)) ||
-      ((event.room && event.room.toLowerCase().includes(term)) || (event.location && event.location.toLowerCase().includes(term))) ||
-      (event.venue && event.venue.toLowerCase().includes(term)) ||
-      (event.department && event.department.toLowerCase().includes(term))
-    );
+
+    // Apply sorting
+    return [...filtered].sort((a, b) => {
+      const aDateStr: string | undefined = a?.start_date;
+      const bDateStr: string | undefined = b?.start_date;
+      const aTimeStr: string | undefined = a?.start_time;
+      const bTimeStr: string | undefined = b?.start_time;
+
+      const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
+      const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
+      const aD = parseMysqlDatetimeToDate(aFull as any);
+      const bD = parseMysqlDatetimeToDate(bFull as any);
+      const aTs = aD ? aD.getTime() : 0;
+      const bTs = bD ? bD.getTime() : 0;
+
+      switch (this.sortBy) {
+        case 'date_desc':
+          return bTs - aTs;
+        case 'date_asc':
+          return aTs - bTs;
+        case 'title_asc':
+          return (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase());
+        case 'title_desc':
+          return (b.title || '').toLowerCase().localeCompare((a.title || '').toLowerCase());
+        default:
+          return bTs - aTs;
+      }
+    });
   }
 
   // Search function
@@ -81,6 +111,10 @@ export class EventsregComponent implements OnInit {
 
   clearSearch() {
     this.searchTerm = '';
+  }
+
+  onSortChange() {
+    // Trigger re-computation of filteredEvents
   }
 
   // Certificate download function (dummy for now)

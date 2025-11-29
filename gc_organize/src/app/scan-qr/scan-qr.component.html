@@ -1,43 +1,43 @@
-<div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
+<div class="p-2 sm:p-4 lg:p-6 bg-gray-100 min-h-screen">
   <!-- Header -->
-  <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
-    <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4"
+  <div class="mb-4 sm:mb-5 lg:mb-6 mx-0 sm:mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-5 border-l-4"
          [ngClass]="isOsws ? 'gc-border-admin' : 'gc-border-primary'">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-lg flex items-center justify-center"
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
              [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'">
-          <i class="fas fa-qrcode text-white"></i>
+          <i class="fas fa-qrcode text-white text-sm sm:text-base"></i>
         </div>
-        <div>
-          <h1 class="text-xl font-bold text-gray-800">QR Code Scanner</h1>
-          <p class="text-sm text-gray-600">Scan QR codes for attendance tracking</p>
+        <div class="min-w-0">
+          <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-800">QR Code Scanner</h1>
+          <p class="text-xs sm:text-sm text-gray-600">Scan QR codes for attendance tracking</p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Scanner Card -->
-  <div class="mx-2 lg:mx-6">
-    <div class="bg-white rounded-lg shadow-md p-6 max-w-3xl mx-auto">
+  <div class="mx-0 sm:mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-3 sm:p-5 lg:p-6 max-w-3xl mx-auto space-y-4 sm:space-y-5">
       
       <!-- Mode Toggle Section -->
-      <div class="bg-gray-50 rounded-lg p-4 border-2 border-gray-200">
-        <label class="block text-sm font-bold text-gray-700 mb-3">
-          <i class="fas fa-toggle-on mr-2" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+      <div class="bg-gray-50 rounded-lg p-3 sm:p-4 border-2 border-gray-200">
+        <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-2 sm:mb-3">
+          <i class="fas fa-toggle-on mr-1.5 sm:mr-2 text-xs sm:text-sm" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
           Attendance Mode
         </label>
-        <div class="flex gap-3">
+        <div class="flex gap-2 sm:gap-3">
           <label class="flex-1 cursor-pointer">
             <input type="radio" name="mode" [(ngModel)]="mode" [value]="'time_in'" class="sr-only peer" />
-            <div class="px-4 py-3 rounded-lg border-2 text-center font-semibold transition-all duration-200 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-800 border-gray-300 text-gray-600 hover:border-green-300 min-h-[48px] flex items-center justify-center">
-              <i class="fas fa-sign-in-alt mr-2"></i>
+            <div class="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 text-center font-semibold transition-all duration-200 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-800 border-gray-300 text-gray-600 hover:border-green-300 min-h-[44px] flex items-center justify-center text-xs sm:text-sm">
+              <i class="fas fa-sign-in-alt mr-1 sm:mr-2 text-xs sm:text-sm"></i>
               Time In
             </div>
           </label>
           <label class="flex-1 cursor-pointer">
             <input type="radio" name="mode" [(ngModel)]="mode" [value]="'time_out'" class="sr-only peer" />
-            <div class="px-4 py-3 rounded-lg border-2 text-center font-semibold transition-all duration-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-800 border-gray-300 text-gray-600 hover:border-red-300 min-h-[48px] flex items-center justify-center">
-              <i class="fas fa-sign-out-alt mr-2"></i>
+            <div class="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg border-2 text-center font-semibold transition-all duration-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-800 border-gray-300 text-gray-600 hover:border-red-300 min-h-[44px] flex items-center justify-center text-xs sm:text-sm">
+              <i class="fas fa-sign-out-alt mr-1 sm:mr-2 text-xs sm:text-sm"></i>
               Time Out
             </div>
           </label>
@@ -45,41 +45,41 @@
       </div>
 
       <!-- Event Selector -->
-      <div *ngIf="events.length" class="space-y-2">
-        <label class="block text-sm font-bold text-gray-700">
-          <i class="fas fa-calendar-check mr-2" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+      <div *ngIf="events.length" class="space-y-1.5 sm:space-y-2">
+        <label class="block text-xs sm:text-sm font-bold text-gray-700">
+          <i class="fas fa-calendar-check mr-1.5 sm:mr-2 text-xs sm:text-sm" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
           Select Event
         </label>
-        <select class="w-full border-2 border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all"
+        <select class="w-full border-2 border-gray-300 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all text-sm sm:text-base min-h-[44px]"
                 [ngClass]="isOsws ? 'focus:ring-[#14532d]' : 'focus:ring-[#679436]'"
                 [ngModel]="selectedEventId" 
                 (ngModelChange)="selectedEventId = $event">
           <option [ngValue]="null" disabled>-- Choose an event --</option>
           <option *ngFor="let e of events" [ngValue]="e.event_id">{{ e.title }}</option>
         </select>
-        <p class="text-xs text-gray-500 flex items-center gap-1.5">
-          <i class="fas fa-info-circle"></i>
+        <p class="text-[10px] sm:text-xs text-gray-500 flex items-center gap-1 sm:gap-1.5">
+          <i class="fas fa-info-circle text-[9px] sm:text-xs"></i>
           Attendance will be recorded for the selected event.
         </p>
       </div>
 
       <!-- Camera Controls -->
-      <div class="space-y-2" *ngIf="cameras.length > 0">
-        <label class="block text-sm font-bold text-gray-700">
-          <i class="fas fa-video mr-2" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+      <div class="space-y-1.5 sm:space-y-2" *ngIf="cameras.length > 0">
+        <label class="block text-xs sm:text-sm font-bold text-gray-700">
+          <i class="fas fa-video mr-1.5 sm:mr-2 text-xs sm:text-sm" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
           Camera Settings
         </label>
         <div class="flex gap-2">
-          <select class="flex-1 border-2 border-gray-300 px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all text-sm"
+          <select class="flex-1 border-2 border-gray-300 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all text-xs sm:text-sm min-h-[44px]"
                   [ngClass]="isOsws ? 'focus:ring-[#14532d]' : 'focus:ring-[#679436]'"
                   [ngModel]="selectedCameraId" 
                   (ngModelChange)="onCameraChange($event)">
             <option *ngFor="let c of cameras" [value]="c.id">{{ c.label || 'Camera ' + (cameras.indexOf(c) + 1) }}</option>
           </select>
-          <button class="text-white px-4 py-2.5 rounded-lg transition-all duration-200 shadow hover:shadow-lg font-semibold text-sm flex items-center gap-2 min-h-[44px]"
+          <button class="text-white px-3 sm:px-4 py-2.5 rounded-lg transition-all duration-200 shadow hover:shadow-lg font-semibold text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 min-h-[44px] flex-shrink-0"
                     [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'"
                   (click)="switchCamera()">
-            <i class="fas fa-sync-alt"></i>
+            <i class="fas fa-sync-alt text-xs sm:text-sm"></i>
             <span class="hidden sm:inline">Switch</span>
           </button>
         </div>
@@ -91,35 +91,35 @@
       </div>
 
       <!-- Status Message -->
-      <div *ngIf="message" class="p-4 rounded-lg border-2 flex items-start gap-3"
+      <div *ngIf="message" class="p-3 sm:p-4 rounded-lg border-2 flex items-start gap-2 sm:gap-3"
            [ngClass]="message.includes('Success') || message.includes('recorded') ? 'bg-green-50 border-green-300 text-green-800' : 'bg-blue-50 border-blue-300 text-blue-800'">
-        <i class="fas text-lg mt-0.5" 
+        <i class="fas text-base sm:text-lg mt-0.5 flex-shrink-0" 
            [ngClass]="message.includes('Success') || message.includes('recorded') ? 'fa-check-circle' : 'fa-info-circle'"></i>
-        <p class="text-sm font-semibold flex-1">{{ message }}</p>
+        <p class="text-xs sm:text-sm font-semibold flex-1">{{ message }}</p>
       </div>
 
       <!-- Scanner Controls -->
       <!-- Location Consent -->
-      <div class="flex items-center justify-between gap-3">
-        <label class="flex items-center gap-3 text-sm">
-          <input type="checkbox" [(ngModel)]="locationConsent" class="w-4 h-4" />
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3">
+        <label class="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+          <input type="checkbox" [(ngModel)]="locationConsent" class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
           <span class="text-gray-700">I consent to share my location for attendance verification</span>
         </label>
-        <button class="text-sm text-gray-600 underline" (click)="showPrivacy()">Privacy</button>
+        <button class="text-xs sm:text-sm text-gray-600 underline hover:text-gray-800 flex-shrink-0" (click)="showPrivacy()">Privacy</button>
       </div>
 
-      <div class="flex flex-col gap-3 pt-2">
-        <button class="w-full text-white px-6 py-3.5 sm:py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl font-semibold flex items-center justify-center gap-2 min-h-[52px]"
+      <div class="flex flex-col gap-2 sm:gap-3 pt-2">
+        <button class="w-full text-white px-5 sm:px-6 py-3 sm:py-3.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl active:shadow-md font-semibold flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[52px] text-sm sm:text-base"
                   [ngClass]="isOsws ? 'gc-bg-admin' : 'gc-bg-primary'"
                 (click)="retry()" 
                 *ngIf="!isRunning">
-          <i class="fas fa-play"></i>
+          <i class="fas fa-play text-sm sm:text-base"></i>
           Start Scanner
         </button>
-        <button class="w-full bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 sm:py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl font-semibold flex items-center justify-center gap-2 min-h-[52px]"
+        <button class="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white px-5 sm:px-6 py-3 sm:py-3.5 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl active:shadow-md font-semibold flex items-center justify-center gap-2 min-h-[48px] sm:min-h-[52px] text-sm sm:text-base"
                 (click)="stopScanner()" 
                 *ngIf="isRunning">
-          <i class="fas fa-stop"></i>
+          <i class="fas fa-stop text-sm sm:text-base"></i>
           Stop Scanner
         </button>
       </div>

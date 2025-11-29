@@ -32,6 +32,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   creatorId: number;
   adminId: number;
   private _searchTerm: string = '';
+  // Loading states for actions
+  approvingRegistrationId: number | null = null;
+  rejectingRegistrationId: number | null = null;
+  isCreatingEvent = false;
   get searchTerm(): string {
     return this._searchTerm;
   }
@@ -726,12 +730,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
   approveParticipant(p: any) {
     if (!p?.registration_id) return;
+    this.approvingRegistrationId = p.registration_id;
     this.eventService.approveRegistration(p.registration_id).subscribe({
       next: () => {
+        this.approvingRegistrationId = null;
         Swal.fire('Approved', 'Registration approved.', 'success');
         this.refreshParticipantsList();
       },
       error: (err) => {
+        this.approvingRegistrationId = null;
         console.error('Approve failed', err);
         Swal.fire('Error', 'Failed to approve registration.', 'error');
       }
@@ -740,12 +747,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
   rejectParticipant(p: any) {
     if (!p?.registration_id) return;
+    this.rejectingRegistrationId = p.registration_id;
     this.eventService.rejectRegistration(p.registration_id).subscribe({
       next: () => {
+        this.rejectingRegistrationId = null;
         Swal.fire('Declined', 'Registration declined.', 'success');
         this.refreshParticipantsList();
       },
       error: (err) => {
+        this.rejectingRegistrationId = null;
         console.error('Decline failed', err);
         Swal.fire('Error', 'Failed to decline registration.', 'error');
       }
@@ -1484,9 +1494,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
 
     if (this.isEditing && this.editingEventId) {
+      this.isCreatingEvent = true;
       Swal.fire({ title: 'Updating Event...', text: 'Please wait while we update your event.', allowOutsideClick: false, allowEscapeKey: false, showConfirmButton: false, didOpen: () => Swal.showLoading() });
       this.eventService.updateEvent(this.editingEventId, formData).subscribe({
         next: () => {
+          this.isCreatingEvent = false;
           Swal.close();
           Swal.fire('Success', 'Event updated successfully!', 'success').then(() => {
             this.closeCreateModal();
@@ -1499,6 +1511,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           });
         },
         error: (error) => {
+          this.isCreatingEvent = false;
           console.error('Error updating event:', error);
           Swal.close();
           Swal.fire('Error', 'Failed to update event.', 'error');
@@ -1514,6 +1527,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         formData.append('created_by_org_id', String(creatorId));
       }
 
+      this.isCreatingEvent = true;
       Swal.fire({
         title: 'Creating Event...',
         text: 'Please wait while we save your event.',
@@ -1525,6 +1539,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
       this.eventService.createEvent(formData).subscribe({
         next: () => {
+          this.isCreatingEvent = false;
           Swal.close();
           Swal.fire({ icon: 'success', title: 'Event Created!', text: 'Your event has been created successfully.', confirmButtonColor: '#679436' }).then(() => {
             this.closeCreateModal();
@@ -1538,6 +1553,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           });
         },
         error: (error) => {
+          this.isCreatingEvent = false;
           console.error('Error creating event:', error);
           Swal.close();
           Swal.fire('Error', 'Failed to create event. Please try again.', 'error');

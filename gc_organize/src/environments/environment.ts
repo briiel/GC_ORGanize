@@ -6,8 +6,7 @@ export const environment = {
   apiUrl: `http://${window.location.hostname}:5000/api`,
   // Default geofence radius in meters (used when an event-specific radius is not set)
   // Reduced to 200m per recent change request.
-  defaultGeofenceMeters: 200
-  ,
+  defaultGeofenceMeters: 200,
   // Geofence bypass removed for all environments; always enforce geofence checks.
   attendanceGeofenceBypass: false
 };

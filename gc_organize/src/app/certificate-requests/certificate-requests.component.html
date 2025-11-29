@@ -1,22 +1,22 @@
-<div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
+<div class="p-2 sm:p-4 lg:p-6 bg-gray-100 min-h-screen">
   <!-- Header -->
-  <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
-    <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#679436]">
-      <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
-            <i class="fas fa-certificate text-white"></i>
+  <div class="mb-4 sm:mb-5 lg:mb-6 mx-0 sm:mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-5 border-l-4 border-[#679436]">
+      <div class="flex items-center justify-between gap-2 sm:gap-3">
+        <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#679436] flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-certificate text-white text-sm sm:text-base"></i>
           </div>
-          <div>
-            <h1 class="text-xl font-bold text-gray-800">E-Certificate Requests</h1>
-            <p class="text-sm text-gray-600">Review and approve student certificate requests</p>
+          <div class="min-w-0">
+            <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-800">E-Certificate Requests</h1>
+            <p class="text-xs sm:text-sm text-gray-600 truncate">Review and approve student certificate requests</p>
           </div>
         </div>
-        <div class="hidden sm:flex items-center gap-2 bg-[#679436] text-white px-4 py-2 rounded-lg">
-          <i class="fas fa-hourglass-half text-lg"></i>
+        <div class="hidden sm:flex items-center gap-2 bg-[#679436] text-white px-3 sm:px-4 py-2 rounded-lg flex-shrink-0">
+          <i class="fas fa-hourglass-half text-base sm:text-lg"></i>
           <div class="text-left">
-            <p class="text-xs opacity-80">Pending</p>
-            <p class="text-xl font-bold">{{ getPendingCount() }}</p>
+            <p class="text-[10px] sm:text-xs opacity-80">Pending</p>
+            <p class="text-lg sm:text-xl font-bold">{{ getPendingCount() }}</p>
           </div>
         </div>
       </div>
@@ -24,16 +24,16 @@
   </div>
 
   <!-- Stats Cards - Mobile -->
-  <div class="sm:hidden mb-6 mx-2 lg:mx-6">
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-4">
+  <div class="sm:hidden mb-4 sm:mb-5 lg:mb-6 mx-0 sm:mx-2 lg:mx-6">
+    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-3 sm:p-4">
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
-            <i class="fas fa-hourglass-half text-yellow-600 text-xl"></i>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-hourglass-half text-yellow-600 text-lg sm:text-xl"></i>
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-600">Pending Requests</p>
-            <p class="text-2xl font-bold text-yellow-600">{{ getPendingCount() }}</p>
+            <p class="text-xs sm:text-sm font-medium text-gray-600">Pending Requests</p>
+            <p class="text-xl sm:text-2xl font-bold text-yellow-600">{{ getPendingCount() }}</p>
           </div>
         </div>
       </div>
@@ -41,14 +41,14 @@
   </div>
 
   <!-- Filters -->
-  <div class="mb-6 mx-2 lg:mx-6">
+  <div class="mb-4 sm:mb-5 lg:mb-6 mx-0 sm:mx-2 lg:mx-6">
     <div class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
-      <div class="p-5">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="p-3 sm:p-4 lg:p-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           <!-- Search -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-search mr-1 text-gray-500"></i>
+            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
+              <i class="fas fa-search mr-1 text-gray-500 text-[10px] sm:text-xs"></i>
               Search
             </label>
             <input 
@@ -56,19 +56,19 @@
               [(ngModel)]="searchTerm" 
               (input)="onFilterChange()"
               placeholder="Search by event, student name, ID, or email..."
-              class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all">
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all text-sm sm:text-base min-h-[44px]">
           </div>
 
           <!-- Status Filter -->
           <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-2">
-              <i class="fas fa-tasks mr-1 text-gray-500"></i>
+            <label class="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5 sm:mb-2">
+              <i class="fas fa-tasks mr-1 text-gray-500 text-[10px] sm:text-xs"></i>
               Status
             </label>
             <select 
               [(ngModel)]="statusFilter" 
               (change)="onFilterChange()"
-              class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all font-medium text-gray-700">
+              class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all font-medium text-gray-700 text-sm sm:text-base min-h-[44px]">
               <option value="all">All Requests</option>
               <option value="pending">Pending</option>
               <option value="processing">Processing</option>
@@ -81,50 +81,50 @@
   </div>
 
   <!-- Toast / Messages -->
-  <div class="mx-2 lg:mx-6">
-    <div *ngIf="successMessage" class="mb-4">
+  <div class="mx-0 sm:mx-2 lg:mx-6">
+    <div *ngIf="successMessage" class="mb-3 sm:mb-4">
       <div class="toast success">
         <div class="toast-body">
-          <i class="fas fa-check-circle"></i>
-          <span class="toast-text">{{ successMessage }}</span>
+          <i class="fas fa-check-circle text-sm sm:text-base"></i>
+          <span class="toast-text text-xs sm:text-sm">{{ successMessage }}</span>
         </div>
-        <button class="toast-close" (click)="successMessage = null">×</button>
+        <button class="toast-close min-w-[44px] min-h-[44px] flex items-center justify-center text-lg sm:text-xl" (click)="successMessage = null">×</button>
       </div>
     </div>
-    <div *ngIf="error" class="mb-4">
+    <div *ngIf="error" class="mb-3 sm:mb-4">
       <div class="toast error">
         <div class="toast-body">
-          <i class="fas fa-exclamation-triangle"></i>
-          <span class="toast-text">{{ error }}</span>
+          <i class="fas fa-exclamation-triangle text-sm sm:text-base"></i>
+          <span class="toast-text text-xs sm:text-sm">{{ error }}</span>
         </div>
-        <button class="toast-close" (click)="error = null">×</button>
+        <button class="toast-close min-w-[44px] min-h-[44px] flex items-center justify-center text-lg sm:text-xl" (click)="error = null">×</button>
       </div>
     </div>
   </div>
 
   <!-- Bulk Actions Bar -->
-  <div *ngIf="!loading && !error && filteredRequests.length > 0" class="mb-6 mx-2 lg:mx-6">
+  <div *ngIf="!loading && !error && filteredRequests.length > 0" class="mb-4 sm:mb-5 lg:mb-6 mx-0 sm:mx-2 lg:mx-6">
     <div class="bg-gradient-to-r from-[#679436] to-[#567a2d] rounded-lg shadow-md border-2 border-[#679436] overflow-hidden">
-      <div class="p-4">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center border-2 border-white/30">
-              <i class="fas fa-tasks text-white text-lg"></i>
+      <div class="p-3 sm:p-4">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 sm:gap-4">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center border-2 border-white/30 flex-shrink-0">
+              <i class="fas fa-tasks text-white text-base sm:text-lg"></i>
             </div>
             <div>
-              <h3 class="text-white font-bold text-sm">Bulk Actions</h3>
-              <p class="text-white/80 text-xs">
+              <h3 class="text-white font-bold text-xs sm:text-sm">Bulk Actions</h3>
+              <p class="text-white/80 text-[10px] sm:text-xs">
                 <span *ngIf="selectedRequests.size === 0">Select requests to update their status</span>
                 <span *ngIf="selectedRequests.size > 0">{{ selectedRequests.size }} request(s) selected</span>
               </p>
             </div>
           </div>
           
-          <div class="flex items-center gap-3 w-full md:w-auto">
+          <div class="flex items-center gap-2 sm:gap-3 w-full md:w-auto">
             <select 
               [(ngModel)]="bulkStatus"
               [disabled]="selectedRequests.size === 0 || isUpdatingBulk"
-              class="px-4 py-2 border-2 border-white/30 bg-white/10 text-white rounded-lg focus:ring-2 focus:ring-white focus:border-white transition-all font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm">
+              class="px-3 sm:px-4 py-2.5 border-2 border-white/30 bg-white/10 text-white rounded-lg focus:ring-2 focus:ring-white focus:border-white transition-all font-semibold text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-sm min-h-[44px]">
               <option value="pending" class="bg-gray-800 text-white">PENDING</option>
               <option value="processing" class="bg-gray-800 text-white">PROCESSING</option>
               <option value="sent" class="bg-gray-800 text-white">SENT</option>
@@ -133,10 +133,11 @@
             <button
               (click)="bulkUpdateStatus()"
               [disabled]="selectedRequests.size === 0 || isUpdatingBulk"
-              class="px-4 py-2 bg-white text-[#679436] rounded-lg font-bold text-sm hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center gap-2">
-              <i *ngIf="!isUpdatingBulk" class="fas fa-sync-alt"></i>
-              <i *ngIf="isUpdatingBulk" class="fas fa-spinner fa-spin"></i>
-              <span *ngIf="!isUpdatingBulk">Update Selected</span>
+              class="px-3 sm:px-4 py-2.5 bg-white text-[#679436] rounded-lg font-bold text-xs sm:text-sm hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg flex items-center gap-1.5 sm:gap-2 min-h-[44px] flex-shrink-0">
+              <i *ngIf="!isUpdatingBulk" class="fas fa-sync-alt text-xs sm:text-sm"></i>
+              <i *ngIf="isUpdatingBulk" class="fas fa-spinner fa-spin text-xs sm:text-sm"></i>
+              <span *ngIf="!isUpdatingBulk" class="hidden sm:inline">Update Selected</span>
+              <span *ngIf="!isUpdatingBulk" class="sm:hidden">Update</span>
               <span *ngIf="isUpdatingBulk">Updating...</span>
             </button>
           </div>
@@ -296,31 +297,31 @@
       </div>
 
       <!-- Mobile Card View -->
-      <div class="md:hidden space-y-4 p-4 bg-gray-50">
+      <div class="md:hidden space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-50">
         <div *ngFor="let request of pagedRequests; let i = index" 
              class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden"
              [class.ring-2]="isSelected(request.id)"
              [class.ring-[#679436]]="isSelected(request.id)">
           
           <!-- Header with Checkbox and Status -->
-          <div class="bg-[#679436] px-4 py-3 flex justify-between items-center">
-             <div class="flex items-center gap-3">
+          <div class="bg-[#679436] px-3 sm:px-4 py-2.5 sm:py-3 flex justify-between items-center gap-2">
+             <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <input 
                   type="checkbox" 
                   [checked]="isSelected(request.id)"
                   (change)="toggleSelectRequest(request.id)"
-                  class="w-5 h-5 rounded border-2 border-white/50 bg-white/20 text-[#679436] focus:ring-2 focus:ring-white cursor-pointer">
-                <span class="text-white font-bold truncate max-w-[150px]">{{ getStudentName(request) }}</span>
+                  class="w-5 h-5 rounded border-2 border-white/50 bg-white/20 text-[#679436] focus:ring-2 focus:ring-white cursor-pointer flex-shrink-0">
+                <span class="text-white font-bold truncate text-sm sm:text-base">{{ getStudentName(request) }}</span>
              </div>
-             <span class="text-xs bg-white/20 text-white px-2 py-1 rounded">{{ request.student_id }}</span>
+             <span class="text-[10px] sm:text-xs bg-white/20 text-white px-2 py-1 rounded flex-shrink-0">{{ request.student_id }}</span>
           </div>
 
           <!-- Body -->
-          <div class="p-4 space-y-3">
+          <div class="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
              <!-- Event -->
              <div>
-                <p class="text-xs text-gray-500 font-semibold uppercase">Event</p>
-                <p class="font-medium text-gray-900">{{ request.event_title }}</p>
+                <p class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase">Event</p>
+                <p class="font-medium text-gray-900 text-sm sm:text-base">{{ request.event_title }}</p>
                 <p *ngIf="request.event_location" class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
                    <i class="fas fa-map-marker-alt"></i> {{ request.event_location }}
                 </p>
@@ -328,34 +329,34 @@
 
              <!-- Requested Date -->
            <div>
-             <p class="text-xs text-gray-500 font-semibold uppercase">Requested</p>
-             <p class="font-medium text-gray-900">{{ formatDate(request.requested_at || request.requested_at_local || '') }}</p>
+             <p class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase">Requested</p>
+             <p class="font-medium text-gray-900 text-sm sm:text-base">{{ formatDate(request.requested_at || request.requested_at_local || '') }}</p>
            </div>
 
              <!-- Status Action -->
              <div>
-                <p class="text-xs text-gray-500 font-semibold uppercase mb-1">Status</p>
+                <p class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase mb-1.5">Status</p>
                 <div class="flex items-center gap-2">
                     <select
                       [ngModel]="request.status"
                       (change)="updateRequestStatus(request, $any($event.target).value)"
                       [disabled]="updatingRequestId === request.id"
                       [ngClass]="getStatusSelectClass(request.status)"
-                      class="w-full px-4 py-2.5 rounded-lg text-xs font-bold border-2 cursor-pointer focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wide">
+                      class="flex-1 px-3 sm:px-4 py-2.5 rounded-lg text-xs font-bold border-2 cursor-pointer focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wide min-h-[44px]">
                       <option value="pending">PENDING</option>
                       <option value="processing">PROCESSING</option>
                       <option value="sent">SENT</option>
                     </select>
-                    <i *ngIf="updatingRequestId === request.id" class="fas fa-spinner fa-spin text-[#679436]"></i>
-                    <a *ngIf="request.certificate_url" [href]="request.certificate_url" target="_blank" rel="noopener" class="ml-2 px-3 py-1 bg-[#679436] text-white rounded text-xs font-semibold hover:bg-[#56732d] transition-all">View</a>
+                    <i *ngIf="updatingRequestId === request.id" class="fas fa-spinner fa-spin text-[#679436] text-base"></i>
+                    <a *ngIf="request.certificate_url" [href]="request.certificate_url" target="_blank" rel="noopener" class="px-3 py-2.5 bg-[#679436] text-white rounded text-xs font-semibold hover:bg-[#56732d] transition-all min-h-[44px] flex items-center flex-shrink-0">View</a>
                 </div>
-                <div *ngIf="request.status === 'rejected' && request.rejection_reason" class="w-full">
+                <div *ngIf="request.status === 'rejected' && request.rejection_reason" class="w-full mt-2">
                     <div class="bg-red-50 border border-red-200 rounded px-2 py-1">
                       <p class="text-xs text-red-700 font-medium">{{ request.rejection_reason }}</p>
                     </div>
                   </div>
-                <div *ngIf="request.processed_at" class="mt-1">
-                  <p class="text-xs text-gray-500">Updated: {{ formatDate(request.processed_at || request.processed_at_local || '') }}</p>
+                <div *ngIf="request.processed_at" class="mt-1.5">
+                  <p class="text-[10px] sm:text-xs text-gray-500">Updated: {{ formatDate(request.processed_at || request.processed_at_local || '') }}</p>
                 </div>
              </div>
           </div>
@@ -363,23 +364,23 @@
       </div>
       
       <!-- Pagination and Results Summary -->
-      <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p class="text-sm text-gray-600">
+      <div class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-3">
+        <p class="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
           Showing <span class="font-semibold text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> 
           to <span class="font-semibold text-gray-900">{{ Math.min(currentPage * itemsPerPage, filteredRequests.length) }}</span> 
           of <span class="font-semibold text-gray-900">{{ filteredRequests.length }}</span> 
           {{ filteredRequests.length === 1 ? 'request' : 'requests' }}
-          <span *ngIf="statusFilter !== 'all'"> with status: <span class="font-semibold">{{ statusFilter }}</span></span>
+          <span *ngIf="statusFilter !== 'all'" class="hidden sm:inline"> with status: <span class="font-semibold">{{ statusFilter }}</span></span>
         </p>
         
         <!-- Pagination Controls -->
-        <div *ngIf="totalPages > 1" class="flex items-center gap-2">
+        <div *ngIf="totalPages > 1" class="flex items-center gap-1.5 sm:gap-2">
           <!-- Previous Button -->
           <button
             (click)="onPageChange(currentPage - 1)"
             [disabled]="currentPage === 1"
-            class="px-3 py-1.5 rounded-lg border-2 border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-            <i class="fas fa-chevron-left"></i>
+            class="px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg border-2 border-gray-300 bg-white text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all min-h-[44px] min-w-[44px] flex items-center justify-center">
+            <i class="fas fa-chevron-left text-xs sm:text-sm"></i>
           </button>
           
           <!-- Page Numbers -->
@@ -390,7 +391,7 @@
             [class.bg-[#679436]]="page === currentPage"
             [class.text-white]="page === currentPage"
             [class.border-[#679436]]="page === currentPage"
-            class="min-w-[2.5rem] px-3 py-1.5 rounded-lg border-2 border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-default disabled:hover:bg-white transition-all">
+            class="min-w-[44px] min-h-[44px] px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg border-2 border-gray-300 bg-white text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-default disabled:hover:bg-white transition-all flex items-center justify-center">
             <span *ngIf="page !== -1">{{ page }}</span>
             <span *ngIf="page === -1">...</span>
           </button>
@@ -399,8 +400,8 @@
           <button
             (click)="onPageChange(currentPage + 1)"
             [disabled]="currentPage === totalPages"
-            class="px-3 py-1.5 rounded-lg border-2 border-gray-300 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-            <i class="fas fa-chevron-right"></i>
+            class="px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-lg border-2 border-gray-300 bg-white text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all min-h-[44px] min-w-[44px] flex items-center justify-center">
+            <i class="fas fa-chevron-right text-xs sm:text-sm"></i>
           </button>
         </div>
       </div>

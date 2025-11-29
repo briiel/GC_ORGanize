@@ -1,24 +1,24 @@
 <!-- Request Organization Officer Role Component -->
-<div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
+<div class="p-2 sm:p-4 lg:p-6 bg-gray-100 min-h-screen">
   <div class="max-w-7xl mx-auto">
     
     <!-- Header Section -->
-    <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
-      <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#679436]">
+    <div class="mb-4 sm:mb-5 lg:mb-6 mx-0 sm:mx-2 lg:mx-6">
+      <div class="bg-white rounded-lg shadow-md p-3 sm:p-4 lg:p-5 border-l-4 border-[#679436]">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-[#679436] flex items-center justify-center">
-              <i class="fas fa-user-plus text-white"></i>
+          <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#679436] flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-user-plus text-white text-sm sm:text-base"></i>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-gray-800">Request Officer Role</h1>
-              <p class="text-sm text-gray-600">Apply to become an officer in a student organization</p>
+              <h1 class="text-base sm:text-lg lg:text-xl font-bold text-gray-800">Request Officer Role</h1>
+              <p class="text-xs sm:text-sm text-gray-600">Apply to become an officer in a student organization</p>
             </div>
           </div>
           <button 
             (click)="openRequestModal()"
-            class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-all duration-200 font-semibold shadow-md hover:shadow-lg border-2 border-[#679436] flex items-center gap-2 min-h-[44px]">
-            <i class="fas fa-plus"></i>
+            class="px-4 py-2.5 sm:py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] active:bg-[#4a5f26] transition-all duration-200 font-semibold shadow-md hover:shadow-lg border-2 border-[#679436] flex items-center justify-center gap-2 min-h-[44px] text-sm sm:text-base w-full sm:w-auto">
+            <i class="fas fa-plus text-sm sm:text-base"></i>
             <span class="hidden sm:inline">Submit Request</span>
             <span class="sm:hidden">New Request</span>
           </button>
@@ -30,34 +30,34 @@
     <div *ngIf="isModalOpen" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fade-in" style="z-index: 3000;" (click)="closeRequestModal()">
       <div class="bg-white rounded-lg shadow-2xl max-w-[95vw] sm:max-w-[95vw] md:max-w-2xl w-full max-h-[85vh] overflow-hidden animate-scale-in" (click)="$event.stopPropagation()">
         <!-- Modal Header -->
-        <div class="px-4 sm:px-6 py-4 border-b-2 border-gray-100 bg-gradient-to-r from-[#679436] to-[#56732e]">
-          <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3 flex-1">
-              <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-                <i class="fas fa-file-alt text-white"></i>
+        <div class="px-3 sm:px-5 lg:px-6 py-3.5 sm:py-4 border-b-2 border-gray-100 bg-gradient-to-r from-[#679436] to-[#56732e]">
+          <div class="flex items-center justify-between gap-2 sm:gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+              <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-file-alt text-white text-sm sm:text-base"></i>
               </div>
-              <div>
-                <h2 class="text-lg sm:text-xl font-bold text-white">Submit New Request</h2>
+              <div class="min-w-0">
+                <h2 class="text-base sm:text-lg lg:text-xl font-bold text-white truncate">Submit New Request</h2>
                 <p class="text-xs sm:text-sm text-white/80">Apply for an officer role</p>
               </div>
             </div>
             <button 
               (click)="closeRequestModal()"
               type="button"
-              class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0 min-h-[44px] min-w-[44px]">
-              <i class="fas fa-times text-lg"></i>
+              class="w-11 h-11 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90 flex-shrink-0 min-h-[44px] min-w-[44px]">
+              <i class="fas fa-times text-base sm:text-lg"></i>
             </button>
           </div>
         </div>
         
         <!-- Modal Content -->
-        <div class="p-4 sm:p-6 overflow-y-auto" style="max-height: calc(85vh - 80px); -webkit-overflow-scrolling: touch;">
-          <form (ngSubmit)="submitRequest()" class="space-y-4 sm:space-y-5">
+        <div class="p-3 sm:p-5 lg:p-6 overflow-y-auto" style="max-height: calc(85vh - 80px); -webkit-overflow-scrolling: touch;">
+          <form (ngSubmit)="submitRequest()" class="space-y-3.5 sm:space-y-4 lg:space-y-5">
             
             <!-- Organization Selection -->
             <div>
-              <label for="organization" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                <i class="fas fa-building text-[#679436]"></i>
+              <label for="organization" class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2">
+                <i class="fas fa-building text-[#679436] text-xs sm:text-sm"></i>
                 Select Organization <span class="text-red-500">*</span>
               </label>
               <select 
@@ -69,19 +69,19 @@
                 [disabled]="isSubmitting"
                 [attr.aria-invalid]="!!formErrors['organization']"
                 [ngClass]="{'border-red-500': formErrors['organization']}"
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed">
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px]">
                 <option [value]="null" disabled>-- Select an Organization --</option>
                 <option *ngFor="let org of filteredOrganizations" [value]="org.org_id">
                   {{ org.org_name }} <span class="text-gray-500">({{ org.department }})</span>
                 </option>
               </select>
-              <p *ngIf="formErrors['organization']" class="text-red-600 text-sm mt-1" role="alert">{{ formErrors['organization'] }}</p>
+              <p *ngIf="formErrors['organization']" class="text-red-600 text-xs sm:text-sm mt-1" role="alert">{{ formErrors['organization'] }}</p>
             </div>
 
             <!-- Position -->
             <div>
-              <label for="position" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                <i class="fas fa-user-tie text-[#679436]"></i>
+              <label for="position" class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2">
+                <i class="fas fa-user-tie text-[#679436] text-xs sm:text-sm"></i>
                 Requested Position <span class="text-red-500">*</span>
               </label>
               <select
@@ -92,13 +92,13 @@
                 [disabled]="isSubmitting"
                 [attr.aria-invalid]="!!(formErrors['position'] || formErrors['otherPosition'])"
                 [ngClass]="{'border-red-500': formErrors['position'] || formErrors['otherPosition']}"
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed">
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px]">
                 <option [value]="''" disabled>-- Select a Position --</option>
                 <option *ngFor="let pos of positions" [value]="pos">{{ pos }}</option>
               </select>
-              <p *ngIf="formErrors['position']" class="text-red-600 text-sm mt-1" role="alert">{{ formErrors['position'] }}</p>
+              <p *ngIf="formErrors['position']" class="text-red-600 text-xs sm:text-sm mt-1" role="alert">{{ formErrors['position'] }}</p>
 
-              <div *ngIf="requestedPosition === 'Others'" class="mt-3">
+              <div *ngIf="requestedPosition === 'Others'" class="mt-2.5 sm:mt-3">
                 <input
                   type="text"
                   id="otherPosition"
@@ -109,16 +109,16 @@
                   [attr.aria-invalid]="!!formErrors['otherPosition']"
                   [ngClass]="{'border-red-500': formErrors['otherPosition']}"
                   placeholder="Please specify your position"
-                  class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed">
-                <p *ngIf="formErrors['otherPosition']" class="text-red-600 text-sm mt-1" role="alert">{{ formErrors['otherPosition'] }}</p>
+                  class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base min-h-[44px]">
+                <p *ngIf="formErrors['otherPosition']" class="text-red-600 text-xs sm:text-sm mt-1" role="alert">{{ formErrors['otherPosition'] }}</p>
               </div>
             </div>
 
             <!-- Justification (Optional) -->
             <div>
-              <label for="justification" class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                <i class="fas fa-comment-dots text-[#679436]"></i>
-                Justification <span class="text-gray-500 font-normal">(Optional)</span>
+              <label for="justification" class="block text-xs sm:text-sm font-bold text-gray-700 mb-1.5 sm:mb-2 flex items-center gap-1.5 sm:gap-2">
+                <i class="fas fa-comment-dots text-[#679436] text-xs sm:text-sm"></i>
+                Justification <span class="text-gray-500 font-normal text-xs sm:text-sm">(Optional)</span>
               </label>
               <textarea 
                 id="justification"
@@ -130,30 +130,30 @@
                 placeholder="Explain why you should be granted this role and how you plan to contribute to the organization..."
                 [attr.aria-invalid]="!!formErrors['justification']"
                 [ngClass]="{'border-red-500': formErrors['justification']}"
-                class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"></textarea>
+                class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all duration-200 resize-none disabled:bg-gray-100 disabled:cursor-not-allowed text-sm sm:text-base"></textarea>
               <div class="flex items-center justify-between mt-1">
-                <p *ngIf="formErrors['justification']" class="text-red-600 text-sm" role="alert">{{ formErrors['justification'] }}</p>
-                <p class="text-xs text-gray-500 ml-auto" [ngClass]="{'text-yellow-600': justificationCharsLeft<=20 && justificationCharsLeft>0, 'text-red-600': justificationCharsLeft<0}">{{ justification.length }} / {{ justificationMax }}</p>
+                <p *ngIf="formErrors['justification']" class="text-red-600 text-xs sm:text-sm" role="alert">{{ formErrors['justification'] }}</p>
+                <p class="text-[10px] sm:text-xs text-gray-500 ml-auto" [ngClass]="{'text-yellow-600': justificationCharsLeft<=20 && justificationCharsLeft>0, 'text-red-600': justificationCharsLeft<0}">{{ justification.length }} / {{ justificationMax }}</p>
               </div>
-              <p class="text-xs text-gray-500 mt-1">
+              <p class="text-[10px] sm:text-xs text-gray-500 mt-1">
                 <i class="fas fa-info-circle"></i> Providing a justification can strengthen your request
               </p>
             </div>
 
             <!-- Submit Button -->
-            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t-2 border-gray-100">
+            <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4 border-t-2 border-gray-100">
               <button 
                 type="button"
                 (click)="closeRequestModal()"
                 [disabled]="isSubmitting"
-                class="w-full sm:w-auto px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 text-gray-700 border-2 bg-white hover:bg-gray-50 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]">
+                class="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg active:shadow flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 text-gray-700 border-2 bg-white hover:bg-gray-50 active:bg-gray-100 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] text-sm sm:text-base">
                 <span>Cancel</span>
               </button>
               <button 
                 type="submit"
                 [disabled]="isSubmitting || !selectedOrgId || !isPositionValid()"
-                class="w-full sm:w-auto relative px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 text-white border-2 bg-[#679436] hover:bg-[#56732e] border-[#679436] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed min-h-[44px]">
-                <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+                class="w-full sm:w-auto relative px-4 sm:px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg active:shadow flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 text-white border-2 bg-[#679436] hover:bg-[#56732e] active:bg-[#4a5f26] border-[#679436] disabled:bg-gray-400 disabled:border-gray-400 disabled:cursor-not-allowed min-h-[44px] text-sm sm:text-base">
+                <i class="fas fa-spinner fa-spin text-sm sm:text-base" *ngIf="isSubmitting"></i>
                 <span>{{ isSubmitting ? 'Submitting...' : 'Submit Request' }}</span>
               </button>
             </div>
@@ -163,48 +163,48 @@
     </div>
 
     <!-- My Requests History -->
-    <div class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
+    <div class="mx-0 sm:mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
       <!-- Loading State -->
-      <div *ngIf="isLoading" class="text-center py-12">
-        <i class="fas fa-spinner fa-spin text-4xl text-[#679436] mb-4"></i>
-        <p class="text-gray-600 font-medium">Loading your requests...</p>
+      <div *ngIf="isLoading" class="text-center py-8 sm:py-12">
+        <i class="fas fa-spinner fa-spin text-3xl sm:text-4xl text-[#679436] mb-3 sm:mb-4"></i>
+        <p class="text-sm sm:text-base text-gray-600 font-medium">Loading your requests...</p>
       </div>
 
       <!-- No Requests -->
-      <div *ngIf="!isLoading && myRequests.length === 0" class="text-center py-12 px-6">
-        <div class="w-20 h-20 rounded-full bg-[#679436] flex items-center justify-center mx-auto mb-4 opacity-20">
-          <i class="fas fa-inbox text-4xl text-white"></i>
+      <div *ngIf="!isLoading && myRequests.length === 0" class="text-center py-8 sm:py-12 px-4 sm:px-6">
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#679436] flex items-center justify-center mx-auto mb-3 sm:mb-4 opacity-20">
+          <i class="fas fa-inbox text-3xl sm:text-4xl text-white"></i>
         </div>
-        <p class="text-gray-600 font-medium text-lg">No requests yet</p>
-        <p class="text-gray-500 text-sm mt-2">Submit a request above to get started</p>
+        <p class="text-base sm:text-lg text-gray-600 font-medium">No requests yet</p>
+        <p class="text-xs sm:text-sm text-gray-500 mt-1.5 sm:mt-2">Submit a request above to get started</p>
       </div>
 
       <!-- Requests Table -->
       <div *ngIf="!isLoading && myRequests.length > 0" class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200">
         <!-- Desktop Table View -->
-        <div class="hidden md:block overflow-x-auto">
+        <div class="hidden md:block overflow-x-auto" style="-webkit-overflow-scrolling: touch;">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-[#679436]">
-            <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
-              <th class="px-4 py-3 text-left font-semibold min-w-[200px]">Organization</th>
-              <th class="px-4 py-3 text-left font-semibold min-w-[150px]">Position</th>
-              <th class="px-4 py-3 text-center font-semibold">Status</th>
-              <th class="px-4 py-3 text-left font-semibold">Requested</th>
-              <th class="px-4 py-3 text-left font-semibold">Review Details</th>
+            <tr class="uppercase tracking-wider text-white text-[10px] sm:text-xs lg:text-sm">
+              <th class="px-3 sm:px-4 py-3 sm:py-3.5 text-left font-semibold min-w-[180px] sm:min-w-[200px]">Organization</th>
+              <th class="px-3 sm:px-4 py-3 sm:py-3.5 text-left font-semibold min-w-[130px] sm:min-w-[150px]">Position</th>
+              <th class="px-3 sm:px-4 py-3 sm:py-3.5 text-center font-semibold min-w-[100px]">Status</th>
+              <th class="px-3 sm:px-4 py-3 sm:py-3.5 text-left font-semibold min-w-[110px]">Requested</th>
+              <th class="px-3 sm:px-4 py-3 sm:py-3.5 text-left font-semibold min-w-[140px]">Review Details</th>
             </tr>
           </thead>
             <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-              <tr *ngFor="let request of myRequests" class="hover:bg-green-50/50 transition-all duration-200">
+              <tr *ngFor="let request of myRequests" class="hover:bg-green-50/50 active:bg-green-50 transition-all duration-200">
               
               <!-- Organization -->
-              <td class="px-4 py-3.5">
-                <div class="flex items-start gap-2.5">
-                  <div class="w-9 h-9 rounded-lg bg-[#679436] flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-building text-white text-xs"></i>
+              <td class="px-3 sm:px-4 py-3 sm:py-3.5">
+                <div class="flex items-start gap-2 sm:gap-2.5">
+                  <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#679436] flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-building text-white text-[10px] sm:text-xs"></i>
                   </div>
-                  <div>
-                    <div class="text-sm font-semibold text-[#679436]">{{ request.org_name }}</div>
-                    <div class="text-xs text-gray-500 mt-0.5">
+                  <div class="min-w-0">
+                    <div class="text-xs sm:text-sm font-semibold text-[#679436] truncate">{{ request.org_name }}</div>
+                    <div class="text-[10px] sm:text-xs text-gray-500 mt-0.5 truncate">
                       <i class="fas fa-graduation-cap mr-1"></i>{{ request.department }}
                     </div>
                   </div>
@@ -212,49 +212,49 @@
               </td>
 
               <!-- Position -->
-              <td class="px-4 py-3.5">
-                <div class="text-sm font-semibold text-gray-800">
-                  <i class="fas fa-user-tie text-[#679436] mr-1.5"></i>{{ request.requested_position }}
+              <td class="px-3 sm:px-4 py-3 sm:py-3.5">
+                <div class="text-xs sm:text-sm font-semibold text-gray-800">
+                  <i class="fas fa-user-tie text-[#679436] mr-1 sm:mr-1.5 text-[10px] sm:text-xs"></i>{{ request.requested_position }}
                 </div>
-                <div *ngIf="request.justification" class="text-xs text-gray-500 italic mt-1.5 max-w-xs line-clamp-2" [title]="request.justification">
+                <div *ngIf="request.justification" class="text-[10px] sm:text-xs text-gray-500 italic mt-1 sm:mt-1.5 max-w-xs line-clamp-2" [title]="request.justification">
                   <i class="fas fa-quote-left mr-1 opacity-50"></i>{{ request.justification }}
                 </div>
               </td>
 
               <!-- Status -->
-              <td class="px-4 py-3.5 text-center">
-                <span [ngClass]="getStatusClass(request.status)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2">
-                  <i class="fas fa-clock text-xs" *ngIf="request.status === 'pending'"></i>
-                  <i class="fas fa-check-circle text-xs" *ngIf="request.status === 'approved'"></i>
-                  <i class="fas fa-times-circle text-xs" *ngIf="request.status === 'rejected'"></i>
+              <td class="px-3 sm:px-4 py-3 sm:py-3.5 text-center">
+                <span [ngClass]="getStatusClass(request.status)" class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold border-2">
+                  <i class="fas fa-clock text-[9px] sm:text-xs" *ngIf="request.status === 'pending'"></i>
+                  <i class="fas fa-check-circle text-[9px] sm:text-xs" *ngIf="request.status === 'approved'"></i>
+                  <i class="fas fa-times-circle text-[9px] sm:text-xs" *ngIf="request.status === 'rejected'"></i>
                   {{ request.status | titlecase }}
                 </span>
               </td>
 
               <!-- Requested Date -->
-              <td class="px-4 py-3.5">
-                <div class="text-sm text-gray-600">
-                  <i class="far fa-calendar text-gray-400 mr-1.5"></i>{{ formatDate(request.requested_at) }}
+              <td class="px-3 sm:px-4 py-3 sm:py-3.5">
+                <div class="text-xs sm:text-sm text-gray-600">
+                  <i class="far fa-calendar text-gray-400 mr-1 sm:mr-1.5 text-[10px] sm:text-xs"></i>{{ formatDate(request.requested_at) }}
                 </div>
               </td>
 
               <!-- Review Details -->
-              <td class="px-4 py-3.5">
-                <div *ngIf="request.reviewed_at" class="space-y-1">
-                  <div class="text-sm text-gray-600">
-                    <i class="far fa-calendar-check text-gray-400 mr-1.5"></i>{{ formatDate(request.reviewed_at) }}
+              <td class="px-3 sm:px-4 py-3 sm:py-3.5">
+                <div *ngIf="request.reviewed_at" class="space-y-0.5 sm:space-y-1">
+                  <div class="text-xs sm:text-sm text-gray-600">
+                    <i class="far fa-calendar-check text-gray-400 mr-1 sm:mr-1.5 text-[10px] sm:text-xs"></i>{{ formatDate(request.reviewed_at) }}
                   </div>
-                  <div *ngIf="request.reviewer_first_name" class="text-xs text-gray-500">
-                    <i class="fas fa-user-shield text-gray-400 mr-1"></i>by {{ request.reviewer_first_name }} {{ request.reviewer_last_name }}
+                  <div *ngIf="request.reviewer_first_name" class="text-[10px] sm:text-xs text-gray-500">
+                    <i class="fas fa-user-shield text-gray-400 mr-0.5 sm:mr-1 text-[9px] sm:text-xs"></i>by {{ request.reviewer_first_name }} {{ request.reviewer_last_name }}
                   </div>
-                  <div *ngIf="request.review_notes" class="mt-1.5 p-2 bg-gray-50 rounded-lg border border-gray-200">
-                    <p class="text-xs text-gray-700 italic">
-                      <i class="fas fa-comment-dots text-[#679436] mr-1"></i>{{ request.review_notes }}
+                  <div *ngIf="request.review_notes" class="mt-1 sm:mt-1.5 p-1.5 sm:p-2 bg-gray-50 rounded-lg border border-gray-200">
+                    <p class="text-[10px] sm:text-xs text-gray-700 italic">
+                      <i class="fas fa-comment-dots text-[#679436] mr-0.5 sm:mr-1 text-[9px] sm:text-xs"></i>{{ request.review_notes }}
                     </p>
                   </div>
                 </div>
-                <span *ngIf="!request.reviewed_at" class="text-gray-400 text-sm italic">
-                  <i class="fas fa-hourglass-half mr-1"></i>Pending review
+                <span *ngIf="!request.reviewed_at" class="text-gray-400 text-xs sm:text-sm italic">
+                  <i class="fas fa-hourglass-half mr-1 text-[10px] sm:text-xs"></i>Pending review
                 </span>
               </td>
             </tr>
@@ -263,65 +263,65 @@
         </div>
 
         <!-- Mobile Card View -->
-        <div class="md:hidden space-y-4 p-4 bg-gray-50">
+        <div class="md:hidden space-y-3 sm:space-y-4 p-3 sm:p-4 bg-gray-50">
           <div *ngFor="let request of myRequests" class="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
             <!-- Header -->
-            <div class="bg-[#679436] px-4 py-3 flex justify-between items-center">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
-                  <i class="fas fa-building text-white text-xs"></i>
+            <div class="bg-[#679436] px-3 sm:px-4 py-2.5 sm:py-3 flex justify-between items-center gap-2">
+              <div class="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <i class="fas fa-building text-white text-[10px] sm:text-xs"></i>
                 </div>
-                <div>
-                  <h3 class="text-white font-bold text-sm">{{ request.org_name }}</h3>
-                  <p class="text-white/80 text-xs">{{ request.department }}</p>
+                <div class="min-w-0 flex-1">
+                  <h3 class="text-white font-bold text-xs sm:text-sm truncate">{{ request.org_name }}</h3>
+                  <p class="text-white/80 text-[10px] sm:text-xs truncate">{{ request.department }}</p>
                 </div>
               </div>
-              <span [ngClass]="getStatusClass(request.status)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 bg-white">
-                <i class="fas fa-clock text-xs" *ngIf="request.status === 'pending'"></i>
-                <i class="fas fa-check-circle text-xs" *ngIf="request.status === 'approved'"></i>
-                <i class="fas fa-times-circle text-xs" *ngIf="request.status === 'rejected'"></i>
-                {{ request.status | titlecase }}
+              <span [ngClass]="getStatusClass(request.status)" class="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold border-2 bg-white flex-shrink-0">
+                <i class="fas fa-clock text-[9px] sm:text-xs" *ngIf="request.status === 'pending'"></i>
+                <i class="fas fa-check-circle text-[9px] sm:text-xs" *ngIf="request.status === 'approved'"></i>
+                <i class="fas fa-times-circle text-[9px] sm:text-xs" *ngIf="request.status === 'rejected'"></i>
+                <span class="hidden xs:inline">{{ request.status | titlecase }}</span>
               </span>
             </div>
 
             <!-- Body -->
-            <div class="p-4 space-y-3">
+            <div class="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
               <!-- Position -->
               <div>
-                <p class="text-xs text-gray-500 font-semibold uppercase">Position</p>
-                <div class="flex items-center gap-2 mt-1">
-                  <i class="fas fa-user-tie text-[#679436] text-sm"></i>
-                  <span class="text-sm font-semibold text-gray-800">{{ request.requested_position }}</span>
+                <p class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase">Position</p>
+                <div class="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1">
+                  <i class="fas fa-user-tie text-[#679436] text-xs sm:text-sm flex-shrink-0"></i>
+                  <span class="text-xs sm:text-sm font-semibold text-gray-800">{{ request.requested_position }}</span>
                 </div>
-                <div *ngIf="request.justification" class="mt-2 p-2 bg-gray-50 rounded-lg border border-gray-200">
-                  <p class="text-xs text-gray-700 italic" [title]="request.justification">
-                    <i class="fas fa-quote-left text-gray-400 mr-1"></i>{{ request.justification }}
+                <div *ngIf="request.justification" class="mt-1.5 sm:mt-2 p-1.5 sm:p-2 bg-gray-50 rounded-lg border border-gray-200">
+                  <p class="text-[10px] sm:text-xs text-gray-700 italic line-clamp-3" [title]="request.justification">
+                    <i class="fas fa-quote-left text-gray-400 mr-0.5 sm:mr-1 text-[9px] sm:text-[10px]"></i>{{ request.justification }}
                   </p>
                 </div>
               </div>
 
               <!-- Review Details -->
-              <div *ngIf="request.reviewed_at" class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                <p class="text-xs text-gray-500 font-semibold uppercase mb-2">Review Details</p>
-                <div class="text-xs text-gray-600 mb-1">
-                  <i class="far fa-calendar-check text-gray-400 mr-1.5"></i>{{ formatDate(request.reviewed_at) }}
+              <div *ngIf="request.reviewed_at" class="bg-gray-50 p-2 sm:p-3 rounded-lg border border-gray-200">
+                <p class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase mb-1.5 sm:mb-2">Review Details</p>
+                <div class="text-[10px] sm:text-xs text-gray-600 mb-0.5 sm:mb-1">
+                  <i class="far fa-calendar-check text-gray-400 mr-1 sm:mr-1.5 text-[9px] sm:text-xs"></i>{{ formatDate(request.reviewed_at) }}
                 </div>
-                <div *ngIf="request.reviewer_first_name" class="text-xs text-gray-600 mb-1">
-                  <i class="fas fa-user-shield text-gray-400 mr-1"></i>
+                <div *ngIf="request.reviewer_first_name" class="text-[10px] sm:text-xs text-gray-600 mb-0.5 sm:mb-1">
+                  <i class="fas fa-user-shield text-gray-400 mr-1 sm:mr-1.5 text-[9px] sm:text-xs"></i>
                   by {{ request.reviewer_first_name }} {{ request.reviewer_last_name }}
                 </div>
-                <div *ngIf="request.review_notes" class="text-xs text-gray-700 italic mt-1">
-                  <i class="fas fa-comment-dots text-[#679436] mr-1"></i>{{ request.review_notes }}
+                <div *ngIf="request.review_notes" class="text-[10px] sm:text-xs text-gray-700 italic mt-1">
+                  <i class="fas fa-comment-dots text-[#679436] mr-0.5 sm:mr-1 text-[9px] sm:text-xs"></i>{{ request.review_notes }}
                 </div>
               </div>
-              <div *ngIf="!request.reviewed_at" class="text-gray-400 text-xs italic flex items-center gap-1">
-                <i class="fas fa-hourglass-half"></i>Pending review
+              <div *ngIf="!request.reviewed_at" class="text-gray-400 text-[10px] sm:text-xs italic flex items-center gap-1">
+                <i class="fas fa-hourglass-half text-[9px] sm:text-xs"></i>Pending review
               </div>
 
               <!-- Requested Date -->
-              <div class="pt-3 border-t border-gray-100">
-                <p class="text-xs text-gray-600">
-                  <i class="far fa-calendar text-gray-400 mr-1.5"></i><strong>Requested:</strong> {{ formatDate(request.requested_at) }}
+              <div class="pt-2 sm:pt-3 border-t border-gray-100">
+                <p class="text-[10px] sm:text-xs text-gray-600">
+                  <i class="far fa-calendar text-gray-400 mr-1 sm:mr-1.5 text-[9px] sm:text-xs"></i><strong>Requested:</strong> {{ formatDate(request.requested_at) }}
                 </p>
               </div>
             </div>

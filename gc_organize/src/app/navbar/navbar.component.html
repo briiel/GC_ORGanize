@@ -4,9 +4,22 @@
     <div class="flex justify-between h-14 sm:h-16">
       
       <!-- Logo and Brand -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 sm:gap-4">
         <img src="/main_logo.webp" alt="GC Logo" class="h-8 w-8 sm:h-10 sm:w-10">
         <span class="text-base sm:text-xl font-bold text-[#679436]">GC-ORGANIZE</span>
+        
+        <!-- Date and Time Display -->
+        <div class="hidden sm:flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4 text-gray-600">
+          <span class="text-xs sm:text-sm flex items-center" [title]="today | date:'fullDate'" aria-label="Today's date">
+            <i class="far fa-calendar-alt mr-1 text-xs sm:text-sm" aria-hidden="true"></i>
+            <span class="hidden md:inline">{{ today | date:'EEE, MMM. d, y' }}</span>
+            <span class="md:hidden">{{ today | date:'EEE, MMM. d, y' }}</span>
+          </span>
+          <span class="text-xs sm:text-sm whitespace-nowrap flex items-center" aria-label="Current time">
+            <i class="far fa-clock mr-1 text-xs sm:text-sm" aria-hidden="true"></i>
+            {{ currentTime }}
+          </span>
+        </div>
       </div>
 
       <!-- Desktop Navigation Links -->
