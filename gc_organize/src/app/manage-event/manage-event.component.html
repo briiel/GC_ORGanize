@@ -561,7 +561,7 @@
           <li *ngFor="let event of pagedEvents; let i = index" class="hover:bg-gray-50 transition-colors duration-200 flex items-stretch min-h-[56px]">
             <span class="px-2 sm:px-3 py-2.5 sm:py-3 text-gray-400 font-bold flex items-center text-xs sm:text-sm" [ngClass]="selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-gray-50' : ''">{{ (eventPage - 1) * eventPageSize + i + 1 }}.</span>
             <button
-              class="flex-1 text-left px-2 sm:px-3 py-2.5 sm:py-3 font-semibold hover:underline focus:outline-none flex items-center min-h-[44px]"
+              class="flex-1 text-left px-2 sm:px-3 py-2.5 sm:py-3 font-semibold hover:underline focus:outline-none flex items-center min-h-[44px] min-w-0 overflow-hidden"
               [ngClass]="[
                 'text-[#679436]',
                 selectedEvent && selectedEvent.event_id === event.event_id ? 'bg-gray-50' : '',
@@ -571,7 +571,7 @@
               [title]="event.title"
             >
               <span class="inline-flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-1.5 w-full">
-                <span class="truncate max-w-full text-xs sm:text-sm md:text-base" [title]="event.title">{{ event.title }}</span>
+                <span class="line-clamp-2 max-w-full text-xs sm:text-sm md:text-base" [title]="event.title">{{ event.title }}</span>
                 <span class="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded border text-[9px] sm:text-[10px] font-bold self-start"
                       [ngClass]="event.is_paid ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'">
                   <i class="fas text-[8px] sm:text-[9px]" [ngClass]="event.is_paid ? 'fa-peso-sign' : 'fa-ticket-alt'"></i>
