@@ -97,16 +97,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           return { ...e, status: computed };
         });
 
-        // Sort: normal < concluded < cancelled; within each group, latest created_at first
-        const weight = (e: any) => {
-          const status = String(e.status || '').toLowerCase();
-          if (status === 'cancelled') return 2;
-          if (status === 'concluded') return 1;
-          return 0;
-        };
+        // Sort by creation date only (newest first)
         allEvents.sort((a, b) => {
-          const wDiff = weight(a) - weight(b);
-          if (wDiff !== 0) return wDiff;
           const dateA = new Date(a.created_at || a.createdAt || 0).getTime();
           const dateB = new Date(b.created_at || b.createdAt || 0).getTime();
           return dateB - dateA; // latest first
@@ -149,9 +141,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     filtered = [...filtered].sort((a, b) => {
       switch (this.sortBy) {
         case 'date_desc':
-          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
+          return new Date(b.created_at || b.createdAt || 0).getTime() - new Date(a.created_at || a.createdAt || 0).getTime();
         case 'date_asc':
-          return new Date(a.start_date || 0).getTime() - new Date(b.start_date || 0).getTime();
+          return new Date(a.created_at || a.createdAt || 0).getTime() - new Date(b.created_at || b.createdAt || 0).getTime();
         case 'title_asc':
           return (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase());
         case 'title_desc':
