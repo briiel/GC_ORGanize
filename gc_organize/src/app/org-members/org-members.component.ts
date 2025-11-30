@@ -6,6 +6,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
 import { ExcelExportService } from '../services/excel-export.service';
 import { environment } from '../../environments/environment';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
+import { REQUEST_POSITIONS } from '../constants/positions';
 
 interface OrganizationMember {
   member_id: number;
@@ -39,7 +40,7 @@ export class OrgMembersComponent implements OnInit {
   // Search and filter
   searchTerm: string = '';
   filterPosition: string = '';
-  sortBy: string = 'name_asc';
+  sortBy: string = 'position_hierarchy';
   
   // Pagination
   currentPage: number = 1;
@@ -49,6 +50,18 @@ export class OrgMembersComponent implements OnInit {
   // Make Math available in template
   Math = Math;
 
+  // We'll initialize the position order from the shared `Request Role` options
+  private positionOrder: string[] = [];
+
+  private getPositionRank(position: string): number {
+    const pos = (position || '').toLowerCase();
+    for (let i = 0; i < this.positionOrder.length; i++) {
+      // match by substring to account for longer titles (e.g., 'vice president for internal affairs')
+      if (pos.includes(this.positionOrder[i])) return i;
+    }
+    return this.positionOrder.length; // unknown positions rank lowest
+  }
+
   constructor(
     private http: HttpClient,
     private authService: RbacAuthService,
@@ -56,6 +69,8 @@ export class OrgMembersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // initialize hierarchy order from shared request-role positions
+    this.positionOrder = REQUEST_POSITIONS.map(p => p.toLowerCase());
     const org = this.authService.getUserOrganization();
     if (org) {
       this.orgName = org.org_name;
@@ -152,6 +167,13 @@ export class OrgMembersComponent implements OnInit {
           return fullNameB2.localeCompare(fullNameA2);
         case 'position_asc':
           return a.position.toLowerCase().localeCompare(b.position.toLowerCase());
+        case 'position_hierarchy':
+          const ra = this.getPositionRank(a.position);
+          const rb = this.getPositionRank(b.position);
+          if (ra !== rb) return ra - rb;
+          // tie-breaker: name ascending
+          return (`${a.first_name} ${a.last_name}`).toLowerCase()
+            .localeCompare((`${b.first_name} ${b.last_name}`).toLowerCase());
         case 'date_desc':
           return new Date(b.joined_at || 0).getTime() - new Date(a.joined_at || 0).getTime();
         default:

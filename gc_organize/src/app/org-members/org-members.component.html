@@ -73,6 +73,7 @@
             <option value="name_asc">Name (A-Z)</option>
             <option value="name_desc">Name (Z-A)</option>
             <option value="position_asc">Position (A-Z)</option>
+              <option value="position_hierarchy">Position (Hierarchy)</option>
             <option value="date_desc">Recently Joined</option>
           </select>
         </div>
@@ -106,7 +107,7 @@
               <th class="px-3 sm:px-4 py-3 sm:py-3.5 text-center font-semibold min-w-[80px]">Actions</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="bg-white divide-y divide-gray-200 text-center">
             <tr *ngFor="let member of paginatedMembers" class="hover:bg-green-50/50 active:bg-green-50 transition-all duration-200">
               <td class="px-3 sm:px-4 py-3 sm:py-3.5 text-xs sm:text-sm font-semibold text-gray-900">
                 {{ member.student_id }}

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
+import { REQUEST_POSITIONS } from '../constants/positions';
 import { environment } from '../../environments/environment';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
@@ -46,22 +47,7 @@ export class RequestRoleComponent implements OnInit {
   selectedOrgId: number | null = null;
   requestedPosition: string = '';
   otherPosition: string = '';
-  positions: string[] = [
-    'President',
-    'Vice President for Internal Affairs',
-    'Vice President for External Affairs',
-    'Secretary',
-    'Assitant Secretary',
-    'Treasurer',
-    'Auditor',
-    'Business Manager',
-    'Public Information Officer (P.I.O.)',
-    '1st Year Representative',
-    '2nd Year Representative',
-    '3rd Year Representative',
-    '4th Year Representative',
-    'Others'
-  ];
+  positions: string[] = REQUEST_POSITIONS;
   justification: string = '';
   // UI / validation helpers
   formErrors: { [key: string]: string } = {};
