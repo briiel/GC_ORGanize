@@ -8,6 +8,7 @@ import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
 @Component({
   selector: 'app-so-dashboard',
+  standalone: true,
   templateUrl: './so-dashboard.component.html',
   styleUrls: ['./so-dashboard.component.css'],
   imports: [CommonModule, RouterModule],

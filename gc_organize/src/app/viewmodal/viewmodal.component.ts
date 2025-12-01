@@ -4,9 +4,10 @@ import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-viewmodal',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './viewmodal.component.html',
-  styleUrl: './viewmodal.component.css'
+  styleUrls: ['./viewmodal.component.css']
 })
 export class ViewmodalComponent {
   @Output() close = new EventEmitter<void>();

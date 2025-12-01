@@ -72,6 +72,56 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async startScanner() {
+    // Show privacy policy notice if not yet accepted
+    const hasAcceptedPrivacy = localStorage.getItem('privacy_policy_accepted');
+    if (!hasAcceptedPrivacy || hasAcceptedPrivacy !== 'true') {
+      const result = await Swal.fire({
+        title: 'Data Privacy Notice',
+        html: `
+          <div style="text-align: left; font-size: 14px; line-height: 1.6;">
+            <p>I have read the Gordon College General Privacy Notice at 
+            <a href="https://gordoncollege.edu.ph/datapolicy" target="_blank" style="color: #679436; text-decoration: underline;">
+            https://gordoncollege.edu.ph/datapolicy</a>.</p>
+            
+            <p style="margin-top: 12px;">By clicking the "Accept and Continue" button, I recognize the authority of the Gordon College 
+            to process my personal and sensitive personal information, pursuant to the Gordon College General 
+            Privacy Notice and applicable laws, and agree to the collection and use of information in accordance 
+            with the policy stated.</p>
+          </div>
+        `,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonText: 'Accept and Continue',
+        cancelButtonText: 'Close',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        reverseButtons: true
+      });
+      
+      if (!result.isConfirmed) {
+        return;
+      }
+      
+      // Record acceptance in the database
+      const token = localStorage.getItem('gc_organize_token');
+      if (token) {
+        try {
+          await firstValueFrom(
+            this.http.post(
+              `${environment.apiUrl}/auth/accept-privacy-policy`,
+              {},
+              { headers: { Authorization: `Bearer ${token}` } }
+            )
+          );
+          // Mark as accepted in localStorage to avoid showing again
+          localStorage.setItem('privacy_policy_accepted', 'true');
+        } catch (error) {
+          console.error('Failed to record privacy policy acceptance:', error);
+          // Continue anyway - don't block scanner usage
+        }
+      }
+    }
+
     // Require explicit location consent before starting scanner
     if (!this.locationConsent) {
       const result = await Swal.fire({
@@ -297,8 +347,23 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
 
   showPrivacy() {
     Swal.fire({
-      title: 'Privacy Notice',
-      html: `We collect your device location only to verify attendance at Gordon College. The location is stored with the attendance record for audit and fraud prevention and will be retained according to policy. By consenting you agree to this usage.`,
+      title: 'Data Privacy Notice',
+      html: `
+        <div style="text-align: left; font-size: 14px; line-height: 1.6;">
+          <p>I have read the Gordon College General Privacy Notice at 
+          <a href="https://gordoncollege.edu.ph/datapolicy" target="_blank" style="color: #679436; text-decoration: underline;">
+          https://gordoncollege.edu.ph/datapolicy</a>.</p>
+          
+          <p style="margin-top: 12px;">By using the scanner, you recognize the authority of the Gordon College 
+          to process your personal and sensitive personal information, pursuant to the Gordon College General 
+          Privacy Notice and applicable laws, and agree to the collection and use of information in accordance 
+          with the policy stated.</p>
+          
+          <p style="margin-top: 12px;"><b>Location Privacy:</b> Your device location is collected only to verify 
+          attendance at Gordon College. The location is stored with the attendance record for audit and fraud 
+          prevention and will be retained according to policy.</p>
+        </div>
+      `,
       icon: 'info',
       confirmButtonText: 'Close'
     });

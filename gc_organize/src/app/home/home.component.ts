@@ -1,7 +1,6 @@
-import { Component, OnInit, HostListener, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ModalService } from '../modal.service';
 import { RegistermodalComponent } from '../registermodal/registermodal.component';
 import { ViewmodalComponent } from '../viewmodal/viewmodal.component';
 import { Router, RouterModule } from '@angular/router';
@@ -137,8 +136,18 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Apply sorting
-    filtered = [...filtered].sort((a, b) => {
+    // Apply sorting with status ranking so "ongoing" appears before "not yet started"
+    const statusRank = (ev: any) => {
+      const s = String(ev?.status || '').toLowerCase();
+      if (s === 'ongoing') return 0;
+      if (s === 'not yet started' || s === 'not_yet_started' || s === 'notyetstarted') return 1;
+      if (s === 'pending') return 2;
+      if (s === 'concluded' || s === 'ended' || s === 'finished') return 3;
+      if (s === 'cancelled' || s === 'canceled') return 4;
+      return 5; // unknown/other statuses
+    };
+
+    const baseCompare = (a: any, b: any) => {
       switch (this.sortBy) {
         case 'date_desc':
           return new Date(b.created_at || b.createdAt || 0).getTime() - new Date(a.created_at || a.createdAt || 0).getTime();
@@ -153,6 +162,12 @@ export class HomeComponent implements OnInit, OnDestroy {
         default:
           return 0;
       }
+    };
+
+    filtered = [...filtered].sort((a, b) => {
+      const r = statusRank(a) - statusRank(b);
+      if (r !== 0) return r; // status ordering first
+      return baseCompare(a, b); // then the requested sort
     });
 
     // Pagination logic

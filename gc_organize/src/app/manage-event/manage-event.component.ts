@@ -14,6 +14,7 @@ import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 
 @Component({
   selector: 'app-manage-event',
+  standalone: true,
   templateUrl: './manage-event.component.html',
   styleUrls: ['./manage-event.component.css'],
   imports: [CommonModule, FormsModule]

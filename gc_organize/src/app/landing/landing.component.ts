@@ -9,7 +9,7 @@ import { MetricsService } from '../services/metrics.service';
   standalone: true,
   imports: [CommonModule, RouterModule, HttpClientModule],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css'
+  styleUrls: ['./landing.component.css']
 })
 export class LandingComponent implements OnInit {
   currentYear = new Date().getFullYear();

@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, NotificationBellComponent],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
