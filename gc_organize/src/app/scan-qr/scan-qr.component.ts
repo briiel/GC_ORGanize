@@ -27,6 +27,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedCameraId: string | undefined;
   role: string | null = null;
   get isOsws(): boolean { return this.role === 'osws_admin'; }
+  privacyPolicy: string | null = null;
 
   // Event selection for disambiguating which event to record attendance for
   events: any[] = [];
@@ -56,6 +57,16 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       this.role = 'student';
     }
     this.fetchScannerEvents();
+    // Fetch current privacy policy (public endpoint)
+    this.http.get(`${environment.apiUrl}/admin/privacy-policy`).subscribe({
+      next: (res: any) => {
+        const p = res?.data?.policy || res?.policy || null;
+        this.privacyPolicy = p?.content ?? null;
+      },
+      error: () => {
+        // ignore quietly
+      }
+    });
   }
 
   ngAfterViewInit() {}
@@ -346,24 +357,11 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   showPrivacy() {
+    const content = this.privacyPolicy || `I have read the Gordon College General Privacy Notice at \nhttps://gordoncollege.edu.ph/datapolicy\n\nBy using the scanner, you recognize the authority of the Gordon College to process personal information and agree to collection and use in accordance with the policy.`;
+    // Show read-only policy
     Swal.fire({
       title: 'Data Privacy Notice',
-      html: `
-        <div style="text-align: left; font-size: 14px; line-height: 1.6;">
-          <p>I have read the Gordon College General Privacy Notice at 
-          <a href="https://gordoncollege.edu.ph/datapolicy" target="_blank" style="color: #679436; text-decoration: underline;">
-          https://gordoncollege.edu.ph/datapolicy</a>.</p>
-          
-          <p style="margin-top: 12px;">By using the scanner, you recognize the authority of the Gordon College 
-          to process your personal and sensitive personal information, pursuant to the Gordon College General 
-          Privacy Notice and applicable laws, and agree to the collection and use of information in accordance 
-          with the policy stated.</p>
-          
-          <p style="margin-top: 12px;"><b>Location Privacy:</b> Your device location is collected only to verify 
-          attendance at Gordon College. The location is stored with the attendance record for audit and fraud 
-          prevention and will be retained according to policy.</p>
-        </div>
-      `,
+      html: `<div style="text-align: left; font-size: 14px; line-height: 1.6;">${content.replace(/\n/g, '<br/>')}</div>`,
       icon: 'info',
       confirmButtonText: 'Close'
     });
