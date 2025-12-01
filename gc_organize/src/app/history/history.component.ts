@@ -102,7 +102,7 @@ export class HistoryComponent implements OnInit {
     if (!d) return '';
     try {
       const dd = parseMysqlDatetimeToDate(d as any);
-      return dd ? dd.toLocaleDateString() : '';
+      return dd ? dd.toLocaleDateString('en-US', { timeZone: 'Asia/Manila' }) : '';
     } catch { return d || ''; }
   }
 

@@ -1778,7 +1778,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         `${evaluation.first_name || ''} ${evaluation.middle_initial || ''} ${evaluation.last_name || ''} ${evaluation.suffix || ''}`.trim(),
         evaluation.department ?? '-',
         evaluation.program ?? '-',
-        evaluation.submitted_at ? (parseMysqlDatetimeToDate(evaluation.submitted_at)?.toLocaleString() ?? '-') : '-',
+        evaluation.submitted_at ? (parseMysqlDatetimeToDate(evaluation.submitted_at)?.toLocaleString('en-US', { timeZone: 'Asia/Manila' }) ?? '-') : '-',
         ratings.question1 ?? '-',
         ratings.question2 ?? '-',
         ratings.question3 ?? '-',

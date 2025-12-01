@@ -50,8 +50,10 @@ export function parseMysqlDatetimeToDate(value: string | Date | null | undefined
 
 export function formatToLocalShort(d: Date | null, options?: Intl.DateTimeFormatOptions): string {
   if (!d) return '-';
+  // Use Manila timezone explicitly for consistent display across all browsers/systems
   return new Intl.DateTimeFormat(undefined, Object.assign({
     year: 'numeric', month: 'short', day: '2-digit',
-    hour: '2-digit', minute: '2-digit'
+    hour: '2-digit', minute: '2-digit',
+    timeZone: 'Asia/Manila'  // Force Manila timezone for events
   }, options || {})).format(d);
 }

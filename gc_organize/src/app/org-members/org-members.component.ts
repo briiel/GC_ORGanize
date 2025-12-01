@@ -240,7 +240,8 @@ export class OrgMembersComponent implements OnInit {
     return d.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'Asia/Manila'
     });
   }
 

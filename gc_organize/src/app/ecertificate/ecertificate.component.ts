@@ -237,7 +237,7 @@ export class EcertificateComponent implements OnInit {
     const parts = ymd.split('-').map(n => parseInt(n, 10));
     if (parts.length === 3 && !parts.some(isNaN)) {
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
-      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' });
     }
     // Fallback to raw string
     return ymd;
