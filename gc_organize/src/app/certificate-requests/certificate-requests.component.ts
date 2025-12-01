@@ -237,7 +237,27 @@ export class CertificateRequestsComponent implements OnInit {
     // - an ISO string with timezone (e.g. 2025-11-30T08:04:31+08:00)
     // - a server-local plain DATETIME (e.g. 2025-11-30 08:04:31)
     // - a UTC ISO with Z (e.g. 2025-11-30T00:04:31.000Z)
-    // parseMysqlDatetimeToDate will honor ISO+Z and plain DATETIME correctly
+    
+    // Try to parse as ISO first (handles both UTC Z and timezone offset formats)
+    try {
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime())) {
+        // Valid ISO date - format it in Manila timezone
+        return d.toLocaleString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+          timeZone: 'Asia/Manila'
+        });
+      }
+    } catch (e) {
+      // Fall through to MySQL parsing
+    }
+    
+    // Fall back to MySQL DATETIME parsing for plain strings
     const d = parseMysqlDatetimeToDate(dateStr as any);
     if (!d) return 'N/A';
     return formatToLocalShort(d);
