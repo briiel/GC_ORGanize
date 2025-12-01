@@ -20,7 +20,7 @@ export class CertificateRequestService {
   // Get all certificate requests for the organization
   getCertificateRequests(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/requests`, { headers: this.getAuthHeaders() }).pipe(
-      map((resp: any) => (Array.isArray(resp) ? resp : resp.data || [])),
+      map((resp: any) => Array.isArray(resp) ? resp : (resp && Array.isArray(resp.items)) ? resp.items : (resp.data || [])),
       catchError(err => throwError(() => err))
     );
   }

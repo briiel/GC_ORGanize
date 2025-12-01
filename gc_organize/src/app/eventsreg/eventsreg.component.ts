@@ -35,9 +35,28 @@ export class EventsregComponent implements OnInit {
     this.loading = true;
     this.eventService.getRegisteredEvents(this.studentId).subscribe({
       next: (events) => {
-        this.registeredEvents = events.data || events;
+        // Normalize response shape: support { items }, legacy { data }, or raw array
+        let payload: any = events;
+        // If API uses wrapper { success: true, data: ... }
+        if (events && events.data !== undefined && events.success !== undefined) {
+          payload = events.data;
+        }
+        // If payload contains paginated envelope { items: [...] }
+        if (payload && Array.isArray(payload.items)) {
+          this.registeredEvents = payload.items;
+        } else if (payload && Array.isArray(payload)) {
+          this.registeredEvents = payload;
+        } else if (payload && Array.isArray(payload.data)) {
+          // nested data.data
+          this.registeredEvents = payload.data;
+        } else {
+          // fallback to empty array to avoid runtime errors
+          this.registeredEvents = [];
+        }
         // Sort latest first: assume "latest" means most recent event by start_date then start_time
-        this.registeredEvents.sort((a, b) => {
+        // Ensure we only call sort when we have an array
+        if (Array.isArray(this.registeredEvents)) {
+          this.registeredEvents.sort((a, b) => {
           const aDateStr: string | undefined = a?.start_date;
           const bDateStr: string | undefined = b?.start_date;
           const aTimeStr: string | undefined = a?.start_time;
@@ -51,7 +70,8 @@ export class EventsregComponent implements OnInit {
           const aTs = aD ? aD.getTime() : 0;
           const bTs = bD ? bD.getTime() : 0;
           return bTs - aTs; // descending (latest first)
-        });
+          });
+        }
         this.loading = false;
       },
       error: (err) => {
@@ -63,7 +83,7 @@ export class EventsregComponent implements OnInit {
 
   // Filtered events based on search
   get filteredEvents() {
-    let filtered = this.registeredEvents;
+    let filtered = Array.isArray(this.registeredEvents) ? this.registeredEvents : [];
     
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();

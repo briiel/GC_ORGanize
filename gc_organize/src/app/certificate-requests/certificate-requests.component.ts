@@ -78,7 +78,7 @@ export class CertificateRequestsComponent implements OnInit {
     
     this.certificateRequestService.getCertificateRequests().subscribe({
       next: (response: any) => {
-        const raw = Array.isArray(response) ? response : response.data || [];
+        const raw = Array.isArray(response) ? response : (response && Array.isArray(response.items)) ? response.items : (response?.data || []);
         // Normalize each request to include a displayable timestamp.
         // Prefer an ISO/UTC timestamp from `requested_at` when available so
         // the browser will convert it to the viewer's local time. If the

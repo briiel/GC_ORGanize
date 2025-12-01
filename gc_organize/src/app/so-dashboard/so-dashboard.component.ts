@@ -5,6 +5,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
+import { normalizeList, normalizeSingle } from '../utils/api-utils';
 
 @Component({
   selector: 'app-so-dashboard',
@@ -121,24 +122,14 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   private loadOrgEvents(creatorId: number) {
     this.eventService.getEventsByCreator(creatorId).subscribe({
       next: (res) => {
-        let events: any[] = [];
-        if (res && Array.isArray(res.data)) {
-          events = res.data;
-        } else if (Array.isArray(res)) {
-          events = res;
-        } else if (res && Array.isArray(res.events)) {
-          events = res.events;
-        }
-        this.events = events;
+        this.events = normalizeList(res);
 
         // Reset to first page if events change
         this.upcomingPage = 1;
 
         // Count events by status. Prefer server-provided `auto_status` when present
-        // (server computes time-based status and marks `auto_status`). This keeps
-        // the dashboard counts consistent with backend stats endpoints.
         let upcoming = 0, ongoing = 0, concluded = 0, cancelled = 0;
-        for (const e of events) {
+        for (const e of this.events) {
           const status = String(e.auto_status || e.status || '').toLowerCase();
           if (status === 'cancelled') {
             cancelled++;
@@ -162,10 +153,9 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         // Get backend stats (if needed for additional data)
         this.eventService.getOrgStats().subscribe({
           next: (s) => {
-            const data = s?.data ?? s;
+            const data = normalizeSingle(s);
             if (data) {
-              // Only override if backend has different totals (e.g., includes archived events)
-              if (data.totalEvents && data.totalEvents !== events.length) {
+              if (data.totalEvents && data.totalEvents !== this.events.length) {
                 this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
                 this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
                 this.stats.concluded = data.concluded ?? this.stats.concluded;
@@ -176,7 +166,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
           error: () => { /* keep computed fallback */ }
         });
 
-        this.fetchAttendanceStats(events.map((e: any) => e.event_id));
+        this.fetchAttendanceStats(this.events.map((e: any) => e.event_id));
       },
       error: (err) => {
         console.error('Error fetching events:', err);
@@ -218,12 +208,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   fetchAttendanceStats(eventIds: number[]) {
     this.eventService.getAllAttendanceRecords().subscribe({
       next: (res) => {
-        let records: any[] = [];
-        if (res && Array.isArray(res.data)) {
-          records = res.data;
-        } else if (Array.isArray(res)) {
-          records = res;
-        }
+        const records = normalizeList(res);
         this.stats.totalAttendees = records.filter((r: any) => eventIds.includes(r.event_id)).length;
       },
       error: (err) => {

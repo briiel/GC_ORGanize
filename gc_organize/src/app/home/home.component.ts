@@ -39,24 +39,26 @@ export class HomeComponent implements OnInit, OnDestroy {
       ([orgEvents, oswsEvents]) => {
         let allEvents: any[] = [];
 
+        // Helper to normalize various API response shapes into an array of events
+        const normalize = (payload: any): any[] => {
+          if (!payload) return [];
+          if (Array.isArray(payload)) return payload;
+          if (payload.items && Array.isArray(payload.items)) return payload.items;
+          if (payload.data && Array.isArray(payload.data)) return payload.data;
+          if (payload.events && Array.isArray(payload.events)) return payload.events;
+          // Some endpoints may return { success: true, data: { items: [...] } }
+          if (payload.success !== undefined && payload.data) {
+            if (Array.isArray(payload.data)) return payload.data;
+            if (payload.data.items && Array.isArray(payload.data.items)) return payload.data.items;
+          }
+          return [];
+        };
+
         // Merge org events
-        if (orgEvents && Array.isArray(orgEvents.data)) {
-          allEvents = allEvents.concat(orgEvents.data);
-        } else if (Array.isArray(orgEvents)) {
-          allEvents = allEvents.concat(orgEvents);
-        } else if (orgEvents && Array.isArray(orgEvents.events)) {
-          allEvents = allEvents.concat(orgEvents.events);
-        }
+        allEvents = allEvents.concat(normalize(orgEvents));
 
         // Merge OSWS events and tag them
-        let oswsList: any[] = [];
-        if (oswsEvents && Array.isArray(oswsEvents.data)) {
-          oswsList = oswsEvents.data;
-        } else if (Array.isArray(oswsEvents)) {
-          oswsList = oswsEvents;
-        } else if (oswsEvents && Array.isArray(oswsEvents.events)) {
-          oswsList = oswsEvents.events;
-        }
+        let oswsList: any[] = normalize(oswsEvents);
         oswsList = oswsList.map(e => ({
           ...e,
           osws: true,

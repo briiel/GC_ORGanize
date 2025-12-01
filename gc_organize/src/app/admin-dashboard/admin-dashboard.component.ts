@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
 import Chart from 'chart.js/auto';
+import { normalizeList, normalizeSingle } from '../utils/api-utils';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -148,15 +149,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     // For OSWS admin, aggregate across all events (OSWS + organizations)
     this.eventService.getAllEvents().subscribe({
       next: (res) => {
-        let events: any[] = [];
-        if (res && Array.isArray(res.data)) {
-          events = res.data;
-        } else if (Array.isArray(res)) {
-          events = res;
-        } else if (res && Array.isArray(res.events)) {
-          events = res.events;
-        }
-        this.events = events || [];
+        this.events = normalizeList(res) || [];
 
         // Compute statistics by status with date-based fallback
         this.computeStats();
@@ -170,7 +163,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         // Fetch backend OSWS stats and use them as the source of truth so dashboard reflects server-computed statuses
         this.eventService.getOswsStats().subscribe({
           next: (s) => {
-            const data = (s as any)?.data ?? s;
+            const data = normalizeSingle(s) ?? s;
             if (data) {
               this.stats.upcoming = data.upcoming ?? this.stats.upcoming;
               this.stats.ongoing = data.ongoing ?? this.stats.ongoing;
@@ -225,12 +218,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private fetchAttendanceStats(eventIds: number[]): void {
     this.eventService.getAllAttendanceRecords().subscribe({
       next: (res) => {
-        let records: any[] = [];
-        if (res && Array.isArray(res.data)) {
-          records = res.data;
-        } else if (Array.isArray(res)) {
-          records = res;
-        }
+        const records = normalizeList(res);
         this.stats.totalAttendees = records.filter((r: any) => eventIds.includes(r.event_id)).length;
         // Re-render charts if needed (no-op for current datasets)
       },
@@ -552,11 +540,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private fetchServerChartsIfPossible(): void {
     try {
       this.eventService.getOswsCharts(this.pieChartFilter).subscribe({
-        next: (res) => {
-          const data = (res as any)?.data ?? res;
-          if (data) {
-            this.serverDeptData = data.events_by_department || null;
-            this.serverOrgData = data.activities_by_organization || null;
+          next: (res) => {
+            const data = (res as any)?.items ?? (res as any)?.data ?? res;
+            if (data) {
+              this.serverDeptData = data.events_by_department || null;
+              this.serverOrgData = data.activities_by_organization || null;
             // Re-render charts to use server data
             if (this.viewReady) {
               this.renderPieChart();

@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { environment } from '../../environments/environment';
+import { normalizeSingle } from '../utils/api-utils';
 
 @Component({
   selector: 'app-registermodal',
@@ -60,8 +61,8 @@ export class RegistermodalComponent implements OnInit {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       }).subscribe({
         next: (res) => {
-          const ev = res?.data ? res.data : res;
-          this.isPaid = !!ev?.is_paid;
+            const ev = normalizeSingle(res) || res;
+            this.isPaid = !!ev?.is_paid;
         },
         error: () => {
           this.isPaid = false;

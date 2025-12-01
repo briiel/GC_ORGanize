@@ -11,6 +11,7 @@ import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { ExcelExportService } from '../services/excel-export.service';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
+import { normalizeList, normalizeSingle } from '../utils/api-utils';
 
 @Component({
   selector: 'app-manage-event',
@@ -401,11 +402,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   fetchEvents() {
     this.eventService.getEventsByCreator(this.creatorId).subscribe({
       next: (res) => {
-        this.events = res.data || res;
-  // Default view excludes concluded events; they remain searchable
-  this.filteredList = (this.events || []).filter(e => (String(e?.status || '').toLowerCase()) !== 'concluded');
-  // Reset page within bounds
-  this.eventPage = 1;
+        this.events = normalizeList(res);
+        // Default view excludes concluded events; they remain searchable
+        this.filteredList = (this.events || []).filter(e => (String(e?.status || '').toLowerCase()) !== 'concluded');
+        // Reset page within bounds
+        this.eventPage = 1;
         // Do not auto-select event; only show details when a title is clicked
         if (this.selectedEvent) {
           // If the selected event was deleted, clear selection
@@ -423,7 +424,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (!this.adminId) return;
     this.eventService.getEventsByAdmin(this.adminId).subscribe({
       next: (res) => {
-        this.oswsEvents = res.data || res;
+        this.oswsEvents = normalizeList(res);
       },
       error: (err) => {
         console.error('Error fetching OSWS events:', err);
@@ -434,7 +435,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   fetchOrgEvents() {
     this.eventService.getAllOrgEvents().subscribe({
       next: (res) => {
-        this.orgEvents = res.data || res;
+        this.orgEvents = normalizeList(res);
         this.searchOrgEvents(); // Apply initial filters
       },
       error: (err) => {
@@ -685,9 +686,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   this.toggleBodyModalClass();
     this.eventService.getEventParticipants(event.event_id).subscribe({
       next: (res) => {
-        this.participants = res.data || res;
+        this.participants = normalizeList(res);
         this.participantsLoading = false;
-  this.selectedRegistrations.clear();
+        this.selectedRegistrations.clear();
     // Ensure current page is within bounds after load
     const total = this.participantsTotalPages;
     if (this.participantsPage > total) this.participantsPage = total;
@@ -717,7 +718,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.participantsLoading = true;
     this.eventService.getEventParticipants(id).subscribe({
       next: (res) => {
-        this.participants = res.data || res;
+        this.participants = normalizeList(res);
         this.participantsLoading = false;
         this.selectedRegistrations.clear();
         const total = this.participantsTotalPages;
@@ -1339,7 +1340,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     // Load event details from API to ensure all fields
     this.eventService.getEventById(eventId).subscribe({
       next: (res: any) => {
-        const event = res?.data ? res.data : res;
+        const event = normalizeSingle(res) || res;
         // Use toDateInputValue to ensure correct format for date inputs
         this.newEvent = {
           title: event.title || '',
@@ -1655,9 +1656,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       next: (response) => {
         this.evaluationsLoading = false;
 
-        // Support multiple response shapes: { success, data: { evaluations, stats } } OR { evaluations, stats } OR Array
+        // Support multiple response shapes: { items }, { data: { evaluations, stats } }, { evaluations, stats } OR Array
         let data: any = null;
-        if (response && response.data) data = response.data;
+        if (response && Array.isArray(response.items)) data = { evaluations: response.items, stats: response.stats };
+        else if (response && response.data) data = response.data;
         else data = response;
 
         if (Array.isArray(response)) {

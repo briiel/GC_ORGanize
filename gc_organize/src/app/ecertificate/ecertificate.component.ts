@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { normalizeList, normalizeSingle } from '../utils/api-utils';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -38,7 +39,7 @@ export class EcertificateComponent implements OnInit {
         next: (res) => {
           // Show all events (both OSWS and Organization events)
           // Students can see evaluation requirements and request certificates
-          this.certificates = Array.isArray(res) ? res : (res?.data || []);
+          this.certificates = normalizeList(res);
           this.loading = false;
         },
         error: () => {
@@ -117,11 +118,12 @@ export class EcertificateComponent implements OnInit {
           });
           // Update the local certificate entry so UI immediately reflects the new request state
           const cert = this.certificates.find(c => c.event_id === eventId || c.id === eventId);
-          if (cert) {
-            cert.request_status = res.request_status || (res.data && res.data.request_status) || 'pending';
-            // if server returned any certificate url or related fields, merge them
-            if (res.certificate_url) cert.certificate_url = res.certificate_url;
-            if (res.request_certificate_url) cert.request_certificate_url = res.request_certificate_url;
+            if (cert) {
+              const s = normalizeSingle(res) || res;
+              cert.request_status = s?.request_status ?? res?.request_status ?? 'pending';
+              // if server returned any certificate url or related fields, merge them
+              if (s?.certificate_url || res?.certificate_url) cert.certificate_url = s?.certificate_url ?? res?.certificate_url;
+              if (s?.request_certificate_url || res?.request_certificate_url) cert.request_certificate_url = s?.request_certificate_url ?? res?.request_certificate_url;
           }
           setTimeout(() => this.requestMessage = '', 5000);
         }

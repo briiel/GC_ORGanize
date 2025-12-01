@@ -46,6 +46,15 @@ export class RequestQueueComponent implements OnInit {
   
   isLoading = true;
   processingRequestId: number | null = null;
+  // Pagination state for Pending tab
+  pendingPage: number = 1;
+  pendingPerPage: number = 10;
+  pendingTotal: number = 0;
+
+  // Pagination state for All tab
+  allPage: number = 1;
+  allPerPage: number = 10;
+  allTotal: number = 0;
 
   constructor(
     private http: HttpClient,
@@ -62,10 +71,14 @@ export class RequestQueueComponent implements OnInit {
   loadPendingRequests(): void {
     this.isLoading = true;
     const headers = this.authService.getAuthHeaders();
-
-    this.http.get<any>(`${this.apiUrl}/admin/requests/pending`, { headers }).subscribe({
+    const params = `?page=${this.pendingPage}&per_page=${this.pendingPerPage}`;
+    this.http.get<any>(`${this.apiUrl}/admin/requests/pending${params}`, { headers }).subscribe({
       next: (response) => {
-        this.pendingRequests = response.requests || [];
+        this.pendingRequests = response.items || [];
+        this.pendingTotal = response.total || (response.items || []).length || 0;
+        // keep page/per_page as returned (if provided)
+        this.pendingPage = response.page || this.pendingPage;
+        this.pendingPerPage = response.per_page || this.pendingPerPage;
         this.isLoading = false;
       },
       error: (error) => {
@@ -87,9 +100,15 @@ export class RequestQueueComponent implements OnInit {
     this.isLoading = true;
     const headers = this.authService.getAuthHeaders();
 
-    this.http.get<any>(`${this.apiUrl}/admin/requests`, { headers }).subscribe({
+    const statusParam = this.filterStatus && this.filterStatus !== 'all' ? `&status=${encodeURIComponent(this.filterStatus)}` : '';
+    const params = `?page=${this.allPage}&per_page=${this.allPerPage}${statusParam}`;
+
+    this.http.get<any>(`${this.apiUrl}/admin/requests${params}`, { headers }).subscribe({
       next: (response) => {
-        this.allRequests = response.requests || [];
+        this.allRequests = response.items || [];
+        this.allTotal = response.total || (response.items || []).length || 0;
+        this.allPage = response.page || this.allPage;
+        this.allPerPage = response.per_page || this.allPerPage;
         this.isLoading = false;
       },
       error: (error) => {
@@ -250,10 +269,50 @@ export class RequestQueueComponent implements OnInit {
    * Get filtered requests for "All" tab
    */
   get filteredRequests(): RoleRequest[] {
-    if (this.filterStatus === 'all') {
-      return this.allRequests;
-    }
-    return this.allRequests.filter(req => req.status === this.filterStatus);
+    // With server-side pagination we request filtered results from the API.
+    // `allRequests` already reflects the current server-side filter.
+    return this.allRequests;
+  }
+
+  // Pending pagination helpers
+  get pendingTotalPages(): number {
+    return Math.max(1, Math.ceil((this.pendingTotal || 0) / this.pendingPerPage));
+  }
+
+  get displayedPendingRequests(): RoleRequest[] {
+    // Server returns paged requests already
+    return this.pendingRequests || [];
+  }
+
+  // All/History pagination helpers
+  get allTotalPages(): number {
+    return Math.max(1, Math.ceil((this.allTotal || 0) / this.allPerPage));
+  }
+
+  get displayedAllRequests(): RoleRequest[] {
+    // Server returns paged results according to current filter
+    return this.allRequests || [];
+  }
+
+  // Page navigation helpers
+  setPendingPage(page: number) {
+    if (page < 1) page = 1;
+    if (page > this.pendingTotalPages) page = this.pendingTotalPages;
+    this.pendingPage = page;
+    this.loadPendingRequests();
+  }
+
+  setAllPage(page: number) {
+    if (page < 1) page = 1;
+    if (page > this.allTotalPages) page = this.allTotalPages;
+    this.allPage = page;
+    this.loadAllRequests();
+  }
+
+  onFilterStatusChange(newStatus: string) {
+    this.filterStatus = newStatus;
+    this.allPage = 1;
+    this.loadAllRequests();
   }
 
   /**

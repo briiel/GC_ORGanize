@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventService } from '../services/event.service';
 import { ArchiveService } from '../services/archive.service';
+import { normalizeList, normalizeSingle } from '../utils/api-utils';
 import { FormsModule } from '@angular/forms';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
@@ -61,9 +62,8 @@ export class TrashComponent implements OnInit {
 		
 		// Load events
 		this.eventService.getTrashedEvents().subscribe({
-			next: (res: any) => {
-				const data = res?.data ?? res ?? [];
-				this.trashedEvents = Array.isArray(data) ? data : [];
+				next: (res: any) => {
+					this.trashedEvents = normalizeList(res);
 			},
 			error: (err: any) => {
 				console.error('Error loading trashed events:', err);
@@ -73,7 +73,7 @@ export class TrashComponent implements OnInit {
 		// Load users and members
 		this.archiveService.getTrash().subscribe({
 			next: (res: any) => {
-				const data = res?.data ?? res;
+				const data = normalizeSingle(res) || res;
 				this.trashedAdmins = data?.admins || [];
 				this.trashedOrganizations = data?.organizations || [];
 				this.trashedMembers = data?.members || [];

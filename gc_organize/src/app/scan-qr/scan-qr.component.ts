@@ -9,6 +9,7 @@ import { OsmService } from '../services/osm.service';
 import { firstValueFrom } from 'rxjs';
 import { EventService } from '../services/event.service';
 import { environment } from '../../environments/environment';
+import { normalizeList, normalizeSingle } from '../utils/api-utils';
 
 @Component({
   selector: 'app-scan-qr',
@@ -60,7 +61,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     // Fetch current privacy policy (public endpoint)
     this.http.get(`${environment.apiUrl}/admin/privacy-policy`).subscribe({
       next: (res: any) => {
-        const p = res?.data?.policy || res?.policy || null;
+        const pObj = normalizeSingle(res) || res;
+        const p = pObj?.policy ?? res?.policy ?? null;
         this.privacyPolicy = p?.content ?? null;
       },
       error: () => {
@@ -450,7 +452,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!adminId) return;
       this.eventService.getEventsByAdmin(adminId).subscribe({
         next: (res: any) => {
-          const rows = res?.data || res || [];
+          const rows = normalizeList(res);
           this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
         },
         error: () => {}
@@ -460,7 +462,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!creatorId) return;
       this.eventService.getEventsByCreator(creatorId).subscribe({
         next: (res: any) => {
-          const rows = res?.data || res || [];
+          const rows = normalizeList(res);
           this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
         },
         error: () => {}

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
 import Swal from 'sweetalert2';
+import { normalizeSingle } from '../utils/api-utils';
 
 @Component({
   selector: 'app-manage-users',
@@ -66,11 +67,11 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.adminService.getManageUsers().subscribe({
       next: (res) => {
-        // Support multiple possible response shapes for resilience:
-        // - { success: true, data: { admins, organizations } }
-        // - { admins, organizations }
-        // - { data: { admins, organizations } }
-        const payload = res?.data ?? res ?? {};
+      // Support multiple possible response shapes for resilience:
+      // - { success: true, data: { admins, organizations } }
+      // - { admins, organizations }
+      // - { data: { admins, organizations } }
+      const payload = normalizeSingle(res) || (res?.data ?? res ?? {});
         // If API returns top-level success=false, surface message
         if (res && res.success === false) {
           console.error('ManageUsers API returned failure:', res);

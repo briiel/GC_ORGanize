@@ -5,6 +5,7 @@ import { EventService } from '../services/event.service';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import Swal from 'sweetalert2';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
+import { normalizeList } from '../utils/api-utils';
 
 @Component({
   selector: 'app-history',
@@ -40,8 +41,7 @@ export class HistoryComponent implements OnInit {
     this.loading = true;
     this.eventService.getAttendedEvents(studentId).subscribe({
       next: (res) => {
-        const rows = res?.data ?? res ?? [];
-        this.attendedEvents = Array.isArray(rows) ? rows : [];
+        this.attendedEvents = normalizeList(res);
         this.loading = false;
       },
       error: (err) => {

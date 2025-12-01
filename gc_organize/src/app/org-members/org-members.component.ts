@@ -98,6 +98,8 @@ export class OrgMembersComponent implements OnInit {
         try {
           if (Array.isArray(response)) {
             members = response as OrganizationMember[];
+          } else if (response && Array.isArray((response as any).items)) {
+            members = (response as any).items;
           } else if (Array.isArray((response as any).data)) {
             members = (response as any).data;
           } else if ((response as any).members && Array.isArray((response as any).members)) {

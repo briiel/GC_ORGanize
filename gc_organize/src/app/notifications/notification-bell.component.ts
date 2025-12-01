@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationItem, NotificationService } from '../services/notification.service';
+import { normalizeList } from '../utils/api-utils';
 
 @Component({
   selector: 'app-notification-bell',
@@ -72,8 +73,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   refresh() {
     this.loading = true;
     this.api.list(this.panel ?? undefined, this.orgId ?? undefined).subscribe((res: any) => {
-      const data: NotificationItem[] = Array.isArray(res) ? res : res.data ?? [];
-      this.items = data;
+      this.items = normalizeList(res) as NotificationItem[];
       this.loading = false;
     }, _ => { this.loading = false; });
   }

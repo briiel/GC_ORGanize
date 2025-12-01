@@ -166,7 +166,7 @@ export class RequestRoleComponent implements OnInit {
     
     this.http.get<any>(`${this.apiUrl}/roles/my-requests`, { headers }).subscribe({
       next: (response) => {
-        this.myRequests = response.requests || [];
+        this.myRequests = response.items || response.requests || [];
         this.isLoading = false;
       },
       error: (error) => {

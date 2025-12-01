@@ -6,6 +6,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 import { ExcelExportService } from '../services/excel-export.service';
 import { parseMysqlDatetimeToDate, formatToLocalShort } from '../utils/date-utils';
+import { normalizeList } from '../utils/api-utils';
 
 @Component({
   selector: 'app-attendance-records',
@@ -103,10 +104,10 @@ export class AttendanceRecordsComponent implements OnInit {
       const adminId = this.auth.getAdminId();
       if (!adminId) return;
       this.eventService.getEventsByAdmin(adminId).subscribe({
-        next: (res) => {
-          this.events = res.data || res;
-          this.selectedEvent = null;
-          this.loading = false;
+              next: (res) => {
+                this.events = normalizeList(res);
+                this.selectedEvent = null;
+                this.loading = false;
         },
         error: (err) => {
           this.error = 'Failed to load events';
@@ -118,7 +119,7 @@ export class AttendanceRecordsComponent implements OnInit {
       if (!creatorId) return;
       this.eventService.getEventsByCreator(creatorId).subscribe({
         next: (res) => {
-          this.events = res.data || res;
+          this.events = normalizeList(res);
           this.selectedEvent = null;
           this.loading = false;
         },
@@ -137,7 +138,7 @@ export class AttendanceRecordsComponent implements OnInit {
     this.loading = true;
     this.eventService.getEventAttendance(eventId).subscribe({
       next: (res) => {
-        this.attendanceRecords = res.data || res;
+        this.attendanceRecords = normalizeList(res);
         this.filteredRecords = this.attendanceRecords;
         this.recordPage = 1;
         this.loading = false;

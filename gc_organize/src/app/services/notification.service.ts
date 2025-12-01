@@ -26,7 +26,7 @@ export class NotificationService {
     });
   }
 
-  list(panel?: string, orgId?: number): Observable<{ success: boolean; data: NotificationItem[] } | NotificationItem[]> {
+  list(panel?: string, orgId?: number): Observable<any> {
     let url = `${this.api}`;
     const params: any = {};
     if (panel) params.panel = panel;
