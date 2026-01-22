@@ -1,3 +1,13 @@
+/**
+ * LEGACY FILE - NOT ACTIVELY USED
+ * This service has been replaced by rbac-auth.service.ts for RBAC functionality.
+ * Kept for reference and potential future use.
+ * 
+ * Status: Recently updated to use environment.apiUrl, but not imported anywhere
+ * Date marked as legacy: January 4, 2026
+ * Replacement: Use RbacAuthService instead
+ */
+
 // filepath: src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -5,14 +15,14 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private tokenExpiryTimeout: any = null;
-  // Dev: 'http://localhost:5000/api'
-  private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api'; // Use as base URL
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -29,18 +39,18 @@ export class AuthService {
 
   // Save token to localStorage
   saveToken(token: string): void {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem('gc_organize_token', token);
     this.setTokenExpiryTimer(token);
   }
 
   // Get token from localStorage
   getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('gc_organize_token');
   }
 
   // Remove token from localStorage (logout)
   logout(): void {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('gc_organize_token');
     if (this.tokenExpiryTimeout) {
       clearTimeout(this.tokenExpiryTimeout);
       this.tokenExpiryTimeout = null;
