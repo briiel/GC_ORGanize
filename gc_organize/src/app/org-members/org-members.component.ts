@@ -246,14 +246,19 @@ export class OrgMembersComponent implements OnInit {
   }
 
   getPositionBadgeClass(position: string): string {
-    const pos = position.toLowerCase();
-    if (pos.includes('president')) return 'bg-purple-100 text-purple-800';
+    const pos = (position || '').toLowerCase();
     if (pos.includes('vice')) return 'bg-blue-100 text-blue-800';
+    if (pos.includes('president')) return 'bg-purple-100 text-purple-800';
+    if (pos.includes('assistant secretary') || pos.includes('assitant secretary')) return 'bg-emerald-100 text-emerald-800';
     if (pos.includes('secretary')) return 'bg-green-100 text-green-800';
     if (pos.includes('treasurer')) return 'bg-yellow-100 text-yellow-800';
     if (pos.includes('auditor')) return 'bg-orange-100 text-orange-800';
+    if (pos.includes('business manager')) return 'bg-teal-100 text-teal-800';
+    if (pos.includes('public information officer') || pos.includes('p.i.o') || pos.includes('pio')) return 'bg-pink-100 text-pink-800';
+    if (pos.includes('representative')) return 'bg-indigo-100 text-indigo-800';
     if (pos.includes('member')) return 'bg-gray-100 text-gray-800';
-    return 'bg-indigo-100 text-indigo-800';
+    if (pos.includes('others')) return 'bg-slate-100 text-slate-700';
+    return 'bg-gray-100 text-gray-800';
   }
 
   async downloadExcel(): Promise<void> {

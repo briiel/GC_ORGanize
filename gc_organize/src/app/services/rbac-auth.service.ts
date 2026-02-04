@@ -134,6 +134,10 @@ export class RbacAuthService {
    */
   private decodeToken(token: string): JwtPayload | null {
     try {
+      if (!this.isJwt(token)) {
+        localStorage.removeItem(this.TOKEN_KEY);
+        return null;
+      }
       const decoded = jwtDecode<any>(token) as JwtPayload | null;
 
       // Normalize roles to the frontend's expected casing for compatibility
@@ -158,6 +162,14 @@ export class RbacAuthService {
   }
 
   /**
+   * Basic JWT format check (header.payload.signature)
+   */
+  private isJwt(token: string): boolean {
+    const parts = String(token).split('.');
+    return parts.length === 3 && parts.every(p => p.length > 0);
+  }
+
+  /**
    * Get decoded token payload
    */
   getDecodedToken(): JwtPayload | null {
@@ -165,9 +177,10 @@ export class RbacAuthService {
     if (!token) return null;
     
     const decoded = this.decodeToken(token);
+    if (!decoded) return null;
     
     // Check if token is expired
-    if (decoded && decoded.exp) {
+    if (decoded.exp) {
       const currentTime = Date.now() / 1000;
       if (decoded.exp < currentTime) {
         this.logout();
