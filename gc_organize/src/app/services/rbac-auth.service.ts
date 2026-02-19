@@ -10,6 +10,7 @@ import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { SecureStorageService } from './secure-storage.service';
 
 interface JwtPayload {
   userId: string;           // Prefixed: "S_202211223", "O_1", "A_1"
@@ -63,20 +64,48 @@ interface LoginResponse {
 export class RbacAuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'gc_organize_token';
-  
+  private readonly TOKEN_HASH_KEY = 'gc_organize_token_sig';
+
   // BehaviorSubject to track authentication state
   private currentUserSubject: BehaviorSubject<JwtPayload | null>;
   public currentUser$: Observable<JwtPayload | null>;
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private secureStorage: SecureStorageService
   ) {
     // Initialize with current token if exists
     const token = this.getToken();
     const decoded = token ? this.decodeToken(token) : null;
     this.currentUserSubject = new BehaviorSubject<JwtPayload | null>(decoded);
     this.currentUser$ = this.currentUserSubject.asObservable();
+
+    // Run one-time integrity check on startup (safe here — no navigation is in progress yet)
+    this.verifyTokenIntegrity();
+  }
+
+  /**
+   * One-time startup check: verify the stored token's integrity hash.
+   * Only called from the constructor — NEVER from getToken() — to avoid
+   * async side-effects that would conflict with in-progress navigation.
+   */
+  private verifyTokenIntegrity(): void {
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    const storedHash = localStorage.getItem(this.TOKEN_HASH_KEY);
+    if (!token || !storedHash) return; // Nothing to verify
+
+    this.secureStorage.hashData(token).then(expectedHash => {
+      if (expectedHash !== storedHash) {
+        console.warn('[Security] Startup token integrity check failed — clearing invalid token.');
+        localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.TOKEN_HASH_KEY);
+        this.currentUserSubject.next(null);
+        this.router.navigate(['/login']);
+      }
+    }).catch(() => {
+      // Crypto API unavailable — trust token as-is
+    });
   }
 
   /**
@@ -86,15 +115,15 @@ export class RbacAuthService {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(response => {
-            // Support both envelope-shaped responses ({ success, data: { token } })
-            // and unwrapped responses ( { token, user } ) depending on interceptor state.
-            const token = response?.token ?? response?.data?.token;
-            if (token) {
-              this.saveToken(token);
-              const decoded = this.getDecodedToken();
-              this.currentUserSubject.next(decoded);
-            }
-          })
+          // Support both envelope-shaped responses ({ success, data: { token } })
+          // and unwrapped responses ( { token, user } ) depending on interceptor state.
+          const token = response?.token ?? response?.data?.token;
+          if (token) {
+            this.saveToken(token);
+            const decoded = this.getDecodedToken();
+            this.currentUserSubject.next(decoded);
+          }
+        })
       );
   }
 
@@ -110,20 +139,30 @@ export class RbacAuthService {
    */
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.TOKEN_HASH_KEY);
     localStorage.setItem('justLoggedOut', 'true');
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
   /**
-   * Save JWT to localStorage
+   * Save JWT to localStorage with an integrity hash for tamper detection
    */
   private saveToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
+    // Store a SHA-256 integrity hash to detect localStorage tampering
+    this.secureStorage.hashData(token).then(hash => {
+      localStorage.setItem(this.TOKEN_HASH_KEY, hash);
+    }).catch(() => {
+      // Fallback: hash unavailable, store without integrity check
+      localStorage.removeItem(this.TOKEN_HASH_KEY);
+    });
   }
 
   /**
-   * Get JWT from localStorage
+   * Get JWT from localStorage.
+   * Pure synchronous read — no side effects.
+   * Integrity is verified once at startup by verifyTokenIntegrity().
    */
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
@@ -175,10 +214,10 @@ export class RbacAuthService {
   getDecodedToken(): JwtPayload | null {
     const token = this.getToken();
     if (!token) return null;
-    
+
     const decoded = this.decodeToken(token);
     if (!decoded) return null;
-    
+
     // Check if token is expired
     if (decoded.exp) {
       const currentTime = Date.now() / 1000;
@@ -187,7 +226,7 @@ export class RbacAuthService {
         return null;
       }
     }
-    
+
     return decoded;
   }
 
@@ -249,7 +288,7 @@ export class RbacAuthService {
   getStudentId(): string | null {
     const decoded = this.getDecodedToken();
     const studentId = decoded?.studentId || null;
-    
+
     return studentId;
   }
 
@@ -291,7 +330,7 @@ export class RbacAuthService {
     } else if (decoded?.organization?.org_id) {
       creatorId = decoded.organization.org_id;
     }
-    
+
     return creatorId;
   }
 
@@ -304,7 +343,7 @@ export class RbacAuthService {
     if (decoded?.userType === 'admin') {
       adminId = Number(decoded.legacyId);
     }
-    
+
     return adminId;
   }
 
@@ -370,11 +409,11 @@ export class RbacAuthService {
    */
   getPrimaryRole(): string | null {
     const roles = this.getUserRoles();
-    
+
     if (roles.includes('OSWSAdmin')) return 'OSWSAdmin';
     if (roles.includes('OrgOfficer')) return 'OrgOfficer';
     if (roles.includes('Student')) return 'Student';
-    
+
     return null;
   }
 
@@ -383,7 +422,7 @@ export class RbacAuthService {
    */
   getDefaultRoute(): string {
     const primaryRole = this.getPrimaryRole();
-    
+
     switch (primaryRole) {
       case 'OSWSAdmin':
         return '/osws-admin';

@@ -9,7 +9,7 @@ import { normalizeSingle } from '../utils/api-utils';
 
 @Component({
   selector: 'app-registermodal',
-  standalone: true, 
+  standalone: true,
   templateUrl: './registermodal.component.html',
   styleUrls: ['./registermodal.component.css'],
   imports: [CommonModule, FormsModule]
@@ -18,7 +18,7 @@ export class RegistermodalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Input() eventId: number | null = null;
   isPaid: boolean = false;
-  
+
   // Proof of payment upload state
   proofPreviewUrl: string | null = null;
   selectedFile: File | null = null;
@@ -47,13 +47,13 @@ export class RegistermodalComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private authService: RbacAuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (this.eventId !== null) {
       this.registrationData.event_id = this.eventId;
     }
-    
+
     // Fetch event to determine if paid
     if (this.eventId !== null) {
       const token = localStorage.getItem('gc_organize_token') || '';
@@ -61,15 +61,15 @@ export class RegistermodalComponent implements OnInit {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       }).subscribe({
         next: (res) => {
-            const ev = normalizeSingle(res) || res;
-            this.isPaid = !!ev?.is_paid;
+          const ev = normalizeSingle(res) || res;
+          this.isPaid = !!ev?.is_paid;
         },
         error: () => {
           this.isPaid = false;
         }
       });
     }
-    
+
     // Fetch student info from JWT token and backend
     this.loadStudentInfo();
   }
@@ -89,8 +89,8 @@ export class RegistermodalComponent implements OnInit {
     }
 
     const decoded = this.authService.getDecodedToken();
-    
-    
+
+
     if (!decoded) {
       console.error('Invalid or expired token');
       Swal.fire({
@@ -121,8 +121,8 @@ export class RegistermodalComponent implements OnInit {
     this.studentInfo.last_name = decoded.lastName || '';
     this.studentInfo.email = decoded.email || '';
     this.registrationData.student_id = decoded.studentId;
-    
-    
+
+
 
     // Fetch additional student details from backend
     this.http.get<any>(`${environment.apiUrl}/users/${decoded.studentId}`, {
@@ -145,7 +145,7 @@ export class RegistermodalComponent implements OnInit {
           if (!this.registrationData.student_id) {
             this.registrationData.student_id = student.id || decoded.studentId;
           }
-          
+
         }
       },
       error: (err) => {
@@ -158,7 +158,7 @@ export class RegistermodalComponent implements OnInit {
   previewImages(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    
+
     if (!file) {
       this.selectedFile = null;
       this.proofPreviewUrl = null;
@@ -219,7 +219,7 @@ export class RegistermodalComponent implements OnInit {
 
   submitRegistration(): void {
     if (this.isSubmitting) return;
-    
+
     const token = localStorage.getItem('gc_organize_token');
     if (!token) {
       Swal.fire({
@@ -230,24 +230,27 @@ export class RegistermodalComponent implements OnInit {
       return;
     }
 
-    // Validate required fields with detailed logging
-    
-    
-    if (!this.registrationData.event_id || !this.registrationData.student_id) {
+    // Validate required fields — use explicit null check (0 is a falsy but invalid event_id from DB)
+    const eventIdMissing = this.registrationData.event_id === null ||
+      this.registrationData.event_id === undefined ||
+      this.registrationData.event_id <= 0;
+    const studentIdMissing = !this.registrationData.student_id;
+
+    if (eventIdMissing || studentIdMissing) {
       console.error('[RegisterModal] Validation failed - Missing required fields:', {
         event_id: this.registrationData.event_id,
         student_id: this.registrationData.student_id,
         eventId_input: this.eventId,
         studentInfo: this.studentInfo
       });
-      
+
       Swal.fire({
         icon: 'error',
         title: 'Missing Information',
         html: `<p>Registration failed due to missing information:</p>
                <ul style="text-align: left; margin-top: 10px;">
-                 <li>Event ID: ${this.registrationData.event_id || '<span style="color:red;">Missing</span>'}</li>
-                 <li>Student ID: ${this.registrationData.student_id || '<span style="color:red;">Missing</span>'}</li>
+                 <li>Event ID: ${eventIdMissing ? '<span style="color:red;">Missing</span>' : this.registrationData.event_id}</li>
+                 <li>Student ID: ${studentIdMissing ? '<span style="color:red;">Missing</span>' : this.registrationData.student_id}</li>
                </ul>
                <p style="margin-top: 10px;">Please try logging out and logging in again.</p>`,
         confirmButtonColor: '#679436'
@@ -269,7 +272,7 @@ export class RegistermodalComponent implements OnInit {
     const formData = new FormData();
     formData.append('event_id', this.registrationData.event_id.toString());
     formData.append('student_id', this.registrationData.student_id.toString());
-    
+
     if (this.selectedFile) {
       formData.append('proof_of_payment', this.selectedFile);
     }
@@ -315,7 +318,7 @@ export class RegistermodalComponent implements OnInit {
         this.isSubmitting = false;
         console.error('Registration error:', err);
         let errorMessage = 'An error occurred during registration.';
-        
+
         if (err.error?.message) {
           errorMessage = err.error.message;
         } else if (err.message) {
@@ -325,7 +328,7 @@ export class RegistermodalComponent implements OnInit {
         } else if (err.status === 400) {
           errorMessage = 'Invalid file format. Only PNG, JPG, JPEG, or WEBP images are allowed.';
         }
-        
+
         Swal.fire({
           icon: 'error',
           title: 'Registration Failed',
