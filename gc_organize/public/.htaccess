@@ -1,0 +1,39 @@
+# Angular SPA + static assets (Apache)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Serve existing files/directories as-is
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Never rewrite real asset requests to index.html
+  RewriteCond %{REQUEST_URI} \.(?:js|mjs|css|map|json|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|otf|webmanifest|txt|xml)$ [NC]
+  RewriteRule ^ - [L]
+
+  # Angular routes -> index.html
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType application/javascript .js .mjs
+  AddType text/css .css
+  AddType application/json .json
+  AddType application/manifest+json .webmanifest
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+
+  # Cache static assets aggressively (hashed chunks are safe)
+  <FilesMatch "\.(js|mjs|css|map|jpg|jpeg|png|gif|svg|ico|webp|woff|woff2|ttf|otf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Never cache app shell/service worker metadata
+  <FilesMatch "^(index\.html|ngsw\.json|ngsw-worker\.js)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+</IfModule>
