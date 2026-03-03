@@ -25,7 +25,7 @@ export class EvaluationFormComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private evaluationService: EvaluationService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Get event ID from route
@@ -51,7 +51,7 @@ export class EvaluationFormComponent implements OnInit {
       question11: [null, Validators.required],
       question12: [null, Validators.required],
       question13: [null, Validators.required],
-      
+
       // Open-ended questions 14-16
       question14: ['', Validators.required],
       question15: ['', Validators.required],
@@ -96,7 +96,7 @@ export class EvaluationFormComponent implements OnInit {
     this.successMessage = '';
 
     const formValue = this.evaluationForm.value;
-    
+
     // Structure the responses according to OSWS-SA Form 05
     const responses = {
       ratings: {
@@ -124,7 +124,12 @@ export class EvaluationFormComponent implements OnInit {
     this.evaluationService.submitEvaluation(this.eventId, responses).subscribe({
       next: (response) => {
         this.submitting = false;
-        this.successMessage = 'Evaluation submitted successfully! Your certificate is now ready. Redirecting...';
+        // response may be wrapped in { success, data } by the interceptor
+        const body = response?.data ?? response;
+        const isOswsEvent = body?.is_osws_event ?? false;
+        this.successMessage = isOswsEvent
+          ? 'Evaluation submitted! Your certificate is ready to download. Redirecting...'
+          : 'Evaluation submitted! You can now request your certificate from the organizer. Redirecting...';
         setTimeout(() => {
           this.router.navigate(['/student-dashboard/ecertificate']);
         }, 2500);

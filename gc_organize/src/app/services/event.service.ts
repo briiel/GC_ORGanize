@@ -9,17 +9,18 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class EventService {
-  // Trash (soft-delete) multiple events
-  trashMultipleEvents(eventIds: number[]): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/events/trash-multiple`, { eventIds }, { headers });
-  }
   private apiUrl = `${environment.apiUrl}/event`;
 
   private statusChangedSubject = new Subject<void>();
   public statusChanged$ = this.statusChangedSubject.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
+
+  // Trash (soft-delete) multiple events
+  trashMultipleEvents(eventIds: number[]): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/events/trash-multiple`, { eventIds }, { headers });
+  }
 
 
   // Fetch attendance records for a specific event
@@ -76,10 +77,7 @@ export class EventService {
 
   // Fetch all attendance records
   getAllAttendanceRecords(): Observable<any> {
-    const token = localStorage.getItem('gc_organize_token');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
+    const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/attendance-records`, { headers });
   }
 

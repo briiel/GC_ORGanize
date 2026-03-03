@@ -17,17 +17,16 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   items: NotificationItem[] = [];
   loading = false;
   private pollId: any = null;
+  private visibilityHandler = () => { if (!document.hidden) this.refresh(); };
 
-  constructor(private api: NotificationService) {}
+  constructor(private api: NotificationService) { }
 
   ngOnInit(): void {
     this.refresh();
     // light polling to reflect new notifications without reload
     this.pollId = setInterval(() => this.refresh(), 15000);
-    // refresh when user focuses tab
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) this.refresh();
-    });
+    // refresh when user focuses tab — stored so we can remove it on destroy
+    document.addEventListener('visibilitychange', this.visibilityHandler);
   }
 
   // Return header style based on current panel
@@ -56,7 +55,7 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
       clearInterval(this.pollId);
       this.pollId = null;
     }
-    // No-op removal since listener is anonymous; acceptable for small component lifetime
+    document.removeEventListener('visibilitychange', this.visibilityHandler);
   }
 
   toggle() {
