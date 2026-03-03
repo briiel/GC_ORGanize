@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { RbacAuthService } from '../services/rbac-auth.service';
-import { normalizeList, normalizeSingle } from '../utils/api-utils';
+import { normalizeList } from '../utils/api-utils';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -103,30 +103,29 @@ export class EcertificateComponent implements OnInit {
     this.certificateService.requestCertificate(eventId).subscribe({
       next: (res) => {
         this.requestingCertIds.delete(eventId);
-        if (res.success) {
-          const msg = res.message || 'Certificate request submitted successfully!';
-          this.requestMessage = msg;
-          // show SweetAlert toast for better UX
-          Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: msg,
-            showConfirmButton: false,
-            timer: 3500,
-            timerProgressBar: true
-          });
-          // Update the local certificate entry so UI immediately reflects the new request state
-          const cert = this.certificates.find(c => c.event_id === eventId || c.id === eventId);
-            if (cert) {
-              const s = normalizeSingle(res) || res;
-              cert.request_status = s?.request_status ?? res?.request_status ?? 'pending';
-              // if server returned any certificate url or related fields, merge them
-              if (s?.certificate_url || res?.certificate_url) cert.certificate_url = s?.certificate_url ?? res?.certificate_url;
-              if (s?.request_certificate_url || res?.request_certificate_url) cert.request_certificate_url = s?.request_certificate_url ?? res?.request_certificate_url;
-          }
-          setTimeout(() => this.requestMessage = '', 5000);
+        // The UnwrapResponseInterceptor strips the { success, data } envelope,
+        // so res here is already the inner data object { message: '...' }.
+        // Being in the next() callback already means the request succeeded.
+        const msg = (res && res.message) || 'Certificate request submitted successfully!';
+        this.requestMessage = msg;
+        // Show SweetAlert toast
+        Swal.fire({
+          toast: true,
+          position: 'top-end',
+          icon: 'success',
+          title: msg,
+          showConfirmButton: false,
+          timer: 3500,
+          timerProgressBar: true
+        });
+        // Update the local certificate entry so the status badge changes immediately
+        const cert = this.certificates.find(c => c.event_id === eventId || c.id === eventId);
+        if (cert) {
+          cert.request_status = res?.request_status ?? 'pending';
+          if (res?.certificate_url) cert.certificate_url = res.certificate_url;
+          if (res?.request_certificate_url) cert.request_certificate_url = res.request_certificate_url;
         }
+        setTimeout(() => this.requestMessage = '', 5000);
       },
       error: (err) => {
         this.requestingCertIds.delete(eventId);

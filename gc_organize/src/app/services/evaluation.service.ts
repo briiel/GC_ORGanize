@@ -30,6 +30,7 @@ export interface EvaluationResponses {
 }
 
 export interface EvaluationStatus {
+  event_concluded: boolean;
   has_attended: boolean;
   has_evaluated: boolean;
   evaluation_submitted_at: string | null;

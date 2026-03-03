@@ -65,6 +65,10 @@ export class EvaluationFormComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         const body = response?.data ?? response;
+        if (!body?.event_concluded) {
+          this.errorMessage = 'The evaluation form is only available after the event has concluded.';
+          return;
+        }
         if (body?.has_evaluated) {
           this.errorMessage = 'You have already submitted an evaluation for this event.';
           setTimeout(() => {
