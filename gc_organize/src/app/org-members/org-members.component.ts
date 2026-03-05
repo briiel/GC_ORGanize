@@ -36,12 +36,12 @@ export class OrgMembersComponent implements OnInit {
   loading: boolean = false;
   error: string | null = null;
   orgName: string = '';
-  
+
   // Search and filter
   searchTerm: string = '';
   filterPosition: string = '';
   sortBy: string = 'position_hierarchy';
-  
+
   // Pagination
   currentPage: number = 1;
   itemsPerPage: number = 10;
@@ -66,7 +66,7 @@ export class OrgMembersComponent implements OnInit {
     private http: HttpClient,
     private authService: RbacAuthService,
     private excelExportService: ExcelExportService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // initialize hierarchy order from shared request-role positions
@@ -140,7 +140,7 @@ export class OrgMembersComponent implements OnInit {
     // Search filter
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(member => 
+      filtered = filtered.filter(member =>
         member.first_name.toLowerCase().includes(term) ||
         member.last_name.toLowerCase().includes(term) ||
         member.student_id.toLowerCase().includes(term) ||
@@ -151,7 +151,7 @@ export class OrgMembersComponent implements OnInit {
 
     // Position filter
     if (this.filterPosition) {
-      filtered = filtered.filter(member => 
+      filtered = filtered.filter(member =>
         member.position.toLowerCase() === this.filterPosition.toLowerCase()
       );
     }
@@ -265,7 +265,7 @@ export class OrgMembersComponent implements OnInit {
     if (!this.filteredMembers || this.filteredMembers.length === 0) return;
 
     const headers = ['#', 'Student ID', 'Name', 'Email', 'Position', 'Department', 'Program', 'Joined Date'];
-    
+
     const data = this.filteredMembers.map((member, i) => [
       i + 1,
       member.student_id ?? '-',

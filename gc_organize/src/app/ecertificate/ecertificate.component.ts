@@ -23,14 +23,14 @@ export class EcertificateComponent implements OnInit {
   downloadingCertIds: Set<number> = new Set();
   requestingCertIds: Set<number> = new Set();
   requestMessage: string = '';
-  requestError: string = ''; 
+  requestError: string = '';
 
   constructor(
     private certificateService: CertificateService,
     private http: HttpClient,
     private router: Router,
     private auth: RbacAuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     const studentId = this.auth.getStudentId();
@@ -65,17 +65,17 @@ export class EcertificateComponent implements OnInit {
       })
       .then(blob => {
         const url = window.URL.createObjectURL(blob);
-        
+
         const link = document.createElement('a');
         link.href = url;
-        
+
         const sanitizedEventTitle = eventTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.download = `certificate_${sanitizedEventTitle}.png`;
-        
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         window.URL.revokeObjectURL(url);
       })
       .catch(error => {
@@ -94,12 +94,12 @@ export class EcertificateComponent implements OnInit {
       queryParams: { title: eventTitle }
     });
   }
-  
+
   requestCertificate(eventId: number) {
     this.requestingCertIds.add(eventId);
     this.requestMessage = '';
     this.requestError = '';
-    
+
     this.certificateService.requestCertificate(eventId).subscribe({
       next: (res) => {
         this.requestingCertIds.delete(eventId);
@@ -140,7 +140,7 @@ export class EcertificateComponent implements OnInit {
       }
     });
   }
-  
+
   isRequesting(eventId: number): boolean {
     return this.requestingCertIds.has(eventId);
   }
@@ -153,17 +153,17 @@ export class EcertificateComponent implements OnInit {
     this.http.get(certUrl, { responseType: 'blob' }).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
-        
+
         const link = document.createElement('a');
         link.href = url;
 
         const sanitizedEventTitle = eventTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         link.download = `certificate_${sanitizedEventTitle}.png`;
-        
+
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         window.URL.revokeObjectURL(url);
       },
       error: (error) => {
@@ -184,7 +184,7 @@ export class EcertificateComponent implements OnInit {
 
   get filteredCertificates() {
     let filtered = this.certificates;
-    
+
     if (this.searchTerm) {
       filtered = filtered.filter(cert =>
         cert.event_title.toLowerCase().includes(this.searchTerm.toLowerCase())
@@ -227,7 +227,7 @@ export class EcertificateComponent implements OnInit {
     if (!sd && !ed) return '—';
     if (sd && !ed) return this.formatYmd(sd);
     if (!sd && ed) return this.formatYmd(ed);
-  if (sd === ed && sd) return this.formatYmd(sd);
+    if (sd === ed && sd) return this.formatYmd(sd);
     return `${this.formatYmd(sd!)} – ${this.formatYmd(ed!)}`;
   }
 

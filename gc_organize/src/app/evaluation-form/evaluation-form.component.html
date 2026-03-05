@@ -1,7 +1,8 @@
 <div class="min-h-screen bg-gray-100 p-3 sm:p-6">
   <!-- Back Button -->
   <div class="mb-4 mx-0 sm:mx-2 lg:mx-6">
-    <button (click)="goBack()" class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center">
+    <button (click)="goBack()"
+      class="px-4 py-2 bg-[#679436] text-white rounded-lg hover:bg-[#56732e] transition-colors flex items-center">
       <i class="fas fa-arrow-left mr-2"></i>
       Back
     </button>
@@ -30,7 +31,8 @@
   </div>
 
   <!-- Success Message -->
-  <div *ngIf="successMessage" class="mx-2 lg:mx-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-md mb-6">
+  <div *ngIf="successMessage"
+    class="mx-2 lg:mx-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-lg shadow-md mb-6">
     <div class="flex items-start">
       <i class="fas fa-check-circle text-green-500 text-xl mr-3 mt-1"></i>
       <div>
@@ -41,7 +43,7 @@
 
   <!-- Evaluation Form -->
   <form *ngIf="!loading && !successMessage" [formGroup]="evaluationForm" (ngSubmit)="onSubmit()" class="mx-2 lg:mx-6">
-    
+
     <!-- Rating Scale Legend -->
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 shadow-sm">
       <h3 class="font-semibold text-gray-800 mb-2 flex items-center">
@@ -49,11 +51,11 @@
         Rating Scale
       </h3>
       <p class="text-gray-700 text-sm lg:text-base">
-        <span class="font-semibold">NA</span> - Not Applicable | 
-        <span class="font-semibold">1</span> - Needs Improvement | 
-        <span class="font-semibold">2</span> - Fair | 
-        <span class="font-semibold">3</span> - Satisfactory | 
-        <span class="font-semibold">4</span> - Very Satisfactory | 
+        <span class="font-semibold">NA</span> - Not Applicable |
+        <span class="font-semibold">1</span> - Needs Improvement |
+        <span class="font-semibold">2</span> - Fair |
+        <span class="font-semibold">3</span> - Satisfactory |
+        <span class="font-semibold">4</span> - Very Satisfactory |
         <span class="font-semibold">5</span> - Excellent
       </p>
     </div>
@@ -72,16 +74,21 @@
             1. The title or theme aligns with the goals of the activity <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question1" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question1" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question1" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question1" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question1')?.invalid && evaluationForm.get('question1')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question1')?.invalid && evaluationForm.get('question1')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -92,16 +99,21 @@
             2. The goals were aligned with the College's vision and mission. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question2" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question2" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question2" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question2" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question2')?.invalid && evaluationForm.get('question2')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question2')?.invalid && evaluationForm.get('question2')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -112,16 +124,21 @@
             3. The activity supported the overall development of the students. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question3" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question3" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question3" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question3" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question3')?.invalid && evaluationForm.get('question3')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question3')?.invalid && evaluationForm.get('question3')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -129,19 +146,25 @@
         <!-- Question 4 -->
         <div class="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
           <label class="block text-gray-800 font-medium mb-3">
-            4. The objectives met the students' needs and advanced the aims of the relevant organizations. <span class="text-red-500">*</span>
+            4. The objectives met the students' needs and advanced the aims of the relevant organizations. <span
+              class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question4" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question4" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question4" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question4" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question4')?.invalid && evaluationForm.get('question4')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question4')?.invalid && evaluationForm.get('question4')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -152,16 +175,21 @@
             5. The location of the activity was suitable for its execution. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question5" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question5" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question5" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question5" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question5')?.invalid && evaluationForm.get('question5')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question5')?.invalid && evaluationForm.get('question5')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -172,16 +200,21 @@
             6. The activity was conducted as planned. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question6" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question6" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question6" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question6" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question6')?.invalid && evaluationForm.get('question6')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question6')?.invalid && evaluationForm.get('question6')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -192,16 +225,21 @@
             7. The quality of food and the service provided were satisfactory. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question7" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question7" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question7" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question7" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question7')?.invalid && evaluationForm.get('question7')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question7')?.invalid && evaluationForm.get('question7')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -212,16 +250,21 @@
             8. The activity was carried out successfully from beginning to end. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question8" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question8" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question8" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question8" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question8')?.invalid && evaluationForm.get('question8')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question8')?.invalid && evaluationForm.get('question8')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -232,16 +275,21 @@
             9. Participants demonstrated good behavior throughout the event. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question9" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question9" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question9" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question9" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question9')?.invalid && evaluationForm.get('question9')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question9')?.invalid && evaluationForm.get('question9')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -249,19 +297,25 @@
         <!-- Question 10 -->
         <div class="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
           <label class="block text-gray-800 font-medium mb-3">
-            10. The speakers provided valuable and relevant information and insights. <span class="text-red-500">*</span>
+            10. The speakers provided valuable and relevant information and insights. <span
+              class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question10" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question10" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question10" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question10" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question10')?.invalid && evaluationForm.get('question10')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question10')?.invalid && evaluationForm.get('question10')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -269,19 +323,25 @@
         <!-- Question 11 -->
         <div class="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
           <label class="block text-gray-800 font-medium mb-3">
-            11. Faculty members/advisers were present for the entire duration of the activity. <span class="text-red-500">*</span>
+            11. Faculty members/advisers were present for the entire duration of the activity. <span
+              class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question11" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question11" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question11" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question11" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question11')?.invalid && evaluationForm.get('question11')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question11')?.invalid && evaluationForm.get('question11')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -292,16 +352,21 @@
             12. There was clear support from the administration/management. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question12" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question12" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question12" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question12" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question12')?.invalid && evaluationForm.get('question12')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question12')?.invalid && evaluationForm.get('question12')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -312,16 +377,21 @@
             13. Cleanliness was upheld during and after the event. <span class="text-red-500">*</span>
           </label>
           <div class="flex flex-wrap gap-2 sm:gap-3">
-            <label class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question13" value="NA" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question13" value="NA"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">NA</span>
             </label>
-            <label *ngFor="let rating of [1,2,3,4,5]" class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
-              <input type="radio" formControlName="question13" [value]="rating" class="mr-2 text-[#679436] focus:ring-[#679436]" />
+            <label *ngFor="let rating of [1,2,3,4,5]"
+              class="flex items-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors has-[:checked]:border-[#679436] has-[:checked]:bg-green-50 min-h-[44px]">
+              <input type="radio" formControlName="question13" [value]="rating"
+                class="mr-2 text-[#679436] focus:ring-[#679436]" />
               <span class="text-sm font-medium">{{ rating }}</span>
             </label>
           </div>
-          <div *ngIf="evaluationForm.get('question13')?.invalid && evaluationForm.get('question13')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+          <div *ngIf="evaluationForm.get('question13')?.invalid && evaluationForm.get('question13')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> Please select a rating
           </div>
         </div>
@@ -339,16 +409,14 @@
         <!-- Question 14 -->
         <div>
           <label for="question14" class="block text-gray-800 font-medium mb-2">
-            14. Which phase or aspect of the activity/program did you find exceptional? <span class="text-red-500">*</span>
+            14. Which phase or aspect of the activity/program did you find exceptional? <span
+              class="text-red-500">*</span>
           </label>
-          <textarea 
-            id="question14" 
-            formControlName="question14" 
-            rows="4"
+          <textarea id="question14" formControlName="question14" rows="4"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent resize-vertical"
-            placeholder="Share what you found exceptional about this activity..."
-          ></textarea>
-          <div *ngIf="evaluationForm.get('question14')?.invalid && evaluationForm.get('question14')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+            placeholder="Share what you found exceptional about this activity..."></textarea>
+          <div *ngIf="evaluationForm.get('question14')?.invalid && evaluationForm.get('question14')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> This field is required
           </div>
         </div>
@@ -358,14 +426,11 @@
           <label for="question15" class="block text-gray-800 font-medium mb-2">
             15. Which phase or aspect of the activity/program requires enhancement? <span class="text-red-500">*</span>
           </label>
-          <textarea 
-            id="question15" 
-            formControlName="question15" 
-            rows="4"
+          <textarea id="question15" formControlName="question15" rows="4"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent resize-vertical"
-            placeholder="Provide suggestions for improvement..."
-          ></textarea>
-          <div *ngIf="evaluationForm.get('question15')?.invalid && evaluationForm.get('question15')?.touched" class="text-red-500 text-sm mt-2 flex items-center">
+            placeholder="Provide suggestions for improvement..."></textarea>
+          <div *ngIf="evaluationForm.get('question15')?.invalid && evaluationForm.get('question15')?.touched"
+            class="text-red-500 text-sm mt-2 flex items-center">
             <i class="fas fa-exclamation-circle mr-1"></i> This field is required
           </div>
         </div>
@@ -375,13 +440,9 @@
           <label for="question16" class="block text-gray-800 font-medium mb-2">
             16. Other comments and suggestions <span class="text-gray-500 text-sm">(Optional)</span>
           </label>
-          <textarea 
-            id="question16" 
-            formControlName="question16" 
-            rows="4"
+          <textarea id="question16" formControlName="question16" rows="4"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-transparent resize-vertical"
-            placeholder="Any other feedback you'd like to share..."
-          ></textarea>
+            placeholder="Any other feedback you'd like to share..."></textarea>
         </div>
       </div>
     </div>

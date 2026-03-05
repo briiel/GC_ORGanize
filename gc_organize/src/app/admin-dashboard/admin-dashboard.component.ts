@@ -41,7 +41,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private serverDeptData: Array<{ department: string; count: number }> | null = null;
   private serverOrgData: Array<{ org_name: string; count: number }> | null = null;
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService) { }
 
   ngOnInit(): void {
     // Initial load
@@ -96,7 +96,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   getAvailableStatuses(event: any): string[] {
     const currentStatus = String(event.status).toLowerCase();
     const allStatuses = ['not yet started', 'ongoing', 'concluded', 'cancelled'];
-    
+
     // Customize this logic based on your business rules
     switch (currentStatus) {
       case 'not yet started':
@@ -335,7 +335,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       orgLabels = sortedOrgs.map(([name]) => name);
       orgCounts = sortedOrgs.map(([, count]) => count);
     }
-    
+
     const orgColors = [
       '#679436', '#3b82f6', '#ec4899', '#f59e0b', '#10b981',
       '#8b5cf6', '#ef4444', '#06b6d4', '#eab308', '#a855f7',
@@ -379,7 +379,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           scales: {
             x: {
               beginAtZero: true,
-              ticks: { 
+              ticks: {
                 precision: 0,
                 font: { size: 11 }
               },
@@ -396,7 +396,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
             }
           },
           plugins: {
-            legend: { 
+            legend: {
               display: false
             },
             tooltip: {
@@ -422,13 +422,13 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       this.events.filter((e: any) => e.created_by_osws_id != null),
       this.lineChartFilter
     );
-    
+
     let labels: string[] = [];
     let timeData: number[] = [];
-    
+
     if (this.lineChartFilter === 'weekly') {
       // Weekly view - show last 12 weeks
-      labels = Array.from({length: 12}, (_, i) => `Week ${12 - i}`);
+      labels = Array.from({ length: 12 }, (_, i) => `Week ${12 - i}`);
       timeData = new Array(12).fill(0);
       const now = new Date();
       for (const e of oswsOnly) {
@@ -442,7 +442,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
       }
     } else if (this.lineChartFilter === 'monthly') {
       // Monthly view - show all 12 months
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       labels = months;
       timeData = new Array(12).fill(0);
       for (const e of oswsOnly) {
@@ -454,7 +454,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     } else if (this.lineChartFilter === 'yearly') {
       // Yearly view - show last 5 years
       const currentYear = new Date().getFullYear();
-      labels = Array.from({length: 5}, (_, i) => `${currentYear - 4 + i}`);
+      labels = Array.from({ length: 5 }, (_, i) => `${currentYear - 4 + i}`);
       timeData = new Array(5).fill(0);
       for (const e of oswsOnly) {
         const d = e.start_date ? new Date(e.start_date) : undefined;
@@ -500,7 +500,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
           }
         },
         plugins: {
-          legend: { 
+          legend: {
             display: true,
             position: 'bottom'
           }
@@ -511,7 +511,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
 
   private filterEventsByTime(events: any[], filter: 'weekly' | 'monthly' | 'yearly'): any[] {
     const now = new Date();
-    
+
     if (filter === 'weekly') {
       const twelveWeeksAgo = new Date(now.getTime() - (12 * 7 * 24 * 60 * 60 * 1000));
       return events.filter((e: any) => {
@@ -531,7 +531,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         return d && !isNaN(d.getTime()) && d >= fiveYearsAgo;
       });
     }
-    
+
     return events;
   }
 
@@ -540,11 +540,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private fetchServerChartsIfPossible(): void {
     try {
       this.eventService.getOswsCharts(this.pieChartFilter).subscribe({
-          next: (res) => {
-            const data = (res as any)?.items ?? (res as any)?.data ?? res;
-            if (data) {
-              this.serverDeptData = data.events_by_department || null;
-              this.serverOrgData = data.activities_by_organization || null;
+        next: (res) => {
+          const data = (res as any)?.items ?? (res as any)?.data ?? res;
+          if (data) {
+            this.serverDeptData = data.events_by_department || null;
+            this.serverOrgData = data.activities_by_organization || null;
             // Re-render charts to use server data
             if (this.viewReady) {
               this.renderPieChart();

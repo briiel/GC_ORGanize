@@ -1,7 +1,6 @@
 <!-- Role Request Queue Component (Admin) -->
 <div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
   <div class="max-w-7xl mx-auto">
-    
     <!-- Header -->
     <div class="mb-6 mx-0 sm:mx-2 lg:mx-6">
       <div class="bg-white rounded-lg shadow-md p-4 sm:p-5 border-l-4 border-[#14532d]">
@@ -21,25 +20,20 @@
     <div class="mb-6 mx-2 lg:mx-6">
       <div class="border-b border-gray-200">
         <nav class="flex space-x-8">
-          <button 
-            (click)="switchTab('pending')"
-            [class.border-[#14532d]]="selectedTab === 'pending'"
-            [class.text-[#14532d]]="selectedTab === 'pending'"
-            [class.border-transparent]="selectedTab !== 'pending'"
+          <button (click)="switchTab('pending')" [class.border-[#14532d]]="selectedTab === 'pending'"
+            [class.text-[#14532d]]="selectedTab === 'pending'" [class.border-transparent]="selectedTab !== 'pending'"
             [class.text-gray-500]="selectedTab !== 'pending'"
             class="pb-4 px-1 border-b-2 font-semibold text-sm hover:text-[#14532d] hover:border-gray-300 transition-colors">
             <i class="fas fa-clock mr-2"></i>
             Pending Requests
-            <span *ngIf="pendingRequests.length > 0" class="ml-2 bg-yellow-100 text-yellow-800 py-0.5 px-2 rounded-full text-xs font-semibold">
+            <span *ngIf="pendingRequests.length > 0"
+              class="ml-2 bg-yellow-100 text-yellow-800 py-0.5 px-2 rounded-full text-xs font-semibold">
               {{ pendingRequests.length }}
             </span>
           </button>
-          
-          <button 
-            (click)="switchTab('all')"
-            [class.border-[#14532d]]="selectedTab === 'all'"
-            [class.text-[#14532d]]="selectedTab === 'all'"
-            [class.border-transparent]="selectedTab !== 'all'"
+
+          <button (click)="switchTab('all')" [class.border-[#14532d]]="selectedTab === 'all'"
+            [class.text-[#14532d]]="selectedTab === 'all'" [class.border-transparent]="selectedTab !== 'all'"
             [class.text-gray-500]="selectedTab !== 'all'"
             class="pb-4 px-1 border-b-2 font-semibold text-sm hover:text-[#14532d] hover:border-gray-300 transition-colors">
             <i class="fas fa-list mr-2"></i>
@@ -57,8 +51,7 @@
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <i class="fas fa-filter mr-1"></i>Filter by Status
             </label>
-            <select 
-              [(ngModel)]="filterStatus" (ngModelChange)="onFilterStatusChange($event)"
+            <select [(ngModel)]="filterStatus" (ngModelChange)="onFilterStatusChange($event)"
               class="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all font-semibold text-sm bg-white">
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -78,7 +71,6 @@
 
     <!-- Pending Requests Tab -->
     <div *ngIf="!isLoading && selectedTab === 'pending'">
-      
       <!-- No Pending Requests -->
       <div *ngIf="pendingRequests.length === 0" class="mx-2 lg:mx-6 bg-white rounded-lg shadow-md p-12 text-center">
         <div class="w-16 h-16 rounded-lg bg-green-100 flex items-center justify-center mx-auto mb-4">
@@ -89,7 +81,8 @@
       </div>
 
       <!-- Pending Requests Table -->
-      <div *ngIf="pendingRequests.length > 0" class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
+      <div *ngIf="pendingRequests.length > 0"
+        class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
         <!-- Enhanced Header with Gradient -->
         <div class="px-6 py-4 bg-[#14532d]">
           <div class="flex items-center justify-between">
@@ -99,29 +92,43 @@
               </div>
               <div>
                 <h2 class="text-lg font-bold text-white">Pending Approval</h2>
-                <p class="text-sm text-white/80">Review and process role requests</p>
+                <p class="text-sm text-white/80">
+                  Review and process role requests
+                </p>
               </div>
             </div>
-            <span class="bg-yellow-400 text-yellow-900 px-3 py-1.5 rounded-lg text-sm font-bold shadow-md">
-              {{ pendingRequests.length }} {{ pendingRequests.length === 1 ? 'Request' : 'Requests' }}
+            <span
+              class="bg-yellow-400 text-yellow-900 px-3 py-1.5 rounded-lg text-sm font-bold shadow-md whitespace-nowrap">
+              {{ pendingRequests.length }}
+              {{ pendingRequests.length === 1 ? "Request" : "Requests" }}
             </span>
           </div>
         </div>
 
-        <div class="bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-[#14532d]">
+        <div class="hidden md:block bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-[#14532d]">
               <tr class="uppercase tracking-wider text-white text-[10px] sm:text-xs lg:text-sm">
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Student</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Organization</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Position</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Requested</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Actions</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">
+                  Student
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">
+                  Organization
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">
+                  Position
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">
+                  Requested
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-              <tr *ngFor="let request of displayedPendingRequests" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
-                
+              <tr *ngFor="let request of displayedPendingRequests"
+                class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
                 <!-- Student Info -->
                 <td class="px-3 sm:px-4 py-3.5">
                   <div class="flex items-start gap-2.5">
@@ -129,9 +136,10 @@
                       <i class="fas fa-user-graduate text-white text-xs"></i>
                     </div>
 
-                    
                     <div>
-                      <div class="text-sm font-semibold text-gray-900 whitespace-nowrap">{{ request.first_name }} {{ request.last_name }}</div>
+                      <div class="text-sm font-semibold text-gray-900 whitespace-nowrap">
+                        {{ request.first_name }} {{ request.last_name }}
+                      </div>
                       <div class="text-xs text-gray-500 mt-0.5">
                         <i class="fas fa-id-card mr-1"></i>{{ request.student_id }}
                       </div>
@@ -147,7 +155,9 @@
                   <div class="flex items-start gap-2">
                     <i class="fas fa-building text-[#14532d] mt-1 text-sm"></i>
                     <div>
-                      <div class="text-sm font-semibold text-[#14532d]">{{ request.org_name }}</div>
+                      <div class="text-sm font-semibold text-[#14532d]">
+                        {{ request.org_name }}
+                      </div>
                       <div class="text-xs text-gray-500 mt-0.5">
                         <i class="fas fa-graduation-cap mr-1"></i>{{ request.department }}
                       </div>
@@ -160,7 +170,8 @@
                   <div class="text-sm font-semibold text-gray-800 whitespace-nowrap">
                     <i class="fas fa-user-tie text-[#14532d] mr-1.5"></i>{{ request.requested_position }}
                   </div>
-                  <div *ngIf="request.justification" class="mt-1.5 p-2 bg-blue-50 rounded-lg border border-blue-200 max-w-xs">
+                  <div *ngIf="request.justification"
+                    class="mt-1.5 p-2 bg-blue-50 rounded-lg border border-blue-200 max-w-xs">
                     <p class="text-xs text-gray-700 italic line-clamp-2" [title]="request.justification">
                       <i class="fas fa-quote-left text-blue-400 mr-1"></i>{{ request.justification }}
                     </p>
@@ -177,22 +188,18 @@
                 <!-- Actions -->
                 <td class="px-3 sm:px-4 py-3.5">
                   <div class="flex gap-2 justify-center">
-                    <button 
-                      (click)="approveRequest(request)"
-                      [disabled]="processingRequestId === request.request_id"
+                    <button (click)="approveRequest(request)" [disabled]="processingRequestId === request.request_id"
                       class="font-semibold px-3.5 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 text-xs text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap">
                       <i class="fas fa-check text-xs" *ngIf="processingRequestId !== request.request_id"></i>
                       <i class="fas fa-spinner fa-spin text-xs" *ngIf="processingRequestId === request.request_id"></i>
                       Approve
                     </button>
-                    
-                    <button 
-                      (click)="rejectRequest(request)"
-                      [disabled]="processingRequestId === request.request_id"
+
+                    <button (click)="rejectRequest(request)" [disabled]="processingRequestId === request.request_id"
                       class="font-semibold px-3.5 py-2 rounded-lg transition-all duration-200 flex items-center justify-center gap-1.5 text-xs text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap">
                       <i class="fas fa-times text-xs" *ngIf="processingRequestId !== request.request_id"></i>
-                        <i class="fas fa-spinner fa-spin text-xs" *ngIf="processingRequestId === request.request_id"></i>
-                        Decline
+                      <i class="fas fa-spinner fa-spin text-xs" *ngIf="processingRequestId === request.request_id"></i>
+                      Decline
                     </button>
                   </div>
                 </td>
@@ -204,7 +211,8 @@
           <div class="px-6 py-3 flex items-center justify-between bg-white border-t border-gray-100">
             <div class="flex items-center gap-3 text-sm text-gray-600">
               <span class="font-semibold">Showing</span>
-              <select [(ngModel)]="pendingPerPage" (ngModelChange)="setPendingPage(1)" class="border rounded px-2 py-1 text-sm">
+              <select [(ngModel)]="pendingPerPage" (ngModelChange)="setPendingPage(1)"
+                class="border rounded px-2 py-1 text-sm">
                 <option [ngValue]="5">5</option>
                 <option [ngValue]="10">10</option>
                 <option [ngValue]="25">25</option>
@@ -214,63 +222,182 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <button (click)="setPendingPage(pendingPage - 1)" [disabled]="pendingPage === 1" class="px-3 py-1 rounded bg-white border disabled:opacity-50">Prev</button>
-              <div class="text-sm font-medium">Page {{ pendingPage }} / {{ pendingTotalPages }}</div>
-              <button (click)="setPendingPage(pendingPage + 1)" [disabled]="pendingPage === pendingTotalPages" class="px-3 py-1 rounded bg-white border disabled:opacity-50">Next</button>
+              <button (click)="setPendingPage(pendingPage - 1)" [disabled]="pendingPage === 1"
+                class="px-3 py-1 rounded bg-white border disabled:opacity-50">
+                Prev
+              </button>
+              <div class="text-sm font-medium">
+                Page {{ pendingPage }} / {{ pendingTotalPages }}
+              </div>
+              <button (click)="setPendingPage(pendingPage + 1)" [disabled]="pendingPage === pendingTotalPages"
+                class="px-3 py-1 rounded bg-white border disabled:opacity-50">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Card View for Pending Requests -->
+        <div class="md:hidden space-y-3 p-3 bg-gray-50 border-t border-gray-200">
+          <div *ngFor="let request of displayedPendingRequests"
+            class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-3">
+              <!-- Header: Student & Date -->
+              <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-3 min-w-0 pr-3">
+                  <div
+                    class="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0 shadow-sm text-white">
+                    <i class="fas fa-user-graduate text-sm"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="text-sm font-bold text-gray-900 truncate">
+                      {{ request.first_name }} {{ request.last_name }}
+                    </h3>
+                    <p class="text-xs text-gray-500 font-medium mt-0.5">
+                      {{ request.student_id }}
+                    </p>
+                  </div>
+                </div>
+                <div
+                  class="text-[10px] text-gray-500 text-right flex-shrink-0 bg-gray-50 px-2 py-1 rounded-md border border-gray-100 font-medium">
+                  <i class="far fa-calendar text-gray-400 mr-1.5"></i>{{ formatDate(request.requested_at) }}
+                </div>
+              </div>
+
+              <!-- Body: Org and Position -->
+              <div
+                class="flex flex-col gap-3 mb-3 text-xs bg-gray-50/80 p-3 rounded-lg border border-gray-100 shadow-sm">
+                <div class="flex flex-col gap-1">
+                  <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fas fa-building text-gray-400"></i> Organization
+                  </p>
+                  <div class="font-bold text-[#14532d] text-sm">
+                    {{ request.org_name }}
+                  </div>
+                  <div class="text-[11px] text-gray-600 font-medium">
+                    {{ request.department }}
+                  </div>
+                </div>
+                <div class="h-px bg-gray-200 w-full my-0.5"></div>
+                <div class="flex flex-col gap-1">
+                  <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fas fa-user-tie text-gray-400"></i> Requested Role
+                  </p>
+                  <div class="font-bold text-gray-800 text-sm">
+                    {{ request.requested_position }}
+                  </div>
+                </div>
+              </div>
+
+              <div *ngIf="request.justification"
+                class="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100 shadow-sm">
+                <p class="text-xs text-gray-700 italic flex gap-2">
+                  <i class="fas fa-quote-left text-blue-400 text-[10px] mt-1 flex-shrink-0"></i>
+                  <span class="leading-relaxed">{{
+                    request.justification
+                    }}</span>
+                </p>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex gap-2 pt-1">
+                <button (click)="approveRequest(request)" [disabled]="processingRequestId === request.request_id"
+                  class="flex-1 font-bold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 shadow-sm min-h-[44px]">
+                  <i class="fas fa-check text-sm" *ngIf="processingRequestId !== request.request_id"></i>
+                  <i class="fas fa-spinner fa-spin text-sm" *ngIf="processingRequestId === request.request_id"></i>
+                  Approve
+                </button>
+                <button (click)="rejectRequest(request)" [disabled]="processingRequestId === request.request_id"
+                  class="flex-1 font-bold py-2.5 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 text-sm text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 shadow-sm min-h-[44px]">
+                  <i class="fas fa-times text-sm" *ngIf="processingRequestId !== request.request_id"></i>
+                  <i class="fas fa-spinner fa-spin text-sm" *ngIf="processingRequestId === request.request_id"></i>
+                  Decline
+                </button>
+              </div>
             </div>
           </div>
 
+          <!-- Pagination -->
+          <div class="flex items-center justify-between mt-3 text-xs bg-white p-2 rounded border border-gray-200">
+            <button (click)="setPendingPage(pendingPage - 1)" [disabled]="pendingPage === 1"
+              class="px-3 py-2 rounded bg-gray-50 border border-gray-200 disabled:opacity-50 min-h-[44px]">
+              Prev
+            </button>
+            <span class="font-medium text-gray-600">Pg {{ pendingPage }} of {{ pendingTotalPages }}</span>
+            <button (click)="setPendingPage(pendingPage + 1)" [disabled]="pendingPage === pendingTotalPages"
+              class="px-3 py-2 rounded bg-gray-50 border border-gray-200 disabled:opacity-50 min-h-[44px]">
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- History/All Requests Tab -->
     <div *ngIf="!isLoading && $any(selectedTab) === 'all'">
-      
       <!-- No Requests -->
-      <div *ngIf="filteredRequests.length === 0" class="mx-2 lg:mx-6 bg-white rounded-2xl shadow-xl p-12 text-center border-2 border-gray-200">
+      <div *ngIf="filteredRequests.length === 0"
+        class="mx-2 lg:mx-6 bg-white rounded-2xl shadow-xl p-12 text-center border-2 border-gray-200">
         <div class="w-20 h-20 rounded-full bg-[#e6f7ef] flex items-center justify-center mx-auto mb-4">
           <i class="fas fa-inbox text-4xl text-gray-300"></i>
         </div>
         <p class="text-gray-800 text-xl font-bold mb-2">No requests found</p>
-        <p class="text-gray-600">There are no role requests matching your filter.</p>
+        <p class="text-gray-600">
+          There are no role requests matching your filter.
+        </p>
       </div>
 
       <!-- All Requests Table -->
-      <div *ngIf="filteredRequests.length > 0" class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
+      <div *ngIf="filteredRequests.length > 0"
+        class="mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
         <!-- Enhanced Header with Gradient -->
         <div class="px-6 py-3 bg-[#14532d]">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
               <i class="fas fa-history text-white text-sm"></i>
             </div>
-            <h2 class="text-lg lg:text-xl font-bold text-white">Request History</h2>
-            <span class="ml-auto bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
-              {{ filteredRequests.length }} {{ filteredRequests.length === 1 ? 'Request' : 'Requests' }}
+            <h2 class="text-lg lg:text-xl font-bold text-white">
+              Request History
+            </h2>
+            <span class="ml-auto bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold whitespace-nowrap">
+              {{ filteredRequests.length }}
+              {{ filteredRequests.length === 1 ? "Request" : "Requests" }}
             </span>
           </div>
         </div>
 
-        <div class="bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-[#14532d]">
+        <div class="hidden md:block bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-[#14532d]">
               <tr class="uppercase tracking-wider text-white text-[10px] sm:text-xs lg:text-sm">
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Student</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Organization</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Position</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Status</th>
-                <th class="px-3 sm:px-4 py-3 text-center font-semibold">Timeline</th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">
+                  Student
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">
+                  Organization
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">
+                  Position
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">
+                  Status
+                </th>
+                <th class="px-3 sm:px-4 py-3 text-center font-semibold">
+                  Timeline
+                </th>
               </tr>
             </thead>
             <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-              <tr *ngFor="let request of displayedAllRequests" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
-                
+              <tr *ngFor="let request of displayedAllRequests"
+                class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
                 <!-- Student Info -->
                 <td class="px-3 sm:px-4 py-3.5">
                   <div class="flex items-start gap-2">
                     <i class="fas fa-user-graduate text-blue-500 mt-0.5 text-sm"></i>
                     <div>
-                      <div class="text-sm font-semibold text-gray-900 whitespace-nowrap">{{ request.first_name }} {{ request.last_name }}</div>
+                      <div class="text-sm font-semibold text-gray-900 whitespace-nowrap">
+                        {{ request.first_name }} {{ request.last_name }}
+                      </div>
                       <div class="text-xs text-gray-500 mt-0.5">
                         <i class="fas fa-id-card mr-1"></i>{{ request.student_id }}
                       </div>
@@ -283,7 +410,9 @@
                   <div class="flex items-start gap-2">
                     <i class="fas fa-building text-[#14532d] mt-0.5 text-sm"></i>
                     <div>
-                      <div class="text-sm font-semibold text-[#14532d]">{{ request.org_name }}</div>
+                      <div class="text-sm font-semibold text-[#14532d]">
+                        {{ request.org_name }}
+                      </div>
                       <div class="text-xs text-gray-500 mt-0.5">
                         <i class="fas fa-graduation-cap mr-1"></i>{{ request.department }}
                       </div>
@@ -300,18 +429,25 @@
 
                 <!-- Status -->
                 <td class="px-3 sm:px-4 py-3.5 text-center">
-                  <span [ngClass]="getStatusClass(request.status)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 whitespace-nowrap">
+                  <span [ngClass]="getStatusClass(request.status)"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border-2 whitespace-nowrap">
                     <i class="fas fa-clock text-xs" *ngIf="request.status === 'pending'"></i>
                     <i class="fas fa-check-circle text-xs" *ngIf="request.status === 'approved'"></i>
                     <i class="fas fa-times-circle text-xs" *ngIf="request.status === 'rejected'"></i>
                     {{ getStatusLabel(request.status) }}
                   </span>
                   <div *ngIf="request.reviewer_first_name" class="text-xs text-gray-500 mt-1.5 whitespace-nowrap">
-                    <i class="fas fa-user-shield text-gray-400 mr-1"></i>{{ request.reviewer_first_name }} {{ request.reviewer_last_name }}
+                    <i class="fas fa-user-shield text-gray-400 mr-1"></i>{{ request.reviewer_first_name }}
+                    {{ request.reviewer_last_name }}
                   </div>
-                  <div *ngIf="request.review_notes" class="mt-1.5 p-2 bg-gray-50 rounded-lg border border-gray-200 max-w-xs mx-auto">
+                  <div *ngIf="request.review_notes"
+                    class="mt-1.5 p-2 bg-gray-50 rounded-lg border border-gray-200 max-w-xs mx-auto">
                     <p class="text-xs text-gray-700 italic" [title]="request.review_notes">
-                      <i class="fas fa-comment-dots text-[#14532d] mr-1"></i>{{ request.review_notes.length > 50 ? (request.review_notes.substring(0, 50) + '...') : request.review_notes }}
+                      <i class="fas fa-comment-dots text-[#14532d] mr-1"></i>{{
+                      request.review_notes.length > 50
+                      ? request.review_notes.substring(0, 50) + "..."
+                      : request.review_notes
+                      }}
                     </p>
                   </div>
                 </td>
@@ -320,10 +456,12 @@
                 <td class="px-3 sm:px-4 py-3.5">
                   <div class="space-y-1.5">
                     <div class="text-sm text-gray-600 whitespace-nowrap">
-                      <i class="far fa-calendar text-gray-400 mr-1.5"></i><strong>Requested:</strong> {{ formatDate(request.requested_at) }}
+                      <i class="far fa-calendar text-gray-400 mr-1.5"></i><strong>Requested:</strong>
+                      {{ formatDate(request.requested_at) }}
                     </div>
                     <div *ngIf="request.reviewed_at" class="text-sm text-gray-600 whitespace-nowrap">
-                      <i class="far fa-calendar-check text-gray-400 mr-2"></i><strong>Reviewed:</strong> {{ formatDate(request.reviewed_at) }}
+                      <i class="far fa-calendar-check text-gray-400 mr-2"></i><strong>Reviewed:</strong>
+                      {{ formatDate(request.reviewed_at) }}
                     </div>
                   </div>
                 </td>
@@ -345,15 +483,131 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <button (click)="setAllPage(allPage - 1)" [disabled]="allPage === 1" class="px-3 py-1 rounded bg-white border disabled:opacity-50">Prev</button>
-              <div class="text-sm font-medium">Page {{ allPage }} / {{ allTotalPages }}</div>
-              <button (click)="setAllPage(allPage + 1)" [disabled]="allPage === allTotalPages" class="px-3 py-1 rounded bg-white border disabled:opacity-50">Next</button>
+              <button (click)="setAllPage(allPage - 1)" [disabled]="allPage === 1"
+                class="px-3 py-1 rounded bg-white border disabled:opacity-50">
+                Prev
+              </button>
+              <div class="text-sm font-medium">
+                Page {{ allPage }} / {{ allTotalPages }}
+              </div>
+              <button (click)="setAllPage(allPage + 1)" [disabled]="allPage === allTotalPages"
+                class="px-3 py-1 rounded bg-white border disabled:opacity-50">
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Card View for All Requests -->
+        <div class="md:hidden space-y-3 p-3 bg-gray-50 border-t border-gray-200">
+          <div *ngFor="let request of displayedAllRequests"
+            class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-3">
+              <!-- Header: Student & Status -->
+              <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-3">
+                <div class="flex items-center gap-3 min-w-0 pr-3">
+                  <div
+                    class="w-10 h-10 rounded-lg bg-blue-500 flex items-center justify-center flex-shrink-0 shadow-sm text-white">
+                    <i class="fas fa-user-graduate text-sm"></i>
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="text-sm font-bold text-gray-900 truncate">
+                      {{ request.first_name }} {{ request.last_name }}
+                    </h3>
+                    <p class="text-xs text-gray-500 font-medium mt-0.5">
+                      {{ request.student_id }}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex-shrink-0">
+                  <span [ngClass]="getStatusClass(request.status)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold border shadow-sm whitespace-nowrap uppercase tracking-wide">
+                    <i class="fas fa-clock text-xs" *ngIf="request.status === 'pending'"></i>
+                    <i class="fas fa-check-circle text-xs" *ngIf="request.status === 'approved'"></i>
+                    <i class="fas fa-times-circle text-xs" *ngIf="request.status === 'rejected'"></i>
+                    {{ getStatusLabel(request.status) }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Body: Org and Position -->
+              <div
+                class="flex flex-col gap-3 mb-3 text-xs bg-gray-50/80 p-3 rounded-lg border border-gray-100 shadow-sm">
+                <div class="flex flex-col gap-1">
+                  <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fas fa-building text-gray-400"></i> Organization
+                  </p>
+                  <div class="font-bold text-[#14532d] text-sm">
+                    {{ request.org_name }}
+                  </div>
+                  <div class="text-[11px] text-gray-600 font-medium">
+                    {{ request.department }}
+                  </div>
+                </div>
+                <div class="h-px bg-gray-200 w-full my-0.5"></div>
+                <div class="flex flex-col gap-1">
+                  <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fas fa-user-tie text-gray-400"></i> Role
+                  </p>
+                  <div class="font-bold text-gray-800 text-sm">
+                    {{ request.requested_position }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reviewer Info if any -->
+              <div *ngIf="
+                  request.status !== 'pending' && request.reviewer_first_name
+                " class="mb-3 p-3 bg-white border border-gray-200 rounded-lg text-xs shadow-sm">
+                <p class="text-gray-700 font-medium flex items-center gap-1.5">
+                  <i class="fas fa-user-shield text-gray-400"></i>
+                  Reviewed by
+                  <span class="font-bold text-gray-900">{{ request.reviewer_first_name }}
+                    {{ request.reviewer_last_name }}</span>
+                </p>
+                <div *ngIf="request.review_notes"
+                  class="mt-2 text-gray-600 italic flex gap-2 bg-gray-50 p-2 rounded border border-gray-100">
+                  <i class="fas fa-comment-dots text-gray-400 mt-0.5 flex-shrink-0"></i>
+                  <span class="leading-relaxed">{{
+                    request.review_notes
+                    }}</span>
+                </div>
+              </div>
+
+              <!-- Dates -->
+              <div class="flex flex-col gap-2 text-[11px] text-gray-500 pt-3 border-t border-gray-100">
+                <div class="flex items-center gap-2">
+                  <i class="far fa-calendar-plus text-gray-400 w-3 text-center"></i>
+                  <span class="font-semibold text-gray-600 uppercase tracking-wider text-[10px]">Requested</span>
+                  <span class="ml-auto font-medium text-gray-800">{{
+                    formatDate(request.requested_at)
+                    }}</span>
+                </div>
+                <div *ngIf="request.reviewed_at" class="flex items-center gap-2">
+                  <i class="far fa-calendar-check text-gray-400 w-3 text-center"></i>
+                  <span class="font-semibold text-gray-600 uppercase tracking-wider text-[10px]">Reviewed</span>
+                  <span class="ml-auto font-medium text-gray-800">{{
+                    formatDate(request.reviewed_at)
+                    }}</span>
+                </div>
+              </div>
             </div>
           </div>
 
+          <!-- Pagination -->
+          <div class="flex items-center justify-between mt-3 text-xs bg-white p-2 rounded border border-gray-200">
+            <button (click)="setAllPage(allPage - 1)" [disabled]="allPage === 1"
+              class="px-3 py-2 rounded bg-gray-50 border border-gray-200 disabled:opacity-50 min-h-[44px]">
+              Prev
+            </button>
+            <span class="font-medium text-gray-600">Pg {{ allPage }} of {{ allTotalPages }}</span>
+            <button (click)="setAllPage(allPage + 1)" [disabled]="allPage === allTotalPages"
+              class="px-3 py-2 rounded bg-gray-50 border border-gray-200 disabled:opacity-50 min-h-[44px]">
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
-
   </div>
 </div>

@@ -48,15 +48,15 @@ export class CertificateRequestsComponent implements OnInit {
   loading = true;
   error: string | null = null;
   successMessage: string | null = null;
-  
+
   updatingRequestId: number | null = null;
-  
+
   // Bulk update
   selectedRequests: Set<number> = new Set();
   bulkStatus: 'pending' | 'processing' | 'sent' = 'processing';
   isUpdatingBulk = false;
   selectAll = false;
-  
+
   // Filters
   statusFilter: 'all' | 'pending' | 'processing' | 'sent' | 'approved' | 'rejected' = 'all';
   searchTerm = '';
@@ -66,7 +66,7 @@ export class CertificateRequestsComponent implements OnInit {
   itemsPerPage = 10;
   totalPages = 1;
 
-  constructor(private certificateRequestService: CertificateRequestService) {}
+  constructor(private certificateRequestService: CertificateRequestService) { }
 
   ngOnInit(): void {
     this.loadRequests();
@@ -75,7 +75,7 @@ export class CertificateRequestsComponent implements OnInit {
   loadRequests(): void {
     this.loading = true;
     this.error = null;
-    
+
     this.certificateRequestService.getCertificateRequests().subscribe({
       next: (response: any) => {
         const raw = Array.isArray(response) ? response : (response && Array.isArray(response.items)) ? response.items : (response?.data || []);
@@ -149,12 +149,12 @@ export class CertificateRequestsComponent implements OnInit {
 
   applyFilters(): void {
     let filtered = [...this.requests];
-    
+
     // Status filter
     if (this.statusFilter !== 'all') {
       filtered = filtered.filter(r => r.status === this.statusFilter);
     }
-    
+
     // Search filter
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
@@ -166,7 +166,7 @@ export class CertificateRequestsComponent implements OnInit {
         r.student_email.toLowerCase().includes(term)
       );
     }
-    
+
     this.filteredRequests = filtered;
     this.totalPages = Math.ceil(this.filteredRequests.length / this.itemsPerPage);
     this.currentPage = 1; // Reset to first page when filters change
@@ -192,7 +192,7 @@ export class CertificateRequestsComponent implements OnInit {
   getPageNumbers(): number[] {
     const pages: number[] = [];
     const maxVisible = 5;
-    
+
     if (this.totalPages <= maxVisible) {
       for (let i = 1; i <= this.totalPages; i++) {
         pages.push(i);
@@ -214,7 +214,7 @@ export class CertificateRequestsComponent implements OnInit {
         pages.push(this.totalPages);
       }
     }
-    
+
     return pages;
   }
 
@@ -237,7 +237,7 @@ export class CertificateRequestsComponent implements OnInit {
     // - an ISO string with timezone (e.g. 2025-11-30T08:04:31+08:00)
     // - a server-local plain DATETIME (e.g. 2025-11-30 08:04:31)
     // - a UTC ISO with Z (e.g. 2025-11-30T00:04:31.000Z)
-    
+
     // Try to parse as ISO first (handles both UTC Z and timezone offset formats)
     try {
       const d = new Date(dateStr);
@@ -256,7 +256,7 @@ export class CertificateRequestsComponent implements OnInit {
     } catch (e) {
       // Fall through to MySQL parsing
     }
-    
+
     // Fall back to MySQL DATETIME parsing for plain strings
     const d = parseMysqlDatetimeToDate(dateStr as any);
     if (!d) return 'N/A';
@@ -336,7 +336,7 @@ export class CertificateRequestsComponent implements OnInit {
   }
 
   updateSelectAllState(): void {
-    this.selectAll = this.pagedRequests.length > 0 && 
+    this.selectAll = this.pagedRequests.length > 0 &&
       this.pagedRequests.every(req => this.selectedRequests.has(req.id));
   }
 

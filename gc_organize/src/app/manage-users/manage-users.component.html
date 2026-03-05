@@ -1,7 +1,8 @@
 <div class="p-3 sm:p-6 bg-gray-100 min-h-screen">
   <!-- Add Admin Modal -->
-  <div *ngIf="isAddAdminModalOpen" class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="z-index: 3000;">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-lg relative overflow-hidden" style="max-height: 85vh;">
+  <div *ngIf="isAddAdminModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" style="z-index: 3000;">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg relative overflow-hidden" style="max-height: 85vh;">
       <!-- Modal Header -->
       <div class="px-6 py-4 bg-gradient-to-r from-[#14532d] to-[#166534]">
         <div class="flex items-center justify-between">
@@ -11,9 +12,9 @@
             </div>
             <h2 class="text-xl font-bold text-white">Add Admin Account</h2>
           </div>
-          <button (click)="closeAddAdminModal()" 
-                  class="w-10 h-10 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors" 
-                  aria-label="Close">
+          <button (click)="closeAddAdminModal()"
+            class="w-10 h-10 rounded-lg bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
+            aria-label="Close">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -25,47 +26,33 @@
           <!-- Name Field -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
-            <input type="text" 
-                   [(ngModel)]="newName" 
-                   name="newName" 
-                   required 
-                   placeholder="Enter admin full name"
-                   class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all" />
+            <input type="text" [(ngModel)]="newName" name="newName" required placeholder="Enter admin full name"
+              class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all" />
           </div>
 
           <!-- Email Field -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-            <input type="email" 
-                   [(ngModel)]="newEmail" 
-                   name="newEmail" 
-                   required 
-                   placeholder="Enter email address"
-                   class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all" />
+            <input type="email" [(ngModel)]="newEmail" name="newEmail" required placeholder="Enter email address"
+              class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all" />
           </div>
 
           <!-- Password Field -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-            <input type="password" 
-                   [(ngModel)]="newPassword" 
-                   name="newPassword" 
-                   required 
-                   placeholder="Enter secure password"
-                   class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all" />
+            <input type="password" [(ngModel)]="newPassword" name="newPassword" required
+              placeholder="Enter secure password"
+              class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all" />
           </div>
 
           <!-- Modal Footer -->
           <div class="flex justify-end gap-3 pt-4">
-            <button type="button" 
-                    (click)="closeAddAdminModal()"
-                    [disabled]="isAddingAdmin"
-                    class="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <button type="button" (click)="closeAddAdminModal()" [disabled]="isAddingAdmin"
+              class="px-6 py-2 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               Cancel
             </button>
-            <button type="submit" 
-                    [disabled]="isAddingAdmin"
-                    class="px-6 py-2 rounded-lg bg-[#14532d] text-white font-semibold hover:bg-[#166534] transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+            <button type="submit" [disabled]="isAddingAdmin"
+              class="px-6 py-2 rounded-lg bg-[#14532d] text-white font-semibold hover:bg-[#166534] transition-colors shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
               <i class="fas" [ngClass]="isAddingAdmin ? 'fa-spinner fa-spin' : 'fa-user-plus'"></i>
               <span>{{ isAddingAdmin ? 'Adding...' : 'Add Admin' }}</span>
             </button>
@@ -96,7 +83,8 @@
       <p class="text-gray-600 font-semibold">Loading user data...</p>
     </div>
   </div>
-  <div *ngIf="error" class="bg-red-50 border-2 border-red-300 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center gap-3">
+  <div *ngIf="error"
+    class="bg-red-50 border-2 border-red-300 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center gap-3">
     <i class="fas fa-exclamation-triangle text-2xl"></i>
     <span class="font-semibold">{{ error }}</span>
   </div>
@@ -114,14 +102,14 @@
             <h2 class="text-lg font-bold text-white">OSWS Admin Accounts</h2>
           </div>
         </div>
-        <button (click)="openAddAdminModal()" 
-                class="bg-white text-[#14532d] px-4 py-2 rounded-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 font-semibold text-sm min-h-[44px]">
+        <button (click)="openAddAdminModal()"
+          class="bg-white text-[#14532d] px-4 py-2 rounded-lg hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2 font-semibold text-sm min-h-[44px]">
           <i class="fas fa-user-plus text-sm"></i>
           <span>Add Admin</span>
         </button>
       </div>
     </div>
-    
+
     <!-- Enhanced Search Bar -->
     <div class="px-6 py-4 bg-[#e6f7ef]/50 border-b-2 border-gray-200">
       <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
@@ -130,27 +118,21 @@
             <i class="fas fa-search mr-1"></i>Search Admins
           </label>
           <div class="relative">
-            <input
-              type="text"
-              [(ngModel)]="adminSearchTerm"
-              placeholder="Search by name or email..."
-              class="w-full px-4 py-2.5 pl-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm"
-            />
+            <input type="text" [(ngModel)]="adminSearchTerm" placeholder="Search by name or email..."
+              class="w-full px-4 py-2.5 pl-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm" />
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           </div>
         </div>
-        <button
-          type="button"
-          class="px-4 py-2.5 bg-[#14532d] hover:bg-[#166534] text-white rounded-lg transition-all duration-200 shadow hover:shadow-lg font-semibold text-sm flex items-center gap-2 justify-center"
-        >
+        <button type="button"
+          class="px-4 py-2.5 bg-[#14532d] hover:bg-[#166534] text-white rounded-lg transition-all duration-200 shadow hover:shadow-lg font-semibold text-sm flex items-center gap-2 justify-center">
           Search
         </button>
       </div>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
-        <table *ngIf="!loading && filteredAdmins.length" class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-[#14532d]">
+    <div class="hidden md:block bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
+      <table *ngIf="!loading && filteredAdmins.length" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-[#14532d]">
           <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
             <th class="px-3 sm:px-4 py-3 text-center w-12 sm:w-16 font-semibold">#</th>
             <th class="px-3 sm:px-4 py-3 text-center font-semibold">Name</th>
@@ -159,36 +141,70 @@
           </tr>
         </thead>
         <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-          <tr *ngFor="let admin of filteredAdmins; let i = index" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
-              <td class="px-3 sm:px-4 py-3.5 text-center text-[#14532d] font-semibold text-sm">{{ i + 1 }}</td>
-              <td class="px-3 sm:px-4 py-3.5 text-center">
-                <span class="font-semibold text-gray-800 text-sm">{{ admin.name }}</span>
-              </td>
-              <td class="px-3 sm:px-4 py-3.5 text-center">
-                <div class="flex items-center gap-2 text-gray-600 justify-center">
-                  <i class="fas fa-envelope text-xs text-gray-400"></i>
-                  <span class="text-xs sm:text-sm break-all">{{ admin.email }}</span>
-                </div>
-              </td>
-              <td class="px-3 sm:px-4 py-3.5 text-center">
-                <button (click)="deleteAdmin(admin.id, admin.name)" 
-                        [disabled]="deletingAdminId === admin.id"
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed" 
-                        title="Archive Admin">
-                  <i class="fas text-sm" [ngClass]="deletingAdminId === admin.id ? 'fa-spinner fa-spin' : 'fa-trash-alt'"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div *ngIf="!loading && filteredAdmins.length === 0" class="text-center py-12 text-gray-500 bg-gray-50">
-          <div class="flex flex-col items-center gap-3">
-            <i class="fas fa-user-shield text-4xl text-gray-300"></i>
-            <p class="font-semibold text-lg">{{ adminSearchTerm ? 'No admins found matching your search' : 'No admin accounts found' }}</p>
+          <tr *ngFor="let admin of filteredAdmins; let i = index"
+            class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
+            <td class="px-3 sm:px-4 py-3.5 text-center text-[#14532d] font-semibold text-sm">{{ i + 1 }}</td>
+            <td class="px-3 sm:px-4 py-3.5 text-center">
+              <span class="font-semibold text-gray-800 text-sm">{{ admin.name }}</span>
+            </td>
+            <td class="px-3 sm:px-4 py-3.5 text-center">
+              <div class="flex items-center gap-2 text-gray-600 justify-center">
+                <i class="fas fa-envelope text-xs text-gray-400"></i>
+                <span class="text-xs sm:text-sm break-all">{{ admin.email }}</span>
+              </div>
+            </td>
+            <td class="px-3 sm:px-4 py-3.5 text-center">
+              <button (click)="deleteAdmin(admin.id, admin.name)" [disabled]="deletingAdminId === admin.id"
+                class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Archive Admin">
+                <i class="fas text-sm"
+                  [ngClass]="deletingAdminId === admin.id ? 'fa-spinner fa-spin' : 'fa-trash-alt'"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="!loading && filteredAdmins.length === 0" class="text-center py-12 text-gray-500 bg-gray-50">
+        <div class="flex flex-col items-center gap-3">
+          <i class="fas fa-user-shield text-4xl text-gray-300"></i>
+          <p class="font-semibold text-lg">{{ adminSearchTerm ? 'No admins found matching your search' : 'No admin
+            accounts found' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Card View for Admins -->
+    <div class="md:hidden bg-gray-50 p-3 sm:p-4 space-y-3 rounded-b-lg border border-t-0 border-gray-200">
+      <div *ngFor="let admin of filteredAdmins; let i = index"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-[#14532d] px-3 py-2 flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded">{{ i + 1 }}</span>
+            <span class="text-white font-bold text-sm truncate">{{ admin.name }}</span>
           </div>
         </div>
+        <div class="p-3 space-y-3">
+          <div class="flex items-center gap-2 text-sm text-gray-600">
+            <i class="fas fa-envelope text-gray-400"></i>
+            <span class="truncate">{{ admin.email }}</span>
+          </div>
+          <div class="pt-2 border-t border-gray-100">
+            <button (click)="deleteAdmin(admin.id, admin.name)" [disabled]="deletingAdminId === admin.id"
+              class="w-full flex justify-center items-center gap-2 py-2 rounded-lg text-white bg-red-600 hover:bg-red-700 transition-colors disabled:opacity-50 text-sm font-semibold">
+              <i class="fas" [ngClass]="deletingAdminId === admin.id ? 'fa-spinner fa-spin' : 'fa-trash-alt'"></i>
+              <span>Archive</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!loading && filteredAdmins.length === 0"
+        class="text-center py-8 text-gray-500 bg-white rounded-lg border border-gray-200">
+        <i class="fas fa-user-shield text-3xl text-gray-300 mb-2"></i>
+        <p class="font-semibold text-sm">{{ adminSearchTerm ? 'No admins found matching your search' : 'No admin
+          accounts found' }}</p>
+      </div>
     </div>
-    </div>
+  </div>
 
   <!-- Student Organizations Table Section -->
   <div class="mx-2 lg:mx-6 mb-10 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
@@ -203,7 +219,7 @@
         </h2>
       </div>
     </div>
-    
+
     <!-- Enhanced Search Bar -->
     <div class="px-6 py-4 bg-[#e6f7ef]/50 border-b-2 border-gray-200">
       <div class="flex flex-col sm:flex-row gap-3 sm:items-end">
@@ -212,27 +228,21 @@
             <i class="fas fa-search mr-1"></i>Search Organizations
           </label>
           <div class="relative">
-            <input
-              type="text"
-              [(ngModel)]="orgSearchTerm"
-              placeholder="Search by name, email, or department..."
-              class="w-full px-4 py-2.5 pl-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm"
-            />
+            <input type="text" [(ngModel)]="orgSearchTerm" placeholder="Search by name, email, or department..."
+              class="w-full px-4 py-2.5 pl-10 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14532d] focus:border-[#14532d] transition-all text-sm" />
             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           </div>
         </div>
-        <button
-          type="button"
-          class="px-4 py-2.5 bg-[#14532d] hover:bg-[#166534] text-white rounded-lg transition-all duration-200 shadow hover:shadow-lg font-semibold text-sm flex items-center gap-2 justify-center min-h-[44px]"
-        >
+        <button type="button"
+          class="px-4 py-2.5 bg-[#14532d] hover:bg-[#166534] text-white rounded-lg transition-all duration-200 shadow hover:shadow-lg font-semibold text-sm flex items-center gap-2 justify-center min-h-[44px]">
           Search
         </button>
       </div>
     </div>
 
-    <div class="bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
-        <table *ngIf="!loading && filteredOrganizations.length" class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-[#14532d]">
+    <div class="hidden md:block bg-white rounded-b-lg shadow-lg overflow-x-auto border border-gray-200">
+      <table *ngIf="!loading && filteredOrganizations.length" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-[#14532d]">
           <tr class="uppercase tracking-wider text-white text-xs lg:text-sm">
             <th class="px-3 sm:px-4 py-3 text-center w-12 sm:w-16 font-semibold">#</th>
             <th class="px-3 sm:px-4 py-3 text-center font-semibold whitespace-nowrap">Organization Name</th>
@@ -241,7 +251,8 @@
           </tr>
         </thead>
         <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-          <tr *ngFor="let org of filteredOrganizations; let i = index" class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
+          <tr *ngFor="let org of filteredOrganizations; let i = index"
+            class="hover:bg-[#e6f7ef]/30 transition-all duration-200">
             <td class="px-3 sm:px-4 py-3.5 text-center text-[#14532d] font-semibold text-sm">{{ i + 1 }}</td>
             <td class="px-3 sm:px-4 py-3.5 text-center">
               <span class="font-semibold text-gray-800 text-sm">{{ org.name }}</span>
@@ -260,13 +271,44 @@
             </td>
           </tr>
         </tbody>
-        </table>
-        <div *ngIf="!loading && filteredOrganizations.length === 0" class="text-center py-12 text-gray-500 bg-gray-50">
-          <div class="flex flex-col items-center gap-3">
-            <i class="fas fa-users text-4xl text-gray-300"></i>
-            <p class="font-semibold text-lg">{{ orgSearchTerm ? 'No organizations found matching your search' : 'No organization accounts found' }}</p>
+      </table>
+      <div *ngIf="!loading && filteredOrganizations.length === 0" class="text-center py-12 text-gray-500 bg-gray-50">
+        <div class="flex flex-col items-center gap-3">
+          <i class="fas fa-users text-4xl text-gray-300"></i>
+          <p class="font-semibold text-lg">{{ orgSearchTerm ? 'No organizations found matching your search' : 'No
+            organization accounts found' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Card View for Organizations -->
+    <div class="md:hidden bg-gray-50 p-3 sm:p-4 space-y-3 rounded-b-lg border border-t-0 border-gray-200">
+      <div *ngFor="let org of filteredOrganizations; let i = index"
+        class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-[#14532d] px-3 py-2 flex justify-between items-center">
+          <div class="flex items-center gap-2 overflow-hidden min-w-0 flex-1">
+            <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded flex-shrink-0">{{ i + 1
+              }}</span>
+            <span class="text-white font-bold text-sm truncate">{{ org.name }}</span>
           </div>
         </div>
+        <div class="p-3 space-y-2">
+          <div class="flex items-center gap-2 text-sm text-gray-600">
+            <i class="fas fa-envelope text-gray-400 w-4 text-center"></i>
+            <span class="truncate">{{ org.email }}</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-gray-600">
+            <i class="fas fa-building text-gray-400 w-4 text-center"></i>
+            <span class="truncate">{{ org.department }}</span>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!loading && filteredOrganizations.length === 0"
+        class="text-center py-8 text-gray-500 bg-white rounded-lg border border-gray-200">
+        <i class="fas fa-users text-3xl text-gray-300 mb-2"></i>
+        <p class="font-semibold text-sm">{{ orgSearchTerm ? 'No orgs found matching your search' : 'No org accounts
+          found' }}</p>
+      </div>
     </div>
-    </div>
+  </div>
 </div>

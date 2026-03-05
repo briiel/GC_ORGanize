@@ -22,9 +22,9 @@ export class LoginComponent implements OnInit {
   justLoggedOut = false;
 
   constructor(
-    private authService: RbacAuthService, 
+    private authService: RbacAuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // If already authenticated, redirect to appropriate dashboard
@@ -89,9 +89,9 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(email, password).subscribe({
       next: (response) => {
-        
+
         this.isLoading = false;
-        
+
         // Support both envelope-shaped and unwrapped responses.
         const loginSucceeded = !!(
           response && (
@@ -107,12 +107,12 @@ export class LoginComponent implements OnInit {
           // Verify token was saved
           const token = this.authService.getToken();
           const decoded = this.authService.getDecodedToken();
-          
-          
+
+
           // Get default route based on user's primary role
           const defaultRoute = this.authService.getDefaultRoute();
-          
-          
+
+
           // Show success message
           Swal.fire({
             toast: true,
@@ -127,7 +127,7 @@ export class LoginComponent implements OnInit {
           // Navigate to appropriate dashboard
           setTimeout(() => {
             this.router.navigate([defaultRoute]).then(
-              (success) => {},
+              (success) => { },
               (error) => console.error('Navigation error:', error)
             );
           }, 500);
@@ -137,7 +137,7 @@ export class LoginComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-        
+
         if (error.status === 401) {
           this.errorMessage = 'Invalid email or password. Please try again.';
         } else if (error.status === 403) {
@@ -145,7 +145,7 @@ export class LoginComponent implements OnInit {
         } else {
           this.errorMessage = error.error?.message || 'An error occurred during login. Please try again.';
         }
-        
+
         console.error('Login error:', error);
       }
     });
@@ -169,14 +169,14 @@ export class LoginComponent implements OnInit {
     if (!this.installPrompt) {
       return;
     }
-    
+
     this.installPrompt.prompt();
-    
+
     this.installPrompt.userChoice.then((choiceResult: any) => {
       if (choiceResult.outcome === 'accepted') {
-        
+
       } else {
-        
+
       }
       this.installPrompt = null;
     });

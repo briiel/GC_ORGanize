@@ -25,7 +25,7 @@ export class LandingComponent implements OnInit {
     this.mobileMenuOpen = false;
   }
 
-  constructor(private metrics: MetricsService) {}
+  constructor(private metrics: MetricsService) { }
 
   ngOnInit(): void {
     // Only increment once per browser (use localStorage flag)

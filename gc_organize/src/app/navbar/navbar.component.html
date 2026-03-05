@@ -2,15 +2,16 @@
 <nav class="bg-white shadow-lg sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
     <div class="flex justify-between h-14 sm:h-16">
-      
+
       <!-- Logo and Brand -->
       <div class="flex items-center gap-2 sm:gap-4">
         <img src="/main_logo.webp" alt="GC Logo" class="h-8 w-8 sm:h-10 sm:w-10">
         <span class="text-base sm:text-xl font-bold text-[#679436]">GC-ORGANIZE</span>
-        
+
         <!-- Date and Time Display -->
         <div class="hidden sm:flex items-center gap-2 sm:gap-3 ml-2 sm:ml-4 text-gray-600">
-          <span class="text-xs sm:text-sm flex items-center" [title]="today | date:'fullDate'" aria-label="Today's date">
+          <span class="text-xs sm:text-sm flex items-center" [title]="today | date:'fullDate'"
+            aria-label="Today's date">
             <i class="far fa-calendar-alt mr-1 text-xs sm:text-sm" aria-hidden="true"></i>
             <span class="hidden md:inline">{{ today | date:'EEE, MMM. d, y' }}</span>
             <span class="md:hidden">{{ today | date:'EEE, MMM. d, y' }}</span>
@@ -24,38 +25,31 @@
 
       <!-- Desktop Navigation Links -->
       <div class="hidden md:flex items-center space-x-4">
-        
+
         <!-- Student Panel Link -->
-        <a *ngIf="isStudent" 
-           routerLink="/student-dashboard/home" 
-           routerLinkActive="bg-[#679436] text-white"
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-[#679436] hover:text-white transition-colors duration-200">
+        <a *ngIf="isStudent" routerLink="/student-dashboard/home" routerLinkActive="bg-[#679436] text-white"
+          class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-[#679436] hover:text-white transition-colors duration-200">
           <i class="fas fa-user-graduate mr-2"></i>
           Student Panel
         </a>
 
         <!-- Organization Panel Link -->
-        <a *ngIf="isOrgOfficer" 
-           routerLink="/org-panel/dashboard" 
-           routerLinkActive="bg-[#679436] text-white"
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-[#679436] hover:text-white transition-colors duration-200">
+        <a *ngIf="isOrgOfficer" routerLink="/org-panel/dashboard" routerLinkActive="bg-[#679436] text-white"
+          class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-[#679436] hover:text-white transition-colors duration-200">
           <i class="fas fa-users mr-2"></i>
           Organization Panel
         </a>
 
         <!-- Admin Panel Link -->
-        <a *ngIf="isAdmin" 
-           routerLink="/osws-admin/dashboard" 
-           routerLinkActive="bg-[#679436] text-white"
-           class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-[#679436] hover:text-white transition-colors duration-200">
+        <a *ngIf="isAdmin" routerLink="/osws-admin/dashboard" routerLinkActive="bg-[#679436] text-white"
+          class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-[#679436] hover:text-white transition-colors duration-200">
           <i class="fas fa-shield-alt mr-2"></i>
           Admin Panel
         </a>
 
         <!-- User Menu Dropdown -->
         <div class="relative ml-3">
-          <button 
-            (click)="toggleUserMenu()"
+          <button (click)="toggleUserMenu()"
             class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#679436]">
             <div class="h-8 w-8 rounded-full bg-[#679436] text-white flex items-center justify-center font-medium">
               {{ userName.charAt(0).toUpperCase() }}
@@ -64,19 +58,18 @@
           </button>
 
           <!-- Dropdown Menu -->
-          <div *ngIf="isUserMenuOpen" 
-               class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
-            
+          <div *ngIf="isUserMenuOpen"
+            class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100">
+
             <!-- User Info Section -->
             <div class="px-4 py-3">
               <p class="text-sm font-medium text-gray-900">{{ userName }}</p>
               <p class="text-xs text-gray-500 truncate">{{ userEmail }}</p>
-              
+
               <!-- Role Badges -->
               <div class="mt-2 flex flex-wrap gap-1">
-                <span *ngFor="let role of roleBadges" 
-                      [ngClass]="getBadgeClass(role)"
-                      class="px-2 py-1 text-xs font-medium rounded-full">
+                <span *ngFor="let role of roleBadges" [ngClass]="getBadgeClass(role)"
+                  class="px-2 py-1 text-xs font-medium rounded-full">
                   {{ role }}
                 </span>
               </div>
@@ -90,17 +83,14 @@
 
             <!-- Menu Items -->
             <div class="py-1">
-              <a routerLink="/profile" 
-                 (click)="closeMenus()"
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <a routerLink="/profile" (click)="closeMenus()"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 <i class="fas fa-user mr-2"></i>
                 My Profile
               </a>
-              
-              <a *ngIf="isStudent" 
-                 routerLink="/student-dashboard/request-role" 
-                 (click)="closeMenus()"
-                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+
+              <a *ngIf="isStudent" routerLink="/student-dashboard/request-role" (click)="closeMenus()"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 <i class="fas fa-hand-paper mr-2"></i>
                 Request Officer Role
               </a>
@@ -108,9 +98,7 @@
 
             <!-- Logout -->
             <div class="py-1">
-              <button 
-                (click)="logout()"
-                class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+              <button (click)="logout()" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-50">
                 <i class="fas fa-sign-out-alt mr-2"></i>
                 Logout
               </button>
@@ -121,8 +109,7 @@
 
       <!-- Mobile Menu Button -->
       <div class="md:hidden flex items-center">
-        <button 
-          (click)="toggleMobileMenu()"
+        <button (click)="toggleMobileMenu()"
           class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#679436] min-h-[44px] min-w-[44px]">
           <i class="fas text-xl" [ngClass]="isMobileMenuOpen ? 'fa-times' : 'fa-bars'"></i>
         </button>
@@ -133,46 +120,39 @@
   <!-- Mobile Menu -->
   <div *ngIf="isMobileMenuOpen" class="md:hidden border-t border-gray-200">
     <div class="px-3 py-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
-      
+
       <!-- User Info (Mobile) -->
       <div class="px-3 py-3 border-b border-gray-200 mb-2">
         <p class="text-sm font-medium text-gray-900 break-words">{{ userName }}</p>
         <p class="text-xs text-gray-500 break-all">{{ userEmail }}</p>
         <div class="mt-2 flex flex-wrap gap-1">
-          <span *ngFor="let role of roleBadges" 
-                [ngClass]="getBadgeClass(role)"
-                class="px-2 py-1 text-xs font-medium rounded-full">
+          <span *ngFor="let role of roleBadges" [ngClass]="getBadgeClass(role)"
+            class="px-2 py-1 text-xs font-medium rounded-full">
             {{ role }}
           </span>
         </div>
       </div>
 
       <!-- Student Panel Link (Mobile) -->
-      <a *ngIf="isStudent" 
-         routerLink="/student-dashboard/home"
-         (click)="closeMenus()"
-         routerLinkActive="bg-[#679436] text-white"
-         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-[#679436] hover:text-white">
+      <a *ngIf="isStudent" routerLink="/student-dashboard/home" (click)="closeMenus()"
+        routerLinkActive="bg-[#679436] text-white"
+        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-[#679436] hover:text-white">
         <i class="fas fa-user-graduate mr-2"></i>
         Student Panel
       </a>
 
       <!-- Organization Panel Link (Mobile) -->
-      <a *ngIf="isOrgOfficer" 
-         routerLink="/org-panel/dashboard"
-         (click)="closeMenus()"
-         routerLinkActive="bg-[#679436] text-white"
-         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-[#679436] hover:text-white">
+      <a *ngIf="isOrgOfficer" routerLink="/org-panel/dashboard" (click)="closeMenus()"
+        routerLinkActive="bg-[#679436] text-white"
+        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-[#679436] hover:text-white">
         <i class="fas fa-users mr-2"></i>
         Organization Panel
       </a>
 
       <!-- Admin Panel Link (Mobile) -->
-      <a *ngIf="isAdmin" 
-         routerLink="/osws-admin/dashboard"
-         (click)="closeMenus()"
-         routerLinkActive="bg-[#679436] text-white"
-         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-[#679436] hover:text-white">
+      <a *ngIf="isAdmin" routerLink="/osws-admin/dashboard" (click)="closeMenus()"
+        routerLinkActive="bg-[#679436] text-white"
+        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-[#679436] hover:text-white">
         <i class="fas fa-shield-alt mr-2"></i>
         Admin Panel
       </a>
@@ -181,25 +161,21 @@
       <div class="border-t border-gray-200 my-2"></div>
 
       <!-- Profile Link (Mobile) -->
-      <a routerLink="/profile"
-         (click)="closeMenus()"
-         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+      <a routerLink="/profile" (click)="closeMenus()"
+        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
         <i class="fas fa-user mr-2"></i>
         My Profile
       </a>
 
       <!-- Request Role Link (Mobile) -->
-      <a *ngIf="isStudent" 
-         routerLink="/student-dashboard/request-role"
-         (click)="closeMenus()"
-         class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
+      <a *ngIf="isStudent" routerLink="/student-dashboard/request-role" (click)="closeMenus()"
+        class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100">
         <i class="fas fa-hand-paper mr-2"></i>
         Request Officer Role
       </a>
 
       <!-- Logout (Mobile) -->
-      <button 
-        (click)="logout()"
+      <button (click)="logout()"
         class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-700 hover:bg-red-50">
         <i class="fas fa-sign-out-alt mr-2"></i>
         Logout
@@ -209,8 +185,5 @@
 </nav>
 
 <!-- Click Outside to Close Menus -->
-<div *ngIf="isUserMenuOpen || isMobileMenuOpen" 
-     (click)="closeMenus()" 
-     class="fixed inset-0 z-40" 
-     aria-hidden="true">
+<div *ngIf="isUserMenuOpen || isMobileMenuOpen" (click)="closeMenus()" class="fixed inset-0 z-40" aria-hidden="true">
 </div>

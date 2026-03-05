@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 @Component({
 	selector: 'app-trash',
 	standalone: true,
-		imports: [CommonModule, FormsModule],
+	imports: [CommonModule, FormsModule],
 	templateUrl: './trash.component.html',
 	styleUrls: ['./trash.component.css']
 })
@@ -20,19 +20,19 @@ export class TrashComponent implements OnInit {
 	trashedAdmins: any[] = [];
 	trashedOrganizations: any[] = [];
 	trashedMembers: any[] = [];
-	
+
 	// Active tab
 	activeTab: 'events' | 'admins' | 'organizations' | 'members' = 'events';
-	
+
 	loading = false;
 	error: string | null = null;
 	search = '';
 	role: string | null = null;
-	
+
 	// Pagination: 3x3 layout per page for events, more for tables
 	currentPage: number = 1;
 	pageSize: number = 9;
-	
+
 	// Loading states for individual actions
 	restoringId: number | null = null;
 	deletingId: number | null = null;
@@ -41,7 +41,7 @@ export class TrashComponent implements OnInit {
 		private eventService: EventService,
 		private archiveService: ArchiveService,
 		private auth: RbacAuthService
-	) {}
+	) { }
 
 	ngOnInit(): void {
 		// Determine role for palette (OSWS vs Organization)
@@ -59,17 +59,17 @@ export class TrashComponent implements OnInit {
 	loadTrash(): void {
 		this.loading = true;
 		this.error = null;
-		
+
 		// Load events
 		this.eventService.getTrashedEvents().subscribe({
-				next: (res: any) => {
-					this.trashedEvents = normalizeList(res);
+			next: (res: any) => {
+				this.trashedEvents = normalizeList(res);
 			},
 			error: (err: any) => {
 				console.error('Error loading trashed events:', err);
 			}
 		});
-		
+
 		// Load users and members
 		this.archiveService.getTrash().subscribe({
 			next: (res: any) => {
@@ -108,7 +108,7 @@ export class TrashComponent implements OnInit {
 	// Restore operations
 	restore(item: any): void {
 		this.restoringId = item.id || item.event_id || item.member_id;
-		
+
 		let restoreObservable;
 		switch (this.activeTab) {
 			case 'events':
@@ -127,7 +127,7 @@ export class TrashComponent implements OnInit {
 				this.restoringId = null;
 				return;
 		}
-		
+
 		restoreObservable.subscribe({
 			next: () => {
 				this.restoringId = null;
@@ -144,9 +144,9 @@ export class TrashComponent implements OnInit {
 
 	// Delete forever operations
 	deleteForever(item: any): void {
-		const itemName = item.title || item.name || item.org_name || 
-		                 `${item.first_name || ''} ${item.last_name || ''}`.trim();
-		
+		const itemName = item.title || item.name || item.org_name ||
+			`${item.first_name || ''} ${item.last_name || ''}`.trim();
+
 		Swal.fire({
 			title: 'Permanently delete this item?',
 			text: `${itemName}\n\nThis action cannot be undone.`,
@@ -158,7 +158,7 @@ export class TrashComponent implements OnInit {
 			reverseButtons: true
 		}).then((result) => {
 			if (!result.isConfirmed) return;
-			
+
 			this.deletingId = item.id || item.event_id || item.member_id;
 			Swal.fire({
 				title: 'Deleting…',
@@ -167,7 +167,7 @@ export class TrashComponent implements OnInit {
 				showConfirmButton: false,
 				didOpen: () => Swal.showLoading()
 			});
-			
+
 			let deleteObservable;
 			switch (this.activeTab) {
 				case 'events':
@@ -187,7 +187,7 @@ export class TrashComponent implements OnInit {
 					Swal.close();
 					return;
 			}
-			
+
 			deleteObservable.subscribe({
 				next: () => {
 					this.deletingId = null;
@@ -209,7 +209,7 @@ export class TrashComponent implements OnInit {
 	get filtered(): any[] {
 		const q = (this.search || '').trim().toLowerCase();
 		if (!q) return this.currentData;
-		
+
 		return this.currentData.filter(item => {
 			const searchableText = [
 				item.title,
@@ -223,7 +223,7 @@ export class TrashComponent implements OnInit {
 				item.last_name,
 				item.position
 			].filter(Boolean).join(' ').toLowerCase();
-			
+
 			return searchableText.includes(q);
 		});
 	}
@@ -263,16 +263,16 @@ export class TrashComponent implements OnInit {
 
 	// Convenience getter for styling
 	get isOsws(): boolean { return this.role === 'osws_admin'; }
-	
+
 	// Check if user can see certain tabs
 	get canSeeAdminsTab(): boolean {
 		return this.role === 'osws_admin';
 	}
-	
+
 	get canSeeOrganizationsTab(): boolean {
 		return false; // Hidden for all users
 	}
-	
+
 	get canSeeMembersTab(): boolean {
 		return this.role === 'organization'; // Only org officers, not OSWS admins
 	}

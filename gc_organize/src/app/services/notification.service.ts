@@ -17,7 +17,7 @@ export interface NotificationItem {
 export class NotificationService {
   private api = `${environment.apiUrl}/notifications`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('gc_organize_token');

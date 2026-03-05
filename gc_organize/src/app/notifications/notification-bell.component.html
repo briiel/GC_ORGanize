@@ -1,25 +1,19 @@
 <div class="relative">
   <!-- Bell Button -->
-  <button 
-    (click)="toggle()" 
-    class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-600 transition-all duration-200 hover:scale-105 active:scale-95" 
-    aria-label="Notifications"
-  >
+  <button (click)="toggle()"
+    class="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-600 transition-all duration-200 hover:scale-105 active:scale-95"
+    aria-label="Notifications">
     <i class="fas fa-bell text-lg" [class.animate-bounce]="unreadCount() > 0"></i>
-    <span 
-      *ngIf="unreadCount() > 0" 
-      class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border-2 border-white min-w-[20px] flex items-center justify-center"
-    >
+    <span *ngIf="unreadCount() > 0"
+      class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-lg border-2 border-white min-w-[20px] flex items-center justify-center">
       {{ unreadCount() > 99 ? '99+' : unreadCount() }}
     </span>
   </button>
 
   <!-- Notification Dropdown Panel -->
-  <div 
-    *ngIf="open" 
+  <div *ngIf="open"
     class="absolute right-0 mt-3 w-96 max-w-[90vw] bg-white rounded-xl shadow-2xl overflow-hidden animate-slideDown"
-    [ngStyle]="{'z-index': '9999'}"
-  >
+    [ngStyle]="{'z-index': '9999'}">
     <!-- Header -->
     <div class="px-5 py-4" [ngStyle]="getHeaderStyle()">
       <div class="flex items-center justify-between">
@@ -32,11 +26,9 @@
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <button 
-            class="text-xs text-white/90 hover:text-white font-semibold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 border border-white/30" 
-            (click)="refresh()"
-            title="Refresh notifications"
-          >
+          <button
+            class="text-xs text-white/90 hover:text-white font-semibold px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 border border-white/30"
+            (click)="refresh()" title="Refresh notifications">
             <i class="fas fa-sync-alt mr-1"></i>Refresh
           </button>
 
@@ -67,16 +59,20 @@
 
         <!-- Notification Items -->
         <ul *ngIf="items.length > 0" class="divide-y divide-gray-100">
-          <li *ngFor="let n of items; let i = index" (click)="markRead(n, i)" class="p-4 hover:bg-gray-50 cursor-pointer transition-all duration-200 border-l-4" [ngClass]="{'border-l-[#679436] bg-[#679436]/5': !n.is_read, 'border-l-transparent': n.is_read}">
+          <li *ngFor="let n of items; let i = index" (click)="markRead(n, i)"
+            class="p-4 hover:bg-gray-50 cursor-pointer transition-all duration-200 border-l-4"
+            [ngClass]="{'border-l-[#679436] bg-[#679436]/5': !n.is_read, 'border-l-transparent': n.is_read}">
             <div class="flex items-start gap-3">
               <!-- Icon Badge -->
-              <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm" [ngClass]="getNotificationIconClass(n)">
+              <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm"
+                [ngClass]="getNotificationIconClass(n)">
                 <i [class]="getNotificationIcon(n) + ' text-white text-sm'"></i>
               </div>
 
               <!-- Content -->
               <div class="flex-1 min-w-0">
-                <p class="text-sm leading-relaxed" [ngClass]="{'font-semibold text-gray-900': !n.is_read, 'font-normal text-gray-600': n.is_read}">
+                <p class="text-sm leading-relaxed"
+                  [ngClass]="{'font-semibold text-gray-900': !n.is_read, 'font-normal text-gray-600': n.is_read}">
                   {{ n.message }}
                 </p>
                 <span *ngIf="n.event_title" class="gc-badge gc-badge-info text-xs mt-2 inline-flex">
@@ -91,7 +87,9 @@
 
               <!-- Unread Indicator -->
               <div class="flex items-center gap-2 flex-shrink-0">
-                <span *ngIf="!n.is_read" class="w-2.5 h-2.5 bg-[#679436] rounded-full shadow-md ring-2 ring-[#679436]/20" title="Unread"></span>
+                <span *ngIf="!n.is_read"
+                  class="w-2.5 h-2.5 bg-[#679436] rounded-full shadow-md ring-2 ring-[#679436]/20"
+                  title="Unread"></span>
               </div>
             </div>
           </li>
@@ -100,25 +98,16 @@
     </div>
 
     <!-- Footer -->
-    <div 
-      *ngIf="!loading && items.length > 0" 
-      class="px-4 py-3 bg-gray-50 border-t-2 border-gray-200 text-center"
-    >
-      <button 
-        *ngIf="unreadCount() > 0"
+    <div *ngIf="!loading && items.length > 0" class="px-4 py-3 bg-gray-50 border-t-2 border-gray-200 text-center">
+      <button *ngIf="unreadCount() > 0"
         class="text-xs text-[#679436] hover:text-[#567a2c] font-semibold hover:underline transition-colors duration-200"
-        (click)="markAll()"
-        title="Mark all notifications as read"
-      >
+        (click)="markAll()" title="Mark all notifications as read">
         <i class="fas fa-check-double mr-1"></i>
         Mark all as read
       </button>
-      <button
-        *ngIf="unreadCount() === 0"
+      <button *ngIf="unreadCount() === 0"
         class="text-xs text-gray-600 hover:text-gray-800 font-semibold hover:underline transition-colors duration-200"
-        (click)="toggle()"
-        title="Close notifications"
-      >
+        (click)="toggle()" title="Close notifications">
         <i class="fas fa-times mr-1"></i>
         Close Notifications
       </button>

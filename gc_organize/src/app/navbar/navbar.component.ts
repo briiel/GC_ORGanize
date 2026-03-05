@@ -11,7 +11,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  
+
   // Role flags
   isStudent = false;
   isOrgOfficer = false;
@@ -34,7 +34,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private authService: RbacAuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUserInfo();

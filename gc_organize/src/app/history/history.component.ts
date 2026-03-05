@@ -30,7 +30,7 @@ export class HistoryComponent implements OnInit {
   // per-card request state
   sendingId: number | null = null;
 
-  constructor(private eventService: EventService, private auth: RbacAuthService) {}
+  constructor(private eventService: EventService, private auth: RbacAuthService) { }
 
   ngOnInit(): void {
     const studentId = this.auth.getStudentId();
@@ -114,7 +114,7 @@ export class HistoryComponent implements OnInit {
       // Fallback for HH:MM format
       const [h, m] = String(t).split(':');
       const dt = new Date();
-      dt.setHours(Number(h||0), Number(m||0), 0, 0);
+      dt.setHours(Number(h || 0), Number(m || 0), 0, 0);
       return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     } catch {
       return '';

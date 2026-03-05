@@ -32,7 +32,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
   isAddingAdmin = false;
   deletingAdminId: number | null = null;
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService) { }
 
   // Filtered admins based on search term
   get filteredAdmins() {
@@ -67,11 +67,11 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.adminService.getManageUsers().subscribe({
       next: (res) => {
-      // Support multiple possible response shapes for resilience:
-      // - { success: true, data: { admins, organizations } }
-      // - { admins, organizations }
-      // - { data: { admins, organizations } }
-      const payload = normalizeSingle(res) || (res?.data ?? res ?? {});
+        // Support multiple possible response shapes for resilience:
+        // - { success: true, data: { admins, organizations } }
+        // - { admins, organizations }
+        // - { data: { admins, organizations } }
+        const payload = normalizeSingle(res) || (res?.data ?? res ?? {});
         // If API returns top-level success=false, surface message
         if (res && res.success === false) {
           console.error('ManageUsers API returned failure:', res);
@@ -95,13 +95,13 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
 
   openAddAdminModal() {
     this.isAddAdminModalOpen = true;
-  // Add a global class so the sidebar can blur while modal is open
-  document.body.classList.add('modal-open');
+    // Add a global class so the sidebar can blur while modal is open
+    document.body.classList.add('modal-open');
   }
 
   closeAddAdminModal() {
     this.isAddAdminModalOpen = false;
-  document.body.classList.remove('modal-open');
+    document.body.classList.remove('modal-open');
   }
 
   addAdmin() {
@@ -139,7 +139,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
 
     if (result.isConfirmed) {
       this.deletingAdminId = id;
-      
+
       Swal.fire({
         title: 'Archiving...',
         text: 'Please wait',
@@ -150,7 +150,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
           Swal.showLoading();
         }
       });
-      
+
       this.adminService.deleteAdmin(id).subscribe({
         next: () => {
           this.deletingAdminId = null;

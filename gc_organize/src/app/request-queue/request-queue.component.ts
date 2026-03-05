@@ -37,13 +37,13 @@ interface RoleRequest {
 export class RequestQueueComponent implements OnInit {
   // private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
   private apiUrl = environment.apiUrl;
-  
+
   pendingRequests: RoleRequest[] = [];
   allRequests: RoleRequest[] = [];
-  
+
   selectedTab: 'pending' | 'all' = 'pending';
   filterStatus: string = 'all';
-  
+
   isLoading = true;
   processingRequestId: number | null = null;
   // Pagination state for Pending tab
@@ -59,7 +59,7 @@ export class RequestQueueComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private authService: RbacAuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadPendingRequests();
@@ -172,7 +172,7 @@ export class RequestQueueComponent implements OnInit {
       ).subscribe({
         next: (response) => {
           this.processingRequestId = null;
-          
+
           Swal.fire({
             icon: 'success',
             title: 'Request Approved!',
@@ -189,7 +189,7 @@ export class RequestQueueComponent implements OnInit {
         },
         error: (error) => {
           this.processingRequestId = null;
-          
+
           Swal.fire({
             icon: 'error',
             title: 'Approval Failed',
@@ -237,7 +237,7 @@ export class RequestQueueComponent implements OnInit {
       ).subscribe({
         next: (response) => {
           this.processingRequestId = null;
-          
+
           Swal.fire({
             icon: 'success',
             title: 'Request Declined',
@@ -254,7 +254,7 @@ export class RequestQueueComponent implements OnInit {
         },
         error: (error) => {
           this.processingRequestId = null;
-          
+
           Swal.fire({
             icon: 'error',
             title: 'Decline Failed',

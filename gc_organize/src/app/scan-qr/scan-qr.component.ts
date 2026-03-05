@@ -9,7 +9,7 @@ import { OsmService } from '../services/osm.service';
 import { firstValueFrom } from 'rxjs';
 import { EventService } from '../services/event.service';
 import { environment } from '../../environments/environment';
-import { normalizeList, normalizeSingle } from '../utils/api-utils';
+import { normalizeList } from '../utils/api-utils';
 
 @Component({
   selector: 'app-scan-qr',
@@ -44,7 +44,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     private auth: RbacAuthService,
     private eventService: EventService,
     private osm: OsmService
-  ) {}
+  ) { }
 
   ngOnInit() {
     // Set initial UI text before first change detection to avoid NG0100.
@@ -58,29 +58,18 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       this.role = 'student';
     }
     this.fetchScannerEvents();
-    // Fetch current privacy policy (public endpoint)
-    this.http.get(`${environment.apiUrl}/admin/privacy-policy`).subscribe({
-      next: (res: any) => {
-        const pObj = normalizeSingle(res) || res;
-        const p = pObj?.policy ?? res?.policy ?? null;
-        this.privacyPolicy = p?.content ?? null;
-      },
-      error: () => {
-        // ignore quietly
-      }
-    });
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() { }
 
   async ngOnDestroy() {
     if (this.html5QrCode) {
       try {
         await this.html5QrCode.stop();
-      } catch (e) {}
+      } catch (e) { }
       try {
         await this.html5QrCode.clear();
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
@@ -110,11 +99,11 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
         allowEscapeKey: false,
         reverseButtons: true
       });
-      
+
       if (!result.isConfirmed) {
         return;
       }
-      
+
       // Record acceptance in the database
       const token = localStorage.getItem('gc_organize_token');
       if (token) {
@@ -162,8 +151,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Clear any existing instance
     if (this.html5QrCode) {
-      try { await this.html5QrCode.stop(); } catch {}
-      try { await this.html5QrCode.clear(); } catch {}
+      try { await this.html5QrCode.stop(); } catch { }
+      try { await this.html5QrCode.clear(); } catch { }
     }
 
     this.message = 'Initializing camera…';
@@ -204,23 +193,23 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
         { deviceId: { exact: this.selectedCameraId } },
         { fps: 10, qrbox: 250 },
         (decodedText) => this.onCodeResult(decodedText),
-        () => {}
+        () => { }
       );
 
       this.isRunning = true;
       this.message = 'Scanner ready. Present a QR code.';
       this.cdr.detectChanges();
     } catch (err: any) {
-  this.isRunning = false;
-  const msg = typeof err === 'string' ? err : (err?.message || JSON.stringify(err));
+      this.isRunning = false;
+      const msg = typeof err === 'string' ? err : (err?.message || JSON.stringify(err));
       // Helpful hints for common issues
       const hint = /NotAllowedError/i.test(msg)
         ? ' Camera permission was denied.'
         : /NotFoundError/i.test(msg)
-        ? ' No suitable camera found.'
-        : /NotReadableError|TrackStartError/i.test(msg)
-        ? ' Camera is in use by another app.'
-        : '';
+          ? ' No suitable camera found.'
+          : /NotReadableError|TrackStartError/i.test(msg)
+            ? ' Camera is in use by another app.'
+            : '';
       this.message = 'Camera start failed: ' + msg + hint;
       this.cdr.detectChanges();
     }
@@ -228,8 +217,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async stopScanner() {
     if (this.html5QrCode) {
-      try { await this.html5QrCode.stop(); } catch {}
-      try { await this.html5QrCode.clear(); } catch {}
+      try { await this.html5QrCode.stop(); } catch { }
+      try { await this.html5QrCode.clear(); } catch { }
     }
     this.isRunning = false;
     this.message = 'Scanner stopped.';
@@ -268,8 +257,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Accept both legacy JSON payload and new plain student_id string
-  let registration_id: number | undefined;
-  let event_id: number | undefined;
+    let registration_id: number | undefined;
+    let event_id: number | undefined;
     let student_id: string | undefined;
     try {
       const parsed: any = JSON.parse(resultString);
@@ -455,7 +444,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
           const rows = normalizeList(res);
           this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
         },
-        error: () => {}
+        error: () => { }
       });
     } else if (role === 'organization') {
       const creatorId = this.auth.getCreatorId();
@@ -465,7 +454,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
           const rows = normalizeList(res);
           this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
         },
-        error: () => {}
+        error: () => { }
       });
     }
   }

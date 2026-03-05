@@ -36,8 +36,8 @@ export class AttendanceRecordsComponent implements OnInit {
   role: string | null = null;
   showMobileModal: boolean = false;
 
-  get isOsws(): boolean { 
-    return this.role === 'osws_admin'; 
+  get isOsws(): boolean {
+    return this.role === 'osws_admin';
   }
 
   get filteredEvents() {
@@ -56,38 +56,38 @@ export class AttendanceRecordsComponent implements OnInit {
       return title.includes(term) || status.includes(term);
     });
   }
-  
+
   get sortedEvents() {
-    return [...this.filteredEvents].sort((a, b) => 
+    return [...this.filteredEvents].sort((a, b) =>
       (a.title || '').localeCompare(b.title || '', undefined, { sensitivity: 'base' })
     );
   }
-  
+
   get pagedEvents() {
     const start = (this.eventPage - 1) * this.eventsPerPage;
     return this.sortedEvents.slice(start, start + this.eventsPerPage);
   }
-  
+
   get totalEventPages() {
     return Math.ceil(this.filteredEvents.length / this.eventsPerPage) || 1;
   }
-  
+
   setEventPage(page: number) {
     if (page >= 1 && page <= this.totalEventPages) {
       this.eventPage = page;
     }
   }
-  
+
   onEventSearch() {
     this.eventPage = 1;
   }
 
   constructor(
-    private eventService: EventService, 
-    private auth: RbacAuthService, 
+    private eventService: EventService,
+    private auth: RbacAuthService,
     private http: HttpClient,
     private excelExportService: ExcelExportService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loading = true;
@@ -99,15 +99,15 @@ export class AttendanceRecordsComponent implements OnInit {
     } else if (primaryRole === 'Student') {
       this.role = 'student';
     }
-    
+
     if (this.role === 'osws_admin') {
       const adminId = this.auth.getAdminId();
       if (!adminId) return;
       this.eventService.getEventsByAdmin(adminId).subscribe({
-              next: (res) => {
-                this.events = normalizeList(res);
-                this.selectedEvent = null;
-                this.loading = false;
+        next: (res) => {
+          this.events = normalizeList(res);
+          this.selectedEvent = null;
+          this.loading = false;
         },
         error: (err) => {
           this.error = 'Failed to load events';
@@ -237,7 +237,7 @@ export class AttendanceRecordsComponent implements OnInit {
 
   async downloadExcel() {
     const headers = ['#', 'Student ID', 'Name', 'Department', 'Program', 'Time In', 'Time Out', 'Scanned By'];
-    
+
     const data = this.filteredRecords.map((record, i) => [
       i + 1,
       record.student_id || '-',

@@ -111,7 +111,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   oswsSortBy: string = 'title_asc';
   orgEventDepartmentFilter: string = ''; // Filter by department
   orgEventStatusFilter: string = 'active'; // Default to show only active events (not yet started + ongoing)
-  
+
   get orgEventTotalPages(): number {
     return Math.ceil((this.filteredOrgEventsList?.length || 0) / this.orgEventPageSize) || 1;
   }
@@ -124,7 +124,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const start = (this.orgEventPage - 1) * this.orgEventPageSize;
     return sorted.slice(start, start + this.orgEventPageSize);
   }
-  
+
   // Get unique departments from org events
   get uniqueDepartments(): string[] {
     const departments = this.orgEvents
@@ -133,7 +133,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       .sort();
     return departments;
   }
-  
+
   goToOrgEventPage(page: number) {
     if (page < 1 || page > this.orgEventTotalPages) return;
     this.orgEventPage = page;
@@ -144,7 +144,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   prevOrgEventPage() {
     if (this.orgEventPage > 1) this.orgEventPage--;
   }
-  
+
   changeOrgEventPageSize(size: number) {
     this.orgEventPageSize = size;
     this.orgEventPage = 1;
@@ -163,7 +163,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   participantsSearchTerm: string = ''; // Search term for filtering participants
 
   expandedParticipants: Set<number> = new Set(); // Track which participants are expanded
-  
+
   get filteredParticipants(): any[] {
     if (!this.participantsSearchTerm.trim()) {
       return this.participants || [];
@@ -177,15 +177,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       const department = (participant.department || '').toLowerCase();
       const program = (participant.program || '').toLowerCase();
       const fullName = `${firstName} ${lastName}`;
-      return studentId.includes(term) || 
-             fullName.includes(term) || 
-             firstName.includes(term) || 
-             lastName.includes(term) ||
-             department.includes(term) ||
-             program.includes(term);
+      return studentId.includes(term) ||
+        fullName.includes(term) ||
+        firstName.includes(term) ||
+        lastName.includes(term) ||
+        department.includes(term) ||
+        program.includes(term);
     });
   }
-  
+
   get participantsTotalPages(): number {
     return Math.ceil((this.filteredParticipants?.length || 0) / this.participantsPageSize) || 1;
   }
@@ -239,9 +239,9 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     start_date: '',
     start_time: '',
     end_date: '',
-  end_time: '',
-  is_paid: false,
-  registration_fee: 0
+    end_time: '',
+    is_paid: false,
+    registration_fee: 0
   };
 
   // Geolocation / place coordinates used for geofence validation
@@ -277,7 +277,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   expandedEvaluations: Set<number> = new Set(); // Track which evaluations are expanded
   evaluationSearchTerm: string = ''; // Search term for filtering evaluations
   showAverageRatings: boolean = true; // Toggle for average ratings section
-  
+
   get filteredEvaluations(): any[] {
     if (!this.evaluationSearchTerm.trim()) {
       return this.evaluations || [];
@@ -291,7 +291,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       return studentId.includes(term) || fullName.includes(term) || firstName.includes(term) || lastName.includes(term);
     });
   }
-  
+
   get evaluationsTotalPages(): number {
     return Math.ceil((this.filteredEvaluations?.length || 0) / this.evaluationsPageSize) || 1;
   }
@@ -328,7 +328,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private eventService: EventService, 
+    private eventService: EventService,
     private evaluationService: EvaluationService,
     private router: Router,
     private auth: RbacAuthService,
@@ -447,7 +447,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   updateEventStatus(event: any) {
     this.eventService.updateEventStatus(event.event_id, event.status).subscribe({
       next: (response) => {
-        
+
         // Optionally show success message to user
         // You can add a toast notification here
       },
@@ -503,8 +503,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     } else {
       const search = this.searchTerm.trim().toLowerCase();
       if (!search) {
-  // No search: hide concluded
-  this.filteredList = (this.events || []).filter(e => (String(e?.status || '').toLowerCase()) !== 'concluded');
+        // No search: hide concluded
+        this.filteredList = (this.events || []).filter(e => (String(e?.status || '').toLowerCase()) !== 'concluded');
       } else {
         // With search: include concluded results if they match title or status
         this.filteredList = (this.events || []).filter(event => {
@@ -517,8 +517,8 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       if (this.selectedEvent && !this.filteredList.some(e => e.event_id === this.selectedEvent.event_id)) {
         this.selectedEvent = null;
       }
-  // Reset to first page for new results
-  this.eventPage = 1;
+      // Reset to first page for new results
+      this.eventPage = 1;
     }
   }
 
@@ -546,11 +546,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
   searchOrgEvents() {
     let results = this.orgEvents;
-    
+
     // Apply status filter
     if (this.orgEventStatusFilter === 'active') {
       // Show only 'not yet started' and 'ongoing' events
-      results = results.filter(event => 
+      results = results.filter(event =>
         event.status === 'not yet started' || event.status === 'ongoing'
       );
     } else if (this.orgEventStatusFilter === 'all') {
@@ -560,12 +560,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       // Filter by specific status
       results = results.filter(event => event.status === this.orgEventStatusFilter);
     }
-    
+
     // Apply department filter
     if (this.orgEventDepartmentFilter) {
       results = results.filter(event => event.department === this.orgEventDepartmentFilter);
     }
-    
+
     // Apply search term filter
     const term = this.orgEventsSearchTerm.trim().toLowerCase();
     if (term) {
@@ -578,7 +578,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         (event.status && event.status.toLowerCase().includes(term))
       );
     }
-    
+
     this.filteredOrgEventsList = results;
     this.orgEventPage = 1;
   }
@@ -589,19 +589,19 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.orgEventStatusFilter = 'active'; // Reset to default
     this.searchOrgEvents(); // Re-apply filters
   }
-  
+
   onOrgEventDepartmentChange() {
     this.orgEventPage = 1;
     this.searchOrgEvents();
   }
-  
+
   onOrgEventStatusChange() {
     this.orgEventPage = 1;
     this.searchOrgEvents();
   }
 
   filteredOrgEvents() {
-  return this.filteredOrgEventsList || [];
+    return this.filteredOrgEventsList || [];
   }
 
   filteredOswsEvents(): any[] {
@@ -649,10 +649,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       text: `Move event "${event.title}" to archive?`,
       icon: 'warning',
       showCancelButton: true,
-  confirmButtonText: 'Archive',
-  cancelButtonText: 'Cancel',
-  confirmButtonColor: '#d33',
-  reverseButtons: true
+      confirmButtonText: 'Archive',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#d33',
+      reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
         this.deleteEvent(event.event_id);
@@ -682,16 +682,16 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.showParticipantsModal = true;
     this.participantsLoading = true;
     this.participants = [];
-  this.participantsPage = 1;
-  this.toggleBodyModalClass();
+    this.participantsPage = 1;
+    this.toggleBodyModalClass();
     this.eventService.getEventParticipants(event.event_id).subscribe({
       next: (res) => {
         this.participants = normalizeList(res);
         this.participantsLoading = false;
         this.selectedRegistrations.clear();
-    // Ensure current page is within bounds after load
-    const total = this.participantsTotalPages;
-    if (this.participantsPage > total) this.participantsPage = total;
+        // Ensure current page is within bounds after load
+        const total = this.participantsTotalPages;
+        if (this.participantsPage > total) this.participantsPage = total;
       },
       error: () => {
         this.participants = [];
@@ -704,11 +704,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.showParticipantsModal = false;
     this.participants = [];
     this.selectedEventTitle = '';
-  this.participantsPage = 1;
+    this.participantsPage = 1;
     this.participantsSearchTerm = ''; // Clear search term
     this.expandedParticipants.clear(); // Clear expanded participants
     this.selectedRegistrations.clear();
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
   }
 
   private refreshParticipantsList(): void {
@@ -933,17 +933,17 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       });
       return;
     }
-    
+
     // If called from the details panel, enable inline editing
     if (this.selectedEvent && event && this.selectedEvent.event_id === event.event_id) {
       this.isInlineEditing = true;
       // Deep copy to avoid mutating selectedEvent until save
-  this.inlineEditEvent = { ...this.selectedEvent };
+      this.inlineEditEvent = { ...this.selectedEvent };
       // Ensure date fields are in yyyy-MM-dd format for input type="date"
       this.inlineEditEvent.start_date = this.toDateInputValue(this.inlineEditEvent.start_date);
       this.inlineEditEvent.end_date = this.toDateInputValue(this.inlineEditEvent.end_date);
-  // Coerce is_paid to boolean for radio binding
-  this.inlineEditEvent.is_paid = !!this.inlineEditEvent.is_paid;
+      // Coerce is_paid to boolean for radio binding
+      this.inlineEditEvent.is_paid = !!this.inlineEditEvent.is_paid;
       return;
     }
     // Otherwise, open modal (old logic)
@@ -1114,7 +1114,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
   closeCreateModal() {
     this.showCreateModal = false;
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
   }
 
   // Load saved rooms from localStorage and merge with defaults
@@ -1255,7 +1255,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
               this.isLocationGordon = this.isGordonLocation(address);
             }
           });
-        }, () => {}, { enableHighAccuracy: true });
+        }, () => { }, { enableHighAccuracy: true });
       }
       return;
     }
@@ -1325,7 +1325,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       try {
         const el = document.querySelector<HTMLInputElement>('#other-room-input');
         if (el) el.focus();
-      } catch (e) {}
+      } catch (e) { }
     }, 50);
   }
 
@@ -1367,7 +1367,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
               this.otherRoomInput = event.room;
             }
           }
-        } catch (e) {}
+        } catch (e) { }
 
         // Determine if loaded event location is Gordon College
         this.isLocationGordon = this.isGordonLocation(event.location || this.newEvent.location || '');
@@ -1432,7 +1432,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (fileInput) fileInput.value = '';
     this.isImageUploaded = false;
     this.eventPosterFile = null;
-  this.posterPreviewUrl = null;
+    this.posterPreviewUrl = null;
   }
 
   createEventFromModal(): void {
@@ -1453,7 +1453,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       }
     }
 
-  const formData = new FormData();
+    const formData = new FormData();
     formData.append('title', this.newEvent.title);
     formData.append('description', this.newEvent.description);
     formData.append('location', this.newEvent.location);
@@ -1461,7 +1461,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     formData.append('start_time', this.newEvent.start_time);
     formData.append('end_date', this.newEvent.end_date);
     formData.append('end_time', this.newEvent.end_time);
-  formData.append('is_paid', this.newEvent.is_paid ? '1' : '0');
+    formData.append('is_paid', this.newEvent.is_paid ? '1' : '0');
     // If paid, validate fee
     if (this.newEvent.is_paid) {
       const fee = Number(this.newEvent.registration_fee);
@@ -1477,7 +1477,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       formData.append('event_poster', this.eventPosterFile);
     }
 
-      // Append room info (selected or other) and persist custom rooms
+    // Append room info (selected or other) and persist custom rooms
     let roomToSend = '';
     if (this.showOtherRoomInput && this.otherRoomInput && this.otherRoomInput.trim()) {
       roomToSend = this.otherRoomInput.trim();
@@ -1576,24 +1576,24 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         const m = noQuery.match(/\.([a-zA-Z0-9]+)$/);
         if (m && m[1]) ext = `.${m[1].toLowerCase()}`;
       }
-    } catch {}
+    } catch { }
     return `${student}_${eventSlug}${ext}`;
   }
 
   // Cloudinary trick: force download with desired filename using fl_attachment
   getProofAttachmentUrl(p: any): string {
     const url: string = p?.proof_of_payment || '';
-  if (!url) return '';
-  // Only transform Cloudinary delivery URLs
-  if (!/https?:\/\/res\.cloudinary\.com\//.test(url)) return url;
+    if (!url) return '';
+    // Only transform Cloudinary delivery URLs
+    if (!/https?:\/\/res\.cloudinary\.com\//.test(url)) return url;
 
-  // Build a safe base name without extension for fl_attachment
-  const full = this.getProofDownloadName(p).replace(/[^a-zA-Z0-9._-]/g, '_');
-  const base = full.replace(/\.[a-zA-Z0-9]+$/, '');
+    // Build a safe base name without extension for fl_attachment
+    const full = this.getProofDownloadName(p).replace(/[^a-zA-Z0-9._-]/g, '_');
+    const base = full.replace(/\.[a-zA-Z0-9]+$/, '');
 
-  // Insert fl_attachment immediately after /upload/
-  // Keep the rest of the path intact (version, folders, public_id)
-  return url.replace('/upload/', `/upload/fl_attachment:${base}/`);
+    // Insert fl_attachment immediately after /upload/
+    // Keep the rest of the path intact (version, folders, public_id)
+    return url.replace('/upload/', `/upload/fl_attachment:${base}/`);
   }
 
   async downloadProof(p: any): Promise<void> {
@@ -1622,7 +1622,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     if (!this.participants || this.participants.length === 0) return;
 
     const headers = ['#', 'Event', 'Student ID', 'First Name', 'Last Name', 'Suffix', 'Department', 'Program', 'Proof of Payment URL'];
-    
+
     const data = this.participants.map((p, i) => [
       i + 1,
       this.selectedEventTitle || '-',
@@ -1693,10 +1693,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   // Calculate average rating for a specific question
   getAverageRating(questionKey: string): number {
     if (!this.evaluations || this.evaluations.length === 0) return 0;
-    
+
     let sum = 0;
     let count = 0;
-    
+
     this.evaluations.forEach(evaluation => {
       const responses = evaluation.responses;
       if (responses && responses.ratings && responses.ratings[questionKey]) {
@@ -1707,7 +1707,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         }
       }
     });
-    
+
     return count > 0 ? sum / count : 0;
   }
 
@@ -1724,15 +1724,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   getIndividualAverageRating(evaluation: any): number {
     const responses = evaluation?.responses;
     if (!responses || !responses.ratings) return 0;
-    
+
     const ratings = responses.ratings;
-    const ratingQuestions = ['question1', 'question2', 'question3', 'question4', 'question5', 
-                             'question6', 'question7', 'question8', 'question9', 'question10', 
-                             'question11', 'question12', 'question13'];
-    
+    const ratingQuestions = ['question1', 'question2', 'question3', 'question4', 'question5',
+      'question6', 'question7', 'question8', 'question9', 'question10',
+      'question11', 'question12', 'question13'];
+
     let sum = 0;
     let count = 0;
-    
+
     ratingQuestions.forEach(q => {
       const value = ratings[q];
       // Only count numeric values (skip 'NA' and null/undefined)
@@ -1741,7 +1741,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         count++;
       }
     });
-    
+
     return count > 0 ? sum / count : 0;
   }
 
@@ -1770,7 +1770,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       const responses = evaluation.responses || {};
       const ratings = responses.ratings || {};
       const comments = responses.comments || {};
-      
+
       return [
         i + 1,
         this.selectedEventForEvaluation?.title || '-',

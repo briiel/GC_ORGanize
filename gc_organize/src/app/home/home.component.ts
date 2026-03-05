@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         oswsList = oswsList.map(e => ({
           ...e,
           osws: true,
-          department: e.department || 'OSWS' 
+          department: e.department || 'OSWS'
         }));
         allEvents = allEvents.concat(oswsList);
 
@@ -228,15 +228,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   selectedEventId: number | null = null;
 
   openRegisterModal(event: any) {
-    this.selectedEventId = event.event_id || event.id; 
+    this.selectedEventId = event.event_id || event.id;
     this.isRegisterModalOpen = true;
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
   }
 
   closeRegisterModal() {
     this.isRegisterModalOpen = false;
     this.selectedEventId = null;
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
   }
 
   isViewModalOpen = false;
@@ -245,13 +245,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   openViewModal(event: any) {
     this.selectedEvent = event;
     this.isViewModalOpen = true;
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
   }
 
   closeViewModal() {
     this.isViewModalOpen = false;
     this.selectedEvent = null;
-  this.toggleBodyModalClass();
+    this.toggleBodyModalClass();
   }
 
 

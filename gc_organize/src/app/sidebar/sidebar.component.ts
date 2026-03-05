@@ -36,7 +36,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   // When true, the panel content will show a short fade-out (used when switching panels)
   panelFading = false;
 
-  constructor(public authService: RbacAuthService, private router: Router, private cdRef: ChangeDetectorRef) {}
+  constructor(public authService: RbacAuthService, private router: Router, private cdRef: ChangeDetectorRef) { }
 
   async onLogout(): Promise<void> {
     const result = await Swal.fire({
@@ -52,7 +52,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     if (result.isConfirmed) {
       // Close sidebar immediately for smoother transition
       this.isSidebarOpen = false;
-      
+
       // Small delay to allow sidebar close animation, then logout
       setTimeout(() => {
         this.authService.logout();
@@ -60,17 +60,17 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 150);
     }
   }
-  
+
   ngOnInit(): void {
     // Get all roles from JWT token
     this.userRoles = this.authService.getUserRoles();
-    
+
     // Build list of available panels based on user's roles
     this.buildAvailablePanels();
-    
+
     // Detect current panel based on route
     this.detectCurrentPanel();
-    
+
     // Subscribe to route changes to update current panel and re-enable animations
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -80,13 +80,13 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
       this.panelFading = false;
       this.detectCurrentPanel();
     });
-    
+
     this.updateTime();
     this.timeInterval = setInterval(() => this.updateTime(), 1000);
-    
 
-  // Set initial sidebar state based on viewport width
-  this.syncSidebarWithViewport();
+
+    // Set initial sidebar state based on viewport width
+    this.syncSidebarWithViewport();
   }
 
   ngOnDestroy(): void {
@@ -97,15 +97,15 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   updateTime() {
     const now = new Date();
-  // Always use 12-hour format
-  this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-  // Keep 'today' in sync so the date updates after midnight without reload
-  this.today = now;
+    // Always use 12-hour format
+    this.currentTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    // Keep 'today' in sync so the date updates after midnight without reload
+    this.today = now;
   }
 
   toggleSidebar() {
-  this.isSidebarOpen = !this.isSidebarOpen;
-  this.toggleBodyScrollLock();
+    this.isSidebarOpen = !this.isSidebarOpen;
+    this.toggleBodyScrollLock();
   }
 
   closeIfMobile() {
@@ -185,7 +185,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private buildAvailablePanels(): void {
     this.availablePanels = [];
-    
+
     if (this.userRoles.includes('Student')) {
       this.availablePanels.push({
         role: 'student',
@@ -193,7 +193,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
         route: '/student-dashboard/home'
       });
     }
-    
+
     if (this.userRoles.includes('OrgOfficer')) {
       this.availablePanels.push({
         role: 'organization',
@@ -201,7 +201,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
         route: '/org-panel/dashboard'
       });
     }
-    
+
     if (this.userRoles.includes('OSWSAdmin')) {
       this.availablePanels.push({
         role: 'osws_admin',

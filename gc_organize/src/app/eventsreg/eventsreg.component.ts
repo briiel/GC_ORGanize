@@ -57,19 +57,19 @@ export class EventsregComponent implements OnInit {
         // Ensure we only call sort when we have an array
         if (Array.isArray(this.registeredEvents)) {
           this.registeredEvents.sort((a, b) => {
-          const aDateStr: string | undefined = a?.start_date;
-          const bDateStr: string | undefined = b?.start_date;
-          const aTimeStr: string | undefined = a?.start_time;
-          const bTimeStr: string | undefined = b?.start_time;
+            const aDateStr: string | undefined = a?.start_date;
+            const bDateStr: string | undefined = b?.start_date;
+            const aTimeStr: string | undefined = a?.start_time;
+            const bTimeStr: string | undefined = b?.start_time;
 
-          // Build comparable timestamps; parse as UTC when possible
-          const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
-          const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
-          const aD = parseMysqlDatetimeToDate(aFull as any);
-          const bD = parseMysqlDatetimeToDate(bFull as any);
-          const aTs = aD ? aD.getTime() : 0;
-          const bTs = bD ? bD.getTime() : 0;
-          return bTs - aTs; // descending (latest first)
+            // Build comparable timestamps; parse as UTC when possible
+            const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
+            const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
+            const aD = parseMysqlDatetimeToDate(aFull as any);
+            const bD = parseMysqlDatetimeToDate(bFull as any);
+            const aTs = aD ? aD.getTime() : 0;
+            const bTs = bD ? bD.getTime() : 0;
+            return bTs - aTs; // descending (latest first)
           });
         }
         this.loading = false;
@@ -84,7 +84,7 @@ export class EventsregComponent implements OnInit {
   // Filtered events based on search
   get filteredEvents() {
     let filtered = Array.isArray(this.registeredEvents) ? this.registeredEvents : [];
-    
+
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
       filtered = filtered.filter(event =>
@@ -156,7 +156,7 @@ export class EventsregComponent implements OnInit {
     });
   }
 
-    formatTime(timeString: string | null | undefined): string {
+  formatTime(timeString: string | null | undefined): string {
     if (!timeString) return '';
     const parts = timeString.split(':');
     if (parts.length < 2) return '';

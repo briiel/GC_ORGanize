@@ -46,7 +46,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   private refreshHandle?: ReturnType<typeof setInterval>;
   private statusChangedSub?: Subscription;
 
-  constructor(private eventService: EventService, private auth: RbacAuthService) {}
+  constructor(private eventService: EventService, private auth: RbacAuthService) { }
 
   ngOnInit() {
     const org = this.auth.getUserOrganization();
@@ -77,7 +77,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   updateEventStatus(eventId: number, newStatus: string): void {
     this.eventService.updateEventStatus(eventId, newStatus).subscribe({
       next: (response) => {
-        
+
         // Refresh the events list to reflect the change
         const creatorId = this.auth.getCreatorId();
         if (creatorId) {
@@ -102,7 +102,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   getAvailableStatuses(event: any): string[] {
     const currentStatus = String(event.status).toLowerCase();
     const allStatuses = ['not yet started', 'ongoing', 'concluded', 'cancelled'];
-    
+
     // You can customize this logic based on your business rules
     switch (currentStatus) {
       case 'not yet started':
@@ -229,9 +229,9 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   private loadActivityLog() {
     // Generate activity log from events
     this.activities = [];
-    
-    
-    
+
+
+
     // Helper function to create valid date
     const createValidDate = (dateStr: string | null | undefined, timeStr?: string | null): Date => {
       if (!dateStr) return new Date(); // Fallback to current date
@@ -245,7 +245,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
       const eventDate = event.created_at
         ? createValidDate(event.created_at)
         : createValidDate(event.start_date);
-      
+
       const status = String(event.status || 'not yet started').toLowerCase();
 
       // Determine the name of the creator for this event (org or OSWS admin)
@@ -296,19 +296,19 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         if (activity.action.includes('was cancelled')) return 2; // Cancellations same as creations
         return 1; // Other activities
       };
-      
+
       const priorityA = getPriority(a);
       const priorityB = getPriority(b);
-      
+
       // First, sort by priority
       if (priorityB !== priorityA) return priorityB - priorityA;
-      
+
       // Within same priority, sort by timestamp (most recent first)
       return b.timestamp.getTime() - a.timestamp.getTime();
     });
-    
-    
-    
+
+
+
     // Reset to first page
     this.activityPage = 1;
   }

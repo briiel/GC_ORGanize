@@ -39,11 +39,11 @@ interface MyRequest {
 export class RequestRoleComponent implements OnInit {
   // private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
   private apiUrl = environment.apiUrl;
-  
+
   organizations: Organization[] = [];
   myRequests: MyRequest[] = [];
   userDepartment: string = '';
-  
+
   selectedOrgId: number | null = null;
   requestedPosition: string = '';
   otherPosition: string = '';
@@ -53,7 +53,7 @@ export class RequestRoleComponent implements OnInit {
   formErrors: { [key: string]: string } = {};
   justificationMax = 300;
   @ViewChild('orgSelect') orgSelect?: ElementRef<HTMLSelectElement>;
-  
+
   isSubmitting = false;
   isLoading = true;
   isModalOpen = false;
@@ -61,7 +61,7 @@ export class RequestRoleComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private authService: RbacAuthService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUserInfo();
@@ -75,7 +75,7 @@ export class RequestRoleComponent implements OnInit {
   loadUserInfo(): void {
     this.authService.getUserDepartment((department) => {
       this.userDepartment = department;
-      
+
     });
   }
 
@@ -163,7 +163,7 @@ export class RequestRoleComponent implements OnInit {
    */
   loadMyRequests(): void {
     const headers = this.authService.getAuthHeaders();
-    
+
     this.http.get<any>(`${this.apiUrl}/roles/my-requests`, { headers }).subscribe({
       next: (response) => {
         this.myRequests = response.items || response.requests || [];
@@ -204,7 +204,7 @@ export class RequestRoleComponent implements OnInit {
 
     this.isSubmitting = true;
     const headers = this.authService.getAuthHeaders();
-    
+
     const requestData = {
       org_id: this.selectedOrgId,
       requested_position: finalPosition.trim(),
@@ -215,7 +215,7 @@ export class RequestRoleComponent implements OnInit {
       next: (response) => {
         this.isSubmitting = false;
         this.closeRequestModal();
-        
+
         Swal.fire({
           icon: 'success',
           title: 'Request Submitted!',
@@ -234,9 +234,9 @@ export class RequestRoleComponent implements OnInit {
       },
       error: (error) => {
         this.isSubmitting = false;
-        
+
         const errorMessage = error.error?.message || 'Failed to submit request. Please try again.';
-        
+
         Swal.fire({
           icon: 'error',
           title: 'Request Failed',
