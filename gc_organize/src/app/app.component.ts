@@ -3,11 +3,12 @@ import { RouterOutlet } from '@angular/router';
 import { routeAnimations } from './route-animations';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter } from 'rxjs/operators';
+import { GlobalLoaderComponent } from './components/global-loader/global-loader.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, GlobalLoaderComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
   animations: [routeAnimations]

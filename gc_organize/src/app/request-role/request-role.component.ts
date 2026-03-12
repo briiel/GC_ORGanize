@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { LoadingService } from '../services/loading.service';
 import Swal from 'sweetalert2';
 import { REQUEST_POSITIONS } from '../constants/positions';
 import { environment } from '../../environments/environment';
@@ -39,6 +40,7 @@ interface MyRequest {
 export class RequestRoleComponent implements OnInit {
   // private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
   private apiUrl = environment.apiUrl;
+  private loadingService = inject(LoadingService);
 
   organizations: Organization[] = [];
   myRequests: MyRequest[] = [];
@@ -162,16 +164,20 @@ export class RequestRoleComponent implements OnInit {
    * Load user's own requests
    */
   loadMyRequests(): void {
+    this.isLoading = true;
+    this.loadingService.show('Loading your requests...');
     const headers = this.authService.getAuthHeaders();
 
     this.http.get<any>(`${this.apiUrl}/roles/my-requests`, { headers }).subscribe({
       next: (response) => {
         this.myRequests = response.items || response.requests || [];
         this.isLoading = false;
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading requests:', error);
         this.isLoading = false;
+        this.loadingService.hide();
         Swal.fire({
           icon: 'error',
           title: 'Error',

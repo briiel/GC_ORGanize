@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EvaluationService } from '../services/evaluation.service';
+import { LoadingService } from '../services/loading.service';
 
 @Component({
   selector: 'app-evaluation-form',
@@ -12,6 +13,8 @@ import { EvaluationService } from '../services/evaluation.service';
   styleUrls: ['./evaluation-form.component.css']
 })
 export class EvaluationFormComponent implements OnInit {
+  private loadingService = inject(LoadingService);
+
   evaluationForm!: FormGroup;
   eventId!: number;
   eventTitle: string = '';
@@ -61,9 +64,11 @@ export class EvaluationFormComponent implements OnInit {
 
   checkEvaluationStatus() {
     this.loading = true;
+    this.loadingService.show('Loading evaluation form...');
     this.evaluationService.getEvaluationStatus(this.eventId).subscribe({
       next: (response) => {
         this.loading = false;
+        this.loadingService.hide();
         const body = response?.data ?? response;
         if (!body?.event_concluded) {
           this.errorMessage = 'The evaluation form is only available after the event has concluded.';
@@ -81,6 +86,7 @@ export class EvaluationFormComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
+        this.loadingService.hide();
         console.error('Error checking evaluation status:', err);
       }
     });

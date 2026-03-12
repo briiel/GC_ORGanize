@@ -8,6 +8,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
 import { OsmService } from '../services/osm.service';
 import { firstValueFrom } from 'rxjs';
 import { EventService } from '../services/event.service';
+import { LoadingService } from '../services/loading.service';
 import { environment } from '../../environments/environment';
 import { normalizeList } from '../utils/api-utils';
 
@@ -43,7 +44,8 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private auth: RbacAuthService,
     private eventService: EventService,
-    private osm: OsmService
+    private osm: OsmService,
+    private loadingService: LoadingService
   ) { }
 
   ngOnInit() {
@@ -436,26 +438,31 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     const token = localStorage.getItem('gc_organize_token');
     if (!token) return;
     const role = this.role;
+    this.loadingService.show('Loading events...');
     if (role === 'osws_admin') {
       const adminId = this.auth.getAdminId();
-      if (!adminId) return;
+      if (!adminId) { this.loadingService.hide(); return; }
       this.eventService.getEventsByAdmin(adminId).subscribe({
         next: (res: any) => {
           const rows = normalizeList(res);
           this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
+          this.loadingService.hide();
         },
-        error: () => { }
+        error: () => { this.loadingService.hide(); }
       });
     } else if (role === 'organization') {
       const creatorId = this.auth.getCreatorId();
-      if (!creatorId) return;
+      if (!creatorId) { this.loadingService.hide(); return; }
       this.eventService.getEventsByCreator(creatorId).subscribe({
         next: (res: any) => {
           const rows = normalizeList(res);
           this.events = rows.filter((e: any) => String(e?.status || '').toLowerCase() === 'ongoing');
+          this.loadingService.hide();
         },
-        error: () => { }
+        error: () => { this.loadingService.hide(); }
       });
+    } else {
+      this.loadingService.hide();
     }
   }
 }

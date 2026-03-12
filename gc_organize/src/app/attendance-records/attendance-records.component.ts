@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 import { ExcelExportService } from '../services/excel-export.service';
+import { LoadingService } from '../services/loading.service';
 import { parseMysqlDatetimeToDate, formatToLocalShort } from '../utils/date-utils';
 import { normalizeList } from '../utils/api-utils';
 
@@ -16,6 +17,8 @@ import { normalizeList } from '../utils/api-utils';
   styleUrls: ['./attendance-records.component.css']
 })
 export class AttendanceRecordsComponent implements OnInit {
+  private loadingService = inject(LoadingService);
+
   // Pagination for records table
   recordPage: number = 1;
   recordsPerPage: number = 10;
@@ -103,29 +106,35 @@ export class AttendanceRecordsComponent implements OnInit {
     if (this.role === 'osws_admin') {
       const adminId = this.auth.getAdminId();
       if (!adminId) return;
+      this.loadingService.show('Loading events...');
       this.eventService.getEventsByAdmin(adminId).subscribe({
         next: (res) => {
           this.events = normalizeList(res);
           this.selectedEvent = null;
           this.loading = false;
+          this.loadingService.hide();
         },
         error: (err) => {
           this.error = 'Failed to load events';
           this.loading = false;
+          this.loadingService.hide();
         }
       });
     } else if (this.role === 'organization') {
       const creatorId = this.auth.getCreatorId();
       if (!creatorId) return;
+      this.loadingService.show('Loading events...');
       this.eventService.getEventsByCreator(creatorId).subscribe({
         next: (res) => {
           this.events = normalizeList(res);
           this.selectedEvent = null;
           this.loading = false;
+          this.loadingService.hide();
         },
         error: (err) => {
           this.error = 'Failed to load events';
           this.loading = false;
+          this.loadingService.hide();
         }
       });
     } else {
@@ -136,16 +145,19 @@ export class AttendanceRecordsComponent implements OnInit {
 
   fetchAttendanceForEvent(eventId: number) {
     this.loading = true;
+    this.loadingService.show('Loading attendance records...');
     this.eventService.getEventAttendance(eventId).subscribe({
       next: (res) => {
         this.attendanceRecords = normalizeList(res);
         this.filteredRecords = this.attendanceRecords;
         this.recordPage = 1;
         this.loading = false;
+        this.loadingService.hide();
       },
       error: (err) => {
         this.error = 'Failed to load attendance records for event.';
         this.loading = false;
+        this.loadingService.hide();
       }
     });
   }

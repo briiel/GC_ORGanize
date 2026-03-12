@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventService } from '../services/event.service';
 import { ArchiveService } from '../services/archive.service';
 import { normalizeList, normalizeSingle } from '../utils/api-utils';
 import { FormsModule } from '@angular/forms';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { LoadingService } from '../services/loading.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,6 +16,8 @@ import Swal from 'sweetalert2';
 	styleUrls: ['./trash.component.css']
 })
 export class TrashComponent implements OnInit {
+	private loadingService = inject(LoadingService);
+
 	// Different types of trashed items
 	trashedEvents: any[] = [];
 	trashedAdmins: any[] = [];
@@ -58,6 +61,7 @@ export class TrashComponent implements OnInit {
 
 	loadTrash(): void {
 		this.loading = true;
+		this.loadingService.show('Loading archived items...');
 		this.error = null;
 
 		// Load events
@@ -78,11 +82,13 @@ export class TrashComponent implements OnInit {
 				this.trashedOrganizations = data?.organizations || [];
 				this.trashedMembers = data?.members || [];
 				this.loading = false;
+				this.loadingService.hide();
 				this.currentPage = 1;
 			},
 			error: (err: any) => {
 				this.error = err?.error?.message || 'Failed to load archived items';
 				this.loading = false;
+				this.loadingService.hide();
 			}
 		});
 	}

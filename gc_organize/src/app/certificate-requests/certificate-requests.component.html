@@ -143,14 +143,6 @@
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading" class="mx-2 lg:mx-6">
-    <div class="bg-white rounded-lg shadow-md border border-gray-200 p-12 text-center">
-      <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-[#679436]"></div>
-      <p class="mt-4 text-gray-600 font-medium">Loading certificate requests...</p>
-    </div>
-  </div>
-
   <!-- Error State -->
   <div *ngIf="error && !loading" class="mx-2 lg:mx-6 mb-6">
     <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-5 shadow-md">

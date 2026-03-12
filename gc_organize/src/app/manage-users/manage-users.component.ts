@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
+import { LoadingService } from '../services/loading.service';
 import Swal from 'sweetalert2';
 import { normalizeSingle } from '../utils/api-utils';
 
@@ -13,6 +14,8 @@ import { normalizeSingle } from '../utils/api-utils';
   styleUrls: ['./manage-users.component.css']
 })
 export class ManageUsersComponent implements OnInit, OnDestroy {
+  private loadingService = inject(LoadingService);
+
   admins: any[] = [];
   organizations: any[] = [];
   loading = true;
@@ -65,6 +68,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
 
   loadUsers() {
     this.loading = true;
+    this.loadingService.show('Loading user data...');
     this.adminService.getManageUsers().subscribe({
       next: (res) => {
         // Support multiple possible response shapes for resilience:
@@ -83,12 +87,14 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
         this.admins = payload.admins || payload.admin || [];
         this.organizations = payload.organizations || payload.orgs || [];
         this.loading = false;
+        this.loadingService.hide();
       },
       error: (err) => {
         console.error('ManageUsers load error:', err);
         // Try to show a helpful message if provided by backend
         this.error = err?.error?.message || 'Failed to load users';
         this.loading = false;
+        this.loadingService.hide();
       }
     });
   }

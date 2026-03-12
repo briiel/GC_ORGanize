@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { parseMysqlDatetimeToDate, formatToLocalShort } from '../utils/date-utils';
 import { CommonModule } from '@angular/common';
 import { CertificateRequestService } from '../services/certificate-request.service';
+import { LoadingService } from '../services/loading.service';
 import Swal from 'sweetalert2';
 import { FormsModule } from '@angular/forms';
 import { firstValueFrom } from 'rxjs';
@@ -66,6 +67,8 @@ export class CertificateRequestsComponent implements OnInit {
   itemsPerPage = 10;
   totalPages = 1;
 
+  private loadingService = inject(LoadingService);
+
   constructor(private certificateRequestService: CertificateRequestService) { }
 
   ngOnInit(): void {
@@ -74,6 +77,7 @@ export class CertificateRequestsComponent implements OnInit {
 
   loadRequests(): void {
     this.loading = true;
+    this.loadingService.show('Loading certificate requests...');
     this.error = null;
 
     this.certificateRequestService.getCertificateRequests().subscribe({
@@ -138,11 +142,13 @@ export class CertificateRequestsComponent implements OnInit {
         });
         this.applyFilters();
         this.loading = false;
+        this.loadingService.hide();
       },
       error: (err: any) => {
         console.error('Error loading certificate requests:', err);
         this.error = err.error?.message || 'Failed to load certificate requests';
         this.loading = false;
+        this.loadingService.hide();
       }
     });
   }

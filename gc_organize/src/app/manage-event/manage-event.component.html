@@ -1316,15 +1316,8 @@
       <div class="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6"
         style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
 
-        <!-- Loading State -->
-        <div *ngIf="participantsLoading" class="text-center py-8 sm:py-12">
-          <div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2"
-            [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
-          <p class="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Loading participants...</p>
-        </div>
-
         <!-- Content -->
-        <div *ngIf="!participantsLoading">
+        <div>
 
           <!-- Stats & Actions Bar -->
           <div *ngIf="participants.length > 0" class="space-y-4 mb-6">
@@ -1738,7 +1731,7 @@
                     </div>
                   </div>
 
-                  <div *ngIf="locationSuggestions?.length" class="mt-2">
+                  <div *ngIf="locationSuggestions.length" class="mt-2">
                     <ul class="bg-white border-2 border-gray-200 rounded-lg shadow-lg max-h-40 overflow-auto">
                       <li *ngFor="let s of locationSuggestions"
                         class="px-3 py-2.5 hover:bg-gray-50 cursor-pointer text-sm border-b last:border-b-0"
@@ -2028,14 +2021,8 @@
     <!-- Modal Body -->
     <div class="flex-1 overflow-y-auto px-3 sm:px-4 md:px-6 py-3 sm:py-4 md:py-6"
       style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;">
-      <div *ngIf="evaluationsLoading" class="text-center py-8 sm:py-12">
-        <div class="inline-block animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2"
-          [ngClass]="isOsws ? 'border-[#14532d]' : 'border-[#679436]'"></div>
-        <p class="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Loading evaluations...</p>
-      </div>
-
       <!-- Content -->
-      <div *ngIf="!evaluationsLoading">
+      <div>
         <!-- Empty state when there are no evaluations -->
         <div *ngIf="evaluations.length === 0"
           class="flex-1 flex flex-col items-center justify-center py-8 min-h-[180px]">

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { forkJoin, Subject, Subscription, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError } from 'rxjs/operators';
 import { CommonModule } from '@angular/common'; // <-- Add this import
@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { ExcelExportService } from '../services/excel-export.service';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 import { normalizeList, normalizeSingle } from '../utils/api-utils';
+import { LoadingService } from '../services/loading.service';
 
 @Component({
   selector: 'app-manage-event',
@@ -22,6 +23,7 @@ import { normalizeList, normalizeSingle } from '../utils/api-utils';
 })
 
 export class ManageEventComponent implements OnInit, OnDestroy {
+  private loadingService = inject(LoadingService);
   Math = Math; // Expose Math to template
   showMobileModal = false;
   isSavingInlineEdit = false;
@@ -684,10 +686,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.participants = [];
     this.participantsPage = 1;
     this.toggleBodyModalClass();
+    this.loadingService.show('Loading participants...');
     this.eventService.getEventParticipants(event.event_id).subscribe({
       next: (res) => {
         this.participants = normalizeList(res);
         this.participantsLoading = false;
+        this.loadingService.hide();
         this.selectedRegistrations.clear();
         // Ensure current page is within bounds after load
         const total = this.participantsTotalPages;
@@ -696,6 +700,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       error: () => {
         this.participants = [];
         this.participantsLoading = false;
+        this.loadingService.hide();
       }
     });
   }
@@ -1651,10 +1656,12 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.evaluationsLoading = true;
     this.showEvaluationsModal = true;
     document.body.classList.add('modal-open');
+    this.loadingService.show('Loading evaluations...');
 
     this.evaluationService.getEventEvaluations(event.event_id).subscribe({
       next: (response) => {
         this.evaluationsLoading = false;
+        this.loadingService.hide();
 
         // Support multiple response shapes: { items }, { data: { evaluations, stats } }, { evaluations, stats } OR Array
         let data: any = null;
@@ -1674,6 +1681,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error fetching evaluations:', error);
         this.evaluationsLoading = false;
+        this.loadingService.hide();
         Swal.fire('Error', 'Failed to load evaluations. ' + (error.error?.message || ''), 'error');
       }
     });

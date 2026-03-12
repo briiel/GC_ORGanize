@@ -1,6 +1,5 @@
-// ...existing code...
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -18,58 +17,48 @@ export class EventService {
 
   // Trash (soft-delete) multiple events
   trashMultipleEvents(eventIds: number[]): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/events/trash-multiple`, { eventIds }, { headers });
+    return this.http.post(`${this.apiUrl}/events/trash-multiple`, { eventIds });
   }
-
 
   // Fetch attendance records for a specific event
   getEventAttendance(eventId: number) {
-    const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.apiUrl}/attendance-records/event/${eventId}`, { headers });
+    return this.http.get<any>(`${this.apiUrl}/attendance-records/event/${eventId}`);
   }
 
   // Fetch all events
   getAllEvents(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/events`, { headers });
+    return this.http.get(`${this.apiUrl}/events`);
   }
 
   // Create a new event
   createEvent(eventData: FormData): Observable<any> {
-    const headers = this.getAuthHeaders();
     // Do NOT set Content-Type here; browser will set it for FormData
-    return this.http.post(`${this.apiUrl}/events`, eventData, { headers });
+    return this.http.post(`${this.apiUrl}/events`, eventData);
   }
 
   // Fetch events a participant registered in
   getRegisteredEvents(studentId: string | null): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/participants/${studentId}/events`, { headers });
+    return this.http.get(`${this.apiUrl}/participants/${studentId}/events`);
   }
 
   // Fetch attended events (history) for a student
   getAttendedEvents(studentId: string | null): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/students/${studentId}/attended`, { headers });
+    return this.http.get(`${this.apiUrl}/students/${studentId}/attended`);
   }
 
   // Request e-certificate via email to organizer
   requestCertificate(eventId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/events/${eventId}/request-certificate`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/events/${eventId}/request-certificate`, {});
   }
 
   // Fetch events by creator/org ID
   getEventsByCreator(creatorId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/events/creator/${creatorId}`, { headers });
+    return this.http.get(`${this.apiUrl}/events/creator/${creatorId}`);
   }
 
   // Update event status
   updateEventStatus(eventId: number, status: string): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status }, { headers })
+    return this.http.patch(`${this.apiUrl}/events/${eventId}/status`, { status })
       .pipe(
         tap(() => this.statusChangedSubject.next())
       );
@@ -77,114 +66,74 @@ export class EventService {
 
   // Fetch all attendance records
   getAllAttendanceRecords(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/attendance-records`, { headers });
+    return this.http.get(`${this.apiUrl}/attendance-records`);
   }
 
   // Delete an event
   deleteEvent(eventId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/events/${eventId}`, { headers });
+    return this.http.delete(`${this.apiUrl}/events/${eventId}`);
   }
 
   // List trashed events for current user (org or OSWS, based on token)
   getTrashedEvents(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/events/trash`, { headers });
+    return this.http.get(`${this.apiUrl}/events/trash`);
   }
 
   // Restore an event from trash
   restoreEvent(eventId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/events/${eventId}/restore`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/events/${eventId}/restore`, {});
   }
 
   // Permanently delete an event from trash
   permanentDelete(eventId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/events/${eventId}/permanent`, { headers });
+    return this.http.delete(`${this.apiUrl}/events/${eventId}/permanent`);
   }
-
-  // Helper method to get Authorization headers
-  private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('gc_organize_token');
-    return new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-  }
-
-  // Get notifications
-  // getNotifications() {
-  //   Dev: this.http.get<any[]>('http://localhost:5000/api/notifications', {
-  //   return this.http.get<any[]>('https://gcorg-apiv1-8bn5.onrender.com/api/notifications', {
-  //     headers: this.getAuthHeaders()
-  //   });
-  // }
-
-  // // Mark notification as read
-  // markNotificationAsRead(id: number) {
-  //   Dev: this.http.patch(`http://localhost:5000/api/notifications/${id}/read`, {}, {
-  //   return this.http.patch(`https://gcorg-apiv1-8bn5.onrender.com/api/notifications/${id}/read`, {}, {
-  //     headers: this.getAuthHeaders()
-  //   });
-  // }
 
   // Fetch events by admin ID
   getEventsByAdmin(adminId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/events/admin/${adminId}`, { headers });
+    return this.http.get(`${this.apiUrl}/events/admin/${adminId}`);
   }
 
   // Fetch all events created by student organizations (not OSWS)
   getAllOrgEvents(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/events/organizations`, { headers });
+    return this.http.get(`${this.apiUrl}/events/organizations`);
   }
 
   getAllOswsEvents(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/events/osws`, { headers });
+    return this.http.get(`${this.apiUrl}/events/osws`);
   }
 
   getEventParticipants(eventId: number) {
-    const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.apiUrl}/${eventId}/participants`, { headers });
+    return this.http.get<any>(`${this.apiUrl}/${eventId}/participants`);
   }
 
   approveRegistration(registrationId: number) {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/registrations/${registrationId}/approve`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/registrations/${registrationId}/approve`, {});
   }
 
   rejectRegistration(registrationId: number) {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/registrations/${registrationId}/reject`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/registrations/${registrationId}/reject`, {});
   }
 
   getEventById(eventId: number) {
-    const headers = this.getAuthHeaders();
-    return this.http.get<any>(`${this.apiUrl}/events/${eventId}`, { headers });
+    return this.http.get<any>(`${this.apiUrl}/events/${eventId}`);
   }
 
   updateEvent(eventId: number, formData: FormData) {
-    const headers = this.getAuthHeaders();
-    return this.http.put<any>(`${this.apiUrl}/events/${eventId}`, formData, { headers });
+    return this.http.put<any>(`${this.apiUrl}/events/${eventId}`, formData);
   }
 
   // Dashboard stats endpoints
   getOrgStats(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/stats/organization`, { headers });
+    return this.http.get(`${this.apiUrl}/stats/organization`);
   }
 
   getOswsStats(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/stats/osws`, { headers });
+    return this.http.get(`${this.apiUrl}/stats/osws`);
   }
 
-  // New: fetch aggregated chart datasets for OSWS dashboard
+  // Fetch aggregated chart datasets for OSWS dashboard
   getOswsCharts(filter: 'weekly' | 'monthly' | 'yearly' = 'monthly'): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/stats/osws/charts?filter=${filter}`, { headers });
+    return this.http.get(`${this.apiUrl}/stats/osws/charts?filter=${filter}`);
   }
 }

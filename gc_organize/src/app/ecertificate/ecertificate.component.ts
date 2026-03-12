@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CertificateService } from '../services/certificate.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { LoadingService } from '../services/loading.service';
 import { normalizeList } from '../utils/api-utils';
 import Swal from 'sweetalert2';
 
@@ -16,6 +17,8 @@ import Swal from 'sweetalert2';
   imports: [CommonModule, FormsModule]
 })
 export class EcertificateComponent implements OnInit {
+  private loadingService = inject(LoadingService);
+
   certificates: any[] = [];
   loading = true;
   searchTerm: string = '';
@@ -35,15 +38,18 @@ export class EcertificateComponent implements OnInit {
   ngOnInit() {
     const studentId = this.auth.getStudentId();
     if (studentId) {
+      this.loadingService.show('Loading certificates...');
       this.certificateService.getCertificates(studentId).subscribe({
         next: (res) => {
           // Show all events (both OSWS and Organization events)
           // Students can see evaluation requirements and request certificates
           this.certificates = normalizeList(res);
           this.loading = false;
+          this.loadingService.hide();
         },
         error: () => {
           this.loading = false;
+          this.loadingService.hide();
         }
       });
     } else {

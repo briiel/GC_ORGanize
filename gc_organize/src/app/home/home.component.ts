@@ -6,6 +6,7 @@ import { ViewmodalComponent } from '../viewmodal/viewmodal.component';
 import { Router, RouterModule } from '@angular/router';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
+import { LoadingService } from '../services/loading.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -29,9 +30,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   currentPage: number = 1;
   pageSize: number = 9; // 3x3 layout per page
 
-  constructor(private eventService: EventService, private authService: RbacAuthService, private router: Router) { }
+  constructor(private eventService: EventService, private authService: RbacAuthService, private router: Router, private loadingService: LoadingService) { }
 
   ngOnInit() {
+    this.loadingService.show('Loading events...');
     forkJoin([
       this.eventService.getAllEvents(),
       this.eventService.getAllOswsEvents()
@@ -106,10 +108,12 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
 
         this.events = allEvents;
+        this.loadingService.hide();
       },
       (error) => {
         console.error('Error fetching events:', error);
         this.events = [];
+        this.loadingService.hide();
       }
     );
   }
@@ -118,25 +122,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     document.body.classList.remove('modal-open');
   }
 
-  get filteredEvents() {
+  // Shared filter logic used by both filteredEvents and totalPages
+  private getFilteredList(): any[] {
     const search = this.searchTerm.trim().toLowerCase();
-    let filtered = this.events;
-    if (search) {
-      filtered = this.events.filter(event => {
-        // If searching for "osws", show all events tagged as OSWS
-        if (search === 'osws') {
-          return event.osws === true;
-        }
-        // Otherwise, normal search logic
-        return (
-          (event.title && event.title.toLowerCase().includes(search)) ||
-          (event.department && event.department.toLowerCase().includes(search)) ||
-          ((event.room && event.room.toLowerCase().includes(search)) || (event.location && event.location.toLowerCase().includes(search))) ||
-          (event.description && event.description.toLowerCase().includes(search)) ||
-          (event.status && String(event.status).toLowerCase().includes(search))
-        );
-      });
-    }
+    if (!search) return this.events;
+    return this.events.filter(event => {
+      // If searching for "osws", show all events tagged as OSWS
+      if (search === 'osws') {
+        return event.osws === true;
+      }
+      return (
+        (event.title && event.title.toLowerCase().includes(search)) ||
+        (event.department && event.department.toLowerCase().includes(search)) ||
+        ((event.room && event.room.toLowerCase().includes(search)) || (event.location && event.location.toLowerCase().includes(search))) ||
+        (event.description && event.description.toLowerCase().includes(search)) ||
+        (event.status && String(event.status).toLowerCase().includes(search))
+      );
+    });
+  }
+
+  get filteredEvents() {
+    let filtered = this.getFilteredList();
 
     // Apply sorting with status ranking so "ongoing" appears before "not yet started"
     const statusRank = (ev: any) => {
@@ -178,23 +184,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   get totalPages() {
-    const search = this.searchTerm.trim().toLowerCase();
-    let filtered = this.events;
-    if (search) {
-      filtered = this.events.filter(event => {
-        if (search === 'osws') {
-          return event.osws === true;
-        }
-        return (
-          (event.title && event.title.toLowerCase().includes(search)) ||
-          (event.department && event.department.toLowerCase().includes(search)) ||
-          ((event.room && event.room.toLowerCase().includes(search)) || (event.location && event.location.toLowerCase().includes(search))) ||
-          (event.description && event.description.toLowerCase().includes(search)) ||
-          (event.status && String(event.status).toLowerCase().includes(search))
-        );
-      });
-    }
-    return Math.ceil(filtered.length / this.pageSize) || 1;
+    return Math.ceil(this.getFilteredList().length / this.pageSize) || 1;
   }
 
   changePage(page: number) {

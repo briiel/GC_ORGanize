@@ -78,16 +78,6 @@
             </tr>
           </thead>
           <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-            <!-- Loading State -->
-            <tr *ngIf="loading">
-              <td colspan="5" class="px-3 sm:px-4 py-8 sm:py-12 text-center">
-                <div class="flex flex-col items-center gap-2 sm:gap-3">
-                  <i class="fas fa-spinner fa-spin text-2xl sm:text-3xl text-[#679436]"></i>
-                  <p class="text-sm sm:text-base text-gray-600">Loading your certificates...</p>
-                </div>
-              </td>
-            </tr>
-
             <!-- Empty State -->
             <tr *ngIf="!loading && filteredCertificates.length === 0">
               <td colspan="5" class="px-3 sm:px-4 py-8 sm:py-12 text-center">
@@ -290,12 +280,6 @@
 
       <!-- Mobile Card View -->
       <div class="md:hidden space-y-3 p-3 sm:p-4 bg-gray-50">
-        <!-- Loading State -->
-        <div *ngIf="loading" class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-          <i class="fas fa-spinner fa-spin text-2xl text-[#679436] mb-2"></i>
-          <p class="text-xs text-gray-500">Loading your certificates...</p>
-        </div>
-
         <!-- Empty State -->
         <div *ngIf="!loading && filteredCertificates.length === 0"
           class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">

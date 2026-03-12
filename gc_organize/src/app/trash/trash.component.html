@@ -92,16 +92,6 @@
 		</div>
 	</div>
 
-	<!-- Loading state -->
-	<div *ngIf="loading" role="status" aria-live="polite" class="mx-2 lg:mx-6">
-		<div class="flex items-center justify-center py-12">
-			<div class="flex flex-col items-center gap-3">
-				<i class="fas fa-spinner fa-spin text-4xl" [ngClass]="isOsws ? 'gc-text-admin' : 'gc-text-primary'"></i>
-				<p class="text-gray-600 font-semibold">Loading archived items...</p>
-			</div>
-		</div>
-	</div>
-
 	<!-- Error state -->
 	<div *ngIf="error"
 		class="mx-2 lg:mx-6 flex items-start gap-3 p-4 mb-6 rounded-lg border border-red-200 bg-red-50 text-red-700">

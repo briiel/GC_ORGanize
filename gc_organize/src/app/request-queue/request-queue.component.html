@@ -63,12 +63,6 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="mx-2 lg:mx-6 bg-white rounded-lg shadow-md p-12 text-center">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[#14532d] mb-4"></div>
-      <p class="text-gray-600 font-medium">Loading requests...</p>
-    </div>
-
     <!-- Pending Requests Tab -->
     <div *ngIf="!isLoading && selectedTab === 'pending'">
       <!-- No Pending Requests -->

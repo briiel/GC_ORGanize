@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { LoadingService } from '../services/loading.service';
 import Swal from 'sweetalert2';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 import { normalizeList } from '../utils/api-utils';
@@ -15,6 +16,8 @@ import { normalizeList } from '../utils/api-utils';
   styleUrls: ['./history.component.css']
 })
 export class HistoryComponent implements OnInit {
+  private loadingService = inject(LoadingService);
+
   // Data
   attendedEvents: any[] = [];
   loading = false;
@@ -39,14 +42,17 @@ export class HistoryComponent implements OnInit {
       return;
     }
     this.loading = true;
+    this.loadingService.show('Loading attended events...');
     this.eventService.getAttendedEvents(studentId).subscribe({
       next: (res) => {
         this.attendedEvents = normalizeList(res);
         this.loading = false;
+        this.loadingService.hide();
       },
       error: (err) => {
         this.error = 'Failed to load attended events';
         this.loading = false;
+        this.loadingService.hide();
       }
     });
   }

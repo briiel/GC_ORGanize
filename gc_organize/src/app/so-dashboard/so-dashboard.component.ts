@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { EventService } from '../services/event.service';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { LoadingService } from '../services/loading.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
@@ -46,7 +47,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   private refreshHandle?: ReturnType<typeof setInterval>;
   private statusChangedSub?: Subscription;
 
-  constructor(private eventService: EventService, private auth: RbacAuthService) { }
+  constructor(private eventService: EventService, private auth: RbacAuthService, private loadingService: LoadingService) { }
 
   ngOnInit() {
     const org = this.auth.getUserOrganization();
@@ -120,6 +121,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
   }
 
   private loadOrgEvents(creatorId: number) {
+    this.loadingService.show('Loading organization data...');
     this.eventService.getEventsByCreator(creatorId).subscribe({
       next: (res) => {
         this.events = normalizeList(res);
@@ -167,9 +169,11 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
         });
 
         this.fetchAttendanceStats(this.events.map((e: any) => e.event_id));
+        this.loadingService.hide();
       },
       error: (err) => {
         console.error('Error fetching events:', err);
+        this.loadingService.hide();
       }
     });
   }
@@ -371,7 +375,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
 
   get totalUpcomingEvents(): number {
     return this.events.filter(e => {
-      const status = String(e.status).toLowerCase();
+      const status = String(e.auto_status || e.status || '').toLowerCase();
       return status === 'not yet started' || status === 'upcoming';
     }).length;
   }

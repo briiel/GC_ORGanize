@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
+import { LoadingService } from '../services/loading.service';
 import Chart from 'chart.js/auto';
 import { normalizeList, normalizeSingle } from '../utils/api-utils';
 
@@ -41,7 +42,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private serverDeptData: Array<{ department: string; count: number }> | null = null;
   private serverOrgData: Array<{ org_name: string; count: number }> | null = null;
 
-  constructor(private eventService: EventService) { }
+  constructor(private eventService: EventService, private loadingService: LoadingService) { }
 
   ngOnInit(): void {
     // Initial load
@@ -146,6 +147,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private loadEventsAndStats(): void {
+    this.loadingService.show('Loading dashboard data...');
     // For OSWS admin, aggregate across all events (OSWS + organizations)
     this.eventService.getAllEvents().subscribe({
       next: (res) => {
@@ -181,9 +183,12 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         if (this.viewReady) {
           this.renderCharts();
         }
+
+        this.loadingService.hide();
       },
       error: (err) => {
         console.error('Error fetching all events:', err);
+        this.loadingService.hide();
       }
     });
   }

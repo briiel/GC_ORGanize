@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
+import { LoadingService } from '../services/loading.service';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 import { RbacAuthService } from '../services/rbac-auth.service';
 
@@ -14,6 +15,8 @@ import { RbacAuthService } from '../services/rbac-auth.service';
   styleUrls: ['./eventsreg.component.css']
 })
 export class EventsregComponent implements OnInit {
+  private loadingService = inject(LoadingService);
+
   // Search related properties
   searchTerm: string = '';
   sortBy: string = 'date_desc';
@@ -33,6 +36,7 @@ export class EventsregComponent implements OnInit {
   fetchRegisteredEvents() {
     if (!this.studentId) return;
     this.loading = true;
+    this.loadingService.show('Loading registered events...');
     this.eventService.getRegisteredEvents(this.studentId).subscribe({
       next: (events) => {
         // Normalize response shape: support { items }, legacy { data }, or raw array
@@ -73,10 +77,12 @@ export class EventsregComponent implements OnInit {
           });
         }
         this.loading = false;
+        this.loadingService.hide();
       },
       error: (err) => {
         console.error('Error fetching registered events:', err);
         this.loading = false;
+        this.loadingService.hide();
       }
     });
   }

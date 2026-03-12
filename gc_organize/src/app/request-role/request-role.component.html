@@ -149,12 +149,6 @@
 
     <!-- My Requests History -->
     <div class="mx-0 sm:mx-2 lg:mx-6 overflow-hidden rounded-lg shadow-lg bg-white border border-gray-200">
-      <!-- Loading State -->
-      <div *ngIf="isLoading" class="text-center py-8 sm:py-12">
-        <i class="fas fa-spinner fa-spin text-3xl sm:text-4xl text-[#679436] mb-3 sm:mb-4"></i>
-        <p class="text-sm sm:text-base text-gray-600 font-medium">Loading your requests...</p>
-      </div>
-
       <!-- No Requests -->
       <div *ngIf="!isLoading && myRequests.length === 0" class="text-center py-8 sm:py-12 px-4 sm:px-6">
         <div

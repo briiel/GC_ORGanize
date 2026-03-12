@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { ExcelExportService } from '../services/excel-export.service';
+import { LoadingService } from '../services/loading.service';
 import { environment } from '../../environments/environment';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 import { REQUEST_POSITIONS } from '../constants/positions';
@@ -31,6 +32,8 @@ interface OrganizationMember {
   styleUrls: ['./org-members.component.css']
 })
 export class OrgMembersComponent implements OnInit {
+  private loadingService = inject(LoadingService);
+
   members: OrganizationMember[] = [];
   filteredMembers: OrganizationMember[] = [];
   loading: boolean = false;
@@ -87,6 +90,7 @@ export class OrgMembersComponent implements OnInit {
 
   loadMembers(orgId: number): void {
     this.loading = true;
+    this.loadingService.show('Loading members...');
     this.error = null;
 
     const headers = this.getAuthHeaders();
@@ -117,11 +121,13 @@ export class OrgMembersComponent implements OnInit {
         this.members = members;
         this.applyFilters();
         this.loading = false;
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading members:', error);
         this.error = 'Failed to load organization members';
         this.loading = false;
+        this.loadingService.hide();
         (async () => {
           const Swal = await this.getSwal();
           Swal.fire({

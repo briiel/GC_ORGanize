@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { LoadingService } from '../services/loading.service';
 import Swal from 'sweetalert2';
 import { environment } from '../../environments/environment';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
@@ -37,6 +38,7 @@ interface RoleRequest {
 export class RequestQueueComponent implements OnInit {
   // private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
   private apiUrl = environment.apiUrl;
+  private loadingService = inject(LoadingService);
 
   pendingRequests: RoleRequest[] = [];
   allRequests: RoleRequest[] = [];
@@ -70,6 +72,7 @@ export class RequestQueueComponent implements OnInit {
    */
   loadPendingRequests(): void {
     this.isLoading = true;
+    this.loadingService.show('Loading requests...');
     const headers = this.authService.getAuthHeaders();
     const params = `?page=${this.pendingPage}&per_page=${this.pendingPerPage}`;
     this.http.get<any>(`${this.apiUrl}/admin/requests/pending${params}`, { headers }).subscribe({
@@ -80,10 +83,12 @@ export class RequestQueueComponent implements OnInit {
         this.pendingPage = response.page || this.pendingPage;
         this.pendingPerPage = response.per_page || this.pendingPerPage;
         this.isLoading = false;
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading pending requests:', error);
         this.isLoading = false;
+        this.loadingService.hide();
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -98,6 +103,7 @@ export class RequestQueueComponent implements OnInit {
    */
   loadAllRequests(): void {
     this.isLoading = true;
+    this.loadingService.show('Loading requests...');
     const headers = this.authService.getAuthHeaders();
 
     const statusParam = this.filterStatus && this.filterStatus !== 'all' ? `&status=${encodeURIComponent(this.filterStatus)}` : '';
@@ -110,10 +116,12 @@ export class RequestQueueComponent implements OnInit {
         this.allPage = response.page || this.allPage;
         this.allPerPage = response.per_page || this.allPerPage;
         this.isLoading = false;
+        this.loadingService.hide();
       },
       error: (error) => {
         console.error('Error loading all requests:', error);
         this.isLoading = false;
+        this.loadingService.hide();
         Swal.fire({
           icon: 'error',
           title: 'Error',

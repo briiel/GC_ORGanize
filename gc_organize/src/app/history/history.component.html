@@ -78,16 +78,6 @@
             </tr>
           </thead>
           <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
-            <!-- Loading State -->
-            <tr *ngIf="loading">
-              <td colspan="7" class="px-4 py-12 text-center">
-                <div class="flex flex-col items-center gap-3">
-                  <i class="fas fa-spinner fa-spin text-3xl text-[#679436]"></i>
-                  <p class="text-gray-600">Loading your attended events...</p>
-                </div>
-              </td>
-            </tr>
-
             <!-- Empty State -->
             <tr *ngIf="!loading && items.length === 0">
               <td colspan="7" class="px-4 py-12 text-center">
@@ -153,12 +143,6 @@
 
       <!-- Mobile Card View -->
       <div class="md:hidden space-y-3 p-3 bg-gray-50">
-        <!-- Loading State -->
-        <div *ngIf="loading" class="text-center py-6 sm:py-8">
-          <i class="fas fa-spinner fa-spin text-2xl sm:text-3xl text-[#679436]"></i>
-          <p class="text-sm sm:text-base text-gray-600 mt-2">Loading your attended events...</p>
-        </div>
-
         <!-- Empty State -->
         <div *ngIf="!loading && items.length === 0" class="text-center py-6 sm:py-8">
           <i class="fas fa-calendar-times text-3xl sm:text-4xl text-gray-400"></i>

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { RbacAuthService } from '../services/rbac-auth.service';
+import { LoadingService } from '../services/loading.service';
 import { environment } from '../../environments/environment';
 import { normalizeSingle } from '../utils/api-utils';
 
@@ -46,13 +47,16 @@ export class RegistermodalComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private authService: RbacAuthService
+    private authService: RbacAuthService,
+    private loadingService: LoadingService
   ) { }
 
   ngOnInit(): void {
     if (this.eventId !== null) {
       this.registrationData.event_id = this.eventId;
     }
+
+    this.loadingService.show('Loading event details...');
 
     // Fetch event to determine if paid
     if (this.eventId !== null) {
@@ -63,11 +67,15 @@ export class RegistermodalComponent implements OnInit {
         next: (res) => {
           const ev = normalizeSingle(res) || res;
           this.isPaid = !!ev?.is_paid;
+          this.loadingService.hide();
         },
         error: () => {
           this.isPaid = false;
+          this.loadingService.hide();
         }
       });
+    } else {
+      this.loadingService.hide();
     }
 
     // Fetch student info from JWT token and backend
