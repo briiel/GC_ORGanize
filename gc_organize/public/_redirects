@@ -1,1 +1,2 @@
-/* /index.html 200
+# SPA routing is handled via 404.html (Cloudflare Pages native support)
+# The /* /index.html 200 rule caused an infinite loop due to Cloudflare's Pretty URLs feature.
