@@ -356,8 +356,23 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (this.isOsws) {
-      this.fetchOswsEvents();
-      this.fetchOrgEvents();
+      if (!this.adminId) return;
+      this.loadingService.show('Loading events data...');
+      forkJoin({
+        osws: this.eventService.getEventsByAdmin(this.adminId),
+        org: this.eventService.getAllOrgEvents()
+      }).subscribe({
+        next: (res) => {
+          this.oswsEvents = normalizeList(res.osws);
+          this.orgEvents = normalizeList(res.org);
+          this.searchOrgEvents();
+          this.loadingService.hide();
+        },
+        error: (err) => {
+          console.error('Error fetching events:', err);
+          this.loadingService.hide();
+        }
+      });
       // Subscribe to status change notifications (emitted after manual status updates)
       this.statusChangeSub = this.eventService.statusChanged$.subscribe(() => {
         this.fetchOswsEvents();
@@ -369,7 +384,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         this.fetchOrgEvents();
       }, 60000); // 60s
     } else {
-      this.fetchEvents();
+      this.fetchEvents(true);
     }
   }
 
@@ -401,7 +416,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
   }
 
-  fetchEvents() {
+  fetchEvents(showLoader: boolean = false) {
+    if (showLoader) {
+      this.loadingService.show('Loading events data...');
+    }
     this.eventService.getEventsByCreator(this.creatorId).subscribe({
       next: (res) => {
         this.events = normalizeList(res);
@@ -415,9 +433,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           const stillExists = this.filteredList.some(e => e.event_id === this.selectedEvent.event_id);
           if (!stillExists) this.selectedEvent = null;
         }
+        if (showLoader) {
+          this.loadingService.hide();
+        }
       },
       error: (err) => {
         console.error('Error fetching events:', err);
+        if (showLoader) {
+          this.loadingService.hide();
+        }
       }
     });
   }
@@ -447,13 +471,15 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   updateEventStatus(event: any) {
+    this.loadingService.show('Updating event status...');
     this.eventService.updateEventStatus(event.event_id, event.status).subscribe({
       next: (response) => {
-
+        this.loadingService.hide();
         // Optionally show success message to user
         // You can add a toast notification here
       },
       error: (err) => {
+        this.loadingService.hide();
         console.error('Error updating event status:', err);
         // Optionally show error message to user
         // You can add a toast notification here
@@ -663,8 +689,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   deleteEvent(eventId: number) {
+    this.loadingService.show('Archiving event...');
     this.eventService.deleteEvent(eventId).subscribe({
       next: () => {
+        this.loadingService.hide();
         if (this.isOsws) {
           this.fetchOswsEvents();
           this.fetchOrgEvents();
@@ -673,6 +701,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
+        this.loadingService.hide();
         Swal.fire('Error', 'Failed to delete event.', 'error');
         console.error('Error deleting event:', err);
       }
@@ -897,8 +926,10 @@ export class ManageEventComponent implements OnInit, OnDestroy {
 
   // Cancel an event by updating its status to 'cancelled'
   cancelEvent(event: any): void {
+    this.loadingService.show('Cancelling event...');
     this.eventService.updateEventStatus(event.event_id, 'cancelled').subscribe({
       next: (response) => {
+        this.loadingService.hide();
         Swal.fire({
           icon: 'success',
           title: 'Event Cancelled',
@@ -916,6 +947,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         this.fetchEvents();
       },
       error: (error) => {
+        this.loadingService.hide();
         console.error('Error cancelling event:', error);
         Swal.fire({
           icon: 'error',

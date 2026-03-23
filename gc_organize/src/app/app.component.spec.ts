@@ -20,10 +20,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('gc_organize');
   });
 
-  it('should render title', () => {
+  it('should render app shell', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, gc_organize');
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });
