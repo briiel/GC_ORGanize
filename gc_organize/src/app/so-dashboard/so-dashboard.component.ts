@@ -168,7 +168,7 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
           error: () => { /* keep computed fallback */ }
         });
 
-        this.fetchAttendanceStats(this.events.map((e: any) => e.event_id));
+        this.fetchAttendanceStats();
         this.loadingService.hide();
       },
       error: (err) => {
@@ -209,14 +209,15 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  fetchAttendanceStats(eventIds: number[]) {
-    this.eventService.getAllAttendanceRecords().subscribe({
+  fetchAttendanceStats() {
+    const creatorId = this.auth.getCreatorId();
+    if (!creatorId) return;
+    this.eventService.getAttendeeCountByCreator(creatorId).subscribe({
       next: (res) => {
-        const records = normalizeList(res);
-        this.stats.totalAttendees = records.filter((r: any) => eventIds.includes(r.event_id)).length;
+        this.stats.totalAttendees = res?.total ?? 0;
       },
       error: (err) => {
-        console.error('Error fetching attendance records:', err);
+        console.error('Error fetching attendance count:', err);
       }
     });
   }

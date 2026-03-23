@@ -69,6 +69,11 @@ export class EventService {
     return this.http.get(`${this.apiUrl}/attendance-records`);
   }
 
+  // Fetch total attendee count scoped to a creator org (lightweight — avoids full table scan)
+  getAttendeeCountByCreator(creatorId: number): Observable<{ success: boolean; total: number }> {
+    return this.http.get<{ success: boolean; total: number }>(`${this.apiUrl}/attendance-records/count-by-creator/${creatorId}`);
+  }
+
   // Delete an event
   deleteEvent(eventId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/events/${eventId}`);
