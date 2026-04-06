@@ -1,7 +1,4 @@
-/**
- * Role Guard
- * Protects routes based on user roles
- */
+// Role Guard — redirects unauthenticated users and users missing required route roles
 
 import { Injectable } from '@angular/core';
 import { 

@@ -2,17 +2,21 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { importProvidersFrom, isDevMode } from '@angular/core';
 import { AppComponent } from './app/app.component';
-import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { AuthInterceptor } from './app/services/auth-interceptor.service';
 import { UnwrapResponseInterceptor } from './app/services/unwrap-response.interceptor';
 import { routes } from './app/app.routes';
 import { IMAGE_CONFIG } from '@angular/common';
 import { provideServiceWorker } from '@angular/service-worker';
+import { payloadCryptoInterceptorFn } from './app/core/interceptors/payload-crypto.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(
+      withInterceptorsFromDi(), // Outer layers: Auth, Unwrap etc
+      withInterceptors([payloadCryptoInterceptorFn]) // Innermost layer: Encryption
+    ),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

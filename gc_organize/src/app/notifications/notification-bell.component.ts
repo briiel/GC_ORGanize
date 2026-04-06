@@ -93,16 +93,16 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
 
   getNotificationIcon(item: NotificationItem): string {
     const msg = item.message.toLowerCase();
-    if (msg.includes('✅') || msg.includes('approved') || msg.includes('confirmed')) {
+    if (msg.includes('approved') || msg.includes('confirmed')) {
       return 'fas fa-check-circle';
     }
-    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('declined') || msg.includes('not approved')) {
+    if (msg.includes('rejected') || msg.includes('declined') || msg.includes('not approved')) {
       return 'fas fa-times-circle';
     }
-    if (msg.includes('⏳') || msg.includes('pending') || msg.includes('submitted')) {
+    if (msg.includes('pending') || msg.includes('submitted')) {
       return 'fas fa-hourglass-half';
     }
-    if (msg.includes('📜') || msg.includes('certificate')) {
+    if (msg.includes('certificate')) {
       return 'fas fa-certificate';
     }
     if (msg.includes('registered') || msg.includes('registration')) {
@@ -113,16 +113,16 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
 
   getNotificationIconClass(item: NotificationItem): string {
     const msg = item.message.toLowerCase();
-    if (msg.includes('✅') || msg.includes('approved') || msg.includes('confirmed')) {
+    if (msg.includes('approved') || msg.includes('confirmed')) {
       return item.is_read ? 'bg-green-300' : 'bg-green-500';
     }
-    if (msg.includes('❌') || msg.includes('rejected') || msg.includes('declined') || msg.includes('not approved')) {
+    if (msg.includes('rejected') || msg.includes('declined') || msg.includes('not approved')) {
       return item.is_read ? 'bg-red-300' : 'bg-red-500';
     }
-    if (msg.includes('⏳') || msg.includes('pending') || msg.includes('submitted')) {
+    if (msg.includes('pending') || msg.includes('submitted')) {
       return item.is_read ? 'bg-yellow-300' : 'bg-yellow-500';
     }
-    if (msg.includes('📜') || msg.includes('certificate')) {
+    if (msg.includes('certificate')) {
       return item.is_read ? 'bg-blue-300' : 'bg-blue-500';
     }
     return item.is_read ? 'bg-gray-300' : 'bg-[#679436]';

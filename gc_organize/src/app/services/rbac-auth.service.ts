@@ -1,7 +1,4 @@
-/**
- * Authentication Service (RBAC-enabled)
- * Manages JWT authentication and role-based access control
- */
+// RBAC-enabled auth service: JWT login/logout, role normalization, and token integrity verification
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -13,19 +10,15 @@ import { environment } from '../../environments/environment';
 import { SecureStorageService } from './secure-storage.service';
 
 interface JwtPayload {
-  userId: string;           // Prefixed: "S_202211223", "O_1", "A_1"
-  legacyId: string;         // Original ID from legacy table
-  studentId?: string;       // Only present for students
+  userId: string;       // Prefixed: "S_202211223", "O_1", "A_1"
+  legacyId: string;     // Original ID from the legacy table
+  studentId?: string;   // Present only for students
   email: string;
   firstName: string;
   lastName: string;
   roles: string[];
-  organization: {
-    org_id: number;
-    org_name: string;
-    position: string;
-  } | null;
-  userType: string;         // "student", "organization", or "admin"
+  organization: { org_id: number; org_name: string; position: string; } | null;
+  userType: string;     // "student", "organization", or "admin"
   exp: number;
   iat: number;
 }
@@ -34,28 +27,9 @@ interface LoginResponse {
   success: boolean;
   message: string;
   token: string;
-  // Some server responses wrap payloads under a `data` envelope: { success: true, data: { token, user } }
-  // Accept that shape here so callers can safely access `response.data.token` when present.
-  data?: {
-    token?: string;
-    user?: {
-      userId: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      roles: string[];
-      organization: any;
-    };
-    message?: string;
-  };
-  user: {
-    userId: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    roles: string[];
-    organization: any;
-  };
+  // Also accepts envelope shape: { success, data: { token, user } }
+  data?: { token?: string; user?: { userId: string; email: string; firstName: string; lastName: string; roles: string[]; organization: any; }; message?: string; };
+  user: { userId: string; email: string; firstName: string; lastName: string; roles: string[]; organization: any; };
 }
 
 @Injectable({
@@ -66,7 +40,7 @@ export class RbacAuthService {
   private readonly TOKEN_KEY = 'gc_organize_token';
   private readonly TOKEN_HASH_KEY = 'gc_organize_token_sig';
 
-  // BehaviorSubject to track authentication state
+  // BehaviorSubject tracks the currently authenticated user
   private currentUserSubject: BehaviorSubject<JwtPayload | null>;
   public currentUser$: Observable<JwtPayload | null>;
 
@@ -75,26 +49,19 @@ export class RbacAuthService {
     private router: Router,
     private secureStorage: SecureStorageService
   ) {
-    // Initialize with current token if exists
+    // Initialize from any stored token and run a one-time integrity check
     const token = this.getToken();
     const decoded = token ? this.decodeToken(token) : null;
     this.currentUserSubject = new BehaviorSubject<JwtPayload | null>(decoded);
     this.currentUser$ = this.currentUserSubject.asObservable();
-
-    // Run one-time integrity check on startup (safe here — no navigation is in progress yet)
     this.verifyTokenIntegrity();
   }
 
-  /**
-   * One-time startup check: verify the stored token's integrity hash.
-   * Only called from the constructor — NEVER from getToken() — to avoid
-   * async side-effects that would conflict with in-progress navigation.
-   */
+  // One-time startup check: compare stored hash against current token to detect tampering
   private verifyTokenIntegrity(): void {
     const token = localStorage.getItem(this.TOKEN_KEY);
     const storedHash = localStorage.getItem(this.TOKEN_HASH_KEY);
-    if (!token || !storedHash) return; // Nothing to verify
-
+    if (!token || !storedHash) return;
     this.secureStorage.hashData(token).then(expectedHash => {
       if (expectedHash !== storedHash) {
         console.warn('[Security] Startup token integrity check failed — clearing invalid token.');
@@ -103,40 +70,30 @@ export class RbacAuthService {
         this.currentUserSubject.next(null);
         this.router.navigate(['/login']);
       }
-    }).catch(() => {
-      // Crypto API unavailable — trust token as-is
-    });
+    }).catch(() => { /* Crypto API unavailable — trust token as-is */ });
   }
 
-  /**
-   * Login with email and password
-   */
+  // POST /auth/login, save the token, and emit the decoded user to currentUser$
   login(email: string, password: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(response => {
-          // Support both envelope-shaped responses ({ success, data: { token } })
-          // and unwrapped responses ( { token, user } ) depending on interceptor state.
+          // Accept both unwrapped ({ token }) and envelope ({ data: { token } }) shapes
           const token = response?.token ?? response?.data?.token;
           if (token) {
             this.saveToken(token);
-            const decoded = this.getDecodedToken();
-            this.currentUserSubject.next(decoded);
+            this.currentUserSubject.next(this.getDecodedToken());
           }
         })
       );
   }
 
-  /**
-   * Register new student user
-   */
+  // POST /auth/register for new student accounts
   register(userData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, userData);
   }
 
-  /**
-   * Logout user
-   */
+  // Clear token, emit null user, and navigate to login
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.TOKEN_HASH_KEY);
@@ -145,54 +102,36 @@ export class RbacAuthService {
     this.router.navigate(['/login']);
   }
 
-  /**
-   * Save JWT to localStorage with an integrity hash for tamper detection
-   */
+  // Persist the JWT and store a SHA-256 integrity hash for tamper detection
   private saveToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
-    // Store a SHA-256 integrity hash to detect localStorage tampering
     this.secureStorage.hashData(token).then(hash => {
       localStorage.setItem(this.TOKEN_HASH_KEY, hash);
     }).catch(() => {
-      // Fallback: hash unavailable, store without integrity check
       localStorage.removeItem(this.TOKEN_HASH_KEY);
     });
   }
 
-  /**
-   * Get JWT from localStorage.
-   * Pure synchronous read — no side effects.
-   * Integrity is verified once at startup by verifyTokenIntegrity().
-   */
+  // Pure synchronous read — integrity is verified once at startup only
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  /**
-   * Decode JWT token
-   */
+  // Decode the JWT and normalize role strings to the frontend's expected casing
   private decodeToken(token: string): JwtPayload | null {
     try {
-      if (!this.isJwt(token)) {
-        localStorage.removeItem(this.TOKEN_KEY);
-        return null;
-      }
+      if (!this.isJwt(token)) { localStorage.removeItem(this.TOKEN_KEY); return null; }
       const decoded = jwtDecode<any>(token) as JwtPayload | null;
-
-      // Normalize roles to the frontend's expected casing for compatibility
       if (decoded && Array.isArray(decoded.roles)) {
         const mapRole = (r: string) => {
           const low = String(r).toLowerCase();
           if (low === 'student') return 'Student';
           if (low === 'orgofficer' || low === 'org_officer' || low === 'organization') return 'OrgOfficer';
           if (low === 'oswsadmin' || low === 'admin') return 'OSWSAdmin';
-          // Fallback: capitalize first letter
           return String(r).charAt(0).toUpperCase() + String(r).slice(1);
         };
-
         decoded.roles = decoded.roles.map(mapRole);
       }
-
       return decoded;
     } catch (error) {
       console.error('Error decoding token:', error);
@@ -200,238 +139,84 @@ export class RbacAuthService {
     }
   }
 
-  /**
-   * Basic JWT format check (header.payload.signature)
-   */
+  // Validate token structure (header.payload.signature)
   private isJwt(token: string): boolean {
     const parts = String(token).split('.');
     return parts.length === 3 && parts.every(p => p.length > 0);
   }
 
-  /**
-   * Get decoded token payload
-   */
+  // Decode and return the current token, logging out if expired
   getDecodedToken(): JwtPayload | null {
     const token = this.getToken();
     if (!token) return null;
-
     const decoded = this.decodeToken(token);
     if (!decoded) return null;
-
-    // Check if token is expired
-    if (decoded.exp) {
-      const currentTime = Date.now() / 1000;
-      if (decoded.exp < currentTime) {
-        this.logout();
-        return null;
-      }
-    }
-
+    if (decoded.exp && decoded.exp < Date.now() / 1000) { this.logout(); return null; }
     return decoded;
   }
 
-  /**
-   * Check if user is authenticated
-   */
-  isAuthenticated(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
+  isAuthenticated(): boolean { return this.getDecodedToken() !== null; }
+  getUserRoles(): string[] { return this.getDecodedToken()?.roles || []; }
+  getUserId(): string | null { return this.getDecodedToken()?.userId || null; }
+  getUserEmail(): string | null { return this.getDecodedToken()?.email || null; }
+  getUserFullName(): string { const d = this.getDecodedToken(); return d ? `${d.firstName} ${d.lastName}` : ''; }
+  getUserOrganization(): any { return this.getDecodedToken()?.organization || null; }
+  getStudentId(): string | null { return this.getDecodedToken()?.studentId || null; }
 
-    const decoded = this.getDecodedToken();
-    return decoded !== null;
-  }
-
-  /**
-   * Get user roles from token
-   */
-  getUserRoles(): string[] {
-    const decoded = this.getDecodedToken();
-    return decoded?.roles || [];
-  }
-
-  /**
-   * Get user ID
-   */
-  getUserId(): string | null {
-    const decoded = this.getDecodedToken();
-    return decoded?.userId || null;
-  }
-
-  /**
-   * Get user email
-   */
-  getUserEmail(): string | null {
-    const decoded = this.getDecodedToken();
-    return decoded?.email || null;
-  }
-
-  /**
-   * Get user's full name
-   */
-  getUserFullName(): string {
-    const decoded = this.getDecodedToken();
-    if (!decoded) return '';
-    return `${decoded.firstName} ${decoded.lastName}`;
-  }
-
-  /**
-   * Get user's organization (if OrgOfficer)
-   */
-  getUserOrganization(): any {
-    const decoded = this.getDecodedToken();
-    return decoded?.organization || null;
-  }
-
-  /**
-   * Get student ID (for students only)
-   */
-  getStudentId(): string | null {
-    const decoded = this.getDecodedToken();
-    const studentId = decoded?.studentId || null;
-
-    return studentId;
-  }
-
-  /**
-   * Get user department (from backend API)
-   */
+  // Fetch the student's department from the API via callback
   getUserDepartment(callback: (department: string) => void): void {
     const studentId = this.getStudentId();
-    if (!studentId) {
-      callback('');
-      return;
-    }
-
-    const token = this.getToken();
-    this.http.get<any>(`${environment.apiUrl}/users/${studentId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).subscribe({
-      next: (res) => {
-        const student = res?.data || res;
-        callback(student?.department || '');
-      },
-      error: (err) => {
-        console.error('Error fetching user department:', err);
-        callback('');
-      }
+    if (!studentId) { callback(''); return; }
+    this.http.get<any>(`${environment.apiUrl}/users/${studentId}`, { headers: { Authorization: `Bearer ${this.getToken()}` } }).subscribe({
+      next: (res) => callback(res?.data?.department || res?.department || ''),
+      error: (err) => { console.error('Error fetching user department:', err); callback(''); }
     });
   }
 
-  /**
-   * Get creator/organization ID (for organization accounts)
-   */
+  // Return the org ID for OrgOfficer/organization accounts, or null
   getCreatorId(): number | null {
     const decoded = this.getDecodedToken();
-    // For organization accounts, legacyId is the org ID
-    // For students with OrgOfficer role, use organization.org_id
-    let creatorId = null;
-    if (decoded?.userType === 'organization') {
-      creatorId = Number(decoded.legacyId);
-    } else if (decoded?.organization?.org_id) {
-      creatorId = decoded.organization.org_id;
-    }
-
-    return creatorId;
+    if (decoded?.userType === 'organization') return Number(decoded.legacyId);
+    return decoded?.organization?.org_id || null;
   }
 
-  /**
-   * Get admin ID (for OSWS admins only)
-   */
+  // Return the admin's legacy ID, or null for non-admin accounts
   getAdminId(): number | null {
     const decoded = this.getDecodedToken();
-    let adminId = null;
-    if (decoded?.userType === 'admin') {
-      adminId = Number(decoded.legacyId);
-    }
-
-    return adminId;
+    return decoded?.userType === 'admin' ? Number(decoded.legacyId) : null;
   }
 
-  /**
-   * Check if user has a specific role
-   */
-  hasRole(roleName: string): boolean {
-    const roles = this.getUserRoles();
-    return roles.includes(roleName);
-  }
+  hasRole(roleName: string): boolean { return this.getUserRoles().includes(roleName); }
+  hasAnyRole(roleNames: string[]): boolean { return roleNames.some(r => this.getUserRoles().includes(r)); }
+  isStudent(): boolean { return this.hasRole('Student'); }
+  isOrgOfficer(): boolean { return this.hasRole('OrgOfficer'); }
+  isAdmin(): boolean { return this.hasRole('OSWSAdmin'); }
 
-  /**
-   * Check if user has any of the specified roles
-   */
-  hasAnyRole(roleNames: string[]): boolean {
-    const roles = this.getUserRoles();
-    return roleNames.some(role => roles.includes(role));
-  }
-
-  /**
-   * Check if user is a Student
-   */
-  isStudent(): boolean {
-    return this.hasRole('Student');
-  }
-
-  /**
-   * Check if user is an Organization Officer
-   */
-  isOrgOfficer(): boolean {
-    return this.hasRole('OrgOfficer');
-  }
-
-  /**
-   * Check if user is an OSWS Admin
-   */
-  isAdmin(): boolean {
-    return this.hasRole('OSWSAdmin');
-  }
-
-  /**
-   * Get HTTP headers with Authorization token
-   */
+  // Build Authorization headers for manual HTTP requests
   getAuthHeaders(): HttpHeaders {
-    const token = this.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
+    return new HttpHeaders({ 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.getToken()}` });
   }
 
-  /**
-   * Verify token with backend
-   */
   verifyToken(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/verify`, {
-      headers: this.getAuthHeaders()
-    });
+    return this.http.get(`${this.apiUrl}/verify`, { headers: this.getAuthHeaders() });
   }
 
-  /**
-   * Get primary role for routing (priority: Admin > OrgOfficer > Student)
-   */
+  // Return the highest-priority role (Admin > OrgOfficer > Student)
   getPrimaryRole(): string | null {
     const roles = this.getUserRoles();
-
     if (roles.includes('OSWSAdmin')) return 'OSWSAdmin';
     if (roles.includes('OrgOfficer')) return 'OrgOfficer';
     if (roles.includes('Student')) return 'Student';
-
     return null;
   }
 
-  /**
-   * Get default route based on primary role
-   */
+  // Map primary role to its default landing route
   getDefaultRoute(): string {
-    const primaryRole = this.getPrimaryRole();
-
-    switch (primaryRole) {
-      case 'OSWSAdmin':
-        return '/osws-admin';
-      case 'OrgOfficer':
-        return '/org-panel';
-      case 'Student':
-        return '/student-dashboard';
-      default:
-        return '/login';
+    switch (this.getPrimaryRole()) {
+      case 'OSWSAdmin': return '/osws-admin';
+      case 'OrgOfficer': return '/org-panel';
+      case 'Student': return '/student-dashboard';
+      default: return '/login';
     }
   }
 }

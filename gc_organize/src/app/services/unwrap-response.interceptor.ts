@@ -11,14 +11,12 @@ export class UnwrapResponseInterceptor implements HttpInterceptor {
       map((event: HttpEvent<any>) => {
         if (event instanceof HttpResponse && event.body && typeof event.body === 'object') {
           const body = event.body as any;
-          // If server returned a success envelope, unwrap it to the inner data
+          // Unwrap successful { success: true, data: ... } envelope to inner data
           if (body.success === true && body.hasOwnProperty('data')) {
             return event.clone({ body: body.data });
           }
 
-          // If server returned an error envelope but with HTTP 200, convert it
-          // into an HttpErrorResponse so callers hit the error path instead
-          // of receiving the envelope as data (which causes .filter errors, etc.).
+          // Convert error envelope {{ success: false }} delivered with HTTP 200 to an HttpErrorResponse
           if (body.success === false) {
             const message = body.message || 'API returned an error';
             throw new HttpErrorResponse({
