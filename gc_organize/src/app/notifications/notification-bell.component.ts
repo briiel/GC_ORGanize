@@ -2,6 +2,8 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationItem, NotificationService } from '../services/notification.service';
 import { normalizeList } from '../utils/api-utils';
+import { Subject, merge, timer } from 'rxjs';
+import { switchMap, takeUntil, debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-notification-bell',
@@ -16,16 +18,42 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   open = false;
   items: NotificationItem[] = [];
   loading = false;
-  private pollId: any = null;
-  private visibilityHandler = () => { if (!document.hidden) this.refresh(); };
+
+  /** Completes all subscriptions when the component is destroyed. */
+  private destroy$ = new Subject<void>();
+  /** On-demand refresh trigger (visibility changes, post-action refreshes, etc.). */
+  private manualRefresh$ = new Subject<void>();
+  private visibilityHandler = () => { if (!document.hidden) this.manualRefresh$.next(); };
 
   constructor(private api: NotificationService) { }
 
   ngOnInit(): void {
-    this.refresh();
-    // light polling to reflect new notifications without reload
-    this.pollId = setInterval(() => this.refresh(), 15000);
-    // refresh when user focuses tab — stored so we can remove it on destroy
+    /**
+     * Single reactive pipeline:
+     *  - timer(0, 30_000) fires immediately for the initial load, then every 30 s
+     *  - manualRefresh$ handles on-demand triggers (tab focus, post-action)
+     *  - debounceTime(300) collapses bursts (e.g. timer + visibility firing together)
+     *  - switchMap cancels any in-flight request before starting the next one
+     *  - takeUntil(destroy$) auto-unsubscribes when the component is destroyed
+     */
+    merge(
+      timer(0, 30_000),
+      this.manualRefresh$
+    ).pipe(
+      debounceTime(300),
+      switchMap(() => {
+        this.loading = true;
+        return this.api.list(this.panel ?? undefined, this.orgId ?? undefined);
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (res: any) => {
+        this.items = normalizeList(res) as NotificationItem[];
+        this.loading = false;
+      },
+      error: () => { this.loading = false; }
+    });
+
     document.addEventListener('visibilitychange', this.visibilityHandler);
   }
 
@@ -51,30 +79,23 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.pollId) {
-      clearInterval(this.pollId);
-      this.pollId = null;
-    }
+    this.destroy$.next();
+    this.destroy$.complete();
     document.removeEventListener('visibilitychange', this.visibilityHandler);
   }
 
   toggle() {
     this.open = !this.open;
-    if (this.open && this.items.length === 0) {
-      this.refresh();
-    }
+    // No manual refresh needed — the poller keeps items up-to-date
   }
 
   unreadCount(): number {
     return this.items.filter(i => !i.is_read || Number(i.is_read) === 0).length;
   }
 
+  /** Manually trigger a refresh (e.g. after marking read). */
   refresh() {
-    this.loading = true;
-    this.api.list(this.panel ?? undefined, this.orgId ?? undefined).subscribe((res: any) => {
-      this.items = normalizeList(res) as NotificationItem[];
-      this.loading = false;
-    }, _ => { this.loading = false; });
+    this.manualRefresh$.next();
   }
 
   markRead(item: NotificationItem, idx: number) {
@@ -88,6 +109,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
     if (!this.items || this.items.length === 0) return;
     this.api.markAll(this.panel ?? undefined, this.orgId ?? undefined).subscribe(() => {
       this.items = this.items.map(i => ({ ...i, is_read: true } as any));
+      // Sync with server state after bulk-mark
+      this.manualRefresh$.next();
     });
   }
 

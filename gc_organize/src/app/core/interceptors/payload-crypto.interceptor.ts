@@ -18,8 +18,8 @@ export const payloadCryptoInterceptorFn: HttpInterceptorFn = (req, next) => {
   // Build the (possibly encrypted) outgoing request
   const outgoing$ = shouldEncrypt
     ? from(
-        enc.encrypt(req.body).then(payload =>
-          req.clone({ body: { payload }, setHeaders: { 'X-Encrypted': 'true' } })
+        enc.encrypt(req.body).then(encrypted =>
+          req.clone({ body: encrypted, setHeaders: { 'X-Encrypted': 'true' } })
         )
       )
     : from(Promise.resolve(req));
@@ -31,10 +31,10 @@ export const payloadCryptoInterceptorFn: HttpInterceptorFn = (req, next) => {
         mergeMap(event => {
           if (!(event instanceof HttpResponse)) return from(Promise.resolve(event));
           const body = event.body as any;
-          if (!body || typeof body.payload !== 'string') return from(Promise.resolve(event));
+          if (!body || typeof body !== 'string') return from(Promise.resolve(event));
 
           return from(
-            enc.decrypt(body.payload).then(
+            enc.decrypt(body).then(
               decrypted => event.clone({ body: decrypted }),
               err => {
                 console.error('[PayloadCrypto] Decrypt failed:', err);
