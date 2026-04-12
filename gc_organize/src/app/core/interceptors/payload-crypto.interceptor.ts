@@ -19,7 +19,10 @@ export const payloadCryptoInterceptorFn: HttpInterceptorFn = (req, next) => {
   const outgoing$ = shouldEncrypt
     ? from(
         enc.encrypt(req.body).then(encrypted =>
-          req.clone({ body: encrypted, setHeaders: { 'X-Encrypted': 'true' } })
+          req.clone({
+            body: JSON.stringify(encrypted),
+            setHeaders: { 'X-Encrypted': 'true', 'Content-Type': 'application/json' }
+          })
         )
       )
     : from(Promise.resolve(req));
