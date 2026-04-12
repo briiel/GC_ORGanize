@@ -1,10 +1,4 @@
-import {
-  Component,
-  OnInit,
-  ViewChild,
-  ElementRef,
-  inject,
-} from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -41,7 +35,7 @@ interface MyRequest {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './request-role.component.html',
-  styleUrls: ['./request-role.component.css'],
+  styleUrls: ['./request-role.component.css']
 })
 export class RequestRoleComponent implements OnInit {
   // private apiUrl = 'https://gcorg-apiv1-8bn5.onrender.com/api';
@@ -68,8 +62,8 @@ export class RequestRoleComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private authService: RbacAuthService,
-  ) {}
+    private authService: RbacAuthService
+  ) { }
 
   ngOnInit(): void {
     this.loadUserInfo();
@@ -83,6 +77,7 @@ export class RequestRoleComponent implements OnInit {
   loadUserInfo(): void {
     this.authService.getUserDepartment((department) => {
       this.userDepartment = department;
+
     });
   }
 
@@ -94,7 +89,7 @@ export class RequestRoleComponent implements OnInit {
     if (!this.userDepartment) {
       return orgs;
     }
-    return orgs.filter((org) => org.department === this.userDepartment);
+    return orgs.filter(org => org.department === this.userDepartment);
   }
 
   /**
@@ -126,7 +121,9 @@ export class RequestRoleComponent implements OnInit {
     const headers = this.authService.getAuthHeaders();
     this.http.get<any>(`${this.apiUrl}/organizations`, { headers }).subscribe({
       next: (response) => {
-        // Normalize response gracefully into an array of organizations
+        // Normalize response to an array of organizations.
+        // Some APIs return { organizations: [...] }, others may return the array directly,
+        // or in rare cases an object map. Handle those gracefully and log unexpected shapes.
         let orgs: Organization[] = [];
         try {
           if (response) {
@@ -134,10 +131,7 @@ export class RequestRoleComponent implements OnInit {
               orgs = response.organizations;
             } else if (Array.isArray(response)) {
               orgs = response;
-            } else if (
-              response.organizations &&
-              typeof response.organizations === 'object'
-            ) {
+            } else if (response.organizations && typeof response.organizations === 'object') {
               orgs = Object.values(response.organizations) as Organization[];
             } else if (typeof response === 'object') {
               // If the API returned a plain object (e.g. id->org map), convert to array
@@ -149,10 +143,7 @@ export class RequestRoleComponent implements OnInit {
         }
 
         if (!Array.isArray(orgs)) {
-          console.warn(
-            'Unexpected organizations response shape, defaulting to empty array:',
-            response,
-          );
+          console.warn('Unexpected organizations response shape, defaulting to empty array:', response);
           orgs = [];
         }
 
@@ -163,9 +154,9 @@ export class RequestRoleComponent implements OnInit {
         Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Failed to load organizations.',
+          text: 'Failed to load organizations.'
         });
-      },
+      }
     });
   }
 
@@ -177,25 +168,23 @@ export class RequestRoleComponent implements OnInit {
     this.loadingService.show('Loading your requests...');
     const headers = this.authService.getAuthHeaders();
 
-    this.http
-      .get<any>(`${this.apiUrl}/roles/my-requests`, { headers })
-      .subscribe({
-        next: (response) => {
-          this.myRequests = response.items || response.requests || [];
-          this.isLoading = false;
-          this.loadingService.hide();
-        },
-        error: (error) => {
-          console.error('Error loading requests:', error);
-          this.isLoading = false;
-          this.loadingService.hide();
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to load your requests.',
-          });
-        },
-      });
+    this.http.get<any>(`${this.apiUrl}/roles/my-requests`, { headers }).subscribe({
+      next: (response) => {
+        this.myRequests = response.items || response.requests || [];
+        this.isLoading = false;
+        this.loadingService.hide();
+      },
+      error: (error) => {
+        console.error('Error loading requests:', error);
+        this.isLoading = false;
+        this.loadingService.hide();
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load your requests.'
+        });
+      }
+    });
   }
 
   /**
@@ -207,10 +196,7 @@ export class RequestRoleComponent implements OnInit {
       // focus first invalid field
       if (this.formErrors['organization']) {
         this.orgSelect?.nativeElement.focus();
-      } else if (
-        this.formErrors['position'] ||
-        this.formErrors['otherPosition']
-      ) {
+      } else if (this.formErrors['position'] || this.formErrors['otherPosition']) {
         const el: HTMLElement | null = document.getElementById('position');
         el?.focus();
       } else if (this.formErrors['justification']) {
@@ -220,10 +206,7 @@ export class RequestRoleComponent implements OnInit {
       return;
     }
 
-    const finalPosition =
-      this.requestedPosition === 'Others'
-        ? this.otherPosition
-        : this.requestedPosition;
+    const finalPosition = this.requestedPosition === 'Others' ? this.otherPosition : this.requestedPosition;
 
     this.isSubmitting = true;
     const headers = this.authService.getAuthHeaders();
@@ -231,48 +214,42 @@ export class RequestRoleComponent implements OnInit {
     const requestData = {
       org_id: this.selectedOrgId,
       requested_position: finalPosition.trim(),
-      justification: this.justification.trim() || null,
+      justification: this.justification.trim() || null
     };
 
-    this.http
-      .post<any>(`${this.apiUrl}/roles/request`, requestData, { headers })
-      .subscribe({
-        next: (response) => {
-          this.isSubmitting = false;
-          this.closeRequestModal();
+    this.http.post<any>(`${this.apiUrl}/roles/request`, requestData, { headers }).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+        this.closeRequestModal();
 
-          Swal.fire({
-            icon: 'success',
-            title: 'Request Submitted!',
-            text:
-              (response?.message ?? response?.data?.message) ||
-              'Your role request has been submitted successfully. Please wait for admin approval.',
-            confirmButtonColor: '#679436',
-          });
+        Swal.fire({
+          icon: 'success',
+          title: 'Request Submitted!',
+          text: (response?.message ?? response?.data?.message) || 'Your role request has been submitted successfully. Please wait for admin approval.',
+          confirmButtonColor: '#679436'
+        });
 
-          // Reset form
-          this.selectedOrgId = null;
-          this.requestedPosition = '';
-          this.otherPosition = '';
-          this.justification = '';
+        // Reset form
+        this.selectedOrgId = null;
+        this.requestedPosition = '';
+        this.otherPosition = '';
+        this.justification = '';
 
-          // Reload requests
-          this.loadMyRequests();
-        },
-        error: (error) => {
-          this.isSubmitting = false;
+        // Reload requests
+        this.loadMyRequests();
+      },
+      error: (error) => {
+        this.isSubmitting = false;
 
-          const errorMessage =
-            error.error?.message ||
-            'Failed to submit request. Please try again.';
+        const errorMessage = error.error?.message || 'Failed to submit request. Please try again.';
 
-          Swal.fire({
-            icon: 'error',
-            title: 'Request Failed',
-            text: errorMessage,
-          });
-        },
-      });
+        Swal.fire({
+          icon: 'error',
+          title: 'Request Failed',
+          text: errorMessage
+        });
+      }
+    });
   }
 
   /**
@@ -295,7 +272,7 @@ export class RequestRoleComponent implements OnInit {
    * Get organization name by ID
    */
   getOrgName(orgId: number): string {
-    const org = this.organizations.find((o) => o.org_id === orgId);
+    const org = this.organizations.find(o => o.org_id === orgId);
     return org ? org.org_name : 'Unknown Organization';
   }
 
@@ -311,7 +288,7 @@ export class RequestRoleComponent implements OnInit {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      timeZone: 'Asia/Manila',
+      timeZone: 'Asia/Manila'
     });
   }
 
@@ -323,10 +300,7 @@ export class RequestRoleComponent implements OnInit {
   }
 
   get justificationCharsLeft(): number {
-    return (
-      this.justificationMax -
-      (this.justification ? this.justification.length : 0)
-    );
+    return this.justificationMax - (this.justification ? this.justification.length : 0);
   }
 
   validateForm(): boolean {
@@ -344,12 +318,8 @@ export class RequestRoleComponent implements OnInit {
       }
     }
 
-    if (
-      this.justification &&
-      this.justification.length > this.justificationMax
-    ) {
-      this.formErrors['justification'] =
-        `Justification must be ${this.justificationMax} characters or fewer.`;
+    if (this.justification && this.justification.length > this.justificationMax) {
+      this.formErrors['justification'] = `Justification must be ${this.justificationMax} characters or fewer.`;
     }
 
     return Object.keys(this.formErrors).length === 0;
