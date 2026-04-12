@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
   standalone: true,
   templateUrl: './ecertificate.component.html',
   styleUrls: ['./ecertificate.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule],
 })
 export class EcertificateComponent implements OnInit {
   private loadingService = inject(LoadingService);
@@ -32,8 +32,8 @@ export class EcertificateComponent implements OnInit {
     private certificateService: CertificateService,
     private http: HttpClient,
     private router: Router,
-    private auth: RbacAuthService
-  ) { }
+    private auth: RbacAuthService,
+  ) {}
 
   ngOnInit() {
     const studentId = this.auth.getStudentId();
@@ -50,7 +50,7 @@ export class EcertificateComponent implements OnInit {
         error: () => {
           this.loading = false;
           this.loadingService.hide();
-        }
+        },
       });
     } else {
       this.loading = false;
@@ -63,19 +63,21 @@ export class EcertificateComponent implements OnInit {
     }
 
     fetch(certUrl)
-      .then(response => {
+      .then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         return response.blob();
       })
-      .then(blob => {
+      .then((blob) => {
         const url = window.URL.createObjectURL(blob);
 
         const link = document.createElement('a');
         link.href = url;
 
-        const sanitizedEventTitle = eventTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const sanitizedEventTitle = eventTitle
+          .replace(/[^a-z0-9]/gi, '_')
+          .toLowerCase();
         link.download = `certificate_${sanitizedEventTitle}.png`;
 
         document.body.appendChild(link);
@@ -84,7 +86,7 @@ export class EcertificateComponent implements OnInit {
 
         window.URL.revokeObjectURL(url);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Download failed:', error);
         window.open(certUrl, '_blank');
       })
@@ -97,7 +99,7 @@ export class EcertificateComponent implements OnInit {
 
   goToEvaluation(eventId: number, eventTitle: string) {
     this.router.navigate(['/student-dashboard/evaluation', eventId], {
-      queryParams: { title: eventTitle }
+      queryParams: { title: eventTitle },
     });
   }
 
@@ -109,10 +111,9 @@ export class EcertificateComponent implements OnInit {
     this.certificateService.requestCertificate(eventId).subscribe({
       next: (res) => {
         this.requestingCertIds.delete(eventId);
-        // The UnwrapResponseInterceptor strips the { success, data } envelope,
-        // so res here is already the inner data object { message: '...' }.
-        // Being in the next() callback already means the request succeeded.
-        const msg = (res && res.message) || 'Certificate request submitted successfully!';
+        // Extract success message from the unwrapped response object
+        const msg =
+          (res && res.message) || 'Certificate request submitted successfully!';
         this.requestMessage = msg;
         // Show SweetAlert toast
         Swal.fire({
@@ -122,28 +123,33 @@ export class EcertificateComponent implements OnInit {
           title: msg,
           showConfirmButton: false,
           timer: 3500,
-          timerProgressBar: true
+          timerProgressBar: true,
         });
         // Update the local certificate entry so the status badge changes immediately
-        const cert = this.certificates.find(c => c.event_id === eventId || c.id === eventId);
+        const cert = this.certificates.find(
+          (c) => c.event_id === eventId || c.id === eventId,
+        );
         if (cert) {
           cert.request_status = res?.request_status ?? 'pending';
           if (res?.certificate_url) cert.certificate_url = res.certificate_url;
-          if (res?.request_certificate_url) cert.request_certificate_url = res.request_certificate_url;
+          if (res?.request_certificate_url)
+            cert.request_certificate_url = res.request_certificate_url;
         }
-        setTimeout(() => this.requestMessage = '', 5000);
+        setTimeout(() => (this.requestMessage = ''), 5000);
       },
       error: (err) => {
         this.requestingCertIds.delete(eventId);
-        const msg = err.error?.message || 'Failed to request certificate. Please try again.';
+        const msg =
+          err.error?.message ||
+          'Failed to request certificate. Please try again.';
         this.requestError = msg;
         Swal.fire({
           icon: 'error',
           title: 'Request failed',
-          text: msg
+          text: msg,
         });
-        setTimeout(() => this.requestError = '', 5000);
-      }
+        setTimeout(() => (this.requestError = ''), 5000);
+      },
     });
   }
 
@@ -151,7 +157,11 @@ export class EcertificateComponent implements OnInit {
     return this.requestingCertIds.has(eventId);
   }
 
-  downloadCertificateWithHttp(certUrl: string, eventTitle: string, certId?: number) {
+  downloadCertificateWithHttp(
+    certUrl: string,
+    eventTitle: string,
+    certId?: number,
+  ) {
     if (certId) {
       this.downloadingCertIds.add(certId);
     }
@@ -163,7 +173,9 @@ export class EcertificateComponent implements OnInit {
         const link = document.createElement('a');
         link.href = url;
 
-        const sanitizedEventTitle = eventTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const sanitizedEventTitle = eventTitle
+          .replace(/[^a-z0-9]/gi, '_')
+          .toLowerCase();
         link.download = `certificate_${sanitizedEventTitle}.png`;
 
         document.body.appendChild(link);
@@ -180,7 +192,7 @@ export class EcertificateComponent implements OnInit {
         if (certId) {
           this.downloadingCertIds.delete(certId);
         }
-      }
+      },
     });
   }
 
@@ -192,8 +204,8 @@ export class EcertificateComponent implements OnInit {
     let filtered = this.certificates;
 
     if (this.searchTerm) {
-      filtered = filtered.filter(cert =>
-        cert.event_title.toLowerCase().includes(this.searchTerm.toLowerCase())
+      filtered = filtered.filter((cert) =>
+        cert.event_title.toLowerCase().includes(this.searchTerm.toLowerCase()),
       );
     }
 
@@ -201,15 +213,28 @@ export class EcertificateComponent implements OnInit {
     return [...filtered].sort((a, b) => {
       switch (this.sortBy) {
         case 'date_desc':
-          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
+          return (
+            new Date(b.start_date || 0).getTime() -
+            new Date(a.start_date || 0).getTime()
+          );
         case 'date_asc':
-          return new Date(a.start_date || 0).getTime() - new Date(b.start_date || 0).getTime();
+          return (
+            new Date(a.start_date || 0).getTime() -
+            new Date(b.start_date || 0).getTime()
+          );
         case 'title_asc':
-          return (a.event_title || '').toLowerCase().localeCompare((b.event_title || '').toLowerCase());
+          return (a.event_title || '')
+            .toLowerCase()
+            .localeCompare((b.event_title || '').toLowerCase());
         case 'title_desc':
-          return (b.event_title || '').toLowerCase().localeCompare((a.event_title || '').toLowerCase());
+          return (b.event_title || '')
+            .toLowerCase()
+            .localeCompare((a.event_title || '').toLowerCase());
         default:
-          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
+          return (
+            new Date(b.start_date || 0).getTime() -
+            new Date(a.start_date || 0).getTime()
+          );
       }
     });
   }
@@ -239,10 +264,15 @@ export class EcertificateComponent implements OnInit {
 
   private formatYmd(ymd: string): string {
     // Parse YYYY-MM-DD safely in local time to avoid TZ shifts
-    const parts = ymd.split('-').map(n => parseInt(n, 10));
+    const parts = ymd.split('-').map((n) => parseInt(n, 10));
     if (parts.length === 3 && !parts.some(isNaN)) {
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
-      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' });
+      return d.toLocaleDateString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        timeZone: 'Asia/Manila',
+      });
     }
     // Fallback to raw string
     return ymd;

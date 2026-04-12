@@ -1,5 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { parseMysqlDatetimeToDate, formatToLocalShort } from '../utils/date-utils';
+import {
+  parseMysqlDatetimeToDate,
+  formatToLocalShort,
+} from '../utils/date-utils';
 import { CommonModule } from '@angular/common';
 import { CertificateRequestService } from '../services/certificate-request.service';
 import { LoadingService } from '../services/loading.service';
@@ -40,7 +43,7 @@ interface CertificateRequest {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './certificate-requests.component.html',
-  styleUrls: ['./certificate-requests.component.css']
+  styleUrls: ['./certificate-requests.component.css'],
 })
 export class CertificateRequestsComponent implements OnInit {
   requests: CertificateRequest[] = [];
@@ -59,7 +62,13 @@ export class CertificateRequestsComponent implements OnInit {
   selectAll = false;
 
   // Filters
-  statusFilter: 'all' | 'pending' | 'processing' | 'sent' | 'approved' | 'rejected' = 'all';
+  statusFilter:
+    | 'all'
+    | 'pending'
+    | 'processing'
+    | 'sent'
+    | 'approved'
+    | 'rejected' = 'all';
   searchTerm = '';
 
   // Pagination
@@ -69,7 +78,7 @@ export class CertificateRequestsComponent implements OnInit {
 
   private loadingService = inject(LoadingService);
 
-  constructor(private certificateRequestService: CertificateRequestService) { }
+  constructor(private certificateRequestService: CertificateRequestService) {}
 
   ngOnInit(): void {
     this.loadRequests();
@@ -82,20 +91,16 @@ export class CertificateRequestsComponent implements OnInit {
 
     this.certificateRequestService.getCertificateRequests().subscribe({
       next: (response: any) => {
-        const raw = Array.isArray(response) ? response : (response && Array.isArray(response.items)) ? response.items : (response?.data || []);
-        // Normalize each request to include a displayable timestamp.
-        // Prefer an ISO/UTC timestamp from `requested_at` when available so
-        // the browser will convert it to the viewer's local time. If the
-        // server did not provide an ISO/UTC value, fall back to server-local
-        // ISO (`requested_at_local_iso`) or plain local string (`requested_at_local`).
-        const hasIsoTz = (s: any) => typeof s === 'string' && /[zZ]|[+-]\d{2}:?\d{2}$/.test(s);
+        const raw = Array.isArray(response)
+          ? response
+          : response && Array.isArray(response.items)
+            ? response.items
+            : response?.data || [];
+        // Normalize each request to include a displayable timestamp preferring ISO/UTC value.
+        const hasIsoTz = (s: any) =>
+          typeof s === 'string' && /[zZ]|[+-]\d{2}:?\d{2}$/.test(s);
         this.requests = raw.map((r: any) => {
-          // Choose viewerDisplay so the browser will show the instant in the
-          // viewer's local clock. Preference order:
-          // 1) `requested_at` (UTC/ISO) -> browser converts to viewer local
-          // 2) `requested_at_local_iso` (server local with offset)
-          // 3) `requested_at_local` (plain server-local DATETIME)
-          // Keep a separate serverDisplay (explicit server-local time) when available.
+          // Choose viewerDisplay so the browser will show the instant in the viewer's local clock.
           let sourceLabel: string | undefined = undefined;
           let viewerDisplay: string | undefined = undefined;
           if (hasIsoTz(r?.requested_at)) {
@@ -103,8 +108,12 @@ export class CertificateRequestsComponent implements OnInit {
             sourceLabel = 'Viewer local (converted from UTC)';
           } else if (hasIsoTz(r?.requested_at_local_iso)) {
             viewerDisplay = r.requested_at_local_iso; // server local ISO with offset
-            const tzMatch = String(r.requested_at_local_iso).match(/([+-]\d{2}:?\d{2})$/);
-            sourceLabel = tzMatch ? `Server local (${tzMatch[1]})` : 'Server local';
+            const tzMatch = String(r.requested_at_local_iso).match(
+              /([+-]\d{2}:?\d{2})$/,
+            );
+            sourceLabel = tzMatch
+              ? `Server local (${tzMatch[1]})`
+              : 'Server local';
           } else if (r?.requested_at_local) {
             viewerDisplay = r.requested_at_local; // plain server-local
             sourceLabel = 'Server local';
@@ -114,7 +123,8 @@ export class CertificateRequestsComponent implements OnInit {
           }
 
           let serverDisplay: string | undefined = undefined;
-          if (hasIsoTz(r?.requested_at_local_iso)) serverDisplay = r.requested_at_local_iso;
+          if (hasIsoTz(r?.requested_at_local_iso))
+            serverDisplay = r.requested_at_local_iso;
           else if (r?.requested_at_local) serverDisplay = r.requested_at_local;
 
           // processed_at selection (keep previous behavior)
@@ -125,7 +135,9 @@ export class CertificateRequestsComponent implements OnInit {
             procSourceLabel = 'Viewer local (converted from UTC)';
           } else if (hasIsoTz(r?.processed_at_local_iso)) {
             procDisplay = r.processed_at_local_iso;
-            const m = String(r.processed_at_local_iso).match(/([+-]\d{2}:?\d{2})$/);
+            const m = String(r.processed_at_local_iso).match(
+              /([+-]\d{2}:?\d{2})$/,
+            );
             procSourceLabel = m ? `Server local (${m[1]})` : 'Server local';
           } else if (r?.processed_at_local) {
             procDisplay = r.processed_at_local;
@@ -137,7 +149,7 @@ export class CertificateRequestsComponent implements OnInit {
 
           return Object.assign({}, r, {
             _display_requested_at: viewerDisplay,
-            _display_processed_at: procDisplay
+            _display_processed_at: procDisplay,
           });
         });
         this.applyFilters();
@@ -146,10 +158,11 @@ export class CertificateRequestsComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error loading certificate requests:', err);
-        this.error = err.error?.message || 'Failed to load certificate requests';
+        this.error =
+          err.error?.message || 'Failed to load certificate requests';
         this.loading = false;
         this.loadingService.hide();
-      }
+      },
     });
   }
 
@@ -158,23 +171,26 @@ export class CertificateRequestsComponent implements OnInit {
 
     // Status filter
     if (this.statusFilter !== 'all') {
-      filtered = filtered.filter(r => r.status === this.statusFilter);
+      filtered = filtered.filter((r) => r.status === this.statusFilter);
     }
 
     // Search filter
     if (this.searchTerm.trim()) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(r =>
-        r.event_title.toLowerCase().includes(term) ||
-        r.first_name.toLowerCase().includes(term) ||
-        r.last_name.toLowerCase().includes(term) ||
-        r.student_id.toLowerCase().includes(term) ||
-        r.student_email.toLowerCase().includes(term)
+      filtered = filtered.filter(
+        (r) =>
+          r.event_title.toLowerCase().includes(term) ||
+          r.first_name.toLowerCase().includes(term) ||
+          r.last_name.toLowerCase().includes(term) ||
+          r.student_id.toLowerCase().includes(term) ||
+          r.student_email.toLowerCase().includes(term),
       );
     }
 
     this.filteredRequests = filtered;
-    this.totalPages = Math.ceil(this.filteredRequests.length / this.itemsPerPage);
+    this.totalPages = Math.ceil(
+      this.filteredRequests.length / this.itemsPerPage,
+    );
     this.currentPage = 1; // Reset to first page when filters change
     this.updatePagedRequests();
   }
@@ -211,11 +227,13 @@ export class CertificateRequestsComponent implements OnInit {
       } else if (this.currentPage >= this.totalPages - 2) {
         pages.push(1);
         pages.push(-1); // ellipsis
-        for (let i = this.totalPages - 3; i <= this.totalPages; i++) pages.push(i);
+        for (let i = this.totalPages - 3; i <= this.totalPages; i++)
+          pages.push(i);
       } else {
         pages.push(1);
         pages.push(-1); // ellipsis
-        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++) pages.push(i);
+        for (let i = this.currentPage - 1; i <= this.currentPage + 1; i++)
+          pages.push(i);
         pages.push(-1); // ellipsis
         pages.push(this.totalPages);
       }
@@ -239,10 +257,7 @@ export class CertificateRequestsComponent implements OnInit {
 
   formatDate(dateStr: string): string {
     if (!dateStr) return 'N/A';
-    // `dateStr` may be one of:
-    // - an ISO string with timezone (e.g. 2025-11-30T08:04:31+08:00)
-    // - a server-local plain DATETIME (e.g. 2025-11-30 08:04:31)
-    // - a UTC ISO with Z (e.g. 2025-11-30T00:04:31.000Z)
+    // Parse dateStr which could be ISO with timezone, server-local DATETIME, or UTC ISO
 
     // Try to parse as ISO first (handles both UTC Z and timezone offset formats)
     try {
@@ -256,7 +271,7 @@ export class CertificateRequestsComponent implements OnInit {
           hour: 'numeric',
           minute: '2-digit',
           hour12: true,
-          timeZone: 'Asia/Manila'
+          timeZone: 'Asia/Manila',
         });
       }
     } catch (e) {
@@ -269,7 +284,10 @@ export class CertificateRequestsComponent implements OnInit {
     return formatToLocalShort(d);
   }
 
-  async updateRequestStatus(request: CertificateRequest, newStatus: string): Promise<void> {
+  async updateRequestStatus(
+    request: CertificateRequest,
+    newStatus: string,
+  ): Promise<void> {
     // Only allow updating to pending, processing, or sent statuses
     if (!['pending', 'processing', 'sent'].includes(newStatus)) {
       return;
@@ -284,17 +302,25 @@ export class CertificateRequestsComponent implements OnInit {
 
     try {
       // Update status through API
-      await firstValueFrom(this.certificateRequestService.updateCertificateRequestStatus(request.id, newStatus));
+      await firstValueFrom(
+        this.certificateRequestService.updateCertificateRequestStatus(
+          request.id,
+          newStatus,
+        ),
+      );
       request.status = newStatus as any;
       // Set processed_at immediately using current UTC time so UI shows updated timestamp
       try {
         request.processed_at = new Date().toISOString();
-      } catch (_e) { /* ignore */ }
+      } catch (_e) {
+        /* ignore */
+      }
       this.applyFilters();
       this.successMessage = `Status updated to ${newStatus.toUpperCase()}`;
       window.setTimeout(() => (this.successMessage = null), 4000);
     } catch (error: any) {
-      this.error = error?.error?.message || error?.message || 'Failed to update status';
+      this.error =
+        error?.error?.message || error?.message || 'Failed to update status';
       console.error('Error updating status:', error);
       // Refresh list to keep UI consistent
       this.loadRequests();
@@ -305,28 +331,38 @@ export class CertificateRequestsComponent implements OnInit {
 
   getStatusBadgeClass(status: string): string {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-900 border-yellow-400';
-      case 'processing': return 'bg-blue-100 text-blue-900 border-blue-400';
-      case 'sent': return 'bg-green-100 text-green-900 border-green-400';
-      case 'approved': return 'bg-green-100 text-green-900 border-green-400';
-      case 'rejected': return 'bg-red-100 text-red-900 border-red-400';
-      default: return 'bg-gray-100 text-gray-900 border-gray-400';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-900 border-yellow-400';
+      case 'processing':
+        return 'bg-blue-100 text-blue-900 border-blue-400';
+      case 'sent':
+        return 'bg-green-100 text-green-900 border-green-400';
+      case 'approved':
+        return 'bg-green-100 text-green-900 border-green-400';
+      case 'rejected':
+        return 'bg-red-100 text-red-900 border-red-400';
+      default:
+        return 'bg-gray-100 text-gray-900 border-gray-400';
     }
   }
 
   getStatusSelectClass(status: string): string {
     switch (status) {
-      case 'pending': return 'bg-yellow-50 text-yellow-900 border-yellow-400 focus:ring-yellow-500';
-      case 'processing': return 'bg-blue-50 text-blue-900 border-blue-400 focus:ring-blue-500';
-      case 'sent': return 'bg-green-50 text-green-900 border-green-400 focus:ring-green-500';
-      default: return 'bg-gray-50 text-gray-900 border-gray-400 focus:ring-gray-500';
+      case 'pending':
+        return 'bg-yellow-50 text-yellow-900 border-yellow-400 focus:ring-yellow-500';
+      case 'processing':
+        return 'bg-blue-50 text-blue-900 border-blue-400 focus:ring-blue-500';
+      case 'sent':
+        return 'bg-green-50 text-green-900 border-green-400 focus:ring-green-500';
+      default:
+        return 'bg-gray-50 text-gray-900 border-gray-400 focus:ring-gray-500';
     }
   }
 
   toggleSelectAll(): void {
     this.selectAll = !this.selectAll;
     if (this.selectAll) {
-      this.pagedRequests.forEach(req => this.selectedRequests.add(req.id));
+      this.pagedRequests.forEach((req) => this.selectedRequests.add(req.id));
     } else {
       this.selectedRequests.clear();
     }
@@ -342,8 +378,9 @@ export class CertificateRequestsComponent implements OnInit {
   }
 
   updateSelectAllState(): void {
-    this.selectAll = this.pagedRequests.length > 0 &&
-      this.pagedRequests.every(req => this.selectedRequests.has(req.id));
+    this.selectAll =
+      this.pagedRequests.length > 0 &&
+      this.pagedRequests.every((req) => this.selectedRequests.has(req.id));
   }
 
   isSelected(requestId: number): boolean {
@@ -363,7 +400,7 @@ export class CertificateRequestsComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Yes, update',
       cancelButtonText: 'Cancel',
-      reverseButtons: true
+      reverseButtons: true,
     });
 
     if (!result.isConfirmed) {
@@ -376,11 +413,20 @@ export class CertificateRequestsComponent implements OnInit {
     const updateIds = Array.from(this.selectedRequests);
     try {
       for (const requestId of updateIds) {
-        await firstValueFrom(this.certificateRequestService.updateCertificateRequestStatus(requestId, this.bulkStatus));
-        const request = this.requests.find(r => r.id === requestId);
+        await firstValueFrom(
+          this.certificateRequestService.updateCertificateRequestStatus(
+            requestId,
+            this.bulkStatus,
+          ),
+        );
+        const request = this.requests.find((r) => r.id === requestId);
         if (request) request.status = this.bulkStatus as any;
         if (request) {
-          try { request.processed_at = new Date().toISOString(); } catch (_e) { /* ignore */ }
+          try {
+            request.processed_at = new Date().toISOString();
+          } catch (_e) {
+            /* ignore */
+          }
         }
       }
 
@@ -396,17 +442,19 @@ export class CertificateRequestsComponent implements OnInit {
         timer: 3000,
         showConfirmButton: false,
         toast: true,
-        position: 'top-end'
+        position: 'top-end',
       });
       window.setTimeout(() => (this.successMessage = null), 4000);
     } catch (error: any) {
       console.error('Bulk update failed:', error);
-      const errMsg = error?.error?.message || 'Some requests failed to update. Please try again.';
+      const errMsg =
+        error?.error?.message ||
+        'Some requests failed to update. Please try again.';
       this.error = errMsg;
       Swal.fire({
         icon: 'error',
         title: 'Bulk update failed',
-        text: errMsg
+        text: errMsg,
       });
       // reload to reconcile UI
       this.loadRequests();
@@ -416,7 +464,7 @@ export class CertificateRequestsComponent implements OnInit {
   }
 
   getPendingCount(): number {
-    return this.requests.filter(r => r.status === 'pending').length;
+    return this.requests.filter((r) => r.status === 'pending').length;
   }
 
   // Expose Math for template

@@ -1,4 +1,10 @@
-import { Component, OnDestroy, OnInit, HostListener, inject } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  HostListener,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../services/admin.service';
@@ -11,7 +17,7 @@ import { normalizeSingle } from '../utils/api-utils';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './manage-users.component.html',
-  styleUrls: ['./manage-users.component.css']
+  styleUrls: ['./manage-users.component.css'],
 })
 export class ManageUsersComponent implements OnInit, OnDestroy {
   private loadingService = inject(LoadingService);
@@ -35,7 +41,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
   isAddingAdmin = false;
   deletingAdminId: number | null = null;
 
-  constructor(private adminService: AdminService) { }
+  constructor(private adminService: AdminService) {}
 
   // Filtered admins based on search term
   get filteredAdmins() {
@@ -43,9 +49,10 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
       return this.admins;
     }
     const searchLower = this.adminSearchTerm.toLowerCase();
-    return this.admins.filter(admin =>
-      admin.name.toLowerCase().includes(searchLower) ||
-      admin.email.toLowerCase().includes(searchLower)
+    return this.admins.filter(
+      (admin) =>
+        admin.name.toLowerCase().includes(searchLower) ||
+        admin.email.toLowerCase().includes(searchLower),
     );
   }
 
@@ -55,10 +62,11 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
       return this.organizations;
     }
     const searchLower = this.orgSearchTerm.toLowerCase();
-    return this.organizations.filter(org =>
-      org.name.toLowerCase().includes(searchLower) ||
-      org.email.toLowerCase().includes(searchLower) ||
-      org.department.toLowerCase().includes(searchLower)
+    return this.organizations.filter(
+      (org) =>
+        org.name.toLowerCase().includes(searchLower) ||
+        org.email.toLowerCase().includes(searchLower) ||
+        org.department.toLowerCase().includes(searchLower),
     );
   }
 
@@ -71,10 +79,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
     this.loadingService.show('Loading user data...');
     this.adminService.getManageUsers().subscribe({
       next: (res) => {
-        // Support multiple possible response shapes for resilience:
-        // - { success: true, data: { admins, organizations } }
-        // - { admins, organizations }
-        // - { data: { admins, organizations } }
+        // Support multiple possible response shapes for resilience.
         const payload = normalizeSingle(res) || (res?.data ?? res ?? {});
         // If API returns top-level success=false, surface message
         if (res && res.success === false) {
@@ -95,7 +100,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
         this.error = err?.error?.message || 'Failed to load users';
         this.loading = false;
         this.loadingService.hide();
-      }
+      },
     });
   }
 
@@ -115,7 +120,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
     const newAdmin = {
       email: this.newEmail,
       password: this.newPassword,
-      name: this.newName
+      name: this.newName,
     };
     this.adminService.addAdmin(newAdmin).subscribe({
       next: () => {
@@ -126,7 +131,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
       error: () => {
         this.isAddingAdmin = false;
         // Optionally show error message
-      }
+      },
     });
   }
 
@@ -140,7 +145,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, archive it',
       cancelButtonText: 'Cancel',
-      reverseButtons: true
+      reverseButtons: true,
     });
 
     if (result.isConfirmed) {
@@ -154,7 +159,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
 
       this.adminService.deleteAdmin(id).subscribe({
@@ -165,7 +170,7 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
             title: 'Archived!',
             text: 'Admin account has been moved to the archive.',
             timer: 2000,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
           this.loadUsers();
         },
@@ -175,9 +180,9 @@ export class ManageUsersComponent implements OnInit, OnDestroy {
             icon: 'error',
             title: 'Archive Failed',
             text: err?.error?.message || 'Failed to archive admin account',
-            confirmButtonColor: '#14532d'
+            confirmButtonColor: '#14532d',
           });
-        }
+        },
       });
     }
   }
