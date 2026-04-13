@@ -276,7 +276,7 @@ export class TrashComponent implements OnInit {
 	}
 
 	get canSeeOrganizationsTab(): boolean {
-		return false; // Hidden for all users
+		return false; // Organizations cannot be deleted, so this tab is hidden
 	}
 
 	get canSeeMembersTab(): boolean {
