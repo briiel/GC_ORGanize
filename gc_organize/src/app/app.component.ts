@@ -28,10 +28,17 @@ export class AppComponent {
           document.location.reload();
         });
 
-      // Also check for updates every 5 minutes
+      // When the SW enters an unrecoverable state (e.g. cached chunks no longer
+      // exist on the server after a new deployment), force a full hard reload.
+      // This is the direct cause of the "MIME type text/html" chunk load errors.
+      this.swUpdate.unrecoverable.subscribe(() => {
+        document.location.reload();
+      });
+
+      // Check for updates every minute so idle tabs catch new deployments quickly
       setInterval(() => {
-        this.swUpdate.checkForUpdate();
-      }, 5 * 60 * 1000);
+        this.swUpdate.checkForUpdate().catch(() => { /* ignore if SW not reachable */ });
+      }, 60 * 1000);
     }
   }
 
