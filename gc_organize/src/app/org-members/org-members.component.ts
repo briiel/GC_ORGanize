@@ -94,7 +94,9 @@ export class OrgMembersComponent implements OnInit {
     this.error = null;
 
     const headers = this.getAuthHeaders();
-    this.http.get<any>(`${environment.apiUrl}/users/organization/${orgId}/members`, { headers }).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/users/fetch/org_members`,
+      { org_id: orgId },
+      { headers }).subscribe({
       next: (response) => {
         // Normalize response: interceptor may unwrap envelopes to data,
         // or backend may return { success: true, data: [...] }.

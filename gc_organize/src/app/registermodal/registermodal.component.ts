@@ -61,9 +61,10 @@ export class RegistermodalComponent implements OnInit {
     // Fetch event to determine if paid
     if (this.eventId !== null) {
       const token = localStorage.getItem('gc_organize_token') || '';
-      this.http.get<any>(`${environment.apiUrl}/event/events/${this.eventId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      }).subscribe({
+      this.http.post<any>(`${environment.apiUrl}/event/fetch/event_by_id`,
+        { event_id: this.eventId },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      ).subscribe({
         next: (res) => {
           const ev = normalizeSingle(res) || res;
           this.isPaid = !!ev?.is_paid;
@@ -133,9 +134,10 @@ export class RegistermodalComponent implements OnInit {
 
 
     // Fetch additional student details from backend
-    this.http.get<any>(`${environment.apiUrl}/users/${decoded.studentId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).subscribe({
+    this.http.post<any>(`${environment.apiUrl}/users/fetch/user_by_id`,
+      { id: decoded.studentId },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).subscribe({
       next: (res) => {
         const student = res?.data || res;
         if (student) {

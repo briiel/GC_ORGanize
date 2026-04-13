@@ -9,9 +9,10 @@ export class AdminService {
 
   constructor(private http: HttpClient) {}
 
+  // POST /admin/fetch — hides the manage-users sub-path from the URL
   getManageUsers(): Observable<any> {
     const token = localStorage.getItem('gc_organize_token');
-    return this.http.get(`${this.apiUrl}/admin/manage-users`, {
+    return this.http.post(`${this.apiUrl}/admin/fetch/manage_users`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     });
   }

@@ -119,7 +119,7 @@ export class RequestRoleComponent implements OnInit {
    */
   loadOrganizations(): void {
     const headers = this.authService.getAuthHeaders();
-    this.http.get<any>(`${this.apiUrl}/organizations`, { headers }).subscribe({
+    this.http.post<any>(`${this.apiUrl}/roles/fetch/organizations`, {}, { headers }).subscribe({
       next: (response) => {
         // Normalize response to an array of organizations.
         // Some APIs return { organizations: [...] }, others may return the array directly,
@@ -168,7 +168,7 @@ export class RequestRoleComponent implements OnInit {
     this.loadingService.show('Loading your requests...');
     const headers = this.authService.getAuthHeaders();
 
-    this.http.get<any>(`${this.apiUrl}/roles/my-requests`, { headers }).subscribe({
+    this.http.post<any>(`${this.apiUrl}/roles/fetch/my_requests`, {}, { headers }).subscribe({
       next: (response) => {
         this.myRequests = response.items || response.requests || [];
         this.isLoading = false;

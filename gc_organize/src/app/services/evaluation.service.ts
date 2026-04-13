@@ -42,6 +42,8 @@ export interface EvaluationStatus {
 })
 export class EvaluationService {
   private apiUrl = environment.apiUrl;
+  // All evaluation GETs go through the single event/fetch/:resource dispatcher
+  private fetchUrl = `${this.apiUrl}/event/fetch`;
 
   constructor(private http: HttpClient) {}
 
@@ -68,8 +70,9 @@ export class EvaluationService {
    * Get evaluation status for current student and event
    */
   getEvaluationStatus(eventId: number): Observable<{ success: boolean; data: EvaluationStatus }> {
-    return this.http.get<{ success: boolean; data: EvaluationStatus }>(
-      `${this.apiUrl}/events/${eventId}/evaluations/status`,
+    return this.http.post<{ success: boolean; data: EvaluationStatus }>(
+      `${this.fetchUrl}/eval_status`,
+      { event_id: eventId },
       { headers: this.getHeaders() }
     );
   }
@@ -78,8 +81,9 @@ export class EvaluationService {
    * Get student's submitted evaluation
    */
   getMyEvaluation(eventId: number): Observable<any> {
-    return this.http.get(
-      `${this.apiUrl}/events/${eventId}/evaluations/me`,
+    return this.http.post(
+      `${this.fetchUrl}/eval_mine`,
+      { event_id: eventId },
       { headers: this.getHeaders() }
     );
   }
@@ -88,8 +92,9 @@ export class EvaluationService {
    * Get all evaluations for an event (organizers/admins only)
    */
   getEventEvaluations(eventId: number): Observable<any> {
-    return this.http.get(
-      `${this.apiUrl}/events/${eventId}/evaluations`,
+    return this.http.post(
+      `${this.fetchUrl}/eval_all`,
+      { event_id: eventId },
       { headers: this.getHeaders() }
     );
   }

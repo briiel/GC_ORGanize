@@ -19,52 +19,43 @@ export class ArchiveService {
     });
   }
 
-  // Get all archived/trashed items
+  // POST /archive/fetch — resource discriminator in the body (sub-paths hidden from URL)
   getTrash(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/archive/trash`, { headers });
+    return this.http.post(`${this.apiUrl}/archive/fetch/trash`, {}, { headers: this.getAuthHeaders() });
   }
 
   // Restore operations
   restoreAdmin(adminId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/archive/admins/${adminId}/restore`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/archive/admins/${adminId}/restore`, {}, { headers: this.getAuthHeaders() });
   }
 
   restoreOrganization(orgId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/archive/organizations/${orgId}/restore`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/archive/organizations/${orgId}/restore`, {}, { headers: this.getAuthHeaders() });
   }
 
   restoreMember(memberId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/archive/members/${memberId}/restore`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/archive/members/${memberId}/restore`, {}, { headers: this.getAuthHeaders() });
   }
 
   // Permanent delete operations
   permanentDeleteAdmin(adminId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/archive/admins/${adminId}`, { headers });
+    return this.http.delete(`${this.apiUrl}/archive/admins/${adminId}`, { headers: this.getAuthHeaders() });
   }
 
   permanentDeleteOrganization(orgId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/archive/organizations/${orgId}`, { headers });
+    return this.http.delete(`${this.apiUrl}/archive/organizations/${orgId}`, { headers: this.getAuthHeaders() });
   }
 
   permanentDeleteMember(memberId: number): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete(`${this.apiUrl}/archive/members/${memberId}`, { headers });
+    return this.http.delete(`${this.apiUrl}/archive/members/${memberId}`, { headers: this.getAuthHeaders() });
   }
 
-  // Auto-cleanup operations
+  // POST /archive/fetch with resource=expired_count
   getExpiredItemsCount(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.get(`${this.apiUrl}/archive/expired-count`, { headers });
+    return this.http.post(`${this.apiUrl}/archive/fetch/expired_count`, {}, { headers: this.getAuthHeaders() });
   }
 
   triggerAutoCleanup(): Observable<any> {
-    const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/archive/cleanup`, {}, { headers });
+    return this.http.post(`${this.apiUrl}/archive/cleanup`, {}, { headers: this.getAuthHeaders() });
   }
 }

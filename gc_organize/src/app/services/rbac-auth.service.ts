@@ -167,7 +167,11 @@ export class RbacAuthService {
   getUserDepartment(callback: (department: string) => void): void {
     const studentId = this.getStudentId();
     if (!studentId) { callback(''); return; }
-    this.http.get<any>(`${environment.apiUrl}/users/${studentId}`, { headers: { Authorization: `Bearer ${this.getToken()}` } }).subscribe({
+    this.http.post<any>(
+      `${environment.apiUrl}/users/fetch/user_by_id`,
+      { id: studentId },
+      { headers: { Authorization: `Bearer ${this.getToken()}` } }
+    ).subscribe({
       next: (res) => callback(res?.data?.department || res?.department || ''),
       error: (err) => { console.error('Error fetching user department:', err); callback(''); }
     });
@@ -198,7 +202,7 @@ export class RbacAuthService {
   }
 
   verifyToken(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/verify`, { headers: this.getAuthHeaders() });
+    return this.http.post(`${this.apiUrl}/verify`, {}, { headers: this.getAuthHeaders() });
   }
 
   // Return the highest-priority role (Admin > OrgOfficer > Student)

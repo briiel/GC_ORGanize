@@ -1,6 +1,8 @@
-// Browser-native AES-256-GCM encryption/decryption via Web Crypto API
-// Wire format: "<iv_b64>:<authTag_b64>:<ciphertext_b64>" — mirrors backend transportEncryption.js
-// Pre-shared key sourced from environment.payloadEncryptionKey (64 hex chars = 32 bytes)
+// Browser-native Hybrid Encryption via Web Crypto API
+//
+// 1. Frontend generates a single-use AES-256-GCM Session Key.
+// 2. Frontend encrypts the Session Key with the Backend's RSA-2048 Public Key.
+// 3. Frontend encrypts the payload with the Session Key.
 
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
@@ -9,31 +11,49 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class PayloadEncryptionService {
-  private readonly algorithm = 'AES-GCM';
+  private readonly aesAlgorithm = 'AES-GCM';
+  private readonly rsaAlgorithm = { name: 'RSA-OAEP', hash: 'SHA-256' };
   private readonly ivLength  = 12;  // 96-bit IV
   private readonly tagLength = 128; // 128-bit auth tag (bits)
 
-  // Cached CryptoKey — imported once and reused across all calls
-  private keyPromise: Promise<CryptoKey> | null = null;
+  // Cached RSA Public Key — imported once and reused across all calls
+  private rsaPublicKeyPromise: Promise<CryptoKey> | null = null;
 
-  // Import the hex key from environment into a non-extractable CryptoKey
-  private importKey(): Promise<CryptoKey> {
-    if (this.keyPromise) return this.keyPromise;
-    const hex = environment.payloadEncryptionKey;
-    if (!hex || hex.length !== 64) {
-      return Promise.reject(new Error('[PayloadEncryption] payloadEncryptionKey must be 64 hex chars.'));
+  // Converts a PEM block to a binary ArrayBuffer
+  private pemToArrayBuffer(pem: string): ArrayBuffer {
+    const b64 = pem.replace(/(-----(BEGIN|END) PUBLIC KEY-----|\n|\r)/g, '');
+    const binaryStr = window.atob(b64);
+    const bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) {
+        bytes[i] = binaryStr.charCodeAt(i);
     }
-    const keyBytes = new Uint8Array(hex.match(/.{1,2}/g)!.map(b => parseInt(b, 16)));
-    this.keyPromise = crypto.subtle.importKey(
-      'raw', keyBytes, { name: this.algorithm }, false, ['encrypt', 'decrypt']
+    return bytes.buffer;
+  }
+
+  // Import the RSA Public Key from environment.ts
+  private importRsaPublicKey(): Promise<CryptoKey> {
+    if (this.rsaPublicKeyPromise) return this.rsaPublicKeyPromise;
+    const pem = environment.backendPublicKey;
+    if (!pem || !pem.includes('BEGIN PUBLIC KEY')) {
+      return Promise.reject(new Error('[PayloadEncryption] environment.backendPublicKey is invalid or missing.'));
+    }
+    
+    const keyBuffer = this.pemToArrayBuffer(pem);
+    this.rsaPublicKeyPromise = crypto.subtle.importKey(
+      'spki',
+      keyBuffer,
+      this.rsaAlgorithm,
+      false,
+      ['encrypt']
     );
-    return this.keyPromise;
+    return this.rsaPublicKeyPromise;
   }
 
   // Convert Uint8Array to base64 string
-  private toBase64(arr: Uint8Array): string {
+  private toBase64(arr: Uint8Array | ArrayBuffer): string {
+    const bytes = new Uint8Array(arr);
     let binary = '';
-    for (let i = 0; i < arr.byteLength; i++) binary += String.fromCharCode(arr[i]);
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
     return btoa(binary);
   }
 
@@ -42,15 +62,49 @@ export class PayloadEncryptionService {
     return new Uint8Array(atob(b64).split('').map(c => c.charCodeAt(0)));
   }
 
-  // Encrypt a JS object and return it as "<iv_b64>:<authTag_b64>:<ciphertext_b64>"
-  async encrypt(data: any): Promise<string> {
-    const key       = await this.importKey();
+  /**
+   * Generates a new random AES-256-GCM Session Key.
+   * Returns:
+   *  aesKey: The raw CryptoKey (used for payload encryption/decryption)
+   *  encryptedSessionKeyB64: The session key encrypted with backend's RSA public key (sent in X-Session-Key header)
+   */
+  async generateSessionKey(): Promise<{ aesKey: CryptoKey, encryptedSessionKeyB64: string }> {
+    // 1. Generate random AES-256 key
+    const aesKey = await crypto.subtle.generateKey(
+      { name: this.aesAlgorithm, length: 256 },
+      true, // MUST be extractable so we can encrypt it and send to backend
+      ['encrypt', 'decrypt']
+    );
+
+    // 2. Export raw bytes (32 bytes)
+    const exportedRawKey = await crypto.subtle.exportKey('raw', aesKey);
+
+    // 3. Encrypt the raw bytes using backend's RSA public key
+    const rsaPublicKey = await this.importRsaPublicKey();
+    const encryptedKeyBuffer = await crypto.subtle.encrypt(
+      this.rsaAlgorithm,
+      rsaPublicKey,
+      exportedRawKey
+    );
+
+    // 4. Return both
+    return {
+      aesKey,
+      encryptedSessionKeyB64: this.toBase64(encryptedKeyBuffer)
+    };
+  }
+
+  /**
+   * Encrypt a JS object using the provided single-use AES key.
+   * Format: "<iv_b64>:<authTag_b64>:<ciphertext_b64>"
+   */
+  async encryptPayload(data: any, aesKey: CryptoKey): Promise<string> {
     const iv        = crypto.getRandomValues(new Uint8Array(this.ivLength));
     const plaintext = new TextEncoder().encode(JSON.stringify(data));
 
     // SubtleCrypto AES-GCM appends the 16-byte auth tag at the end of the output buffer
     const ciphertextWithTag = await crypto.subtle.encrypt(
-      { name: this.algorithm, iv, tagLength: this.tagLength }, key, plaintext
+      { name: this.aesAlgorithm, iv, tagLength: this.tagLength }, aesKey, plaintext
     );
 
     const ciphertextBytes = new Uint8Array(ciphertextWithTag, 0, ciphertextWithTag.byteLength - 16);
@@ -59,9 +113,10 @@ export class PayloadEncryptionService {
     return `${this.toBase64(iv)}:${this.toBase64(authTagBytes)}:${this.toBase64(ciphertextBytes)}`;
   }
 
-  // Decrypt a "<iv_b64>:<authTag_b64>:<ciphertext_b64>" wire string back to a JS value
-  async decrypt(encryptedStr: string): Promise<any> {
-    const key   = await this.importKey();
+  /**
+   * Decrypt a wire string back to a JS value using the provided single-use AES key.
+   */
+  async decryptPayload(encryptedStr: string, aesKey: CryptoKey): Promise<any> {
     const parts = encryptedStr.split(':');
     if (parts.length !== 3) throw new Error('[PayloadEncryption] Invalid encrypted payload format.');
 
@@ -75,7 +130,7 @@ export class PayloadEncryptionService {
     combined.set(authTag, ciphertext.length);
 
     const plaintextBuf = await crypto.subtle.decrypt(
-      { name: this.algorithm, iv: iv as any, tagLength: this.tagLength }, key, combined as any
+      { name: this.aesAlgorithm, iv: iv as any, tagLength: this.tagLength }, aesKey, combined as any
     );
     return JSON.parse(new TextDecoder().decode(plaintextBuf));
   }

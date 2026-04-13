@@ -17,9 +17,9 @@ export class CertificateRequestService {
     });
   }
 
-  // Get all certificate requests for the organization
+  // POST /certificates/fetch — no sub-path visible in the URL
   getCertificateRequests(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/requests`, { headers: this.getAuthHeaders() }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/fetch/cert_requests`, {}, { headers: this.getAuthHeaders() }).pipe(
       map((resp: any) => Array.isArray(resp) ? resp : (resp && Array.isArray(resp.items)) ? resp.items : (resp.data || [])),
       catchError(err => throwError(() => err))
     );

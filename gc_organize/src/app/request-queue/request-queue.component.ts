@@ -74,8 +74,9 @@ export class RequestQueueComponent implements OnInit {
     this.isLoading = true;
     this.loadingService.show('Loading requests...');
     const headers = this.authService.getAuthHeaders();
-    const params = `?page=${this.pendingPage}&per_page=${this.pendingPerPage}`;
-    this.http.get<any>(`${this.apiUrl}/admin/requests/pending${params}`, { headers }).subscribe({
+    this.http.post<any>(`${this.apiUrl}/roles/fetch/pending_requests`,
+      { page: this.pendingPage, per_page: this.pendingPerPage },
+      { headers }).subscribe({
       next: (response) => {
         this.pendingRequests = response.items || [];
         this.pendingTotal = response.total || (response.items || []).length || 0;
@@ -106,10 +107,9 @@ export class RequestQueueComponent implements OnInit {
     this.loadingService.show('Loading requests...');
     const headers = this.authService.getAuthHeaders();
 
-    const statusParam = this.filterStatus && this.filterStatus !== 'all' ? `&status=${encodeURIComponent(this.filterStatus)}` : '';
-    const params = `?page=${this.allPage}&per_page=${this.allPerPage}${statusParam}`;
-
-    this.http.get<any>(`${this.apiUrl}/admin/requests${params}`, { headers }).subscribe({
+    this.http.post<any>(`${this.apiUrl}/roles/fetch/admin_requests`,
+      { page: this.allPage, per_page: this.allPerPage, status: this.filterStatus && this.filterStatus !== 'all' ? this.filterStatus : undefined },
+      { headers }).subscribe({
       next: (response) => {
         this.allRequests = response.items || [];
         this.allTotal = response.total || (response.items || []).length || 0;

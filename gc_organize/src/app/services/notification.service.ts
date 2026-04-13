@@ -26,23 +26,23 @@ export class NotificationService {
     });
   }
 
+  // POST /fetch/list — resource name visible in Network tab; panel/org_id stay in the body
   list(panel?: string, orgId?: number): Observable<any> {
-    let url = `${this.api}`;
-    const params: any = {};
-    if (panel) params.panel = panel;
-    if (orgId !== undefined && orgId !== null) params.org_id = String(orgId);
-
-    return this.http.get<any>(url, { headers: this.getAuthHeaders(), params });
+    const body: any = {};
+    if (panel) body.panel = panel;
+    if (orgId !== undefined && orgId !== null) body.org_id = orgId;
+    return this.http.post<any>(`${this.api}/fetch/list`, body, { headers: this.getAuthHeaders() });
   }
 
   markRead(id: number): Observable<any> {
     return this.http.patch(`${this.api}/${id}/read`, {}, { headers: this.getAuthHeaders() });
   }
 
+  // POST /read-all — panel travels in the body
   markAll(panel?: string, orgId?: number): Observable<any> {
-    const params: any = {};
-    if (panel) params.panel = panel;
-    if (orgId !== undefined && orgId !== null) params.org_id = String(orgId);
-    return this.http.patch(`${this.api}/read-all`, {}, { headers: this.getAuthHeaders(), params });
+    const body: any = {};
+    if (panel) body.panel = panel;
+    if (orgId !== undefined && orgId !== null) body.org_id = orgId;
+    return this.http.post(`${this.api}/read-all`, body, { headers: this.getAuthHeaders() });
   }
 }

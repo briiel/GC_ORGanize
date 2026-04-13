@@ -9,7 +9,15 @@ export const environment = {
   defaultGeofenceMeters: 200,
   // Geofence bypass removed for all environments; always enforce geofence checks.
   attendanceGeofenceBypass: false,
-  // Shared AES-256-GCM key for transport-layer payload encryption.
-  // Must match PAYLOAD_ENCRYPTION_KEY in the backend .env file.
-  payloadEncryptionKey: 'e35abf211f6929ae7f358694fa56a0782b2375d1f004249eba5d8eaec50729f2'
+  // RSA-2048 Public Key provided by the backend for Hybrid payload encryption.
+  // It is perfectly safe for this to be visible in the frontend source code.
+  backendPublicKey: `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsCI14AlCK0x5BurOcsZd
+BtDrMwJnaOmLTwAvoStuenox003xrh4UaQZIFNyHEBWQUJ9vvufQe9heknGK7uGm
+moWeCdbtkPJ9CRrZ8uLC4gzBftE6hrEtwAc4EZwyeJ6B9xY0oz92DWT8HfGxCa20
+UfaouY0sF4DuYehQj1+IN4wTKZi26I9tKINxqTTAPrZ39BkWCKL/OM/ESn1st4ZS
+mnUQ8LtYHGGoMtQLV+jluD4QbyJ368DBe5tg/owghxwVcNLnO+IWFal2deAmTmpa
+s/GWv+O3wf0sOVjGO64Qqlnuoh37NI045q8+HTi6wWUQcMvrGuOQfkSw8ZO3756y
+CwIDAQAB
+-----END PUBLIC KEY-----`
 };
