@@ -213,8 +213,8 @@ export class SoDashboardComponent implements OnInit, OnDestroy {
     const creatorId = this.auth.getCreatorId();
     if (!creatorId) return;
     this.eventService.getAttendeeCountByCreator(creatorId).subscribe({
-      next: (res) => {
-        this.stats.totalAttendees = res?.total ?? 0;
+      next: (res: any) => {
+        this.stats.totalAttendees = res?.count ?? 0;
       },
       error: (err) => {
         console.error('Error fetching attendance count:', err);

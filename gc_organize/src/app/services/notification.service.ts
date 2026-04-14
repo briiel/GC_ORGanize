@@ -27,11 +27,16 @@ export class NotificationService {
   }
 
   // POST /fetch/list — resource name visible in Network tab; panel/org_id stay in the body
-  list(panel?: string, orgId?: number): Observable<any> {
+  list(panel?: string, orgId?: number, page?: number, perPage?: number): Observable<any> {
     const body: any = {};
     if (panel) body.panel = panel;
     if (orgId !== undefined && orgId !== null) body.org_id = orgId;
-    return this.http.post<any>(`${this.api}/fetch/list`, body, { headers: this.getAuthHeaders() });
+    
+    let params: any = {};
+    if (page !== undefined) params.page = page.toString();
+    if (perPage !== undefined) params.per_page = perPage.toString();
+
+    return this.http.post<any>(`${this.api}/fetch/list`, body, { headers: this.getAuthHeaders(), params });
   }
 
   markRead(id: number): Observable<any> {

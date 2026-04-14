@@ -75,7 +75,7 @@
                   [ngClass]="{'font-semibold text-gray-900': !n.is_read, 'font-normal text-gray-600': n.is_read}">
                   {{ n.message }}
                 </p>
-                <span *ngIf="n.event_title" class="gc-badge gc-badge-info text-xs mt-2 inline-flex">
+                <span *ngIf="n.event_title" class="gc-badge gc-badge-info text-xs mt-2 inline-flex items-center gap-1 bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md">
                   <i class="fas fa-calendar-alt"></i>
                   <span>{{ n.event_title }}</span>
                 </span>
@@ -94,6 +94,14 @@
             </div>
           </li>
         </ul>
+        
+        <!-- Pagination controls -->
+        <div *ngIf="hasMore" class="p-4 text-center border-t border-gray-100">
+          <button (click)="loadMore()" [disabled]="loadingMore" class="px-4 py-1.5 text-sm font-medium text-[#679436] border border-[#679436] rounded-lg hover:bg-[#679436] hover:text-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
+            <i *ngIf="loadingMore" class="fas fa-spinner fa-spin mr-2"></i>
+            {{ loadingMore ? 'Loading...' : 'Load More' }}
+          </button>
+        </div>
       </ng-container>
     </div>
 

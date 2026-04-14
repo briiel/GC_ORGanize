@@ -89,7 +89,7 @@ export class EventService {
     return this.fetch('all_attendance');
   }
 
-  getAttendeeCountByCreator(creatorId: number): Observable<{ success: boolean; total: number }> {
+  getAttendeeCountByCreator(creatorId: number): Observable<{ count: number }> {
     return this.fetch('attendance_count_by_creator', { creator_id: creatorId });
   }
 

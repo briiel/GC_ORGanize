@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../services/event.service';
 import { LoadingService } from '../services/loading.service';
+import { RbacAuthService } from '../services/rbac-auth.service';
 import Chart from 'chart.js/auto';
 import { normalizeList, normalizeSingle } from '../utils/api-utils';
 
@@ -42,7 +43,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
   private serverDeptData: Array<{ department: string; count: number }> | null = null;
   private serverOrgData: Array<{ org_name: string; count: number }> | null = null;
 
-  constructor(private eventService: EventService, private loadingService: LoadingService) { }
+  constructor(
+    private eventService: EventService, 
+    private loadingService: LoadingService,
+    private authService: RbacAuthService
+  ) { }
 
   ngOnInit(): void {
     // Initial load
@@ -160,7 +165,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
         const ids = this.events
           .map((e: any) => e.event_id || e.id)
           .filter((id: any) => id != null);
-        if (ids.length) this.fetchAttendanceStats(ids);
+        if (ids.length) this.fetchAttendanceStats();
 
         // Fetch backend OSWS stats and use them as the source of truth so dashboard reflects server-computed statuses
         this.eventService.getOswsStats().subscribe({
@@ -220,15 +225,16 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit, OnDestroy
     this.stats.cancelled = cancelled;
   }
 
-  private fetchAttendanceStats(eventIds: number[]): void {
-    this.eventService.getAllAttendanceRecords().subscribe({
-      next: (res) => {
-        const records = normalizeList(res);
-        this.stats.totalAttendees = records.filter((r: any) => eventIds.includes(r.event_id)).length;
-        // Re-render charts if needed (no-op for current datasets)
+  private fetchAttendanceStats(): void {
+    const adminId = this.authService.getAdminId();
+    if (!adminId) return;
+
+    this.eventService.getAttendeeCountByCreator(adminId).subscribe({
+      next: (res: any) => {
+        this.stats.totalAttendees = res?.count ?? 0;
       },
       error: (err) => {
-        console.error('Error fetching attendance records:', err);
+        console.error('Error fetching attendance count by OSWS admin:', err);
       }
     });
   }

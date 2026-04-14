@@ -18,6 +18,12 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   open = false;
   items: NotificationItem[] = [];
   loading = false;
+  loadingMore = false;
+  
+  currentPage = 1;
+  perPage = 10;
+  totalPages = 1;
+  hasMore = false;
 
   /** Completes all subscriptions when the component is destroyed. */
   private destroy$ = new Subject<void>();
@@ -43,12 +49,16 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
       debounceTime(300),
       switchMap(() => {
         this.loading = true;
-        return this.api.list(this.panel ?? undefined, this.orgId ?? undefined);
+        // When refreshing/polling, we just reload the first page containing most recent items
+        this.currentPage = 1;
+        return this.api.list(this.panel ?? undefined, this.orgId ?? undefined, this.currentPage, this.perPage);
       }),
       takeUntil(this.destroy$)
     ).subscribe({
       next: (res: any) => {
         this.items = normalizeList(res) as NotificationItem[];
+        this.totalPages = res?.total_pages || 1;
+        this.hasMore = this.currentPage < this.totalPages;
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -96,6 +106,26 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
   /** Manually trigger a refresh (e.g. after marking read). */
   refresh() {
     this.manualRefresh$.next();
+  }
+
+  loadMore() {
+    if (this.loadingMore || !this.hasMore) return;
+    this.loadingMore = true;
+    this.currentPage++;
+    this.api.list(this.panel ?? undefined, this.orgId ?? undefined, this.currentPage, this.perPage)
+      .subscribe({
+        next: (res: any) => {
+          const newItems = normalizeList(res) as NotificationItem[];
+          this.items = [...this.items, ...newItems];
+          this.totalPages = res?.total_pages || 1;
+          this.hasMore = this.currentPage < this.totalPages;
+          this.loadingMore = false;
+        },
+        error: () => {
+          this.loadingMore = false;
+          this.currentPage--; // Revert page on error
+        }
+      });
   }
 
   markRead(item: NotificationItem, idx: number) {
