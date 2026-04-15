@@ -31,12 +31,10 @@ export class NotificationService {
     const body: any = {};
     if (panel) body.panel = panel;
     if (orgId !== undefined && orgId !== null) body.org_id = orgId;
-    
-    let params: any = {};
-    if (page !== undefined) params.page = page.toString();
-    if (perPage !== undefined) params.per_page = perPage.toString();
+    if (page !== undefined) body.page = page;
+    if (perPage !== undefined) body.per_page = perPage;
 
-    return this.http.post<any>(`${this.api}/fetch/list`, body, { headers: this.getAuthHeaders(), params });
+    return this.http.post<any>(`${this.api}/fetch/list`, body, { headers: this.getAuthHeaders() });
   }
 
   markRead(id: number): Observable<any> {
