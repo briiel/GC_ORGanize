@@ -7,6 +7,7 @@ import { Router, RouterModule } from '@angular/router';
 import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 import { LoadingService } from '../services/loading.service';
+import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -22,7 +23,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   events: any[] = [];
   searchTerm: string = '';
-  sortBy: string = 'date_desc';
+  sortBy: string = 'date_asc';
 
   notifications: any[] = [];
   unreadCount: number = 0;
@@ -156,11 +157,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     };
 
     const baseCompare = (a: any, b: any) => {
+      const aDateStr: string | undefined = a?.start_date;
+      const bDateStr: string | undefined = b?.start_date;
+      const aTimeStr: string | undefined = a?.start_time;
+      const bTimeStr: string | undefined = b?.start_time;
+
+      const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
+      const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
+      const aD = parseMysqlDatetimeToDate(aFull as any);
+      const bD = parseMysqlDatetimeToDate(bFull as any);
+      const aTs = aD ? aD.getTime() : 0;
+      const bTs = bD ? bD.getTime() : 0;
+
       switch (this.sortBy) {
         case 'date_desc':
-          return new Date(b.created_at || b.createdAt || 0).getTime() - new Date(a.created_at || a.createdAt || 0).getTime();
+          return bTs - aTs;
         case 'date_asc':
-          return new Date(a.created_at || a.createdAt || 0).getTime() - new Date(b.created_at || b.createdAt || 0).getTime();
+          return aTs - bTs;
         case 'title_asc':
           return (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase());
         case 'title_desc':
