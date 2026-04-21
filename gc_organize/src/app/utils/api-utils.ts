@@ -4,6 +4,7 @@ export function normalizeList(res: any): any[] {
   if (Array.isArray(res)) return res;
   if (Array.isArray(res.items)) return res.items;
   if (Array.isArray(res.data)) return res.data;
+  if (res.data && Array.isArray(res.data.items)) return res.data.items;
   if (Array.isArray(res.events)) return res.events;
   // Some endpoints return { items: [{ ... }] } when single; guard against that
   if (res.items && Array.isArray(res.items.data)) return res.items.data;
