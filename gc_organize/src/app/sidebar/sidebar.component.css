@@ -104,10 +104,10 @@ nav .ml-7 .sidebar-item-active {
 	   to the viewport minus the sidebar width. Using margin + width change
 	   avoids layout jank and keeps both sidebar and content fully visible. */
 	.panel-content {
-		margin-left: 0;
-		width: 100%;
+		margin-left: 5rem; /* w-20 (5rem = 80px) for collapsed sidebar */
+		width: calc(100% - 5rem);
 		box-sizing: border-box;
-		max-width: 100vw;
+		max-width: calc(100vw - 5rem);
 	}
 
 	.panel-content.content-shift {
@@ -137,4 +137,47 @@ nav .ml-7 .sidebar-item-active {
 	pointer-events: none;
 	overflow: hidden; /* prevent visual overflow while fading */
 }
+
+/* Collapsed Sidebar (Icon-only mode on desktop) */
+@media (min-width: 1024px) {
+	/* Hide title and panel switcher/dropdowns */
+	.collapsed-sidebar h1,
+	.collapsed-sidebar .w-full > select,
+	.collapsed-sidebar .w-full > div.bg-black\/10 {
+		display: none;
+	}
+
+	/* Keep logo visible but resize it properly */
+	.collapsed-sidebar img {
+		width: 2.5rem !important; /* lg:w-10 */
+		height: 2.5rem !important; /* lg:h-10 */
+	}
+
+	/* Hide text spans and dropdown carets in navigation */
+	.collapsed-sidebar nav span:not(.flex),
+	.collapsed-sidebar nav i.fa-chevron-down,
+	.collapsed-sidebar nav i.fa-chevron-up {
+		display: none;
+	}
+
+	/* Center the icons horizontally */
+	.collapsed-sidebar nav button {
+		justify-content: center;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	
+	/* Reset margin on icons since text is hidden */
+	.collapsed-sidebar nav button i {
+		margin-right: 0;
+	}
+
+	/* Remove margins for dropdown containers to avoid pushing icons off-center */
+	.collapsed-sidebar .ml-6,
+	.collapsed-sidebar .sm\:ml-7,
+	.collapsed-sidebar .lg\:ml-5 {
+		margin-left: 0 !important;
+	}
+}
+
 

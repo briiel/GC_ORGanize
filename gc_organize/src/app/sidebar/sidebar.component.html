@@ -10,9 +10,12 @@
                 aria-hidden="true">
         </div>
 
-    <div [class.translate-x-0]="isSidebarOpen" [class.-translate-x-full]="!isSidebarOpen"
-        class="w-72 sm:w-80 lg:w-64 max-w-[90vw] flex flex-col fixed top-0 left-0 h-full transition-transform duration-300 ease-out z-40 shadow-2xl sidebar-blur-target"
+    <div [class.translate-x-0]="isSidebarOpen || !isMobile" [class.-translate-x-full]="!isSidebarOpen && isMobile"
+        class="w-72 sm:w-80 max-w-[90vw] flex flex-col fixed top-0 left-0 h-full transition-all duration-300 ease-out z-40 shadow-2xl sidebar-blur-target"
         [ngClass]="{
+            'lg:w-64': isSidebarOpen,
+            'lg:w-20': !isSidebarOpen && !isMobile,
+            'collapsed-sidebar': !isSidebarOpen && !isMobile,
             'bg-[#679436]': role !== 'osws_admin',
             'bg-[#14532d]': role === 'osws_admin'
          }"
@@ -25,11 +28,11 @@
                         <i class="fas fa-times text-base"></i>
                     </button>
         <div class="p-4 sm:p-5 lg:p-3 flex flex-col items-center space-y-3 sm:space-y-4 lg:space-y-2 mt-12 sm:mt-10 lg:mt-0 border-b border-white/10">
-                                                <img 
-                                                        src="/main_logo.webp" 
-                            alt="GC-ORGANIZE Logo"
-                            class="w-16 h-16 sm:w-20 sm:h-20 lg:w-12 lg:h-12 object-contain"
-                        >
+            <img 
+                src="/main_logo.webp" 
+                alt="GC-ORGANIZE Logo"
+                class="w-16 h-16 sm:w-20 sm:h-20 lg:w-12 lg:h-12 object-contain transition-all duration-300"
+            >
             <h1 class="text-base sm:text-lg lg:text-base font-bold text-center text-white tracking-tight">GC-ORGANIZE</h1>
             
             <!-- Panel Switcher with label (single role shows static label, multiple roles show dropdown) -->
