@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, ErrorHandler } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import {
   provideHttpClient,
@@ -11,6 +11,7 @@ import { UnwrapResponseInterceptor } from './services/unwrap-response.intercepto
 import { payloadCryptoInterceptorFn } from './core/interceptors/payload-crypto.interceptor';
 
 import { routes } from './app.routes';
+import { GlobalErrorHandler } from './core/errors/global-error-handler';
 
 // Interceptor order: Auth → Unwrap (outermost, via DI) → payloadCrypto (innermost, via withInterceptors)
 // Response path (server → payloadCrypto decrypts → Unwrap extracts data → Auth passes through)
@@ -30,5 +31,7 @@ export const appConfig: ApplicationConfig = {
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     // 2. Unwraps { success, data } API envelope
     { provide: HTTP_INTERCEPTORS, useClass: UnwrapResponseInterceptor, multi: true },
+    // 3. Global Error Handler for chunk loading issues
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ]
 };
