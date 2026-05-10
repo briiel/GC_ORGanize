@@ -78,9 +78,9 @@ export class TrashComponent implements OnInit {
 		this.archiveService.getTrash().subscribe({
 			next: (res: any) => {
 				const data = normalizeSingle(res) || res;
-				this.trashedAdmins = data?.admins || [];
-				this.trashedOrganizations = data?.organizations || [];
-				this.trashedMembers = data?.members || [];
+				this.trashedAdmins = data?.items?.admins || data?.admins || [];
+				this.trashedOrganizations = data?.items?.organizations || data?.organizations || [];
+				this.trashedMembers = data?.items?.members || data?.members || [];
 				this.loading = false;
 				this.loadingService.hide();
 				this.currentPage = 1;
