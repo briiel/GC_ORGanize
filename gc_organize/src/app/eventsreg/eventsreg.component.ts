@@ -19,7 +19,7 @@ export class EventsregComponent implements OnInit {
 
   // Search related properties
   searchTerm: string = '';
-  sortBy: string = 'date_desc';
+  sortBy: string = 'default';
   loading: boolean = false;
   registeredEvents: any[] = [];
   studentId: string | null = null;
@@ -57,25 +57,7 @@ export class EventsregComponent implements OnInit {
           // fallback to empty array to avoid runtime errors
           this.registeredEvents = [];
         }
-        // Sort latest first: assume "latest" means most recent event by start_date then start_time
-        // Ensure we only call sort when we have an array
-        if (Array.isArray(this.registeredEvents)) {
-          this.registeredEvents.sort((a, b) => {
-            const aDateStr: string | undefined = a?.start_date;
-            const bDateStr: string | undefined = b?.start_date;
-            const aTimeStr: string | undefined = a?.start_time;
-            const bTimeStr: string | undefined = b?.start_time;
-
-            // Build comparable timestamps; parse as UTC when possible
-            const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
-            const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
-            const aD = parseMysqlDatetimeToDate(aFull as any);
-            const bD = parseMysqlDatetimeToDate(bFull as any);
-            const aTs = aD ? aD.getTime() : 0;
-            const bTs = bD ? bD.getTime() : 0;
-            return bTs - aTs; // descending (latest first)
-          });
-        }
+        // Frontend sorting has been removed to respect backend sorting by Registration Date.
         this.loading = false;
         this.loadingService.hide();
       },
@@ -101,33 +83,35 @@ export class EventsregComponent implements OnInit {
       );
     }
 
-    // Apply sorting
-    return [...filtered].sort((a, b) => {
-      const aDateStr: string | undefined = a?.start_date;
-      const bDateStr: string | undefined = b?.start_date;
-      const aTimeStr: string | undefined = a?.start_time;
-      const bTimeStr: string | undefined = b?.start_time;
+    // Apply sorting if a specific sort option is selected
+    if (this.sortBy !== 'default') {
+      return [...filtered].sort((a, b) => {
+        const aDateStr: string | undefined = a?.start_date;
+        const bDateStr: string | undefined = b?.start_date;
+        const aTimeStr: string | undefined = a?.start_time;
+        const bTimeStr: string | undefined = b?.start_time;
 
-      const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
-      const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
-      const aD = parseMysqlDatetimeToDate(aFull as any);
-      const bD = parseMysqlDatetimeToDate(bFull as any);
-      const aTs = aD ? aD.getTime() : 0;
-      const bTs = bD ? bD.getTime() : 0;
+        const aFull = aDateStr ? `${aDateStr}${aDateStr.includes('T') ? '' : 'T'}${aDateStr.includes('T') ? '' : (aTimeStr || '00:00:00')}` : null;
+        const bFull = bDateStr ? `${bDateStr}${bDateStr.includes('T') ? '' : 'T'}${bDateStr.includes('T') ? '' : (bTimeStr || '00:00:00')}` : null;
+        const aD = parseMysqlDatetimeToDate(aFull as any);
+        const bD = parseMysqlDatetimeToDate(bFull as any);
+        const aTs = aD ? aD.getTime() : 0;
+        const bTs = bD ? bD.getTime() : 0;
 
-      switch (this.sortBy) {
-        case 'date_desc':
-          return bTs - aTs;
-        case 'date_asc':
-          return aTs - bTs;
-        case 'title_asc':
-          return (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase());
-        case 'title_desc':
-          return (b.title || '').toLowerCase().localeCompare((a.title || '').toLowerCase());
-        default:
-          return bTs - aTs;
-      }
-    });
+        switch (this.sortBy) {
+          case 'date_asc':
+            return aTs - bTs;
+          case 'title_asc':
+            return (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase());
+          case 'title_desc':
+            return (b.title || '').toLowerCase().localeCompare((a.title || '').toLowerCase());
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return filtered;
   }
 
   // Search function

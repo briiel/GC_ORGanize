@@ -22,7 +22,7 @@ export class EcertificateComponent implements OnInit {
   certificates: any[] = [];
   loading = true;
   searchTerm: string = '';
-  sortBy: string = 'date_desc';
+  sortBy: string = 'default';
   downloadingCertIds: Set<number> = new Set();
   requestingCertIds: Set<number> = new Set();
   requestMessage: string = '';
@@ -198,20 +198,24 @@ export class EcertificateComponent implements OnInit {
     }
 
     // Apply sorting
-    return [...filtered].sort((a, b) => {
-      switch (this.sortBy) {
-        case 'date_desc':
-          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
-        case 'date_asc':
-          return new Date(a.start_date || 0).getTime() - new Date(b.start_date || 0).getTime();
-        case 'title_asc':
-          return (a.event_title || '').toLowerCase().localeCompare((b.event_title || '').toLowerCase());
-        case 'title_desc':
-          return (b.event_title || '').toLowerCase().localeCompare((a.event_title || '').toLowerCase());
-        default:
-          return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
-      }
-    });
+    if (this.sortBy !== 'default') {
+      return [...filtered].sort((a, b) => {
+        switch (this.sortBy) {
+          case 'date_desc':
+            return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
+          case 'date_asc':
+            return new Date(a.start_date || 0).getTime() - new Date(b.start_date || 0).getTime();
+          case 'title_asc':
+            return (a.event_title || '').toLowerCase().localeCompare((b.event_title || '').toLowerCase());
+          case 'title_desc':
+            return (b.event_title || '').toLowerCase().localeCompare((a.event_title || '').toLowerCase());
+          default:
+            return 0;
+        }
+      });
+    }
+
+    return filtered;
   }
 
   onSearch() {

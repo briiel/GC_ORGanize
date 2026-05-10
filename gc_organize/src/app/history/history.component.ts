@@ -25,8 +25,8 @@ export class HistoryComponent implements OnInit {
 
   // UI state
   searchTerm = '';
-  // Default: latest event date/time first
-  sortBy: 'attended_desc' | 'attended_asc' | 'start_desc' | 'start_asc' = 'start_desc';
+  // Default: backend order (recently attended first)
+  sortBy: string = 'default';
   // Pagination
   page = 1;
   readonly pageSize = 9;
@@ -71,19 +71,20 @@ export class HistoryComponent implements OnInit {
     }
 
     // Sort
-    list.sort((a, b) => {
-      const aAtt = this.safeDate(a.attended_at);
-      const bAtt = this.safeDate(b.attended_at);
-      const aStart = this.safeDate(`${a.start_date}T${a.start_time || '00:00'}`);
-      const bStart = this.safeDate(`${b.start_date}T${b.start_time || '00:00'}`);
-      switch (this.sortBy) {
-        case 'attended_asc': return aAtt - bAtt;
-        case 'attended_desc': return bAtt - aAtt;
-        case 'start_asc': return aStart - bStart;
-        case 'start_desc': return bStart - aStart;
-        default: return 0;
-      }
-    });
+    if (this.sortBy !== 'default') {
+      list.sort((a, b) => {
+        const aAtt = this.safeDate(a.attended_at);
+        const bAtt = this.safeDate(b.attended_at);
+        const aStart = this.safeDate(`${a.start_date}T${a.start_time || '00:00'}`);
+        const bStart = this.safeDate(`${b.start_date}T${b.start_time || '00:00'}`);
+        switch (this.sortBy) {
+          case 'attended_asc': return aAtt - bAtt;
+          case 'start_asc': return aStart - bStart;
+          case 'start_desc': return bStart - aStart;
+          default: return 0;
+        }
+      });
+    }
 
     return list;
   }
