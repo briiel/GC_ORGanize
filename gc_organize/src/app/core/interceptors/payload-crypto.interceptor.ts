@@ -1,4 +1,4 @@
-import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { from, mergeMap, catchError, throwError, map } from 'rxjs';
 import { PayloadEncryptionService } from '../../services/encryption.service';
@@ -62,6 +62,31 @@ export const payloadCryptoInterceptorFn: HttpInterceptorFn = (req, next) => {
                   }
                 )
               );
+            }),
+            catchError(err => {
+              if (err instanceof HttpErrorResponse && err.error && typeof err.error === 'string') {
+                return from(
+                  enc.decryptPayload(err.error, aesKey).then(
+                    decryptedBody => {
+                      const newErr = new HttpErrorResponse({
+                        error: decryptedBody,
+                        headers: err.headers,
+                        status: err.status,
+                        statusText: err.statusText,
+                        url: err.url || undefined
+                      });
+                      return newErr;
+                    },
+                    decryptErr => {
+                      console.error('[PayloadCrypto] Error decrypt failed:', decryptErr);
+                      return err;
+                    }
+                  )
+                ).pipe(
+                  mergeMap(resolvedErr => throwError(() => resolvedErr))
+                );
+              }
+              return throwError(() => err);
             })
           )
         )
