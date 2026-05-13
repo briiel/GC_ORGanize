@@ -120,8 +120,10 @@
                 <td class="px-4 py-3.5 text-center max-w-[160px]">
                   <div class="flex items-center gap-1.5 justify-center">
                     <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-                    <span class="truncate text-sm" [title]="event.room || event.location">{{ event.room ||
-                      event.location }}</span>
+                    <span class="truncate text-sm"
+                          [title]="eventLocationSummary(event)">
+                      {{ eventLocationSummary(event) }}
+                    </span>
                   </div>
                 </td>
 
@@ -245,7 +247,7 @@
                 <p class="text-[10px] text-gray-500 font-semibold uppercase">Location</p>
                 <div class="flex items-center gap-1.5 mt-0.5">
                   <i class="fas fa-map-marker-alt text-gray-400 text-[10px]"></i>
-                  <span class="text-xs font-medium text-gray-800 truncate">{{ event.room || event.location }}</span>
+                  <span class="text-xs font-medium text-gray-800 truncate">{{ eventLocationSummary(event) }}</span>
                 </div>
               </div>
               <!-- Card Actions -->
@@ -420,7 +422,7 @@
                 <td class="px-4 py-4 text-center">
                   <div class="flex items-center gap-2 justify-center">
                     <i class="fas fa-map-marker-alt text-gray-400 text-xs"></i>
-                    <span class="text-sm">{{ event.room || event.location }}</span>
+                    <span class="text-sm">{{ eventLocationSummary(event) }}</span>
                   </div>
                 </td>
                 <td class="px-4 py-4 text-center">
@@ -529,8 +531,7 @@
                 <p class="text-[10px] sm:text-xs text-gray-500 font-semibold uppercase">Location</p>
                 <div class="flex items-center gap-1.5 mt-0.5">
                   <i class="fas fa-map-marker-alt text-gray-400 text-[10px] sm:text-xs"></i>
-                  <span class="text-xs sm:text-sm font-medium text-gray-800 truncate">{{ event.room || event.location
-                    }}</span>
+                  <span class="text-xs sm:text-sm font-medium text-gray-800 truncate">{{ eventLocationSummary(event) }}</span>
                 </div>
               </div>
             </div>
@@ -762,32 +763,113 @@
                     </div>
 
                     <div>
-                      <label class="block text-sm font-semibold mb-1.5 text-gray-700">Location</label>
+                      <label class="block text-sm font-semibold mb-1.5 text-gray-700">Locations</label>
                       <ng-container *ngIf="!isInlineEditing; else editLocationField">
-                        <input type="text"
-                          class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none text-gray-800"
-                          [value]="selectedEvent.room || selectedEvent.location" readonly />
+                        <div *ngIf="selectedEvent?.locations?.length; else legacyLocViewDesktop"
+                          class="rounded-lg bg-gray-50 border border-gray-200 p-3 space-y-2 max-h-40 overflow-y-auto">
+                          <div *ngFor="let loc of selectedEvent.locations; let i = index"
+                            class="text-sm text-gray-800 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                            <span class="font-semibold text-gray-500 flex-shrink-0">{{ i + 1 }}.</span>
+                            <span class="font-medium">{{ loc.name || loc.location || loc.location_name || '—' }}</span>
+                            <span *ngIf="loc.room"
+                              class="text-xs text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded">Room:
+                              {{ loc.room }}</span>
+                          </div>
+                        </div>
+                        <ng-template #legacyLocViewDesktop>
+                          <input type="text"
+                            class="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none text-gray-800"
+                            [value]="selectedEvent.room || selectedEvent.location" readonly />
+                        </ng-template>
                       </ng-container>
                       <ng-template #editLocationField>
-                        <div class="flex gap-1.5 sm:gap-2">
-                          <input id="inline-location-input" type="text"
-                            class="flex-1 px-3 py-2 rounded-lg bg-white border-2 border-[#679436] focus:outline-none text-gray-800 min-h-[44px]"
-                            [(ngModel)]="inlineEditEvent.location" (ngModelChange)="onInlineLocationChange($event)" />
-                          <button type="button" (click)="useCurrentLocationForInline()"
-                            class="px-2.5 sm:px-3 py-2 rounded-md bg-[#679436] text-white hover:bg-[#56732e] min-h-[44px] min-w-[44px] flex items-center justify-center"
-                            title="Use my location">
-                            <i class="fas fa-location-arrow text-xs sm:text-sm"></i>
-                          </button>
-                          <button type="button" (click)="clearInlineLocation()"
-                            class="px-2.5 sm:px-3 py-2 rounded-md border bg-white text-gray-700 hover:bg-gray-50 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                            title="Clear location">
-                            <i class="fas fa-times text-xs sm:text-sm"></i>
-                          </button>
+                        <div class="space-y-3 max-h-[min(70vh,520px)] overflow-y-auto pr-1">
+                          <div *ngIf="inlineEditEvent?.locations?.length" class="space-y-2">
+                            <div *ngFor="let loc of inlineEditEvent.locations; let i = index"
+                              class="flex flex-col sm:flex-row justify-between items-start gap-2 p-2.5 bg-gray-50 border border-gray-200 rounded-lg">
+                              <div class="min-w-0">
+                                <div class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                                  <i class="fas fa-map-pin text-[#679436]"></i>
+                                  {{ loc.name || loc.location_name }}
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 flex flex-wrap gap-2">
+                                  <span *ngIf="loc.room"
+                                    class="bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded font-medium">Room:
+                                    {{ loc.room }}</span>
+                                </div>
+                              </div>
+                              <button type="button" (click)="removeLocationFromList(i)"
+                                class="px-2 py-1 text-red-500 hover:text-white hover:bg-red-500 border border-transparent hover:border-red-600 rounded shrink-0"
+                                title="Remove location">
+                                <i class="fas fa-trash-alt"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div class="bg-white border-2 border-dashed border-[#679436]/40 rounded-lg p-3">
+                            <div class="font-semibold text-gray-700 mb-2 text-xs flex items-center gap-2">
+                              <i class="fas fa-plus-circle text-[#679436]"></i>
+                              Add a location
+                            </div>
+                            <div class="space-y-2">
+                              <div class="relative">
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Location name <span
+                                    class="text-red-500">*</span></label>
+                                <div class="flex">
+                                  <input type="text" [(ngModel)]="newEvent.location"
+                                    (ngModelChange)="onLocationChange($event)" name="inline_add_loc_desktop"
+                                    class="flex-1 px-2 py-2 border border-gray-300 rounded-l-lg text-sm bg-white focus:outline-none focus:ring-1 focus:ring-[#679436]"
+                                    placeholder="Search or enter…" />
+                                  <button type="button" (click)="useCurrentLocationForInline()"
+                                    class="px-2 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-gray-600"
+                                    title="Use my location">
+                                    <i class="fas fa-location-arrow"></i>
+                                  </button>
+                                </div>
+                                <div *ngIf="locationSuggestions.length" class="absolute z-[4001] w-full mt-1">
+                                  <ul
+                                    class="bg-white border-2 border-gray-200 rounded-lg shadow-lg max-h-32 overflow-auto">
+                                    <li *ngFor="let s of locationSuggestions"
+                                      class="px-2 py-2 hover:bg-gray-50 cursor-pointer text-xs border-b last:border-b-0"
+                                      (click)="selectLocationSuggestion(s)">
+                                      <div class="line-clamp-2">{{ s.display_name }}</div>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                              <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Room (optional)</label>
+                                <select [(ngModel)]="selectedRoom" (ngModelChange)="onRoomSelect($event)"
+                                  name="inline_room_desktop" [disabled]="!isLocationGordon"
+                                  [ngClass]="!isLocationGordon ? 'opacity-60 bg-gray-50' : 'bg-white'"
+                                  class="w-full px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none">
+                                  <option value="">Select room…</option>
+                                  <option *ngFor="let r of rooms" [value]="r">{{ r }}</option>
+                                  <option value="Others">Others (custom)</option>
+                                </select>
+                              </div>
+                              <div *ngIf="showOtherRoomInput" class="p-2 bg-white rounded border border-gray-200">
+                                <input type="text" [(ngModel)]="otherRoomInput" id="inline-other-room-desktop"
+                                  class="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:outline-none"
+                                  placeholder="Custom room" />
+                                <div class="flex gap-2 mt-2">
+                                  <button type="button" (click)="saveCustomRoom()" [disabled]="!isLocationGordon"
+                                    class="px-3 py-1 rounded bg-[#679436] text-white text-xs font-semibold">Save</button>
+                                  <button type="button" (click)="showOtherRoomInput=false; otherRoomInput=''"
+                                    class="px-3 py-1 rounded border border-gray-300 text-xs">Cancel</button>
+                                </div>
+                              </div>
+                              <div class="flex justify-end gap-2 pt-1">
+                                <button type="button" (click)="clearInlineAddLocationDraft()"
+                                  class="px-2 py-1.5 text-xs border border-gray-300 rounded-lg text-gray-600 bg-white hover:bg-gray-50">Clear
+                                  draft</button>
+                                <button type="button" (click)="addLocationToList()"
+                                  class="px-3 py-1.5 text-xs rounded-lg bg-[#679436] text-white font-semibold hover:bg-[#56732e]">
+                                  <i class="fas fa-plus mr-1"></i>Add
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <label class="block text-sm font-semibold mb-1.5 text-gray-700 mt-3">Room (optional)</label>
-                        <input type="text"
-                          class="w-full px-3 py-2 rounded-lg bg-white border-2 border-[#679436] focus:outline-none text-gray-800 min-h-[44px]"
-                          [(ngModel)]="inlineEditEvent.room" placeholder="e.g. Function Hall / Room 201" />
                       </ng-template>
                     </div>
 
@@ -913,6 +995,19 @@
                         <textarea
                           class="w-full px-3 py-2 rounded-lg bg-white border-2 border-[#679436] focus:outline-none text-gray-800"
                           [(ngModel)]="inlineEditEvent.description" rows="5"></textarea>
+                      </ng-template>
+                    </div>
+
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+                      <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Contact Us</label>
+                      <ng-container *ngIf="selectedEventHasContactInfo(); else noContactManageDesktop">
+                        <p class="text-xs text-gray-500 font-semibold uppercase mb-0.5">{{ selectedEventOrganizerLabel() }}</p>
+                        <p class="text-sm font-medium text-gray-900">{{ selectedEventOrganizerName() || '—' }}</p>
+                        <a *ngIf="selectedEventOrganizerEmail()" [href]="'mailto:' + selectedEventOrganizerEmail()"
+                          class="text-sm text-[#679436] hover:underline break-all mt-1 inline-block">{{ selectedEventOrganizerEmail() }}</a>
+                      </ng-container>
+                      <ng-template #noContactManageDesktop>
+                        <p class="text-sm text-gray-600">Contact information unavailable.</p>
                       </ng-template>
                     </div>
 
@@ -1066,28 +1161,87 @@
               </ng-template>
             </div>
             <div>
-              <label class="block text-xs sm:text-sm font-medium mb-1 text-gray-700">Location</label>
+              <label class="block text-xs sm:text-sm font-medium mb-1 text-gray-700">Locations</label>
               <ng-container *ngIf="!isInlineEditing; else editLocationFieldMobile">
-                <input type="text"
-                  class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-sm min-h-[44px]"
-                  [value]="selectedEvent.room || selectedEvent.location" readonly />
+                <div *ngIf="selectedEvent?.locations?.length; else legacyLocViewMobile"
+                  class="rounded-md bg-gray-50 border border-gray-200 p-2 space-y-1.5 max-h-36 overflow-y-auto">
+                  <div *ngFor="let loc of selectedEvent.locations; let i = index"
+                    class="text-xs text-gray-800 flex flex-wrap gap-x-1.5 gap-y-0.5">
+                    <span class="font-semibold text-gray-500">{{ i + 1 }}.</span>
+                    <span>{{ loc.name || loc.location || loc.location_name || '—' }}</span>
+                    <span *ngIf="loc.room" class="text-[10px] text-indigo-700 bg-indigo-50 px-1 rounded border border-indigo-200">({{
+                      loc.room }})</span>
+                  </div>
+                </div>
+                <ng-template #legacyLocViewMobile>
+                  <input type="text"
+                    class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 text-sm min-h-[44px]"
+                    [value]="selectedEvent.room || selectedEvent.location" readonly />
+                </ng-template>
               </ng-container>
               <ng-template #editLocationFieldMobile>
-                <div class="flex gap-2">
-                  <input id="inline-location-input-mobile" type="text"
-                    class="flex-1 px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 min-h-[44px]"
-                    [(ngModel)]="inlineEditEvent.location" (ngModelChange)="onInlineLocationChange($event)" />
-                  <button type="button" (click)="useCurrentLocationForInline()"
-                    class="px-3 sm:px-4 py-2 rounded-md bg-[#679436] text-white min-h-[44px] min-w-[44px] flex items-center justify-center"
-                    title="Use my location"><i class="fas fa-location-arrow text-sm"></i></button>
-                  <button type="button" (click)="clearInlineLocation()"
-                    class="px-3 sm:px-4 py-2 rounded-md border bg-white text-gray-700 min-h-[44px] min-w-[44px] flex items-center justify-center"
-                    title="Clear location"><i class="fas fa-times text-sm"></i></button>
+                <div class="space-y-2 max-h-[55vh] overflow-y-auto">
+                  <div *ngIf="inlineEditEvent?.locations?.length" class="space-y-1.5">
+                    <div *ngFor="let loc of inlineEditEvent.locations; let i = index"
+                      class="flex justify-between items-start gap-2 p-2 bg-gray-50 border border-gray-200 rounded-md">
+                      <div class="min-w-0 text-xs">
+                        <div class="font-bold text-gray-800 flex items-center gap-1">
+                          <i class="fas fa-map-pin text-[#679436] text-[10px]"></i>
+                          {{ loc.name || loc.location_name }}
+                        </div>
+                        <div *ngIf="loc.room" class="text-[10px] text-gray-500 mt-0.5">Room: {{ loc.room }}</div>
+                      </div>
+                      <button type="button" (click)="removeLocationFromList(i)"
+                        class="p-1.5 text-red-500 hover:bg-red-500 hover:text-white rounded shrink-0" title="Remove">
+                        <i class="fas fa-trash-alt text-xs"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="border-2 border-dashed border-[#679436]/40 rounded-md p-2 bg-[#679436]/5">
+                    <div class="text-[11px] font-semibold text-gray-700 mb-1.5">Add location</div>
+                    <div class="relative space-y-1.5">
+                      <div class="flex">
+                        <input type="text" [(ngModel)]="newEvent.location" (ngModelChange)="onLocationChange($event)"
+                          name="inline_add_loc_mobile"
+                          class="flex-1 px-2 py-2 border border-gray-300 rounded-l-md text-xs bg-white min-h-[44px]" />
+                        <button type="button" (click)="useCurrentLocationForInline()"
+                          class="px-2 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-md min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-600">
+                          <i class="fas fa-location-arrow text-sm"></i>
+                        </button>
+                      </div>
+                      <div *ngIf="locationSuggestions.length" class="absolute z-[4002] left-0 right-0 top-full mt-0.5">
+                        <ul class="bg-white border border-gray-200 rounded-md shadow max-h-28 overflow-auto text-xs">
+                          <li *ngFor="let s of locationSuggestions" class="px-2 py-1.5 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                            (click)="selectLocationSuggestion(s)">{{ s.display_name }}</li>
+                        </ul>
+                      </div>
+                      <select [(ngModel)]="selectedRoom" (ngModelChange)="onRoomSelect($event)" name="inline_room_mobile"
+                        [disabled]="!isLocationGordon"
+                        [ngClass]="!isLocationGordon ? 'opacity-60 bg-gray-50' : 'bg-white'"
+                        class="w-full px-2 py-2 border border-gray-300 rounded-md text-xs min-h-[40px]">
+                        <option value="">Room…</option>
+                        <option *ngFor="let r of rooms" [value]="r">{{ r }}</option>
+                        <option value="Others">Others</option>
+                      </select>
+                      <div *ngIf="showOtherRoomInput" class="p-2 bg-white rounded border text-xs space-y-1">
+                        <input type="text" [(ngModel)]="otherRoomInput" id="inline-other-room-mobile"
+                          class="w-full px-2 py-1.5 border rounded" placeholder="Custom room" />
+                        <div class="flex gap-1">
+                          <button type="button" (click)="saveCustomRoom()" [disabled]="!isLocationGordon"
+                            class="px-2 py-1 rounded bg-[#679436] text-white">Save</button>
+                          <button type="button" (click)="showOtherRoomInput=false; otherRoomInput=''"
+                            class="px-2 py-1 rounded border">Cancel</button>
+                        </div>
+                      </div>
+                      <div class="flex justify-end gap-1 pt-0.5">
+                        <button type="button" (click)="clearInlineAddLocationDraft()"
+                          class="px-2 py-1.5 text-[10px] border rounded">Clear</button>
+                        <button type="button" (click)="addLocationToList()"
+                          class="px-2 py-1.5 text-[10px] rounded bg-[#679436] text-white font-semibold">+ Add</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <label class="block text-sm font-medium mb-1 text-gray-700 mt-3">Room (optional)</label>
-                <input type="text"
-                  class="w-full px-3 py-2 rounded-md bg-gray-50 focus:outline-none border-0 min-h-[44px]"
-                  [(ngModel)]="inlineEditEvent.room" placeholder="e.g. Function Hall / Room 201" />
               </ng-template>
             </div>
             <div class="grid grid-cols-2 gap-2 sm:gap-3">
@@ -1209,6 +1363,20 @@
                   [(ngModel)]="inlineEditEvent.description" rows="4"></textarea>
               </ng-template>
             </div>
+
+            <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <label class="block text-xs font-bold text-gray-600 uppercase tracking-wide mb-2">Contact Us</label>
+              <ng-container *ngIf="selectedEventHasContactInfo(); else noContactManageMobile">
+                <p class="text-xs text-gray-500 font-semibold uppercase mb-0.5">{{ selectedEventOrganizerLabel() }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ selectedEventOrganizerName() || '—' }}</p>
+                <a *ngIf="selectedEventOrganizerEmail()" [href]="'mailto:' + selectedEventOrganizerEmail()"
+                  class="text-sm text-[#679436] hover:underline break-all mt-1 inline-block">{{ selectedEventOrganizerEmail() }}</a>
+              </ng-container>
+              <ng-template #noContactManageMobile>
+                <p class="text-sm text-gray-600">Contact information unavailable.</p>
+              </ng-template>
+            </div>
+
             <div *ngIf="isInlineEditing || selectedEvent.event_poster">
               <label class="block text-xs sm:text-sm font-medium mb-1 text-gray-700">Poster</label>
               <ng-container *ngIf="!isInlineEditing">
@@ -1700,95 +1868,109 @@
                 class="block text-sm font-semibold mb-2 text-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <span class="flex items-center gap-1.5">
                   <i class="fas fa-map-marker-alt text-xs" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
-                  Location & Room <span class="text-red-500">*</span>
+                  Locations <span class="text-red-500">*</span>
                 </span>
-                <small class="text-xs text-gray-400 font-normal">Use suggestions or your device</small>
+                <small class="text-xs text-gray-400 font-normal">Add one or more locations</small>
               </label>
 
-              <div class="space-y-3">
-                <!-- Location input card -->
-                <div class="bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm">
-                  <label class="block text-xs font-medium text-gray-600 mb-2">Search Location</label>
-                  <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" [(ngModel)]="newEvent.location" (ngModelChange)="onLocationChange($event)"
-                      name="location"
-                      class="flex-1 px-3 py-2.5 border rounded-lg focus:outline-none focus:ring-2 transition-all text-sm min-h-[44px]"
-                      [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'"
-                      placeholder="Search place or address..." />
-                    <div class="flex gap-2">
-                      <button type="button" (click)="useCurrentLocation()"
-                        class="px-3 sm:px-4 py-2.5 rounded-lg border-2 border-gray-300 text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center gap-2"
-                        title="Use my location">
-                        <i class="fas fa-location-arrow"></i>
-                        <span class="hidden sm:inline">Current</span>
-                      </button>
-                      <button type="button"
-                        (click)="newEvent.location=''; newEventLat=null; newEventLon=null; locationSuggestions=[]"
-                        class="px-3 py-2.5 rounded-lg border-2 border-gray-300 text-sm font-medium bg-white text-gray-600 hover:bg-gray-50 transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
-                        title="Clear location">
-                        <i class="fas fa-times"></i>
-                      </button>
+              <div class="space-y-4">
+                <!-- Added locations list -->
+                <div *ngIf="newEvent.locations && newEvent.locations.length > 0" class="space-y-2">
+                  <div *ngFor="let loc of newEvent.locations; let i = index" class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm gap-2 transition-all hover:shadow-md">
+                    <div>
+                      <div class="font-bold text-gray-800 text-sm flex items-center gap-2">
+                        <i class="fas fa-map-pin" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                        {{ loc.name || loc.location_name }}
+                      </div>
+                      <div class="text-xs text-gray-500 mt-1.5 flex flex-wrap gap-2">
+                        <span *ngIf="loc.room" class="bg-indigo-50 border border-indigo-200 text-indigo-700 px-2 py-0.5 rounded font-medium">Room: {{ loc.room }}</span>
+                      </div>
                     </div>
-                  </div>
-
-                  <div *ngIf="locationSuggestions.length" class="mt-2">
-                    <ul class="bg-white border-2 border-gray-200 rounded-lg shadow-lg max-h-40 overflow-auto">
-                      <li *ngFor="let s of locationSuggestions"
-                        class="px-3 py-2.5 hover:bg-gray-50 cursor-pointer text-sm border-b last:border-b-0"
-                        (click)="selectLocationSuggestion(s)">
-                        <div class="flex items-start gap-2">
-                          <i class="fas fa-map-pin text-gray-400 text-xs mt-0.5 flex-shrink-0"></i>
-                          <div class="line-clamp-2 text-xs sm:text-sm">{{ s.display_name }}</div>
-                        </div>
-                      </li>
-                    </ul>
+                    <button type="button" (click)="removeLocationFromList(i)" class="px-2 py-1 text-red-500 hover:text-white hover:bg-red-500 border border-transparent hover:border-red-600 rounded transition" title="Remove Location">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
                   </div>
                 </div>
 
-                <!-- Room select card -->
-                <div class="bg-white border-2 border-gray-200 rounded-lg p-3 shadow-sm">
-                  <label class="block text-xs font-medium text-gray-600 mb-2">Room (Optional)</label>
-                  <div class="flex flex-col sm:flex-row gap-2">
-                    <select name="room_select" [(ngModel)]="selectedRoom" (ngModelChange)="onRoomSelect($event)"
-                      [disabled]="!isLocationGordon"
-                      [ngClass]="!isLocationGordon ? 'opacity-60 cursor-not-allowed bg-gray-50' : ''"
-                      class="flex-1 px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 transition-all min-h-[44px]"
-                      [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]/20' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]/20'">
-                      <option value="" disabled [selected]="!selectedRoom">Select a room...</option>
-                      <option *ngFor="let r of rooms" [value]="r">{{ r }}</option>
-                      <option value="Others">Others (enter custom)</option>
-                    </select>
-                    <button type="button" (click)="openCustomRoomInput()" [disabled]="!isLocationGordon"
-                      [ngClass]="!isLocationGordon ? 'opacity-60 cursor-not-allowed' : ''"
-                      class="px-3 sm:px-4 py-2.5 rounded-lg border-2 border-gray-300 text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 transition-all min-h-[44px] whitespace-nowrap"
-                      title="Add custom room">
-                      <i class="fas fa-plus mr-1.5"></i>Custom
-                    </button>
+                <!-- Add New Location Form Box -->
+                <div class="bg-white border-2 border-dashed rounded-lg p-3 sm:p-4"
+                     [ngClass]="isOsws ? 'border-[#14532d]/40 bg-[#14532d]/5' : 'border-[#679436]/40 bg-[#679436]/5'">
+                  <div class="font-semibold text-gray-700 mb-3 text-sm flex items-center gap-2">
+                    <i class="fas fa-plus-circle" [ngClass]="isOsws ? 'text-[#14532d]' : 'text-[#679436]'"></i>
+                    Add a New Location
                   </div>
 
-                  <div *ngIf="!isLocationGordon" class="mt-2 text-xs text-gray-500 flex items-start gap-1.5">
-                    <i class="fas fa-info-circle text-gray-400 mt-0.5 flex-shrink-0"></i>
-                    <span>Room selection is available only when location is Olongapo Gordon College.</span>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3 relative">
+                    <!-- Location Name -->
+                    <div class="relative">
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Location Name <span class="text-red-500">*</span></label>
+                      <div class="flex">
+                        <input type="text" [(ngModel)]="newEvent.location" (ngModelChange)="onLocationChange($event)" name="location"
+                          class="flex-1 px-3 py-2 border rounded-l-lg focus:outline-none focus:ring-1 text-sm bg-white"
+                          [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]'"
+                          placeholder="Search place or enter name..." />
+                        <button type="button" (click)="useCurrentLocation()" class="px-3 py-2 bg-gray-100 border border-l-0 border-gray-300 rounded-r-lg text-gray-600 hover:bg-gray-200 transition" title="Use my location">
+                          <i class="fas fa-location-arrow"></i>
+                        </button>
+                      </div>
+
+                      <div *ngIf="locationSuggestions.length" class="absolute z-10 w-full mt-1">
+                        <ul class="bg-white border-2 border-gray-200 rounded-lg shadow-lg max-h-40 overflow-auto">
+                          <li *ngFor="let s of locationSuggestions"
+                            class="px-3 py-2.5 hover:bg-gray-50 cursor-pointer text-sm border-b last:border-b-0"
+                            (click)="selectLocationSuggestion(s)">
+                            <div class="flex items-start gap-2">
+                              <i class="fas fa-map-pin text-gray-400 text-xs mt-0.5 flex-shrink-0"></i>
+                              <div class="line-clamp-2 text-xs sm:text-sm">{{ s.display_name }}</div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    <!-- Room Selection -->
+                    <div>
+                      <label class="block text-xs font-medium text-gray-600 mb-1">Room (Optional)</label>
+                      <div class="flex gap-2">
+                        <select name="room_select" [(ngModel)]="selectedRoom" (ngModelChange)="onRoomSelect($event)"
+                          [disabled]="!isLocationGordon"
+                          [ngClass]="!isLocationGordon ? 'opacity-60 cursor-not-allowed bg-gray-50' : 'bg-white'"
+                          class="flex-1 px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-1 transition-all"
+                          [ngClass]="isOsws ? 'border-gray-300 focus:border-[#14532d] focus:ring-[#14532d]' : 'border-gray-300 focus:border-[#679436] focus:ring-[#679436]'">
+                          <option value="" disabled [selected]="!selectedRoom">Select a room...</option>
+                          <option *ngFor="let r of rooms" [value]="r">{{ r }}</option>
+                          <option value="Others">Others (custom)</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
-                  <div *ngIf="showOtherRoomInput" class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+
+                  <div *ngIf="showOtherRoomInput" class="mb-3 p-3 bg-white rounded-lg border border-gray-200 shadow-sm col-span-full">
                     <label class="block text-xs font-medium text-gray-600 mb-2">Specify Custom Room</label>
                     <div class="flex flex-col sm:flex-row gap-2">
                       <input id="other-room-input" name="otherRoomInput" type="text" [(ngModel)]="otherRoomInput"
-                        class="flex-1 px-3 py-2.5 rounded-lg border-2 border-gray-300 text-sm focus:outline-none focus:ring-2 transition-all min-h-[44px]"
-                        [ngClass]="isOsws ? 'focus:border-[#14532d] focus:ring-[#14532d]/20' : 'focus:border-[#679436] focus:ring-[#679436]/20'"
+                        class="flex-1 px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-1 transition-all"
+                        [ngClass]="isOsws ? 'focus:border-[#14532d] focus:ring-[#14532d]' : 'focus:border-[#679436] focus:ring-[#679436]'"
                         placeholder="e.g. Room 201 / Function Hall 2" />
                       <div class="flex gap-2">
                         <button type="button" (click)="saveCustomRoom()" [disabled]="!isLocationGordon"
-                          class="flex-1 sm:flex-none px-4 py-2.5 rounded-lg text-white text-sm font-semibold transition-all min-h-[44px]"
+                          class="flex-1 sm:flex-none px-4 py-2 rounded-lg text-white text-sm font-semibold transition-all"
                           [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'">Save</button>
                         <button type="button" (click)="showOtherRoomInput=false; otherRoomInput='';"
-                          class="flex-1 sm:flex-none px-4 py-2.5 rounded-lg border-2 border-gray-300 text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 transition-all min-h-[44px]">Cancel</button>
+                          class="flex-1 sm:flex-none px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 transition-all">Cancel</button>
                       </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2 flex items-start gap-1.5">
-                      <i class="fas fa-lightbulb text-gray-400 mt-0.5 flex-shrink-0"></i>
-                      <span>Saved rooms are stored in your browser for convenience.</span>
-                    </p>
+                  </div>
+
+                  <div class="flex justify-end mt-3 gap-2">
+                    <button type="button" (click)="newEvent.location=''; newEventLat=null; newEventLon=null; selectedRoom=''; otherRoomInput=''; showOtherRoomInput=false; locationSuggestions=[]"
+                      class="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 text-gray-600 bg-white hover:bg-gray-50 transition">
+                      Clear
+                    </button>
+                    <button type="button" (click)="addLocationToList()" class="px-4 py-2 text-sm font-semibold rounded-lg text-white transition shadow-sm hover:shadow" 
+                      [ngClass]="isOsws ? 'bg-[#14532d] hover:bg-[#166534]' : 'bg-[#679436] hover:bg-[#56732e]'">
+                       <i class="fas fa-plus mr-1"></i> Add Location
+                    </button>
                   </div>
                 </div>
               </div>

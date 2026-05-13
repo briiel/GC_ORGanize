@@ -8,6 +8,7 @@ import { RbacAuthService } from '../services/rbac-auth.service';
 import { EventService } from '../services/event.service';
 import { LoadingService } from '../services/loading.service';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
+import { primaryLocationLabel } from '../utils/location-display';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -286,6 +287,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Helper to get display status
   getDisplayStatus(event: any): string {
     return String(event?.status || '').toLowerCase();
+  }
+
+  /** One location row for cards (hides raw lat/lon text). */
+  homeLocationLine(loc: any, event: any): string {
+    return primaryLocationLabel(loc, event?.location);
+  }
+
+  legacyHomeLocationTitle(event: any): string {
+    if (!event) return '';
+    return primaryLocationLabel({ room: event.room, location: event.location }, event.location);
   }
 
 }

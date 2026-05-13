@@ -249,14 +249,47 @@ export class ExcelExportService {
     sheetName: string,
     headers: string[],
     data: any[][],
-    filename: string
+    filename: string,
+    titleInfo?: { title?: string, details?: string[] }
   ): Promise<void> {
     const columnCount = headers.length;
     const workbook = await this.createWorkbookWithHeader(sheetName, columnCount);
     const worksheet = workbook.getWorksheet(sheetName);
     
     if (worksheet) {
-      this.addDataToWorksheet(worksheet, headers, data);
+      let startRow = 7;
+
+      if (titleInfo) {
+        const lastColLetter = this.getColumnLetter(Math.max(columnCount - 1, 0));
+        
+        if (titleInfo.title) {
+          const titleRow = worksheet.getRow(startRow);
+          worksheet.mergeCells(`A${startRow}:${lastColLetter}${startRow}`);
+          const cell = titleRow.getCell(1);
+          cell.value = titleInfo.title;
+          cell.font = { bold: true, size: 14 };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          titleRow.height = 25;
+          startRow++;
+        }
+        
+        if (titleInfo.details && titleInfo.details.length > 0) {
+          titleInfo.details.forEach(detail => {
+            const detailRow = worksheet.getRow(startRow);
+            worksheet.mergeCells(`A${startRow}:${lastColLetter}${startRow}`);
+            const cell = detailRow.getCell(1);
+            cell.value = detail;
+            cell.font = { size: 11, bold: false };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            startRow++;
+          });
+        }
+        
+        // Add empty row before data
+        startRow++;
+      }
+
+      this.addDataToWorksheet(worksheet, headers, data, startRow);
       await this.exportWorkbook(workbook, filename);
     }
   }

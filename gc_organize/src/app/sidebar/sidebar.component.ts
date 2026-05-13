@@ -27,6 +27,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   currentTime: string = '';
   isUserManagementOpen = false; // For OSWS admin user management dropdown
   isRequestsOpen = false; // For combined Certificate Requests + Attendance Records dropdown
+  userOrganization: any = null; // Organization the user belongs to
 
   private timeInterval: any;
   private readonly desktopBreakpoint = 1024; // match Tailwind's lg breakpoint
@@ -64,6 +65,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     // Get all roles from JWT token
     this.userRoles = this.authService.getUserRoles();
+    
+    // Get organization details if user is an officer
+    this.userOrganization = this.authService.getUserOrganization();
 
     // Build list of available panels based on user's roles
     this.buildAvailablePanels();

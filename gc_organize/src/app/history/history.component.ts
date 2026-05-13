@@ -29,7 +29,7 @@ export class HistoryComponent implements OnInit {
   sortBy: string = 'default';
   // Pagination
   page = 1;
-  readonly pageSize = 9;
+  readonly pageSize = 10;
   // per-card request state
   sendingId: number | null = null;
 

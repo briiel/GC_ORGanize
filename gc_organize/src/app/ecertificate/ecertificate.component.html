@@ -45,7 +45,7 @@
           </label>
           <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()"
             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all text-sm sm:text-base bg-white min-h-[44px]">
-            <option value="default">Latest Certificate</option>
+            <option value="default">Recently Attended</option>
             <option value="date_desc">Latest Event</option>
             <option value="date_asc">Earliest Event</option>
             <option value="title_asc">Event Name (A-Z)</option>
@@ -91,11 +91,11 @@
             </tr>
 
             <!-- Certificate Rows -->
-            <tr *ngFor="let cert of filteredCertificates; let i = index"
+            <tr *ngFor="let cert of pagedCertificates; let i = index"
               class="hover:bg-green-50/50 active:bg-green-50 transition-all duration-200">
               <td
                 class="px-2 sm:px-3 lg:px-4 py-3 sm:py-3.5 text-center text-[#679436] font-semibold text-xs sm:text-sm">
-                {{ i + 1 }}</td>
+                {{ (page - 1) * pageSize + i + 1 }}</td>
               <td class="px-2 sm:px-3 lg:px-4 py-3 sm:py-3.5 font-semibold text-center max-w-[180px] sm:max-w-[200px]">
                 <div class="flex flex-col items-center gap-1.5 sm:gap-2">
                   <div class="text-[#679436] font-semibold truncate w-full text-xs sm:text-sm lg:text-base"
@@ -290,11 +290,11 @@
         </div>
 
         <!-- Cards -->
-        <div *ngFor="let cert of filteredCertificates; let i = index"
+        <div *ngFor="let cert of pagedCertificates; let i = index"
           class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div class="bg-[#679436] px-3 py-2 flex justify-between items-center gap-2">
             <div class="flex items-center gap-2 overflow-hidden min-w-0 flex-1">
-              <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded flex-shrink-0">{{ i + 1
+              <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded flex-shrink-0">{{ (page - 1) * pageSize + i + 1
                 }}</span>
               <h3 class="text-white font-bold truncate text-sm" [title]="cert.event_title">{{ cert.event_title }}</h3>
             </div>
@@ -394,4 +394,45 @@
         </div>
       </div>
     </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="totalPages > 1" class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-t-2 border-gray-200 bg-gray-50 rounded-b-lg shadow-lg">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+        <!-- Showing Info -->
+        <div class="text-xs sm:text-sm text-gray-600 text-center sm:text-left font-medium">
+          Showing <span class="font-bold text-[#679436]">{{ showingFrom }}</span> to
+          <span class="font-bold text-[#679436]">{{ showingTo }}</span> of
+          <span class="font-bold text-[#679436]">{{ totalItems }}</span> certificates
+        </div>
+
+        <!-- Pagination Buttons -->
+        <nav class="inline-flex flex-wrap gap-1.5 sm:gap-1 justify-center" aria-label="Pagination">
+          <!-- Previous Arrow -->
+          <button
+            class="w-11 h-11 sm:w-10 sm:h-10 lg:w-9 lg:h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            [disabled]="page === 1" (click)="prevPage()" aria-label="Previous page">
+            <i class="fas fa-chevron-left text-gray-600 text-sm"></i>
+          </button>
+
+          <!-- Page Numbers -->
+          <ng-container *ngFor="let _ of [].constructor(totalPages); let i = index">
+            <button
+              class="w-11 h-11 sm:w-10 sm:h-10 lg:w-9 lg:h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg transition-all duration-150 border-2 text-sm sm:text-base font-semibold"
+              [ngClass]="page === (i + 1) ? 'bg-[#679436] text-white font-bold border-[#679436] shadow-sm' : 'bg-white border-gray-300 hover:bg-gray-100 active:bg-gray-200 text-gray-800'"
+              [attr.aria-current]="page === (i + 1) ? 'page' : null" [attr.aria-label]="'Page ' + (i + 1)"
+              (click)="goToPage(i + 1)">
+              {{ i + 1 }}
+            </button>
+          </ng-container>
+
+          <!-- Next Arrow -->
+          <button
+            class="w-11 h-11 sm:w-10 sm:h-10 lg:w-9 lg:h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            [disabled]="page === totalPages" (click)="nextPage()" aria-label="Next page">
+            <i class="fas fa-chevron-right text-gray-600 text-sm"></i>
+          </button>
+        </nav>
+      </div>
+    </div>
   </div>
+</div>

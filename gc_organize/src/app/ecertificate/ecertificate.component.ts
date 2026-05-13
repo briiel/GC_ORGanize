@@ -28,6 +28,10 @@ export class EcertificateComponent implements OnInit {
   requestMessage: string = '';
   requestError: string = '';
 
+  // Pagination
+  page = 1;
+  readonly pageSize = 10;
+
   constructor(
     private certificateService: CertificateService,
     private http: HttpClient,
@@ -199,7 +203,7 @@ export class EcertificateComponent implements OnInit {
 
     // Apply sorting
     if (this.sortBy !== 'default') {
-      return [...filtered].sort((a, b) => {
+      filtered.sort((a, b) => {
         switch (this.sortBy) {
           case 'date_desc':
             return new Date(b.start_date || 0).getTime() - new Date(a.start_date || 0).getTime();
@@ -218,16 +222,43 @@ export class EcertificateComponent implements OnInit {
     return filtered;
   }
 
+  // Pagination getters
+  get totalItems() { return this.filteredCertificates.length; }
+  get totalPages() { return Math.max(1, Math.ceil(this.totalItems / this.pageSize)); }
+  
+  get pagedCertificates() {
+    const start = (this.page - 1) * this.pageSize;
+    return this.filteredCertificates.slice(start, start + this.pageSize);
+  }
+
+  get showingFrom() {
+    if (this.totalItems === 0) return 0;
+    return (this.page - 1) * this.pageSize + 1;
+  }
+
+  get showingTo() {
+    return Math.min(this.page * this.pageSize, this.totalItems);
+  }
+
+  goToPage(p: number) {
+    const clamped = Math.min(Math.max(1, p), this.totalPages);
+    this.page = clamped;
+  }
+  
+  prevPage() { this.goToPage(this.page - 1); }
+  nextPage() { this.goToPage(this.page + 1); }
+
   onSearch() {
-    // Optionally trigger filtering logic or just rely on ngModel binding
+    this.page = 1;
   }
 
   clearSearch() {
     this.searchTerm = '';
+    this.page = 1;
   }
 
   onSortChange() {
-    // Trigger re-computation of filteredCertificates
+    this.page = 1;
   }
 
   // Format event date range using start_date/end_date from API

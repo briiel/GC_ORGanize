@@ -136,4 +136,17 @@ export class EventService {
   getOswsCharts(filter: 'weekly' | 'monthly' | 'yearly' = 'monthly'): Observable<any> {
     return this.fetch('osws_charts', { filter });
   }
+
+  /** Organization or OSWS admin — trash retention and auto-archive concluded events */
+  getEventArchiveSettings(): Observable<any> {
+    return this.fetch('event_archive_settings');
+  }
+
+  patchEventArchiveSettings(body: {
+    event_trash_retention_days?: number | null;
+    event_auto_trash_on_conclude?: boolean;
+    event_home_visibility_days?: number | null;
+  }): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/event-archive-settings`, body);
+  }
 }

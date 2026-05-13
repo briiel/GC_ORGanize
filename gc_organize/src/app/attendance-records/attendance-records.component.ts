@@ -247,6 +247,13 @@ export class AttendanceRecordsComponent implements OnInit {
     return withSuffix || '-';
   }
 
+  private parseLocalEventDate(dateStr: string | null, timeStr: string | null): Date | null {
+    if (!dateStr || !timeStr) return null;
+    const dateOnly = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
+    const timeOnly = timeStr.length === 5 ? `${timeStr}:00` : timeStr;
+    return new Date(`${dateOnly}T${timeOnly}`);
+  }
+
   async downloadExcel() {
     const headers = ['#', 'Student ID', 'Name', 'Department', 'Program', 'Time In', 'Time Out', 'Scanned By'];
 
@@ -264,6 +271,19 @@ export class AttendanceRecordsComponent implements OnInit {
     const eventTitle = this.selectedEvent?.title || 'event';
     const filename = `attendees-${eventTitle.replace(/\s+/g, '_')}.xlsx`;
 
-    await this.excelExportService.createAndExportExcel('Attendees', headers, data, filename);
+    const startDate = this.parseLocalEventDate(this.selectedEvent?.start_date, this.selectedEvent?.start_time);
+    const endDate = this.parseLocalEventDate(this.selectedEvent?.end_date, this.selectedEvent?.end_time);
+
+    const formatFn = (d: Date | null) => d ? d.toLocaleString('en-US', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' }) : 'N/A';
+
+    const titleInfo = {
+      title: `${eventTitle} - Attendance Record`,
+      details: [
+        `Date: ${formatFn(startDate)}${endDate ? ' to ' + formatFn(endDate) : ''}`,
+        `Location: ${this.selectedEvent?.location || 'N/A'}`
+      ]
+    };
+
+    await this.excelExportService.createAndExportExcel('Attendees', headers, data, filename, titleInfo);
   }
 }

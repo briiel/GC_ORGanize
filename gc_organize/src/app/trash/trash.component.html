@@ -16,7 +16,9 @@
 								class="inline-flex items-center justify-center text-[10px] sm:text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 text-gray-700"
 								*ngIf="filtered && filtered.length >= 0">{{ filtered.length }}</span>
 						</div>
-						<p class="text-xs sm:text-sm text-gray-600 truncate">Archived items (30-day retention)</p>
+						<p class="text-xs sm:text-sm text-gray-600 truncate">{{ retentionSummary }}</p>
+						<p *ngIf="archiveSettings && (role === 'organization' || role === 'osws_admin')"
+							class="text-xs text-gray-500 truncate mt-0.5">{{ homeVisibilitySummary }}</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
@@ -40,6 +42,59 @@
 						<span class="hidden sm:inline text-sm">Refresh</span>
 					</button>
 				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Event archive policy: retention + auto-move concluded (org / OSWS only) -->
+	<div *ngIf="role === 'organization' || role === 'osws_admin'" class="mx-0 sm:mx-2 lg:mx-6 mb-4">
+		<div class="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-5">
+			<div class="flex items-center gap-2 mb-3">
+				<i class="fas fa-sliders-h text-gray-600"></i>
+				<h2 class="text-sm sm:text-base font-bold text-gray-800">Event listing &amp; archive settings</h2>
+			</div>
+			<p class="text-xs text-red-600 mb-3" *ngIf="settingsLoadError">{{ settingsLoadError }}</p>
+			<div class="grid gap-4 lg:grid-cols-3">
+				<div>
+					<label class="flex items-center gap-2 text-sm text-gray-700 mb-2 cursor-pointer">
+						<input type="checkbox" [(ngModel)]="useCustomRetention" name="useCustomRetention" />
+						<span>Use custom archive retention</span>
+					</label>
+					<div *ngIf="useCustomRetention" class="flex items-center gap-2 flex-wrap">
+						<input type="number" min="1" max="365" [(ngModel)]="retentionDaysInput" name="retentionDays"
+							class="w-28 border-2 border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800" />
+						<span class="text-xs text-gray-500">Days until purge (1–365).</span>
+					</div>
+					<p *ngIf="!useCustomRetention" class="text-xs text-gray-500">Default:
+						{{ archiveSettings?.default_trash_retention_days ?? 30 }} days.</p>
+				</div>
+				<div>
+					<label class="flex items-center gap-2 text-sm text-gray-700 mb-2 cursor-pointer">
+						<input type="checkbox" [(ngModel)]="useCustomHomeVisibility" name="useCustomHomeVisibility" />
+						<span>Use custom Home visibility</span>
+					</label>
+					<div *ngIf="useCustomHomeVisibility" class="flex items-center gap-2 flex-wrap">
+						<input type="number" min="0" max="365" [(ngModel)]="homeVisibilityDaysInput" name="homeVisibilityDays"
+							class="w-28 border-2 border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-800" />
+						<span class="text-xs text-gray-500">Days on student Home after event end (0 = future only).</span>
+					</div>
+					<p *ngIf="!useCustomHomeVisibility" class="text-xs text-gray-500">Default:
+						{{ archiveSettings?.default_home_visibility_days ?? 14 }} days after end.</p>
+				</div>
+				<div>
+					<label class="flex items-start gap-2 text-sm text-gray-700 cursor-pointer">
+						<input type="checkbox" [(ngModel)]="autoTrashOnConclude" name="autoTrash" class="mt-1" />
+						<span>Auto-archive concluded events (server schedule).</span>
+					</label>
+				</div>
+			</div>
+			<div class="mt-4">
+				<button type="button" (click)="saveArchiveSettings()" [disabled]="savingArchiveSettings"
+					class="px-4 py-2.5 rounded-lg font-semibold text-white text-sm disabled:opacity-50 min-h-[44px] inline-flex items-center gap-2"
+					[ngClass]="isOsws ? 'gc-btn-admin' : 'gc-btn-primary'">
+					<i class="fas" [ngClass]="savingArchiveSettings ? 'fa-spinner fa-spin' : 'fa-save'"></i>
+					Save settings
+				</button>
 			</div>
 		</div>
 	</div>
@@ -116,10 +171,11 @@
 			</div>
 			<div class="text-lg font-semibold text-gray-700 mb-2">No items in archive</div>
 			<div class="text-sm text-gray-500 max-w-md">
-				{{ activeTab === 'events' ? 'Archived events' :
-				activeTab === 'admins' ? 'Archived admin accounts' :
-				activeTab === 'organizations' ? 'Archived organizations' :
-				'Archived members' }} will appear here. Items are automatically deleted after 30 days.
+				{{ activeTab === 'events' ? 'No archived events yet.' :
+				activeTab === 'admins' ? 'No archived admins yet.' :
+				activeTab === 'organizations' ? 'No archived organizations yet.' :
+				'No archived members yet.' }}
+				<span *ngIf="activeTab === 'events'"> {{ purgeHint }}</span>
 			</div>
 		</div>
 	</div>

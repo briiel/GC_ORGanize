@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { ExcelExportService } from '../services/excel-export.service';
 import { parseMysqlDatetimeToDate } from '../utils/date-utils';
 import { normalizeList, normalizeSingle } from '../utils/api-utils';
+import { eventLocationSummary as summarizeEventLocation } from '../utils/location-display';
 import { LoadingService } from '../services/loading.service';
 
 @Component({
@@ -238,6 +239,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     title: '',
     description: '',
     location: '',
+    locations: [] as Array<any>,
     start_date: '',
     start_time: '',
     end_date: '',
@@ -390,6 +392,51 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** When true, location draft fields (`newEvent.location`, coords, room) add rows to `inlineEditEvent.locations`. */
+  private isInlineLocationsMode(): boolean {
+    return !!(this.isInlineEditing && this.inlineEditEvent && !this.showCreateModal);
+  }
+
+  addLocationToList(): void {
+    const name = (this.newEvent.location || '').toString().trim();
+    if (!name) {
+      Swal.fire({ icon: 'error', title: 'Location Name required', text: 'Please enter a location name before adding.' });
+      return;
+    }
+    const roomToSave = (this.showOtherRoomInput && this.otherRoomInput && this.otherRoomInput.trim()) ? this.otherRoomInput.trim() : (this.selectedRoom || '');
+    const lat = this.newEventLat != null ? Number(this.newEventLat) : null;
+    const lon = this.newEventLon != null ? Number(this.newEventLon) : null;
+
+    const targetList = this.isInlineLocationsMode()
+      ? (this.inlineEditEvent!.locations = this.inlineEditEvent!.locations || [])
+      : (this.newEvent.locations = this.newEvent.locations || []);
+
+    targetList.push({
+      name,
+      location_name: name,
+      room: roomToSave || null,
+      latitude: lat,
+      longitude: lon
+    });
+
+    this.newEvent.location = '';
+    this.newEventLat = null;
+    this.newEventLon = null;
+    this.selectedRoom = '';
+    this.otherRoomInput = '';
+    this.showOtherRoomInput = false;
+    this.isLocationGordon = false;
+    this.locationSuggestions = [];
+  }
+
+  removeLocationFromList(index: number): void {
+    const list = this.isInlineLocationsMode()
+      ? this.inlineEditEvent?.locations
+      : this.newEvent.locations;
+    if (!list || !Array.isArray(list)) return;
+    list.splice(index, 1);
+  }
+
   // Close any open modal when ESC is pressed (matches behavior used in other modals)
   @HostListener('document:keydown.escape')
   onEsc(): void {
@@ -496,6 +543,31 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const date = new Date();
     date.setHours(+hours, +minutes, 0, 0);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  }
+
+  selectedEventOrganizerName(): string {
+    const e = this.selectedEvent;
+    if (!e) return '';
+    const s = (v: unknown) => (v != null && String(v).trim() ? String(v).trim() : '');
+    return s(e.org_name) || s(e.osws_name) || s(e.admin_name);
+  }
+
+  selectedEventOrganizerEmail(): string {
+    const e = this.selectedEvent;
+    if (!e) return '';
+    const org = e.org_email != null ? String(e.org_email).trim() : '';
+    const osws = e.osws_email != null ? String(e.osws_email).trim() : '';
+    return org || osws;
+  }
+
+  selectedEventOrganizerLabel(): string {
+    const e = this.selectedEvent;
+    if (!e) return 'Organizer';
+    return e.created_by_org_id != null && e.created_by_org_id !== '' ? 'Organization' : 'Organizer';
+  }
+
+  selectedEventHasContactInfo(): boolean {
+    return !!(this.selectedEventOrganizerName() || this.selectedEventOrganizerEmail());
   }
 
   searchEvents() {
@@ -797,6 +869,11 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   get hasSelection(): boolean { return this.selectedRegistrations.size > 0; }
   get selectedCount(): number { return this.selectedRegistrations.size; }
 
+  /** Human-readable location for lists/cards (no raw coordinates). */
+  eventLocationSummary(event: any): string {
+    return summarizeEventLocation(event);
+  }
+
   // Page-level helpers for template
   hasPendingOnPage(): boolean {
     return this.pagedParticipants.some(p => String(p?.status || '').toLowerCase() === 'pending');
@@ -942,13 +1019,39 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     // If called from the details panel, enable inline editing
     if (this.selectedEvent && event && this.selectedEvent.event_id === event.event_id) {
       this.isInlineEditing = true;
-      // Deep copy to avoid mutating selectedEvent until save
-      this.inlineEditEvent = { ...this.selectedEvent };
-      // Ensure date fields are in yyyy-MM-dd format for input type="date"
+      this.loadSavedRooms();
+      this.resetInlineLocationDraft();
+
+      let clonedLocs: any[] = [];
+      const src = this.selectedEvent.locations;
+      let locs = src;
+      if (typeof locs === 'string') {
+        try { locs = JSON.parse(locs); } catch { locs = null; }
+      }
+      if (Array.isArray(locs) && locs.length > 0) {
+        clonedLocs = locs.map((loc: any) => ({
+          name: String(loc?.name || loc?.location || loc?.location_name || '').trim(),
+          location_name: String(loc?.name || loc?.location || loc?.location_name || '').trim(),
+          room: loc?.room != null && String(loc.room).trim() !== '' ? String(loc.room).trim() : null,
+          latitude: loc?.latitude != null && loc?.latitude !== '' ? Number(loc.latitude) : null,
+          longitude: loc?.longitude != null && loc?.longitude !== '' ? Number(loc.longitude) : null
+        })).filter((l: any) => l.name);
+      } else if (this.selectedEvent.location || this.selectedEvent.room) {
+        clonedLocs = [{
+          name: String(this.selectedEvent.location || '').trim(),
+          location_name: String(this.selectedEvent.location || '').trim(),
+          room: this.selectedEvent.room ? String(this.selectedEvent.room).trim() : null,
+          latitude: this.selectedEvent.event_latitude != null ? Number(this.selectedEvent.event_latitude) : null,
+          longitude: this.selectedEvent.event_longitude != null ? Number(this.selectedEvent.event_longitude) : null
+        }].filter((l: any) => l.name);
+      }
+
+      this.inlineEditEvent = { ...this.selectedEvent, locations: clonedLocs };
       this.inlineEditEvent.start_date = this.toDateInputValue(this.inlineEditEvent.start_date);
       this.inlineEditEvent.end_date = this.toDateInputValue(this.inlineEditEvent.end_date);
-      // Coerce is_paid to boolean for radio binding
       this.inlineEditEvent.is_paid = !!this.inlineEditEvent.is_paid;
+      const first = clonedLocs[0];
+      this.inlineEditEvent.location = first ? (first.name || '') : (this.selectedEvent.location || '');
       return;
     }
     // Otherwise, open modal (old logic)
@@ -959,6 +1062,23 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   cancelInlineEdit() {
     this.isInlineEditing = false;
     this.inlineEditEvent = null;
+    this.resetInlineLocationDraft();
+  }
+
+  private resetInlineLocationDraft(): void {
+    this.newEvent.location = '';
+    this.newEventLat = null;
+    this.newEventLon = null;
+    this.selectedRoom = '';
+    this.otherRoomInput = '';
+    this.showOtherRoomInput = false;
+    this.locationSuggestions = [];
+    this.isLocationGordon = false;
+  }
+
+  /** Clears the "add another location" draft row while inline editing (template-safe). */
+  clearInlineAddLocationDraft(): void {
+    this.resetInlineLocationDraft();
   }
 
   saveInlineEdit() {
@@ -973,12 +1093,28 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       const day = dateObj.getDate().toString().padStart(2, '0');
       return `${dateObj.getFullYear()}-${month}-${day}`;
     };
+    // Validate start date/time is in the future (same rule as create modal)
+    const startDateStr = formatDate(this.inlineEditEvent.start_date);
+    const startDateTime = new Date(`${startDateStr}T${this.inlineEditEvent.start_time}`);
+    const now = new Date();
+    if (isNaN(startDateTime.getTime()) || startDateTime < now) {
+      Swal.fire({ icon: 'error', title: 'Invalid Start Date/Time', text: 'Start date and time must be in the future.', confirmButtonColor: '#d33' });
+      return;
+    }
+
+    // Validate end after start if provided
+    if (this.inlineEditEvent.end_date && this.inlineEditEvent.end_time) {
+      const endDateStrCheck = formatDate(this.inlineEditEvent.end_date);
+      const endDateTime = new Date(`${endDateStrCheck}T${this.inlineEditEvent.end_time}`);
+      if (endDateTime < startDateTime) {
+        Swal.fire({ icon: 'error', title: 'Invalid End Date/Time', text: 'End date and time must be after the start date and time.', confirmButtonColor: '#d33' });
+        return;
+      }
+    }
+
     let payload: any;
     let isFormData = false;
-    const startDateStr = formatDate(this.inlineEditEvent.start_date);
     const endDateStr = formatDate(this.inlineEditEvent.end_date);
-    // Determine room to send for inline edits (use inlineEditEvent.room if present,
-    // otherwise use selectedRoom / otherRoomInput similar to create flow)
     let roomToSend = '';
     if (this.inlineEditEvent && this.inlineEditEvent.room) {
       roomToSend = String(this.inlineEditEvent.room || '').trim();
@@ -989,17 +1125,49 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       roomToSend = String(this.selectedRoom || '').trim();
     }
 
-    // Determine coordinates from inline event or modal-scoped newEventLat/newEventLon
     const inlineLat = this.inlineEditEvent && (this.inlineEditEvent.event_latitude != null) ? Number(this.inlineEditEvent.event_latitude) : null;
     const inlineLon = this.inlineEditEvent && (this.inlineEditEvent.event_longitude != null) ? Number(this.inlineEditEvent.event_longitude) : null;
     const latToSend = inlineLat != null ? inlineLat : (this.newEventLat != null ? this.newEventLat : null);
     const lonToSend = inlineLon != null ? inlineLon : (this.newEventLon != null ? this.newEventLon : null);
 
+    let locPayload: any[] = (this.inlineEditEvent.locations || []).map((l: any) => ({
+      name: String(l?.name || l?.location || l?.location_name || '').trim(),
+      location_name: String(l?.name || l?.location || l?.location_name || '').trim(),
+      room: l?.room != null && String(l.room).trim() !== '' ? String(l.room).trim() : null,
+      latitude: l?.latitude != null && l?.latitude !== '' ? Number(l.latitude) : null,
+      longitude: l?.longitude != null && l?.longitude !== '' ? Number(l.longitude) : null
+    })).filter((l: any) => l.name);
+
+    if (locPayload.length === 0) {
+      const draft = String(this.newEvent.location || '').trim();
+      if (draft) {
+        locPayload.push({
+          name: draft,
+          location_name: draft,
+          room: this.isLocationGordon && roomToSend ? roomToSend : null,
+          latitude: latToSend != null ? Number(latToSend) : null,
+          longitude: lonToSend != null ? Number(lonToSend) : null
+        });
+      }
+    }
+
+    if (locPayload.length === 0) {
+      Swal.fire({ icon: 'error', title: 'Location Required', text: 'Add at least one location before saving.', confirmButtonColor: '#d33' });
+      return;
+    }
+
+    this.inlineEditEvent.locations = locPayload;
+    const primaryLocationLabel = locPayload[0].name || '';
+    this.inlineEditEvent.location = primaryLocationLabel;
+    const firstLat = locPayload[0].latitude;
+    const firstLon = locPayload[0].longitude;
+
     if (this.inlineEditPosterFile) {
       payload = new FormData();
       payload.append('title', this.inlineEditEvent.title);
       payload.append('description', this.inlineEditEvent.description);
-      payload.append('location', this.inlineEditEvent.location);
+      payload.append('location', primaryLocationLabel);
+      try { payload.append('locations', JSON.stringify(locPayload)); } catch (e) { /* ignore */ }
       payload.append('start_date', startDateStr);
       payload.append('start_time', this.inlineEditEvent.start_time);
       payload.append('end_date', endDateStr);
@@ -1007,19 +1175,21 @@ export class ManageEventComponent implements OnInit, OnDestroy {
       payload.append('is_paid', this.inlineEditEvent.is_paid ? '1' : '0');
       payload.append('registration_fee', this.inlineEditEvent.is_paid ? String(Number(this.inlineEditEvent.registration_fee || 0).toFixed(2)) : '0');
       payload.append('event_poster', this.inlineEditPosterFile);
-      // Append room and coords when available
-      // Only include room if location is on-campus
-      if (this.isLocationGordon && roomToSend) payload.append('room', roomToSend);
-      if (latToSend != null && lonToSend != null) {
-        payload.append('event_latitude', String(latToSend));
-        payload.append('event_longitude', String(lonToSend));
+      if (locPayload.length === 1 && this.isLocationGordon) {
+        const r = (locPayload[0].room && String(locPayload[0].room).trim()) || roomToSend;
+        if (r) payload.append('room', r);
+      }
+      if (firstLat != null && firstLon != null) {
+        payload.append('event_latitude', String(firstLat));
+        payload.append('event_longitude', String(firstLon));
       }
       isFormData = true;
     } else {
       payload = {
         title: this.inlineEditEvent.title,
         description: this.inlineEditEvent.description,
-        location: this.inlineEditEvent.location,
+        location: primaryLocationLabel,
+        locations: locPayload,
         start_date: startDateStr,
         start_time: this.inlineEditEvent.start_time,
         end_date: endDateStr,
@@ -1028,10 +1198,13 @@ export class ManageEventComponent implements OnInit, OnDestroy {
         registration_fee: this.inlineEditEvent.is_paid ? Number(this.inlineEditEvent.registration_fee || 0).toFixed(2) : 0,
         event_poster: this.inlineEditEvent.event_poster || ''
       } as any;
-      if (this.isLocationGordon && roomToSend) (payload as any).room = roomToSend;
-      if (latToSend != null && lonToSend != null) {
-        (payload as any).event_latitude = latToSend;
-        (payload as any).event_longitude = lonToSend;
+      if (locPayload.length === 1 && this.isLocationGordon) {
+        const r = (locPayload[0].room && String(locPayload[0].room).trim()) || roomToSend;
+        if (r) (payload as any).room = r;
+      }
+      if (firstLat != null && firstLon != null) {
+        (payload as any).event_latitude = firstLat;
+        (payload as any).event_longitude = firstLon;
       }
     }
     Swal.fire({
@@ -1072,7 +1245,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   // Open Create Event modal
   openCreateModal() {
     // reset form
-    this.newEvent = { title: '', description: '', location: '', start_date: '', start_time: '', end_date: '', end_time: '', is_paid: false, registration_fee: 0 };
+    this.newEvent = { title: '', description: '', location: '', locations: [], start_date: '', start_time: '', end_date: '', end_time: '', is_paid: false, registration_fee: 0 };
     this.isImageUploaded = false;
     this.eventPosterFile = null;
     this.posterPreviewUrl = null;
@@ -1169,49 +1342,37 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     this.ensureRoomForLocation();
   }
 
-  // Inline edit: when the location input changes in the details panel
+  // Inline edit: "add location" draft uses the same fields as the create modal (`newEvent.location`, coords, room).
   onInlineLocationChange(value: string) {
-    try {
-      // clear any previously resolved inline coordinates when user edits the field
-      if (this.inlineEditEvent) {
-        this.inlineEditEvent.event_latitude = null;
-        this.inlineEditEvent.event_longitude = null;
-      }
-      // Update whether location is at Gordon College for room logic
-      this.isLocationGordon = this.isGordonLocation(String(value || ''));
-    } catch (e) {
-      // ignore
-    }
+    this.onLocationChange(String(value || ''));
   }
 
-  // Use device geolocation to fill inline edit location and reverse-lookup address
+  // Use device geolocation to fill the inline "add location" draft (same as modal flow)
   useCurrentLocationForInline(): void {
-    if (!this.inlineEditEvent) return;
     if (navigator && 'geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const lat = pos.coords.latitude;
           const lon = pos.coords.longitude;
-          // reverse lookup to get a human-readable address
-          this.osm.reverseLookup(lat, lon).subscribe(address => {
-            if (address) {
-              this.inlineEditEvent.location = address;
-              this.inlineEditEvent.event_latitude = Number(lat);
-              this.inlineEditEvent.event_longitude = Number(lon);
-              this.isLocationGordon = this.isGordonLocation(address);
-            } else {
-              // fallback: write coordinates as location string
-              this.inlineEditEvent.location = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-              this.inlineEditEvent.event_latitude = Number(lat);
-              this.inlineEditEvent.event_longitude = Number(lon);
-              this.isLocationGordon = this.isGordonLocation(this.inlineEditEvent.location);
+          this.newEventLat = Number(lat);
+          this.newEventLon = Number(lon);
+          this.osm.reverseLookup(lat, lon).subscribe(
+            (address) => {
+              if (address) {
+                this.newEvent.location = address;
+                this.isLocationGordon = this.isGordonLocation(address);
+              } else {
+                this.newEvent.location = 'Current location';
+                this.isLocationGordon = this.isGordonLocation(this.newEvent.location);
+              }
+              this.ensureRoomForLocation();
+            },
+            () => {
+              this.newEvent.location = 'Current location';
+              this.isLocationGordon = this.isGordonLocation(this.newEvent.location);
+              this.ensureRoomForLocation();
             }
-          }, () => {
-            this.inlineEditEvent.location = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-            this.inlineEditEvent.event_latitude = Number(lat);
-            this.inlineEditEvent.event_longitude = Number(lon);
-            this.isLocationGordon = this.isGordonLocation(this.inlineEditEvent.location);
-          });
+          );
         },
         (err) => {
           console.warn('Geolocation failed:', err);
@@ -1225,12 +1386,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
   }
 
   clearInlineLocation(): void {
-    if (!this.inlineEditEvent) return;
-    this.inlineEditEvent.location = '';
-    this.inlineEditEvent.event_latitude = null;
-    this.inlineEditEvent.event_longitude = null;
-    // reset room availability for typed locations
-    this.isLocationGordon = false;
+    this.resetInlineLocationDraft();
   }
 
   // Called when user selects a suggested place
@@ -1351,6 +1507,7 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           title: event.title || '',
           description: event.description || '',
           location: event.location || '',
+          locations: event.locations || [],
           start_date: this.toDateInputValue(event.start_date),
           start_time: event.start_time ? String(event.start_time).substring(0, 5) : '',
           end_date: this.toDateInputValue(event.end_date),
@@ -1358,30 +1515,67 @@ export class ManageEventComponent implements OnInit, OnDestroy {
           is_paid: !!event.is_paid,
           registration_fee: Number(event.registration_fee ?? 0)
         };
-        // Load room if present
+        // Prefer populating from `locations` (multi-location support), fallback to legacy `room` and coords
         try {
           this.loadSavedRooms();
-          if (event.room) {
-            if (this.rooms.includes(event.room)) {
-              this.selectedRoom = event.room;
-              this.showOtherRoomInput = false;
-              this.otherRoomInput = '';
-            } else {
-              this.selectedRoom = 'Others';
-              this.showOtherRoomInput = true;
-              this.otherRoomInput = event.room;
+          let locs = event.locations;
+          if (typeof locs === 'string') {
+            try { locs = JSON.parse(locs); } catch (_) { locs = null; }
+          }
+          if (Array.isArray(locs) && locs.length > 0) {
+            this.newEvent.locations = locs;
+            const firstLoc = locs[0] || {};
+            if (firstLoc.name) this.newEvent.location = firstLoc.name;
+            if (firstLoc.latitude != null && firstLoc.longitude != null) {
+              this.newEventLat = Number(firstLoc.latitude);
+              this.newEventLon = Number(firstLoc.longitude);
+            } else if (event.event_latitude != null && event.event_longitude != null) {
+              this.newEventLat = Number(event.event_latitude);
+              this.newEventLon = Number(event.event_longitude);
+            }
+            if (firstLoc.room) {
+              if (this.rooms.includes(firstLoc.room)) {
+                this.selectedRoom = firstLoc.room;
+                this.showOtherRoomInput = false;
+                this.otherRoomInput = '';
+              } else {
+                this.selectedRoom = 'Others';
+                this.showOtherRoomInput = true;
+                this.otherRoomInput = firstLoc.room;
+              }
+            } else if (event.room) {
+              if (this.rooms.includes(event.room)) {
+                this.selectedRoom = event.room;
+                this.showOtherRoomInput = false;
+                this.otherRoomInput = '';
+              } else {
+                this.selectedRoom = 'Others';
+                this.showOtherRoomInput = true;
+                this.otherRoomInput = event.room;
+              }
+            }
+          } else {
+            if (event.room) {
+              if (this.rooms.includes(event.room)) {
+                this.selectedRoom = event.room;
+                this.showOtherRoomInput = false;
+                this.otherRoomInput = '';
+              } else {
+                this.selectedRoom = 'Others';
+                this.showOtherRoomInput = true;
+                this.otherRoomInput = event.room;
+              }
+            }
+            // Load existing coordinates if backend provided them
+            if (event.event_latitude != null && event.event_longitude != null) {
+              this.newEventLat = Number(event.event_latitude);
+              this.newEventLon = Number(event.event_longitude);
             }
           }
         } catch (e) { }
 
         // Determine if loaded event location is Gordon College
         this.isLocationGordon = this.isGordonLocation(event.location || this.newEvent.location || '');
-
-        // Load existing coordinates if backend provided them
-        if (event.event_latitude != null && event.event_longitude != null) {
-          this.newEventLat = Number(event.event_latitude);
-          this.newEventLon = Number(event.event_longitude);
-        }
         // If backend returns poster URL, show it
         const poster = event.event_poster || event.poster || event.poster_url || event.image_url;
         if (poster && typeof poster === 'string') {
@@ -1461,7 +1655,19 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('title', this.newEvent.title);
     formData.append('description', this.newEvent.description);
-    formData.append('location', this.newEvent.location);
+    // Support multiple locations: if the user added locations, send as JSON
+    if (this.newEvent.locations && Array.isArray(this.newEvent.locations) && this.newEvent.locations.length > 0) {
+      formData.append('locations', JSON.stringify(this.newEvent.locations));
+      // Derive primary fields from the first location for backwards compatibility
+      const first = this.newEvent.locations[0];
+      if (first && first.name) formData.append('location', first.name);
+      if (first && first.latitude != null && first.longitude != null) {
+        formData.append('event_latitude', String(first.latitude));
+        formData.append('event_longitude', String(first.longitude));
+      }
+    } else {
+      formData.append('location', this.newEvent.location);
+    }
     formData.append('start_date', this.newEvent.start_date);
     formData.append('start_time', this.newEvent.start_time);
     formData.append('end_date', this.newEvent.end_date);
@@ -1483,21 +1689,24 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
 
     // Append room info (selected or other) and persist custom rooms
-    let roomToSend = '';
-    if (this.showOtherRoomInput && this.otherRoomInput && this.otherRoomInput.trim()) {
-      roomToSend = this.otherRoomInput.trim();
-      // persist custom room for next time
-      this.saveCustomRoomToStorage(roomToSend);
-    } else if (this.selectedRoom) {
-      roomToSend = this.selectedRoom;
-    }
-    // Only append room for on-campus locations
-    if (this.isLocationGordon && roomToSend) formData.append('room', roomToSend);
+    // When multiple locations were provided, the primary room was already included
+    if (!this.newEvent.locations || this.newEvent.locations.length === 0) {
+      let roomToSend = '';
+      if (this.showOtherRoomInput && this.otherRoomInput && this.otherRoomInput.trim()) {
+        roomToSend = this.otherRoomInput.trim();
+        // persist custom room for next time
+        this.saveCustomRoomToStorage(roomToSend);
+      } else if (this.selectedRoom) {
+        roomToSend = this.selectedRoom;
+      }
+      // Only append room for on-campus locations
+      if (this.isLocationGordon && roomToSend) formData.append('room', roomToSend);
 
-    // Append event coordinates for geofence validation (if resolved)
-    if (this.newEventLat != null && this.newEventLon != null) {
-      formData.append('event_latitude', String(this.newEventLat));
-      formData.append('event_longitude', String(this.newEventLon));
+      // Append event coordinates for geofence validation (if resolved)
+      if (this.newEventLat != null && this.newEventLon != null) {
+        formData.append('event_latitude', String(this.newEventLat));
+        formData.append('event_longitude', String(this.newEventLon));
+      }
     }
 
     if (this.isEditing && this.editingEventId) {
@@ -1623,6 +1832,13 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     }
   }
 
+  private parseLocalEventDate(dateStr: string | null | undefined, timeStr: string | null | undefined): Date | null {
+    if (!dateStr || !timeStr) return null;
+    const dateOnly = String(dateStr).includes('T') ? String(dateStr).split('T')[0] : String(dateStr);
+    const timeOnly = String(timeStr).length === 5 ? `${timeStr}:00` : String(timeStr);
+    return new Date(`${dateOnly}T${timeOnly}`);
+  }
+
   async downloadParticipantsExcel(): Promise<void> {
     if (!this.participants || this.participants.length === 0) return;
 
@@ -1643,7 +1859,20 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const slug = (this.selectedEventTitle || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
     const filename = `${slug}_participants.xlsx`;
 
-    await this.excelExportService.createAndExportExcel('Participants', headers, data, filename);
+    const startDate = this.parseLocalEventDate(this.selectedEvent?.start_date, this.selectedEvent?.start_time);
+    const endDate = this.parseLocalEventDate(this.selectedEvent?.end_date, this.selectedEvent?.end_time);
+
+    const formatFn = (d: Date | null) => d ? d.toLocaleString('en-US', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' }) : 'N/A';
+
+    const titleInfo = {
+      title: `${this.selectedEventTitle || 'Event'} - Participants`,
+      details: [
+        `Date: ${formatFn(startDate)}${endDate ? ' to ' + formatFn(endDate) : ''}`,
+        `Location: ${this.selectedEvent?.location || 'N/A'}`
+      ]
+    };
+
+    await this.excelExportService.createAndExportExcel('Participants', headers, data, filename, titleInfo);
   }
 
   // ============ EVALUATION METHODS ============
@@ -1809,7 +2038,20 @@ export class ManageEventComponent implements OnInit, OnDestroy {
     const slug = (this.selectedEventForEvaluation?.title || 'event').toString().trim().replace(/\s+/g, '_').toLowerCase();
     const filename = `${slug}_evaluations.xlsx`;
 
-    await this.excelExportService.createAndExportExcel('Evaluations', headers, data, filename);
+    const startDate = this.parseLocalEventDate(this.selectedEventForEvaluation?.start_date, this.selectedEventForEvaluation?.start_time);
+    const endDate = this.parseLocalEventDate(this.selectedEventForEvaluation?.end_date, this.selectedEventForEvaluation?.end_time);
+
+    const formatFn = (d: Date | null) => d ? d.toLocaleString('en-US', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' }) : 'N/A';
+
+    const titleInfo = {
+      title: `${this.selectedEventForEvaluation?.title || 'Event'} - Evaluations`,
+      details: [
+        `Date: ${formatFn(startDate)}${endDate ? ' to ' + formatFn(endDate) : ''}`,
+        `Location: ${this.selectedEventForEvaluation?.location || 'N/A'}`
+      ]
+    };
+
+    await this.excelExportService.createAndExportExcel('Evaluations', headers, data, filename, titleInfo);
   }
 
   // Get question labels for display

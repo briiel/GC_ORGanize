@@ -288,7 +288,11 @@ export class OrgMembersComponent implements OnInit {
     const slug = this.orgName.trim().replace(/\s+/g, '_').toLowerCase();
     const filename = `${slug}_members.xlsx`;
 
-    await this.excelExportService.createAndExportExcel('Organization Members', headers, data, filename);
+    const titleInfo = {
+      title: `${this.orgName} - Members List`
+    };
+
+    await this.excelExportService.createAndExportExcel('Organization Members', headers, data, filename, titleInfo);
   }
 
   async removeMember(member: OrganizationMember): Promise<void> {

@@ -32,8 +32,10 @@
           </label>
           <select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()"
             class="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#679436] focus:border-[#679436] transition-all text-sm sm:text-base bg-white min-h-[44px]">
-            <option value="default">Latest Event</option>
-            <option value="date_asc">Earliest Event</option>
+            <option value="event_date_desc">Event Date (Latest First)</option>
+            <option value="event_date_asc">Event Date (Earliest First)</option>
+            <option value="reg_date_desc">Registration Date (Latest First)</option>
+            <option value="reg_date_asc">Registration Date (Earliest First)</option>
             <option value="title_asc">Title (A-Z)</option>
             <option value="title_desc">Title (Z-A)</option>
           </select>
@@ -60,6 +62,7 @@
               <th class="px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 lg:py-3 text-center w-10 sm:w-12 font-semibold">#</th>
               <th class="px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 text-center min-w-[140px] sm:min-w-[180px] font-semibold">
                 Title</th>
+              <th class="px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 text-center min-w-[120px] font-semibold">Registered At</th>
               <th class="px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 text-center min-w-[80px] font-semibold">Type</th>
               <th class="px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 text-center min-w-[100px] font-semibold">Organized By</th>
               <th class="px-3 sm:px-4 py-2 sm:py-2.5 lg:py-3 text-center min-w-[110px] font-semibold">Date</th>
@@ -72,7 +75,7 @@
           <tbody class="bg-white text-gray-800 divide-y divide-gray-200">
             <!-- Empty State -->
             <tr *ngIf="!loading && filteredEvents.length === 0">
-              <td colspan="8" class="px-3 sm:px-4 py-8 sm:py-12 text-center">
+              <td colspan="9" class="px-3 sm:px-4 py-8 sm:py-12 text-center">
                 <div class="flex flex-col items-center gap-2 sm:gap-3">
                   <i class="fas fa-calendar-times text-4xl sm:text-5xl text-gray-400"></i>
                   <h3 class="text-base sm:text-lg font-medium text-gray-900">No registered events yet</h3>
@@ -82,15 +85,21 @@
             </tr>
 
             <!-- Event Rows -->
-            <tr *ngFor="let event of filteredEvents; let i = index"
+            <tr *ngFor="let event of pagedEvents; let i = index"
               class="hover:bg-green-50/50 transition-all duration-200">
               <td
                 class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-3.5 text-center text-[#679436] font-semibold text-sm sm:text-base">
-                {{ i + 1 }}</td>
+                {{ (page - 1) * pageSize + i + 1 }}</td>
               <td
                 class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-3.5 font-semibold text-center max-w-[160px] sm:max-w-[200px]">
                 <div class="text-[#679436] font-semibold truncate text-xs sm:text-sm" [title]="event.title">{{
                   event.title }}</div>
+              </td>
+              <td class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-3.5 text-center text-xs sm:text-sm">
+                <div class="flex flex-col gap-0.5">
+                  <span class="font-medium">{{ event.registered_at | date: 'MMM d, y' }}</span>
+                  <span class="text-gray-500 text-[10px] sm:text-xs">{{ event.registered_at | date: 'shortTime' }}</span>
+                </div>
               </td>
               <td class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-3.5 text-center">
                 <div class="flex flex-col gap-1 sm:gap-1.5">
@@ -108,18 +117,21 @@
                 </div>
               </td>
               <td class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-3.5 text-center">
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-full text-[10px] sm:text-xs font-bold text-white border-2"
-                  [ngClass]="{
-                      'bg-orange-500 border-orange-600': event.department === 'CCS',
-                      'bg-yellow-400 border-yellow-500': event.department === 'CBA',
-                      'bg-red-500 border-red-600': event.department === 'CAHS',
-                      'bg-blue-500 border-blue-600': event.department === 'CEAS',
-                      'bg-pink-400 border-pink-500': event.department === 'CHTM',
-                      'bg-[#679436] border-[#56732e]': !event.department || event.department === 'OSWS'
-                    }">
-                  {{ event.department ? event.department : 'OSWS' }}
-                </span>
+                <div class="flex flex-col gap-1 items-center max-w-[140px] sm:max-w-[200px] mx-auto">
+                  <span class="font-semibold text-xs sm:text-sm text-gray-900 line-clamp-2"
+                    [title]="organizerDisplayName(event)">{{ organizerDisplayName(event) || '—' }}</span>
+                  <a *ngIf="organizerEmail(event)" [href]="'mailto:' + organizerEmail(event)"
+                    class="text-[10px] sm:text-xs text-[#679436] hover:underline break-all">{{ organizerEmail(event) }}</a>
+                  <span *ngIf="event.department" class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold text-white"
+                    [ngClass]="{
+                      'bg-orange-500': event.department === 'CCS',
+                      'bg-yellow-400 text-gray-900': event.department === 'CBA',
+                      'bg-red-500': event.department === 'CAHS',
+                      'bg-blue-500': event.department === 'CEAS',
+                      'bg-pink-400': event.department === 'CHTM',
+                      'bg-[#679436]': !event.department || event.department === 'OSWS'
+                    }">{{ event.department || 'OSWS' }}</span>
+                </div>
               </td>
               <td class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-3.5 text-center text-xs sm:text-sm">
                 <div class="flex flex-col gap-0.5">
@@ -138,8 +150,10 @@
               <td class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-3.5 text-center max-w-[130px] sm:max-w-[160px]">
                 <div class="flex items-center gap-1 sm:gap-1.5 justify-center">
                   <i class="fas fa-map-marker-alt text-gray-400 text-[10px] sm:text-xs flex-shrink-0"></i>
-                  <span class="truncate text-xs sm:text-sm" [title]="event.room || event.location">{{ event.room ||
-                    event.location }}</span>
+                  <span class="truncate text-xs sm:text-sm"
+                        [title]="eventLocationSummary(event)">
+                    {{ eventLocationSummary(event) }}
+                  </span>
                 </div>
               </td>
               <td class="px-2 sm:px-3 lg:px-4 py-2.5 sm:py-3 lg:py-4 text-center">
@@ -179,11 +193,11 @@
         </div>
 
         <!-- Cards -->
-        <div *ngFor="let event of filteredEvents; let i = index"
+        <div *ngFor="let event of pagedEvents; let i = index"
           class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div class="bg-[#679436] px-3 py-2 flex justify-between items-center gap-2">
             <div class="flex items-center gap-2 overflow-hidden min-w-0 flex-1">
-              <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded flex-shrink-0">{{ i + 1
+              <span class="bg-white/20 text-white text-[10px] font-bold px-2 py-1 rounded flex-shrink-0">{{ (page - 1) * pageSize + i + 1
                 }}</span>
               <h3 class="text-white font-bold truncate text-sm" [title]="event.title">{{ event.title }}</h3>
             </div>
@@ -215,6 +229,12 @@
             </div>
 
             <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="col-span-2">
+                <p class="text-[10px] text-gray-500 font-semibold uppercase">Organized by</p>
+                <p class="font-medium text-gray-800 mt-0.5">{{ organizerDisplayName(event) || '—' }}</p>
+                <a *ngIf="organizerEmail(event)" [href]="'mailto:' + organizerEmail(event)"
+                  class="text-[10px] text-[#679436] hover:underline break-all inline-block mt-0.5">{{ organizerEmail(event) }}</a>
+              </div>
               <div>
                 <p class="text-[10px] text-gray-500 font-semibold uppercase">Date</p>
                 <div class="font-medium text-gray-800">
@@ -224,6 +244,13 @@
                 </div>
               </div>
               <div>
+                <p class="text-[10px] text-gray-500 font-semibold uppercase">Registered At</p>
+                <div class="font-medium text-gray-800">
+                  {{ event.registered_at | date: 'MMM d, y' }}
+                  <div class="text-[9px] text-gray-500">{{ event.registered_at | date: 'shortTime' }}</div>
+                </div>
+              </div>
+              <div class="col-span-2">
                 <p class="text-[10px] text-gray-500 font-semibold uppercase">Time</p>
                 <div class="font-medium text-gray-800">
                   {{ formatTime(event.start_time) }}
@@ -236,8 +263,10 @@
               <p class="text-[10px] text-gray-500 font-semibold uppercase">Location</p>
               <div class="flex items-center gap-1 mt-0.5">
                 <i class="fas fa-map-marker-alt text-gray-400 text-[10px]"></i>
-                <span class="text-xs font-medium text-gray-800 truncate" [title]="event.room || event.location">{{
-                  event.room || event.location }}</span>
+                <span class="text-xs font-medium text-gray-800 truncate"
+                      [title]="eventLocationSummary(event)">
+                  {{ eventLocationSummary(event) }}
+                </span>
               </div>
             </div>
 
@@ -259,6 +288,46 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="totalPages > 1" class="px-3 sm:px-4 lg:px-6 py-3 sm:py-4 border-t-2 border-gray-200 bg-gray-50 rounded-b-lg shadow-lg">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+        <!-- Showing Info -->
+        <div class="text-xs sm:text-sm text-gray-600 text-center sm:text-left font-medium">
+          Showing <span class="font-bold text-[#679436]">{{ showingFrom }}</span> to
+          <span class="font-bold text-[#679436]">{{ showingTo }}</span> of
+          <span class="font-bold text-[#679436]">{{ totalItems }}</span> events
+        </div>
+
+        <!-- Pagination Buttons -->
+        <nav class="inline-flex flex-wrap gap-1.5 sm:gap-1 justify-center" aria-label="Pagination">
+          <!-- Previous Arrow -->
+          <button
+            class="w-11 h-11 sm:w-10 sm:h-10 lg:w-9 lg:h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            [disabled]="page === 1" (click)="prevPage()" aria-label="Previous page">
+            <i class="fas fa-chevron-left text-gray-600 text-sm"></i>
+          </button>
+
+          <!-- Page Numbers -->
+          <ng-container *ngFor="let _ of [].constructor(totalPages); let i = index">
+            <button
+              class="w-11 h-11 sm:w-10 sm:h-10 lg:w-9 lg:h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg transition-all duration-150 border-2 text-sm sm:text-base font-semibold"
+              [ngClass]="page === (i + 1) ? 'bg-[#679436] text-white font-bold border-[#679436] shadow-sm' : 'bg-white border-gray-300 hover:bg-gray-100 active:bg-gray-200 text-gray-800'"
+              [attr.aria-current]="page === (i + 1) ? 'page' : null" [attr.aria-label]="'Page ' + (i + 1)"
+              (click)="goToPage(i + 1)">
+              {{ i + 1 }}
+            </button>
+          </ng-container>
+
+          <!-- Next Arrow -->
+          <button
+            class="w-11 h-11 sm:w-10 sm:h-10 lg:w-9 lg:h-9 min-w-[44px] min-h-[44px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-lg bg-white border-2 border-gray-300 hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            [disabled]="page === totalPages" (click)="nextPage()" aria-label="Next page">
+            <i class="fas fa-chevron-right text-gray-600 text-sm"></i>
+          </button>
+        </nav>
       </div>
     </div>
   </div>

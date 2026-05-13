@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
+import { primaryLocationLabel } from '../utils/location-display';
 
 @Component({
   selector: 'app-viewmodal',
@@ -61,6 +62,44 @@ export class ViewmodalComponent {
     // Prefer server-provided auto_status (time-based) when available so the UI
     // matches backend dashboard counts and logic.
     return String(this.event?.auto_status || this.event?.status || '').toLowerCase();
+  }
+
+  organizerDisplayName(): string {
+    const e = this.event;
+    if (!e) return '';
+    const s = (v: unknown) => (v != null && String(v).trim() ? String(v).trim() : '');
+    return s(e.org_name) || s(e.osws_name) || s(e.admin_name);
+  }
+
+  organizerEmail(): string {
+    const e = this.event;
+    if (!e) return '';
+    const org = e.org_email != null ? String(e.org_email).trim() : '';
+    const osws = e.osws_email != null ? String(e.osws_email).trim() : '';
+    return org || osws;
+  }
+
+  organizerKindLabel(): string {
+    const e = this.event;
+    if (!e) return 'Organizer';
+    return e.created_by_org_id != null && e.created_by_org_id !== '' ? 'Organization' : 'Organizer';
+  }
+
+  hasContactInfo(): boolean {
+    return !!(this.organizerDisplayName() || this.organizerEmail());
+  }
+
+  /** Location line without raw coordinates. */
+  locationLabel(loc: any): string {
+    if (!loc) return '—';
+    return primaryLocationLabel(loc, this.event?.location);
+  }
+
+  /** Legacy single `room` / `location` fields (no locations array). */
+  legacyLocationLine(): string {
+    const e = this.event;
+    if (!e) return '—';
+    return primaryLocationLabel({ room: e.room, location: e.location }, e.location);
   }
 }
 

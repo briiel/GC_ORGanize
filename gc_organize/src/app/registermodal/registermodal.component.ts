@@ -19,6 +19,8 @@ export class RegistermodalComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
   @Input() eventId: number | null = null;
   isPaid: boolean = false;
+  /** Loaded from event_by_id for Contact Us + paid flag */
+  eventDetails: any = null;
 
   // Proof of payment upload state
   proofPreviewUrl: string | null = null;
@@ -67,6 +69,7 @@ export class RegistermodalComponent implements OnInit {
       ).subscribe({
         next: (res) => {
           const ev = normalizeSingle(res) || res;
+          this.eventDetails = ev;
           this.isPaid = !!ev?.is_paid;
           this.loadingService.hide();
         },
@@ -163,6 +166,31 @@ export class RegistermodalComponent implements OnInit {
         // Continue with basic info from token - student_id is already set above
       }
     });
+  }
+
+  organizerDisplayName(): string {
+    const e = this.eventDetails;
+    if (!e) return '';
+    const s = (v: unknown) => (v != null && String(v).trim() ? String(v).trim() : '');
+    return s(e.org_name) || s(e.osws_name) || s(e.admin_name);
+  }
+
+  organizerEmail(): string {
+    const e = this.eventDetails;
+    if (!e) return '';
+    const org = e.org_email != null ? String(e.org_email).trim() : '';
+    const osws = e.osws_email != null ? String(e.osws_email).trim() : '';
+    return org || osws;
+  }
+
+  organizerKindLabel(): string {
+    const e = this.eventDetails;
+    if (!e) return 'Organizer';
+    return e.created_by_org_id != null && e.created_by_org_id !== '' ? 'Organization' : 'Organizer';
+  }
+
+  hasContactInfo(): boolean {
+    return !!(this.organizerDisplayName() || this.organizerEmail());
   }
 
   previewImages(event: Event): void {

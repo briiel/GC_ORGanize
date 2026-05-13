@@ -36,6 +36,25 @@ export class TrashComponent implements OnInit {
 	currentPage: number = 1;
 	pageSize: number = 9;
 
+	// Event archive policy (org / OSWS)
+	archiveSettings: {
+		scope?: string;
+		event_trash_retention_days: number | null;
+		event_auto_trash_on_conclude: boolean;
+		effective_trash_retention_days: number;
+		default_trash_retention_days: number;
+		event_home_visibility_days: number | null;
+		effective_home_visibility_days: number;
+		default_home_visibility_days: number;
+	} | null = null;
+	useCustomRetention = false;
+	retentionDaysInput: number | string = 30;
+	useCustomHomeVisibility = false;
+	homeVisibilityDaysInput: number | string = 14;
+	autoTrashOnConclude = false;
+	savingArchiveSettings = false;
+	settingsLoadError: string | null = null;
+
 	// Loading states for individual actions
 	restoringId: number | null = null;
 	deletingId: number | null = null;
@@ -57,6 +76,104 @@ export class TrashComponent implements OnInit {
 			this.role = 'student';
 		}
 		this.loadTrash();
+		if (this.role === 'osws_admin' || this.role === 'organization') {
+			this.loadArchiveSettings();
+		}
+	}
+
+	loadArchiveSettings(): void {
+		this.settingsLoadError = null;
+		this.eventService.getEventArchiveSettings().subscribe({
+			next: (d: any) => {
+				this.archiveSettings = d;
+				const explicit = d?.event_trash_retention_days;
+				this.useCustomRetention = explicit !== null && explicit !== undefined;
+				this.retentionDaysInput = this.useCustomRetention ? explicit : (d?.effective_trash_retention_days ?? 30);
+				this.autoTrashOnConclude = !!d?.event_auto_trash_on_conclude;
+				const homeExplicit = d?.event_home_visibility_days;
+				this.useCustomHomeVisibility = homeExplicit !== null && homeExplicit !== undefined;
+				this.homeVisibilityDaysInput = this.useCustomHomeVisibility ? homeExplicit : (d?.effective_home_visibility_days ?? 14);
+			},
+			error: (err: any) => {
+				this.archiveSettings = null;
+				this.settingsLoadError = err?.error?.message || err?.message || 'Could not load archive settings';
+			}
+		});
+	}
+
+	saveArchiveSettings(): void {
+		let days: number | null = null;
+		if (this.useCustomRetention) {
+			const n = parseInt(String(this.retentionDaysInput), 10);
+			if (Number.isNaN(n) || n < 1 || n > 365) {
+				Swal.fire({ icon: 'warning', title: 'Invalid retention', text: 'Enter a number of days between 1 and 365.' });
+				return;
+			}
+			days = n;
+		}
+		let homeDays: number | null = null;
+		if (this.useCustomHomeVisibility) {
+			const h = parseInt(String(this.homeVisibilityDaysInput), 10);
+			if (Number.isNaN(h) || h < 0 || h > 365) {
+				Swal.fire({ icon: 'warning', title: 'Invalid home visibility', text: 'Enter days between 0 (today and future only) and 365.' });
+				return;
+			}
+			homeDays = h;
+		}
+		this.savingArchiveSettings = true;
+		this.eventService.patchEventArchiveSettings({
+			event_trash_retention_days: days,
+			event_auto_trash_on_conclude: this.autoTrashOnConclude,
+			event_home_visibility_days: homeDays
+		}).subscribe({
+			next: (d: any) => {
+				this.savingArchiveSettings = false;
+				this.archiveSettings = d;
+				const explicit = d?.event_trash_retention_days;
+				this.useCustomRetention = explicit !== null && explicit !== undefined;
+				this.retentionDaysInput = this.useCustomRetention ? explicit : (d?.effective_trash_retention_days ?? 30);
+				this.autoTrashOnConclude = !!d?.event_auto_trash_on_conclude;
+				const homeExplicit = d?.event_home_visibility_days;
+				this.useCustomHomeVisibility = homeExplicit !== null && homeExplicit !== undefined;
+				this.homeVisibilityDaysInput = this.useCustomHomeVisibility ? homeExplicit : (d?.effective_home_visibility_days ?? 14);
+				Swal.fire({ icon: 'success', title: 'Saved', timer: 1400, showConfirmButton: false });
+			},
+			error: (err: any) => {
+				this.savingArchiveSettings = false;
+				const msg = err?.error?.message || 'Failed to save settings';
+				Swal.fire({ icon: 'error', title: 'Save failed', text: msg });
+			}
+		});
+	}
+
+	get retentionSummary(): string {
+		if (!this.archiveSettings && (this.role === 'organization' || this.role === 'osws_admin')) {
+			return 'Set retention, Home visibility, and auto-archive below.';
+		}
+		if (!this.archiveSettings) {
+			return '30-day archive retention';
+		}
+		const eff = this.archiveSettings.effective_trash_retention_days ?? 30;
+		const def = this.archiveSettings.default_trash_retention_days ?? 30;
+		if (this.archiveSettings.event_trash_retention_days != null) {
+			return `Archive retention: ${eff} days`;
+		}
+		return `Archive retention: ${eff} days (default ${def})`;
+	}
+
+	get homeVisibilitySummary(): string {
+		if (!this.archiveSettings) return '';
+		const eff = this.archiveSettings.effective_home_visibility_days ?? 14;
+		const def = this.archiveSettings.default_home_visibility_days ?? 14;
+		if (this.archiveSettings.event_home_visibility_days != null) {
+			return `Home listing: ${eff} days after end date`;
+		}
+		return `Home listing: ${eff} days after end (default ${def})`;
+	}
+
+	get purgeHint(): string {
+		const eff = this.archiveSettings?.effective_trash_retention_days ?? 30;
+		return `Purged after ${eff} days unless restored.`;
 	}
 
 	loadTrash(): void {

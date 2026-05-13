@@ -377,9 +377,11 @@
                       - {{ formatTime(event.end_time) }}
                     </span>
                   </span>
-                  <span *ngIf="event.room || event.location" class="flex items-center gap-2">
+                  <span *ngIf="event?.locations?.length || event.room || event.location" class="flex items-center gap-2">
                     <i class="fas fa-map-marker-alt text-blue-500"></i>
-                    <span class="font-medium">{{ event.room || event.location }}</span>
+                    <span class="font-medium" [title]="event?.locations?.length ? (event.locations[0]?.name || event.locations[0]?.room || event.location) : (event.room || event.location)">
+                      {{ event?.locations?.length ? ((event.locations[0]?.name || event.locations[0]?.room || event.location) + (event.locations.length > 1 ? ' (+' + (event.locations.length - 1) + ' more)' : '')) : (event.room || event.location) }}
+                    </span>
                   </span>
                 </div>
               </div>

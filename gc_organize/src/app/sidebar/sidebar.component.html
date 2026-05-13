@@ -229,6 +229,14 @@
                 </div>
             </ng-container>
         </nav>
+
+        <!-- Organization Name display at the bottom -->
+        <div *ngIf="role === 'organization' && userOrganization" class="p-3 sm:p-4 lg:p-3 border-t border-white/10 mt-auto bg-black/5">
+            <div class="px-2 py-1 text-sm font-bold text-white/90 truncate" [title]="userOrganization.org_name">
+                <i class="fas fa-building mr-2 text-xs"></i>
+                {{ userOrganization.org_name }}
+            </div>
+        </div>
     </div>
 
     <!-- Main Content Area: only shift on large screens when sidebar is open -->
