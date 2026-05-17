@@ -244,10 +244,22 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     await this.startScanner();
   }
 
+  lastScannedResult: string = '';
+  lastScannedTime: number = 0;
+
   async onCodeResult(resultString: string) {
     // Prevent multiple triggers for the same scan
     if (!this.scanning) return;
+
+    const now = Date.now();
+    // Debounce: ignore same code if scanned within the last 5 seconds
+    if (this.lastScannedResult === resultString && now - this.lastScannedTime < 5000) {
+      return; 
+    }
+
     this.scanning = false; // Pause scanning
+    this.lastScannedResult = resultString;
+    this.lastScannedTime = now;
 
     // Require an event selection to make the same QR usable across different events
     if (!this.selectedEventId) {
@@ -362,7 +374,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async validateLocation(): Promise<any> {
     if (!('geolocation' in navigator)) {
-      Swal.fire('Location Unavailable', 'Geolocation is not available in this browser.', 'error');
+      await Swal.fire('Location Unavailable', 'Geolocation is not available in this browser.', 'error');
       return { ok: false };
     }
 
@@ -377,7 +389,7 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
       pos = await getPosition();
     } catch (err: any) {
       const msg = err?.message || String(err);
-      Swal.fire('Location Required', `Unable to obtain your location: ${msg}`, 'error');
+      await Swal.fire('Location Required', `Unable to obtain your location: ${msg}`, 'error');
       return { ok: false };
     }
 
@@ -387,47 +399,67 @@ export class ScanQrComponent implements OnInit, AfterViewInit, OnDestroy {
     const accuracy = pos.coords.accuracy ?? null;
     if (accuracy !== null && accuracy > 100) {
       console.warn('Low location accuracy', accuracy, 'meters');
-      Swal.fire('Location Not Precise', 'Your device cannot get a precise location. Use a mobile device with GPS or enable high-accuracy location and try again.', 'warning');
+      await Swal.fire('Location Not Precise', 'Your device cannot get a precise location. Use a mobile device with GPS or enable high-accuracy location and try again.', 'warning');
       return { ok: false };
     }
 
     // Determine event coordinates to validate against
     let eventCoords: { lat: number; lon: number } | null = null;
+    let validLocations: { lat: number; lon: number }[] = [];
     try {
       const ev = this.events?.find((x: any) => x && (x.event_id === this.selectedEventId || x.event_id == this.selectedEventId));
       if (ev) {
-        // Prefer explicit stored coordinates if backend provides them
-        if (ev.event_latitude != null && ev.event_longitude != null) {
-          eventCoords = { lat: Number(ev.event_latitude), lon: Number(ev.event_longitude) };
-        } else if (ev.latitude != null && ev.longitude != null) {
-          eventCoords = { lat: Number(ev.latitude), lon: Number(ev.longitude) };
-        } else if (ev.lat != null && ev.lon != null) {
-          eventCoords = { lat: Number(ev.lat), lon: Number(ev.lon) };
-        } else if (ev.location) {
-          // Resolve textual location on-demand via OSM
-          try {
-            const resolved = await firstValueFrom(this.osm.getPlaceCoordinates(ev.location));
-            if (resolved) eventCoords = { lat: resolved.lat, lon: resolved.lon };
-          } catch (_) {
-            // ignore resolution failure and fall back later
+        if (ev.locations && Array.isArray(ev.locations) && ev.locations.length > 0) {
+           for (const loc of ev.locations) {
+             if (loc.latitude != null && loc.longitude != null) {
+               validLocations.push({ lat: Number(loc.latitude), lon: Number(loc.longitude) });
+             }
+           }
+        }
+        
+        if (validLocations.length === 0) {
+          // Prefer explicit stored coordinates if backend provides them
+          if (ev.event_latitude != null && ev.event_longitude != null) {
+            eventCoords = { lat: Number(ev.event_latitude), lon: Number(ev.event_longitude) };
+          } else if (ev.latitude != null && ev.longitude != null) {
+            eventCoords = { lat: Number(ev.latitude), lon: Number(ev.longitude) };
+          } else if (ev.lat != null && ev.lon != null) {
+            eventCoords = { lat: Number(ev.lat), lon: Number(ev.lon) };
+          } else if (ev.location) {
+            // Resolve textual location on-demand via OSM
+            try {
+              const resolved = await firstValueFrom(this.osm.getPlaceCoordinates(ev.location));
+              if (resolved) eventCoords = { lat: resolved.lat, lon: resolved.lon };
+            } catch (_) {
+              // ignore resolution failure and fall back later
+            }
           }
+          if (eventCoords) validLocations.push(eventCoords);
         }
       }
     } catch (e) {
-      eventCoords = null;
+      validLocations = [];
     }
 
     // If event coordinates could not be determined, fail explicitly (no silent campus fallback)
-    if (!eventCoords) {
-      Swal.fire('Location Error', 'Event does not have saved coordinates. Organizer must set event location.', 'error');
+    if (validLocations.length === 0) {
+      await Swal.fire('Location Error', 'Event does not have saved coordinates. Organizer must set event location.', 'error');
       return { ok: false };
     }
 
-    const dist = this.osm.distanceMeters(userCoords, eventCoords as any);
     const radiusMeters = (environment as any).defaultGeofenceMeters ?? 200;
+    
+    let isWithinAllowedArea = false;
+    for(const loc of validLocations) {
+      const dist = this.osm.distanceMeters(userCoords, loc as any);
+      if (dist <= radiusMeters) {
+        isWithinAllowedArea = true;
+        break;
+      }
+    }
 
-    if (dist > radiusMeters) {
-      Swal.fire('Not at Event Location', `You appear to be outside the allowed area. Move closer to the event location (within ${radiusMeters} m) or use a mobile device with GPS, then try again.`, 'error');
+    if (!isWithinAllowedArea) {
+      await Swal.fire('Not at Event Location', `You appear to be outside the allowed area. Move closer to the event location (within ${radiusMeters} m) or use a mobile device with GPS, then try again.`, 'error');
       return { ok: false, coords: userCoords, accuracy };
     }
 
