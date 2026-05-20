@@ -28,6 +28,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
   isUserManagementOpen = false; // For OSWS admin user management dropdown
   isRequestsOpen = false; // For combined Certificate Requests + Attendance Records dropdown
   userOrganization: any = null; // Organization the user belongs to
+  firstName: string = ''; // Keep track of the user's first name
 
   private timeInterval: any;
   private readonly desktopBreakpoint = 1024; // match Tailwind's lg breakpoint
@@ -68,6 +69,12 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnDestroy {
     
     // Get organization details if user is an officer
     this.userOrganization = this.authService.getUserOrganization();
+
+    // Get user's first name for the greeting
+    const tokenPayload = this.authService.getDecodedToken();
+    if (tokenPayload) {
+      this.firstName = tokenPayload.firstName || 'Student';
+    }
 
     // Build list of available panels based on user's roles
     this.buildAvailablePanels();
